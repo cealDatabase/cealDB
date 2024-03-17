@@ -24,5 +24,12 @@ model User {
   password                String          @default("abcd")
   role                    UserRole        @default(USER)
   createdAt               DateTime        @default(now())
-  library                 String
+  library                 Library         @relation(fields:[libraryId], references:[id])
+  libraryId               String
+}
+
+model Library {
+  id                      String          @id @default(cuid())
+  name                    String
+  contactPerson           User[]
 }
