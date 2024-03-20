@@ -16,6 +16,12 @@ enum UserRole {
   USER
 }
 
+model Library {
+  id                      String          @id @default(cuid())
+  name                    String
+  contactPerson           User[]
+}
+
 model User {
   id                      String          @id @default(cuid())
   name                    String  
@@ -25,11 +31,7 @@ model User {
   role                    UserRole        @default(USER)
   createdAt               DateTime        @default(now())
   library                 Library         @relation(fields:[libraryId], references:[id])
-  libraryId               String
-}
+  libraryId               String          @unique
 
-model Library {
-  id                      String          @id @default(cuid())
-  name                    String
-  contactPerson           User[]
+  @@unique([id, libraryId], name:"user_id_libraryId")
 }
