@@ -31,7 +31,5 @@ model User {
   role                    UserRole        @default(USER)
   createdAt               DateTime        @default(now())
   library                 Library         @relation(fields:[libraryId], references:[id])
-  libraryId               String          @unique
-
-  @@unique([id, libraryId], name:"user_id_libraryId")
+  libraryId               String          
 }
