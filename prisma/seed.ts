@@ -34,6 +34,17 @@ async function main() {
         { shortLanName: "NON", longLanName: "Non-CJK" },
       ],
     }),
+    await prisma.library.create({
+      data:{
+        id:236948,
+        name: "Washington-Law",
+        typeId:4,
+        regionId:9,
+        isLawLibrary: true,
+        libHomePage:"http://www.lib.washington.edu/east-asia/",
+        onlineCatalogPage:"http://catalog.lib.washington.edu/search~",
+      },
+    })
   ]);
   console.log(response);
 }

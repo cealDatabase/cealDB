@@ -1,19 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-}
-
-enum UserRole {
-  ADMIN
-  USER
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model LibraryType {
@@ -31,15 +23,15 @@ model LibraryRegion {
 model Library {
   id                Int           @id
   name              String
-  contactPerson     User[]
-  libraryType       LibraryType   @relation(fields: [typeId], references: [id])
   typeId            Int
-  libraryRegion     LibraryRegion @relation(fields: [regionId], references: [id])
   regionId          Int
   isLawLibrary      Boolean       @default(false)
   isMedLibrary      Boolean       @default(false)
   libHomePage       String
   onlineCatalogPage String
+  libraryRegion     LibraryRegion @relation(fields: [regionId], references: [id])
+  libraryType       LibraryType   @relation(fields: [typeId], references: [id])
+  contactPerson     User[]
 }
 
 model User {
@@ -62,4 +54,9 @@ model Language {
   id           Int    @id @default(autoincrement())
   shortLanName String
   longLanName  String
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
