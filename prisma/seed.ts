@@ -2,16 +2,37 @@ import prisma from "../lib/prisma";
 
 async function main() {
   const response = await Promise.all([
-    await prisma.user.create({
-      data: {
-        name: "Lee Robinson",
-        email: "lee@vercel.com",
-        image:
-          "https://images.ctfassets.net/e5382hct74si/4BtM41PDNrx4z1ml643tdc/7aa88bdde8b5b7809174ea5b764c80fa/adWRdqQ6_400x400.jpg",
-        library: {
-            create: { name: "UW-Madison" },
-        },
-      },
+    await prisma.libraryType.createMany({
+      data: [
+        { name: "Canadian University" },
+        { name: "U.S. Non-University" },
+        { name: "Private U.S. University" },
+        { name: "Public U.S. University" },
+        { name: "Canadian Non-University" },
+      ],
+    }),
+    await prisma.libraryRegion.createMany({
+      data: [
+        { regionName: "New England" },
+        { regionName: "Middle Atlantic" },
+        { regionName: "East North Central" },
+        { regionName: "West North Central" },
+        { regionName: "South Atlantic" },
+        { regionName: "East South Central" },
+        { regionName: "West South Central" },
+        { regionName: "Mountain" },
+        { regionName: "Pacific" },
+        { regionName: "Canada" },
+        { regionName: "Mexico" },
+      ],
+    }),
+    await prisma.language.createMany({
+      data: [
+        { shortLanName: "CHN", longLanName: "Chinese" },
+        { shortLanName: "JPN", longLanName: "Japanese" },
+        { shortLanName: "KOR", longLanName: "Korean" },
+        { shortLanName: "NON", longLanName: "Non-CJK" },
+      ],
     }),
   ]);
   console.log(response);
