@@ -1,4 +1,6 @@
 import { Inter } from 'next/font/google'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import './globals.css'
 import clsx from 'clsx'
 
@@ -22,7 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+      <Header />
+      {children}
+      <Footer />
     </html>
   )
 }

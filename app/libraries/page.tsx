@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import Table from "@/components/table";
+import Table from "@/components/table-library";
 import TablePlaceholder from "@/components/table-placeholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 
@@ -23,30 +23,6 @@ export default function Home() {
       <Suspense fallback={<TablePlaceholder />}>
         <Table />
       </Suspense>
-      <p className="font-light text-gray-600 w-full max-w-lg text-center mt-6">
-        <Link
-          href="https://vercel.com/postgres"
-          className="font-medium underline underline-offset-4 hover:text-black transition-colors"
-        >
-          Vercel Postgres
-        </Link>{" "}
-        demo with{" "}
-        <Link
-          href="https://prisma.io"
-          className="font-medium underline underline-offset-4 hover:text-black transition-colors"
-        >
-          Prisma
-        </Link>{" "}
-        as the ORM. <br /> Built with{" "}
-        <Link
-          href="https://nextjs.org/docs"
-          className="font-medium underline underline-offset-4 hover:text-black transition-colors"
-        >
-          Next.js App Router
-        </Link>
-        .
-      </p>
-
     </main>
   );
 }
