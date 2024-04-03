@@ -17,7 +17,7 @@ export default function Home() {
         <p>CEAL Main Site</p>
         <ExpandingArrow />
       </Link>
-      <h1 className="pt-4 pb-8 bg-gradient-to-br from-black via-[#171717] to-[#575757] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
+      <h1 className="pt-4 pb-8 bg-gradient-to-r from-[#f9572a] to-[#ffc905] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
         CEAL Statistics Database
       </h1>
       <Suspense fallback={<TablePlaceholder />}>

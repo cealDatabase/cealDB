@@ -1,11 +1,12 @@
-import './globals.css'
 import { Inter } from 'next/font/google'
+import './globals.css'
+import clsx from 'clsx'
 
 export const metadata = {
-  metadataBase: new URL('https://postgres-prisma.vercel.app'),
-  title: 'Vercel Postgres Demo with Prisma',
+  metadataBase: new URL('https://ceal-db.vercel.app/'),
+  title: 'CEAL Statistics Database',
   description:
-    'A simple Next.js app with Vercel Postgres as the database and Prisma as the ORM',
+    'CEAL Statistics Database',
 }
 
 const inter = Inter({
@@ -20,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.variable}>{children}</body>
+    <html lang="en" className={inter.variable}>
+      <body>{children}</body>
     </html>
   )
 }
