@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma";
+import seed_library from "./seed_library";
 
 async function main() {
   const response = await Promise.all([
@@ -34,17 +35,22 @@ async function main() {
         { shortLanName: "NON", longLanName: "Non-CJK" },
       ],
     }),
-    await prisma.library.create({
-      data:{
-        id:236948,
-        name: "Washington-Law",
-        typeId:4,
-        regionId:9,
-        isLawLibrary: true,
-        libHomePage:"http://www.lib.washington.edu/east-asia/",
-        onlineCatalogPage:"http://catalog.lib.washington.edu/search~",
+    await prisma.library.createMany({
+      data: seed_library,
+    }),
+    await prisma.user.create({
+      data: {
+        id: 3,
+        firstName: "Lena Lee",
+        lastName: "Yang",
+        email: "iaswr@aol.com",
+        positionTitle: "Director of Library",
+        workPhone: "845-225-1445",
+        faxNumber: "845-225-1485",
+        password:"337669",
+        libraryId:2,
       },
-    })
+    }),
   ]);
   console.log(response);
 }
