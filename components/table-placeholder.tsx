@@ -6,7 +6,7 @@ export default function TablePlaceholder() {
       <div className="flex justify-between items-center mb-4">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold">Recent Users</h2>
-          <p className="text-sm text-gray-500">Fetching users...</p>
+          <p className="text-sm text-gray-500">Fetching...</p>
         </div>
         <RefreshButton />
       </div>

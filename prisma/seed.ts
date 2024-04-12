@@ -1,9 +1,9 @@
-import prisma from "../lib/prisma";
+import { db } from "@/lib/db";
 import seed_library from "./seed_library";
 
 async function main() {
   const response = await Promise.all([
-    await prisma.libraryType.createMany({
+    await db.libraryType.createMany({
       data: [
         { name: "Canadian University" },
         { name: "U.S. Non-University" },
@@ -12,7 +12,7 @@ async function main() {
         { name: "Canadian Non-University" },
       ],
     }),
-    await prisma.libraryRegion.createMany({
+    await db.libraryRegion.createMany({
       data: [
         { regionName: "New England" },
         { regionName: "Middle Atlantic" },
@@ -27,7 +27,7 @@ async function main() {
         { regionName: "Mexico" },
       ],
     }),
-    await prisma.language.createMany({
+    await db.language.createMany({
       data: [
         { shortLanName: "CHN", longLanName: "Chinese" },
         { shortLanName: "JPN", longLanName: "Japanese" },
@@ -35,10 +35,10 @@ async function main() {
         { shortLanName: "NON", longLanName: "Non-CJK" },
       ],
     }),
-    await prisma.library.createMany({
+    await db.library.createMany({
       data: seed_library,
     }),
-    await prisma.user.create({
+    await db.user.create({
       data: {
         id: 3,
         firstName: "Lena Lee",
@@ -56,10 +56,10 @@ async function main() {
 }
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   })
   .catch(async (e) => {
     console.error(e);
-    await prisma.$disconnect();
+    await db.$disconnect();
     process.exit(1);
   });
