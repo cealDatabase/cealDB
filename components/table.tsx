@@ -1,9 +1,9 @@
-import prisma from '@/lib/prisma'
+import { db } from '@/lib/db'
 import { timeAgo } from '@/lib/utils'
 import RefreshButton from './refresh-button'
 
 export default async function Table() {
-  const users = await prisma.user.findMany()
+  const users = await db.user.findMany()
   console.log({users})
 
   return (
