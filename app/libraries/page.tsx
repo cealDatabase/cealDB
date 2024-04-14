@@ -6,11 +6,11 @@ import { getAllLibraries } from "@/data/fetchPrisma";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
 import LibGrid from "./lib-grid";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 async function allLibraries() {
-  const libraries = await getAllLibraries();
-  return <LibGrid libraries={libraries} />;
+    const libraries = await getAllLibraries();
+    return <LibGrid libraries={libraries} />;
 }
 
 export default function LibraiesHomePage() {

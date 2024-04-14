@@ -6,10 +6,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 import LibSingle from "./lib-single";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
-
-function classNames(...classes: any[]) {
-    return classes.filter(Boolean).join(' ')
-  }
+import clsx from 'clsx';
 
 export default function LibGrid({libraries}: { libraries: SingleLibraryType}) {
     const [selected, setSelected] = useState("chose one")
@@ -39,7 +36,7 @@ export default function LibGrid({libraries}: { libraries: SingleLibraryType}) {
                   <Listbox.Option
                     key={library.id}
                     className={({ active }) =>
-                      classNames(
+                      clsx(
                         active ? 'bg-indigo-600 text-white' : 'text-gray-900',
                         'relative cursor-default select-none py-2 pl-3 pr-9'
                       )
@@ -48,13 +45,13 @@ export default function LibGrid({libraries}: { libraries: SingleLibraryType}) {
                   >
                     {({ selected, active }) => (
                       <>
-                        <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'block')}>
+                        <span className={clsx(selected ? 'font-semibold' : 'font-normal', 'block')}>
                           {library.name}
                         </span>
 
                         {selected ? (
                           <span
-                            className={classNames(
+                            className={clsx(
                               active ? 'text-white' : 'text-indigo-600',
                               'absolute inset-y-0 right-0 flex items-center pr-4'
                             )}
