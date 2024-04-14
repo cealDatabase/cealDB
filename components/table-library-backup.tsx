@@ -1,10 +1,7 @@
-"use client"
+import { getAllLibraries } from "@/data/fetchPrisma";
 
-import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
-
-export default async function Table({fetchLibraries}: {fetchLibraries: Promise<any>}) {
-
-  const libraries = await fetchLibraries;
+export default async function Table() {
+  const libraries = await getAllLibraries();
 
   return (
     <>
@@ -16,7 +13,7 @@ export default async function Table({fetchLibraries}: {fetchLibraries: Promise<a
         </div>
         <div className="divide-y divide-gray-900/5">
           {libraries
-            ? libraries.map((library: { id: Key | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
+            ? libraries.map((library) => (
                 <div key={library.id}>{library.name}</div>
               ))
             : "Error: server-side data fetching"}

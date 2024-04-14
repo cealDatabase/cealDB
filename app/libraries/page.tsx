@@ -25,7 +25,7 @@ export default function Home() {
         CEAL Statistics Database
       </h1>
       <Suspense fallback={<TablePlaceholder />}>
-        <Table fetchLibraries = {librariesArray}/>
+        <Table fetchLibraries={librariesArray} />
       </Suspense>
     </main>
   );
