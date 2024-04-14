@@ -1,10 +1,9 @@
-import db from '@/lib/db'
+import { getAllUsers } from '@/data/fetchPrisma'
 import { timeAgo } from '@/lib/utils'
 import RefreshButton from './refresh-button'
 
 export default async function Table() {
-  const users = await db.user.findMany()
-  console.log({users})
+  const users = await getAllUsers();
 
   return (
     <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-xl mx-auto w-full">
@@ -15,7 +14,7 @@ export default async function Table() {
         <RefreshButton />
       </div>
       <div className="divide-y divide-gray-900/5">
-        {users.map((user) => (
+        {users && users.map((user) => (
           <div
             key={user.id}
             className="flex items-center justify-between py-3"
