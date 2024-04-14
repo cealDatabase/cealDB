@@ -19,7 +19,7 @@ export default function Login() {
             Click to request a new password if you{" "}
             <Link href="/forgot">forgot password.</Link>
             <br />
-            CEAL Stats coordinators need to work with their libraries'{" "}
+            CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
             <Link href="/libraries">contact persons</Link> to gain access to the
             database online forms.
           </div>
@@ -28,9 +28,9 @@ export default function Login() {
             about your institution. Every library contact person needs to use
             your email as your User ID, and the Password that you used since
             your last log-in. If you forget your password, you can request a new
-            password by clicking the "Forgot Password" button. A system assigned
-            password will be sent to individual's mail box. CEAL Stats
-            coordinators need to work with their libraries' contact persons to
+            password by clicking the &ldquo;Forgot Password&ldquo; button. A system assigned
+            password will be sent to individual&lsquo;s mail box. CEAL Stats
+            coordinators need to work with their libraries&lsquo; contact persons to
             gain access to the database online forms.
           </div>
         </>
