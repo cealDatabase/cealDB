@@ -1,13 +1,17 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import Table from "@/components/table-library";
 import TablePlaceholder from "@/components/table-placeholder";
 import ExpandingArrow from "@/components/expanding-arrow";
+import { getAllLibraries } from "@/data/fetchPrisma";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
+  const librariesArray = getAllLibraries();
+
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center">
       <Link
@@ -21,7 +25,7 @@ export default function Home() {
         CEAL Statistics Database
       </h1>
       <Suspense fallback={<TablePlaceholder />}>
-        <Table />
+        <Table fetchLibraries = {librariesArray}/>
       </Suspense>
     </main>
   );

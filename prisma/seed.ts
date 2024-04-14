@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import db from "../lib/db";
 import seed_library from "./seed_library";
 
 async function main() {
