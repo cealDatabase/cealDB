@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import Table from "@/components/table-library";
+import Example from "@/components/table-library";
 import TablePlaceholder from "@/components/table-placeholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 import { getAllLibraries } from "@/data/fetchPrisma";
@@ -25,7 +26,8 @@ export default function Home() {
         CEAL Statistics Database
       </h1>
       <Suspense fallback={<TablePlaceholder />}>
-        <Table fetchLibraries={librariesArray} />
+        {/* <Table fetchLibraries={librariesArray} /> */}
+        <Example />
       </Suspense>
     </main>
   );
