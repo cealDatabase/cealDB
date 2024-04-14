@@ -1,6 +1,32 @@
+export type UserType = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  positionTitle: string | null;
+  workPhone: string | null;
+  faxNumber: string | null;
+  password: string;
+  isActive: Boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  libraryId: number;
+};
 export type SingleLibraryType = {
-    id: number;
-    name: string;
-    libHomePage: string;
-    libraryNumber: number;
-  };
+  id: number;
+  typeId: number;
+  name: string;
+  isLawLibrary: boolean;
+  isMedLibrary: boolean;
+  bibliographic: string[];
+  consortia: string[];
+  systemVendor: string[];
+  opac: boolean | null;
+  libHomePage: string | null;
+  onlineCatalogPage: string | null;
+  libraryNumber: number;
+  regionId: number | null;
+  contactPerson: UserType[];
+  lastUpdatedAt: Date;
+  notes: string | null;
+};
