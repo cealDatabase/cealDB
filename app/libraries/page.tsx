@@ -1,18 +1,19 @@
-
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import Table from "@/components/table-library";
-import Example from "@/components/table-library";
 import TablePlaceholder from "@/components/table-placeholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 import { getAllLibraries } from "@/data/fetchPrisma";
+import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
+import LibGrid from "./lib-grid";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
-  const librariesArray = getAllLibraries();
+async function allLibraries() {
+  const libraries = await getAllLibraries();
+  return <LibGrid libraries={libraries} />;
+}
 
+export default function LibraiesHomePage() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center">
       <Link
@@ -26,9 +27,8 @@ export default function Home() {
         CEAL Statistics Database
       </h1>
       <Suspense fallback={<TablePlaceholder />}>
-        {/* <Table fetchLibraries={librariesArray} /> */}
-        <Example />
-      </Suspense>
+        {allLibraries()}
+        </Suspense>
     </main>
   );
 }
