@@ -104,7 +104,7 @@ export function Header() {
                       >
                         <div className="space-y-4">
                           {Menu.map((menu) => (
-                            <MobileNavLink href={menu.href}>
+                            <MobileNavLink href={menu.href} key={menu.label}>
                               {menu.label}
                             </MobileNavLink>
                           ))}
