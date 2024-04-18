@@ -28,7 +28,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/seed.ts"
+    "prisma/seed.ts", 
+    "app/libraries/page.jsx", 
+    "app/libraries/[libraryid]/page.jsx", 
+    "components/lib-single.jsx"
   ],
   "exclude": ["node_modules"]
 }

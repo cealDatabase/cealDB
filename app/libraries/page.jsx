@@ -3,14 +3,13 @@ import { Suspense } from "react";
 import TablePlaceholder from "@/components/table-placeholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 import { getAllLibraries } from "@/data/fetchPrisma";
-import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
-import LibGrid from "./lib-grid";
+import LibGrid from "@/components/lib-grid";
 
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 async function allLibraries() {
-    const libraries = await getAllLibraries();
-    return <LibGrid libraries={libraries} />;
+  const libraries = await getAllLibraries();
+  return <LibGrid libraries={libraries} />;
 }
 
 export default function LibraiesHomePage() {
@@ -26,9 +25,7 @@ export default function LibraiesHomePage() {
       <h1 className="pt-4 pb-8 bg-gradient-to-r from-[#f9572a] to-[#ffc905] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
         CEAL Statistics Database
       </h1>
-      <Suspense fallback={<TablePlaceholder />}>
-        {allLibraries()}
-        </Suspense>
+      <Suspense fallback={<TablePlaceholder />}>{allLibraries()}</Suspense>
     </main>
   );
 }
