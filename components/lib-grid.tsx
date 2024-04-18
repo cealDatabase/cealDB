@@ -32,7 +32,7 @@ export default function LibGrid({
         >
           {Array.isArray(libraries) &&
             libraries.map((library: SingleLibraryType) => (
-              <MenuItem value={library.id}>{library.name}</MenuItem>
+              <MenuItem value={library.id} key={library.id}>{library.name}</MenuItem>
             ))}
         </Select>
       </FormControl>
