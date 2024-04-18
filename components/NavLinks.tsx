@@ -3,19 +3,13 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { Menu } from "@/constant/nav";
 
 export function NavLinks() {
   let [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   let timeoutRef = useRef<number | null>(null);
 
-  return [
-    ["Home", "/"],
-    ["About", "/about"],
-    ["Login", "/login"],
-    ["Statistics", "/statistics"],
-    ["Libraries", "/libraries"],
-    ["Help", "/help"],
-  ].map(([label, href], index) => (
+  return Menu.map(({ label, href }, index) => (
     <Link
       key={label}
       href={href}
