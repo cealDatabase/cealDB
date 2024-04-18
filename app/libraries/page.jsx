@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import TablePlaceholder from "@/components/table-placeholder";
+import TablePlaceholder from "@/components/RenderPlaceholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 import { getAllLibraries } from "@/data/fetchPrisma";
-import LibGrid from "@/components/lib-grid";
+import LibGrid from "@/components/LibList";
 
 export const dynamic = "force-dynamic";
 

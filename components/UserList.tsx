@@ -2,7 +2,7 @@ import { getAllUsers } from '@/data/fetchPrisma'
 import { timeAgo } from '@/lib/utils'
 import RefreshButton from './refresh-button'
 
-export default async function Table() {
+export default async function UserList() {
   const users = await getAllUsers();
 
   return (

@@ -1,7 +1,7 @@
 import { getLibraryById } from "@/data/fetchPrisma";
-import TablePlaceholder from "@/components/table-placeholder";
+import TablePlaceholder from "@/components/RenderPlaceholder";
 import { Suspense } from "react";
-import LibSingle from "@/components/lib-single";
+import LibSingle from "@/components/LibSingle";
 
 export const dynamic = "force-dynamic";
 

@@ -31,7 +31,7 @@
     "prisma/seed.ts", 
     "app/libraries/page.jsx", 
     "app/libraries/[libraryid]/page.jsx", 
-    "components/lib-single.jsx"
+    "components/LibSingle.jsx"
   ],
   "exclude": ["node_modules"]
 }
