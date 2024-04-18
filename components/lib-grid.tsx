@@ -6,10 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-
-import LibSingle from "./lib-single";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
-import clsx from "clsx";
 
 export default function LibGrid({
   libraries,
