@@ -1,5 +1,4 @@
 import { getLibraryById } from "@/data/fetchPrisma";
-import { SingleLibraryType } from "@/types/types";
 import Link from "next/link";
 
 async function searchById({ searchId }) {
