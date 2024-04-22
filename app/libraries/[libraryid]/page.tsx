@@ -5,8 +5,8 @@ import LibSingle from "@/components/LibSingle";
 export const dynamic = "force-dynamic";
 
 async function LibrarySinglePage(passId: number) {
-  const libraryIem = await getLibraryById(passId);
-  return <LibSingle libraries={libraryIem} />;
+  const libraryItem = await getLibraryById(passId);
+  return <LibSingle libraries={libraryItem} />;
 }
 
 export default function LibraiesHomePage({

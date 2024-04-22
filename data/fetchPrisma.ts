@@ -35,3 +35,12 @@ export const getAllUsers = async () => {
     return null;
   }
 };
+
+export const getRegionById = async (id: number) => {
+  try {
+    const region = await db.libraryRegion.findUnique({ where: { id } });
+    return region;
+  } catch {
+    return null;
+  }
+};
