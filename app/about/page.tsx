@@ -1,8 +1,6 @@
 import { Container } from "@/components/Container";
-import TablePlaceholder from "@/components/RenderPlaceholder";
 import ExpandingArrow from "@/components/expanding-arrow";
 import Link from "next/link";
-import { Suspense } from "react";
 
 const AboutPage = () => {
   return (
@@ -18,7 +16,7 @@ const AboutPage = () => {
         About CEAL Statistics Database
       </h1>
 
-      <Container>
+      <Container className="flex flex-col space-y-4">
         <p>
           The Council on East Asian Library (CEAL) Statistics is an annual
           publication of statistical data of East Asian libraries and museum
@@ -39,11 +37,11 @@ const AboutPage = () => {
           funding type. CEAL collection grand total can be viewed from 1957 to
           current in addition to collection median and average data. The variety
           of statistical data collected is similar to that collected by the
-          Association of Research Libraries (ARL) and is included in ARL's
+          Association of Research Libraries (ARL) and is included in ARL&lsquo;s
           annual statistics (
-          <a href="http://www.arl.org/stats/arlstat/index.html">
+          <Link href="http://www.arl.org/stats/arlstat/index.html">
             http://www.arl.org/stats/arlstat/index.html
-          </a>
+          </Link>
           ) . CEAL statistics focus on East Asian collections and especially
           Chinese, Japanese, and Korean languages resources, staffing, and
           service to support East Asian studies in North America.
@@ -58,8 +56,9 @@ const AboutPage = () => {
           online catalogs, library system utilities, and more. The data series
           is the most comprehensive continuing library statistical dataset among
           area studies collections in North America. Statistical data published
-          in PDF are available from the Committee's home page
-          (https://ceal.ku.edu/pdfs).
+          in PDF are available from the Committee&lsquo;s home page (
+          <Link href="https://ceal.ku.edu/pdfs">https://ceal.ku.edu/pdfs</Link>
+          ).
         </p>
         <p>
           The CEAL Statistics site has been created and maintained by the CEAL
