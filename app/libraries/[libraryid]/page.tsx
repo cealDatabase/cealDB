@@ -11,8 +11,6 @@ async function LibrarySinglePage(passId: number) {
 }
 
 export default function LibraiesHomePage({ params }: { params: { libraryid: string } }) {
-  console.log(
-    "params in here: " + {params});
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center">
       <h1 className="pt-4 pb-8 bg-gradient-to-r from-[#f9572a] to-[#ffc905] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
