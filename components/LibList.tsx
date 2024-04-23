@@ -10,7 +10,7 @@ import { SingleLibraryType } from "@/types/types"; // Import the LibraryType typ
 import Link from "next/link";
 import { Button, Stack } from "@mui/material";
 
-export default function LibGrid({
+export default function LibList({
   libraries,
 }: {
   libraries: SingleLibraryType;
@@ -22,33 +22,39 @@ export default function LibGrid({
   };
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
-      <Box sx={{ minWidth: 240 }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">
-            Select an Institution
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={institution}
-            label="Select an institution"
-            onChange={handleChange}
+    <>
+      <Stack direction="row" spacing={2} alignItems="center">
+        <Box sx={{ minWidth: 240 }}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">
+              Select an Institution
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={institution}
+              label="Select an institution"
+              onChange={handleChange}
+            >
+              {Array.isArray(libraries) &&
+                libraries.map((library: SingleLibraryType) => (
+                  <MenuItem value={library.id} key={library.id}>
+                    {library.name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Link href={`/libraries/${institution}`}>
+          <Button
+            variant="contained"
+            size="large"
+            className="py-3 bg-orange-500 hover:bg-red-500"
           >
-            {Array.isArray(libraries) &&
-              libraries.map((library: SingleLibraryType) => (
-                <MenuItem value={library.id} key={library.id}>
-                  {library.name}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Link href={`/libraries/${institution}`}>
-        <Button variant="contained" size="large" className="py-3 bg-orange-500 hover:bg-red-500">
-          Find
-        </Button>
-      </Link>
-    </Stack>
+            Find
+          </Button>
+        </Link>
+      </Stack>
+    </>
   );
 }

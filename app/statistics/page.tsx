@@ -1,7 +1,11 @@
+import Link from "next/link";
+
 const StatisticsPage = () => {
   return (
-    <div>StatisticsPage</div>
-  )
-}
+    <main>
+      <h1>Statistics Guide</h1>
+    </main>
+  );
+};
 
-export default StatisticsPage
+export default StatisticsPage;

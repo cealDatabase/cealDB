@@ -9,6 +9,7 @@ import { Container } from "@/components/Container";
 import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
 import { Menu } from "@/constant/nav";
+import CEALMainWebButton from "./CEALMainWebButton";
 
 function MenuIcon(props: React.ComponentPropsWithoutRef<"svg">) {
   return (
@@ -100,7 +101,7 @@ export function Header() {
                           y: -32,
                           transition: { duration: 0.2 },
                         }}
-                        className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-6 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
+                        className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-10 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                       >
                         <div className="space-y-4">
                           {Menu.map((menu) => (
@@ -108,6 +109,9 @@ export function Header() {
                               {menu.label}
                             </MobileNavLink>
                           ))}
+                          <div className="flex d-inline">
+                          <CEALMainWebButton />
+                          </div>
                         </div>
                         <div className="mt-8 flex flex-col gap-4">
                           <Button href="/login" variant="outline">
@@ -128,6 +132,9 @@ export function Header() {
           <Button href="/help" className="hidden lg:block">
             Help
           </Button>
+          <div className="hidden lg:block">
+            <CEALMainWebButton />
+          </div>
         </div>
       </Container>
     </nav>

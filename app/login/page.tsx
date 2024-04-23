@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 export default function Login() {
   return (
+    <main>
     <AuthLayout
       title="Login by Your Email"
       subtitle={
@@ -58,5 +59,6 @@ export default function Login() {
         </Button>
       </form>
     </AuthLayout>
+    </main>
   );
 }

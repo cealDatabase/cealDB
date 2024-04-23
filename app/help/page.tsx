@@ -1,7 +1,16 @@
+import Link from "next/link";
+
 const HelpPage = () => {
   return (
-    <div>HelpPage</div>
-  )
-}
+    <main>
+      <h1>Help Page</h1>
 
-export default HelpPage
+      <h2>How to Cite</h2>
+      <h2>New Libraries</h2>
+      <h2>Change Password</h2>
+      <h2>CEAL Statistics Online Forms</h2>
+    </main>
+  );
+};
+
+export default HelpPage;
