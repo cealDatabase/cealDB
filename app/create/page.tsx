@@ -36,55 +36,57 @@ const CreateNewLibrary = () => {
     redirect("/libraries");
   }
   return (
-    <form action={createLibrary}>
-      <h3>Create A Library</h3>
-      <div className='flex flex-col gap-4'>
-        <div className='flex gap-4'>
-          <label htmlFor='name'>Library Name</label>
-          <input type='text' id='name' name='name' />
-        </div>
+    <main>
+      <h2>Create a New Library</h2>
+      <form action={createLibrary}>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <label htmlFor="name">Library Name</label>
+            <input type="text" id="name" name="name" />
+          </div>
 
-        <div className='flex gap-4'>
-          <p>Is Law Library?</p>
-          <label htmlFor='isLawLibrary'>Yes</label>
-          <input
-            type='radio'
-            id='isLawLibrary'
-            name='isLawLibrary'
-            value={`true`}
-          />
-          <label htmlFor='isLawLibrary'>No</label>
-          <input
-            type='radio'
-            id='isLawLibrary'
-            name='isLawLibrary'
-            value={`false`}
-          />
-        </div>
+          <div className="flex gap-4">
+            <p>Is Law Library?</p>
+            <label htmlFor="isLawLibrary">Yes</label>
+            <input
+              type="radio"
+              id="isLawLibrary"
+              name="isLawLibrary"
+              value={`true`}
+            />
+            <label htmlFor="isLawLibrary">No</label>
+            <input
+              type="radio"
+              id="isLawLibrary"
+              name="isLawLibrary"
+              value={`false`}
+            />
+          </div>
 
-        <div className='flex gap-4'>
-          <p>Is Med Library?</p>
-          <label htmlFor='isMedLibrary'>Yes</label>
-          <input
-            type='radio'
-            id='isMedLibrary'
-            name='isMedLibrary'
-            value={`true`}
-          />
-          <label htmlFor='isMedLibrary'>No</label>
-          <input
-            type='radio'
-            id='isMedLibrary'
-            name='isMedLibrary'
-            value={`false`}
-          />
-        </div>
+          <div className="flex gap-4">
+            <p>Is Med Library?</p>
+            <label htmlFor="isMedLibrary">Yes</label>
+            <input
+              type="radio"
+              id="isMedLibrary"
+              name="isMedLibrary"
+              value={`true`}
+            />
+            <label htmlFor="isMedLibrary">No</label>
+            <input
+              type="radio"
+              id="isMedLibrary"
+              name="isMedLibrary"
+              value={`false`}
+            />
+          </div>
 
-        <button type='submit' className='rounded p-2 bg-blue-200'>
-          Create
-        </button>
-      </div>
-    </form>
+          <button type="submit" className="rounded p-2 bg-blue-200">
+            Create
+          </button>
+        </div>
+      </form>
+    </main>
   );
 };
 
