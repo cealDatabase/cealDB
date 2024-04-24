@@ -29,7 +29,7 @@ main {
 
 a {
   text-decoration: underline;
-  color: orangered;
+  color: #dd6a6a;
 }
 
 h1 {
@@ -55,6 +55,10 @@ h2 {
   font-size: 1.25rem; /* 20px */
   line-height: 1.75rem; /* 28px */
   font-weight: 600;
+}
+
+h3 {
+  color: #dd6a6a;
 }
 
 .header {

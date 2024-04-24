@@ -1,11 +1,11 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from "next/image";
+import Link from "next/link";
 
-import { Button } from '@/components/Button'
-import { Container } from '@/components/Container'
-import { TextField } from '@/components/Fields'
-import { Logomark } from '@/components/Logo'
-import { NavLinks } from '@/components/NavLinks'
+import { Button } from "@/components/Button";
+import { Container } from "@/components/Container";
+import { TextField } from "@/components/Fields";
+import { Logomark } from "@/components/Logo";
+import { NavLinks } from "@/components/NavLinks";
 
 export function Footer() {
   return (
@@ -21,16 +21,36 @@ export function Footer() {
               required
               className="w-60 min-w-0 shrink"
             />
-            <Button type="submit" color="orange" className="ml-4 flex-none">
+            <Button type="submit" color="orange" variant="outline" className="ml-4 flex-none">
               <span className="hidden lg:inline">Join our newsletter</span>
               <span className="lg:hidden">Join newsletter</span>
             </Button>
           </form>
-          <p className="mt-6 text-sm text-gray-500 md:mt-0">
+          {/* <p className="mt-6 text-sm text-gray-500 md:mt-0">
             &copy; Copyright {new Date().getFullYear()}. All rights reserved.
-          </p>
+          </p> */}
+          <div className="flex flex-col font-light text-gray-500 text-xs">
+            <p className="mt-6 me-0 md:me-12 md:mt-0">
+              CEAL Statistics by{" "}
+              <Link href="https://www.eastasianlib.org">
+                Council on East Asian Libraries Statistics
+              </Link>{" "}
+              is licensed under a{" "}
+              <Link href="http://creativecommons.org/licenses/by/3.0">
+                Creative Commons Attribution 3.0 Unported License
+              </Link>
+              .
+            </p>
+            <p className="mt-6 me-0 md:me-12 md:mt-0">
+              Attribution - You must give appropriate credit, provide a link to
+              the license, and indicate if changes were made. You may do so in
+              any reasonable manner, but not in any way that suggests the
+              licensor endorses you or your use. Based on a work at
+              https://ceal.ku.edu/
+            </p>
+          </div>
         </div>
       </Container>
     </footer>
-  )
+  );
 }

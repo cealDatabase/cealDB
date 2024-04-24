@@ -45,10 +45,11 @@ const AboutPage = () => {
           directory of East Asian collections contact information, URLs of
           online catalogs, library system utilities, and more. The data series
           is the most comprehensive continuing library statistical dataset among
-          area studies collections in North America. Statistical data published
-          in PDF are available from the Committee&lsquo;s home page (
-          <Link href="https://ceal.ku.edu/pdfs">https://ceal.ku.edu/pdfs</Link>
-          ).
+          area studies collections in North America.{" "}
+          <Link href="/statistics/pdf">
+            Statistical data published in PDF
+          </Link>{" "}
+          are available from the Committee&lsquo;s home page.
         </p>
         <p>
           The CEAL Statistics site has been created and maintained by the CEAL

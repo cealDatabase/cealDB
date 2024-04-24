@@ -1,5 +1,4 @@
 import { getLibraryById } from "@/data/fetchPrisma";
-import TablePlaceholder from "@/components/RenderPlaceholder";
 import { Suspense } from "react";
 import LibSingle from "@/components/LibSingle";
 
@@ -10,10 +9,14 @@ async function LibrarySinglePage(passId: number) {
   return <LibSingle libraries={libraryIem} />;
 }
 
-export default function LibraiesHomePage({ params }: { params: { libraryid: string } }) {
+export default function LibraiesHomePage({
+  params,
+}: {
+  params: { libraryid: string };
+}) {
   return (
-      <Suspense fallback={<TablePlaceholder />}>
-        {LibrarySinglePage(Number(params.libraryid))}
-      </Suspense>
+    <main>
+      <Suspense>{LibrarySinglePage(Number(params.libraryid))}</Suspense>
+    </main>
   );
 }
