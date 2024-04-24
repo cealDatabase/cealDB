@@ -29,7 +29,7 @@ const PublishedPDFs = () => {
             </ol>
             <ol>
               Lists of Selected Full-text Databases by Subscription in East
-              Asian Studies," Journal of East Asian Libraries: Vol. 2024 : No.
+              Asian Studies,&ldquo; Journal of East Asian Libraries: Vol. 2024 : No.
               178, Article 8.
             </ol>
           </ul>
@@ -42,7 +42,7 @@ const PublishedPDFs = () => {
             </ol>
             <ol>
               Lists of Selected Full-text Databases by Subscription in East
-              Asian Studies," Journal of East Asian Libraries: Vol. 2023 : No.
+              Asian Studies,&ldquo; Journal of East Asian Libraries: Vol. 2023 : No.
               176 , Article 5.
             </ol>
           </ul>
@@ -55,7 +55,7 @@ const PublishedPDFs = () => {
             </ol>
             <ol>
               Lists of Selected Full-text Databases by Subscription in East
-              Asian Studies," Journal of East Asian Libraries: Vol. 2022 : No.
+              Asian Studies,&ldquo; Journal of East Asian Libraries: Vol. 2022 : No.
               174 , Article 6.
             </ol>
           </ul>

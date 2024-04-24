@@ -51,11 +51,11 @@ const HelpPage = () => {
             <li>Log-in to the database as a user</li>
             <li>
               After you log in to the database, you can change your password
-              immediately by clicking on Change Password link. (Tip: "To
+              immediately by clicking on Change Password link. (Tip: &ldquo;To
               increase security, please choose a password that does not relate
               directly to you. Do not use your first name or birthday. Your
               password is NOT case sensitive. You can use both numeric and
-              character values.").
+              character values.&ldquo;).
             </li>
           </ul>
         </section>
@@ -69,7 +69,7 @@ const HelpPage = () => {
           <p>
             Enter and update your Library Information Form
             (https://ceal.ku.edu/member/library/) which is under Members tab
-            follow the "My Account" link. This form needs to be filled and
+            follow the &ldquo;My Account&ldquo; link. This form needs to be filled and
             updated every year together with all Online Survey Forms.
           </p>
 
