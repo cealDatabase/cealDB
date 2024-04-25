@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getAllLibraries } from "@/data/fetchPrisma";
 import LibList from "@/components/LibList";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 async function allLibraries() {
   const libraries = await getAllLibraries();
