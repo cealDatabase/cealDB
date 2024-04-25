@@ -10,7 +10,7 @@ const HelpPage = () => {
   return (
     <main>
       <h1>Help Page</h1>
-      <Container className="flex flex-col space-y-8">
+      <Container>
         <section>
           <h2>How to Cite</h2>
           <p>
@@ -47,7 +47,7 @@ const HelpPage = () => {
         <section>
           <h2>Change Password</h2>
           <p>From CEAL Database:</p>
-          <ul className="list-decimal list-inside">
+          <ul className="list-decimal">
             <li>Log-in to the database as a user</li>
             <li>
               After you log in to the database, you can change your password

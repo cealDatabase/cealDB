@@ -10,6 +10,7 @@ import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
 import { Menu } from "@/constant/nav";
 import CEALMainWebButton from "./CEALMainWebButton";
+import { ContainerHeadFoot } from "./ContainerHeadFoot";
 
 function MenuIcon(props: React.ComponentPropsWithoutRef<"svg">) {
   return (
@@ -55,7 +56,7 @@ function MobileNavLink(
 export function Header() {
   return (
     <nav>
-      <Container className="relative z-50 flex justify-between py-8">
+      <ContainerHeadFoot className="relative z-50 flex justify-between py-8">
         <div className="relative z-10 flex items-center gap-16">
           <Link href="/" aria-label="Home">
             {/* <Logo className="h-10 w-auto" /> */}
@@ -136,7 +137,7 @@ export function Header() {
             <CEALMainWebButton />
           </div>
         </div>
-      </Container>
+      </ContainerHeadFoot>
     </nav>
   );
 }

@@ -4,7 +4,7 @@ const PublishedPDFs = () => {
   return (
     <main>
       <h1>Published Statistics (PDFs)</h1>
-      <Container className="flex flex-col space-y-16">
+      <Container>
         <section>
           <p>CEAL Statistics PDFs (1999-current)</p>
           <p>CEAL Statistics PDFs (1957-2019/2020)</p>

@@ -1,16 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/Button";
-import { Container } from "@/components/Container";
 import { TextField } from "@/components/Fields";
-import { Logomark } from "@/components/Logo";
-import { NavLinks } from "@/components/NavLinks";
+import { ContainerHeadFoot } from "./ContainerHeadFoot";
 
 export function Footer() {
   return (
     <footer className="border-t border-gray-200">
-      <Container>
+      <ContainerHeadFoot>
         <div className="flex flex-col items-center border-t border-gray-200 pb-12 pt-8 md:flex-row-reverse md:justify-between md:pt-6">
           <form className="flex w-full justify-center md:w-auto">
             <TextField
@@ -50,7 +47,7 @@ export function Footer() {
             </p>
           </div>
         </div>
-      </Container>
+      </ContainerHeadFoot>
     </footer>
   );
 }

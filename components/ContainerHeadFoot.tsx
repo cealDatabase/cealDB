@@ -1,12 +1,12 @@
 import clsx from 'clsx'
 
-export function Container({
+export function ContainerHeadFoot({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
   return (
     <div
-      className={clsx('mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col space-y-8', className)}
+      className={clsx('mx-auto max-w-7xl px-4 sm:px-6 lg:px-8', className)}
       {...props}
     />
   )
