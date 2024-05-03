@@ -29,6 +29,10 @@ const HelpPage = () => {
             database. Contact Anlin Yang{" "}
             <Tooltip title="Copy Email Address" placement="top" arrow>
               <Button
+                style={{
+                  color: "#dd6a6a",
+                  borderColor: "#dd6a6a",
+                }}
                 variant="outlined"
                 size="small"
                 endIcon={<ContentCopyIcon />}
@@ -69,8 +73,8 @@ const HelpPage = () => {
           <p>
             Enter and update your Library Information Form
             (https://ceal.ku.edu/member/library/) which is under Members tab
-            follow the &ldquo;My Account&ldquo; link. This form needs to be filled and
-            updated every year together with all Online Survey Forms.
+            follow the &ldquo;My Account&ldquo; link. This form needs to be
+            filled and updated every year together with all Online Survey Forms.
           </p>
 
           <p>
@@ -78,6 +82,10 @@ const HelpPage = () => {
             version CEAL Stats database, please contact Dongyun Ni{" "}
             <Tooltip title="Copy Email Address" placement="top" arrow>
               <Button
+                style={{
+                  color: "#dd6a6a",
+                  borderColor: "#dd6a6a",
+                }}
                 variant="outlined"
                 size="small"
                 endIcon={<ContentCopyIcon />}
