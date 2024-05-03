@@ -36,7 +36,8 @@ a {
 h1 {
   padding-top: 1rem; /* 16px */
   padding-bottom: 2rem;
-  background-image: linear-gradient(to right, #f9572a, #ffc905);
+  background-image: linear-gradient(to right, #6366f1,#a855f7 20%,#dd6a6a);
+  /* bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500  */
   background-clip: text;
   text-align: center;
   font-size: 2.25rem; /* 36px */
@@ -56,11 +57,11 @@ h2 {
   font-size: 1.25rem; /* 20px */
   line-height: 1.75rem; /* 28px */
   font-weight: 600;
-  color: #f9572a;
+  color: #a855f7;
 }
 
 h3 {
-  color: #dd6a6a;
+  color: #6366f1;
 }
 
 ul > li {

@@ -47,9 +47,14 @@ export default function LibList({
         </Box>
         <Link href={`/libraries/${institution}`}>
           <Button
+            style={{
+              color: "white",
+              borderColor: "#dd6a6a",
+              backgroundColor: "#dd6a6a",
+            }}
             variant="contained"
             size="large"
-            className="py-3 bg-orange-500 hover:bg-red-500"
+            className="py-3"
           >
             Find
           </Button>
