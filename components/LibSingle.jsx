@@ -1,20 +1,48 @@
-import { getRegionById } from "@/data/fetchPrisma";
+import { getRegionById, getUserById } from "@/data/fetchPrisma";
 import Link from "next/link";
 
 async function getRegionDetailById({ regionId }) {
-  const regionItem = await getRegionById(regionIdId);
+  const regionItem = await getRegionById(regionId);
   return <RegionSingle region={regionItem} />;
 }
 
-export default function RegionSingle({ region }) {
-  return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center">
-      <h1 className="pt-4 pb-8 bg-gradient-to-r from-[#f9572a] to-[#ffc905] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
-        {region.name}
-      </h1>
+function RegionSingle({ region }) {
+  return <>{region.regionName}</>;
+}
 
-      <p>{region.id}</p>
-      <h2>{region.name}</h2>
-    </div>
+async function getUserDetailById({ userId }) {
+  const singleUser = await getUserById(3);
+  return <UserSingle user={singleUser} />;
+}
+
+function UserSingle({ user }) {
+  console.log({ user });
+  return (
+    <>
+      <p>
+        Name: {user.firstName} {user.lastName}
+      </p>
+      <p>Email: {user.email}</p>
+      <p>Title: {user.positionTitle}</p>
+    </>
+  );
+}
+
+export default function LibSingle({ libraries }) {
+  return (
+    <main>
+      <h1>{libraries.name}</h1>
+
+      <h3>Library ID: {libraries.id}</h3>
+
+      {libraries.libHomePage && (
+        <h3>
+          <Link href={libraries.libHomePage}>{libraries.libHomePage}</Link>
+        </h3>
+      )}
+
+      <h3>Region: {getRegionDetailById({ regionId: libraries.regionId })}</h3>
+      <h3>Contact Person: {getUserDetailById({ userId: libraries.userId })}</h3>
+    </main>
   );
 }

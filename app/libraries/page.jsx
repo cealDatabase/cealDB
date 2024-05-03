@@ -6,13 +6,14 @@ import LibList from "@/components/LibList";
 
 async function allLibraries() {
   const libraries = await getAllLibraries();
-  return <LibList libraries={libraries} />;
+  return <LibList libraries={libraries}/>;
 }
 
 export default function LibraiesHomePage() {
   return (
     <main>
       <h1>Library Information</h1>
+      <p>This page contains library information of CEAL participants.</p>
       <Suspense>{allLibraries()}</Suspense>
     </main>
   );

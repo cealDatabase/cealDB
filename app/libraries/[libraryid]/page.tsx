@@ -9,7 +9,7 @@ async function LibrarySinglePage(passId: number) {
   return <LibSingle libraries={libraryItem} />;
 }
 
-export default function LibraiesHomePage({
+export default function SingleLibraryInfoHomePage({
   params,
 }: {
   params: { libraryid: string };
