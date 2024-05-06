@@ -14,9 +14,9 @@ enum UserRole {
 }
 
 model LibraryType {
-  id      Int       @id @default(autoincrement())
-  name    String
-  library Library[]
+  id       Int       @id @default(autoincrement())
+  typeName String
+  library  Library[]
 }
 
 model LibraryRegion {

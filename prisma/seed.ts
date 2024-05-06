@@ -5,11 +5,11 @@ async function main() {
   const response = await Promise.all([
     await db.libraryType.createMany({
       data: [
-        { name: "Canadian University" },
-        { name: "U.S. Non-University" },
-        { name: "Private U.S. University" },
-        { name: "Public U.S. University" },
-        { name: "Canadian Non-University" },
+        { typeName: "Canadian University" },
+        { typeName: "U.S. Non-University" },
+        { typeName: "Private U.S. University" },
+        { typeName: "Public U.S. University" },
+        { typeName: "Canadian Non-University" },
       ],
     }),
     await db.libraryRegion.createMany({

@@ -44,3 +44,12 @@ export const getRegionById = async (id: number) => {
     return null;
   }
 };
+
+export const getTypeById = async (id: number) => {
+  try {
+    const type = await db.libraryType.findUnique({ where: { id } });
+    return type;
+  } catch {
+    return null;
+  }
+};
