@@ -35,3 +35,21 @@ export const getAllUsers = async () => {
     return null;
   }
 };
+
+export const getRegionById = async (id: number) => {
+  try {
+    const region = await db.libraryRegion.findUnique({ where: { id } });
+    return region;
+  } catch {
+    return null;
+  }
+};
+
+export const getTypeById = async (id: number) => {
+  try {
+    const type = await db.libraryType.findUnique({ where: { id } });
+    return type;
+  } catch {
+    return null;
+  }
+};

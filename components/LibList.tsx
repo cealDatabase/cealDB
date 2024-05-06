@@ -22,7 +22,7 @@ export default function LibList({
   };
 
   return (
-    <>
+    <div className="mt-8">
       <Stack direction="row" spacing={2} alignItems="center">
         <Box sx={{ minWidth: 240 }}>
           <FormControl fullWidth>
@@ -60,6 +60,6 @@ export default function LibList({
           </Button>
         </Link>
       </Stack>
-    </>
+    </div>
   );
 }
