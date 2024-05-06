@@ -201,6 +201,15 @@ export default function LibSingle({ libraries }) {
                 </dd>
               </div>
             )}
+
+            {libraries.establishedAt && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Established At</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {libraries.establishedAt}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
       </Container>
