@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const AboutPage = () => {
   return (
-    <main>
+    <main className="mt-12">
       <h1>About CEAL Statistics Database</h1>
 
       <Container>
