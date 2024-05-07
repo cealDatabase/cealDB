@@ -24,12 +24,10 @@ export function Header() {
       >
         <div className="flex">
           <a href="/" className="-m-1.5 p-1.5">
-            <span className="sr-only">The Council on East Asian Libraries (CEAL) Statistics</span>
-            <img
-              className="h-18 w-auto"
-              src="/logo.png"
-              alt="CEAL logo"
-            />
+            <span className="sr-only">
+              The Council on East Asian Libraries (CEAL) Statistics
+            </span>
+            <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
           </a>
         </div>
         <div className="flex lg:hidden">
@@ -43,12 +41,12 @@ export function Header() {
           </button>
         </div>
         <Popover.Group className="hidden lg:flex lg:gap-x-12">
-        <Link
-              href="/"
-              className="text-sm font-semibold leading-6 text-gray-900"
-            >
-              Home
-            </Link>
+          <Link
+            href="/"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Home
+          </Link>
           <Popover>
             <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
               Statistics
@@ -69,7 +67,7 @@ export function Header() {
             >
               <Popover.Panel className="absolute inset-x-0 top-0 -z-10 bg-white pt-14 shadow-lg ring-1 ring-gray-900/5">
                 <div className="mx-auto grid max-w-7xl grid-cols-4 gap-x-4 px-6 py-10 lg:px-8 xl:gap-x-8">
-                  {products.map((item) => (
+                  {StatisticsMenu.map((item) => (
                     <div
                       key={item.name}
                       className="group relative rounded-lg p-6 text-sm leading-6 hover:bg-gray-50"
@@ -111,7 +109,7 @@ export function Header() {
             </Button>
             <Button href="/help">Help</Button>
           </div>
-          <div >
+          <div>
             <CEALMainWebButton />
           </div>
         </div>
@@ -125,15 +123,11 @@ export function Header() {
         <div className="fixed inset-0 z-10" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
+            <a href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">
                 The Council on East Asian Libraries (CEAL) Statistics
               </span>
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt=""
-              />
+              <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
             </a>
             <button
               type="button"
@@ -147,11 +141,17 @@ export function Header() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
+                <Link
+                  href="/"
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                  Home
+                </Link>
                 <Disclosure as="div" className="-mx-3">
                   {({ open }) => (
                     <>
                       <Disclosure.Button className="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                        Product
+                        Statistics
                         <ChevronDownIcon
                           className={clsx(
                             open ? "rotate-180" : "",
@@ -161,7 +161,7 @@ export function Header() {
                         />
                       </Disclosure.Button>
                       <Disclosure.Panel className="mt-2 space-y-2">
-                        {[...products].map((item) => (
+                        {[...StatisticsMenu].map((item) => (
                           <Disclosure.Button
                             key={item.name}
                             as="a"
@@ -175,33 +175,32 @@ export function Header() {
                     </>
                   )}
                 </Disclosure>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Features
-                </a>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Marketplace
-                </a>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Company
-                </a>
+
+                {[...MainMenu].map((item) => (
+                  <Link
+                    href={item.href}
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
               <div className="py-6">
-                <a
-                  href="#"
+                <Link
+                  href="/login"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
                   Log in
-                </a>
+                </Link>
+                <Link
+                  href="/help"
+                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                  Help
+                </Link>
+                {/* <div className="max-w-24"> */}
                 <CEALMainWebButton />
+                {/* </div> */}
               </div>
             </div>
           </div>
