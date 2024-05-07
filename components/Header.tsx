@@ -1,17 +1,18 @@
 "use client";
 
-import { Button } from "@/components/Button";
 import { Fragment, useState } from "react";
+import clsx from "clsx";
+import Link from "next/link";
+
+import { Button } from "@/components/Button";
 import { MainMenu } from "@/constant/nav";
 import { StatisticsMenu } from "@/constant/nav";
-import clsx from "clsx";
+import CEALMainWebButton from "@/components/CEALMainWebButton";
+
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
-import CEALMainWebButton from "./CEALMainWebButton";
 
-const products = StatisticsMenu;
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -95,6 +96,7 @@ export function Header() {
 
           {[...MainMenu].map((item) => (
             <Link
+              key={item.label}
               href={item.href}
               className="text-sm font-semibold leading-6 text-gray-900"
             >
@@ -178,6 +180,7 @@ export function Header() {
 
                 {[...MainMenu].map((item) => (
                   <Link
+                    key={item.label}
                     href={item.href}
                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
