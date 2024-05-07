@@ -8,7 +8,7 @@ import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
-import { Menu } from "@/constant/nav";
+import { MainMenu } from "@/constant/nav";
 import CEALMainWebButton from "./CEALMainWebButton";
 import { ContainerHeadFoot } from "./ContainerHeadFoot";
 
@@ -105,7 +105,7 @@ export function Header() {
                         className="absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-50 px-10 pb-6 pt-32 shadow-2xl shadow-gray-900/20"
                       >
                         <div className="space-y-4">
-                          {Menu.map((menu) => (
+                          {MainMenu.map((menu) => (
                             <MobileNavLink href={menu.href} key={menu.label}>
                               {menu.label}
                             </MobileNavLink>
