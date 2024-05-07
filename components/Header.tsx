@@ -79,13 +79,13 @@ export function Header() {
                           aria-hidden="true"
                         />
                       </div>
-                      <a
+                      <Link
                         href={item.href}
                         className="mt-6 block font-semibold text-gray-900"
                       >
                         {item.name}
                         <span className="absolute inset-0" />
-                      </a>
+                      </Link>
                       <p className="mt-1 text-gray-600">{item.description}</p>
                     </div>
                   ))}
