@@ -9,6 +9,7 @@ const seed_library = [
     opac: true,
     libraryNumber: 9101,
     regionId: 9,
+    contactPersonId: 200,
     libHomePage: "http://www.lib.washington.edu/east-asia/",
     onlineCatalogPage: "http://catalog.lib.washington.edu/search~",
     establishedAt: 1941,
@@ -24,6 +25,7 @@ const seed_library = [
     onlineCatalogPage: "https://search.library.wisc.edu/search/catalog/",
     libraryNumber: 9600,
     regionId: 3,
+    contactPersonId: 127,
     establishedAt: 1960,
   },
 ];

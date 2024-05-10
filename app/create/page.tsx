@@ -29,6 +29,7 @@ const CreateNewLibrary = () => {
         regionId: 9,
         libHomePage: "https://www.mcgill.ca/library/",
         onlineCatalogPage: "https://libraryguides.mcgill.ca/az.php",
+        contactPersonId: 127,
       },
     });
 

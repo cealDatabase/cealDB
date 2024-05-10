@@ -47,6 +47,7 @@ model Library {
   libraryNumber     Int
   regionId          Int?
   libraryRegion     LibraryRegion? @relation(fields: [regionId], references: [id])
+  contactPersonId   Int
   contactPerson     User[]
   establishedAt     Int?           @default(1900)
   recordUpdatedAt   DateTime       @default(now())
@@ -57,11 +58,11 @@ model User {
   id              Int       @id @default(autoincrement())
   firstName       String
   lastName        String
-  email           String    @unique
+  email           String?   @unique
   positionTitle   String?
   workPhone       String?
   faxNumber       String?
-  password        String
+  password        String    @default("cealstat2024")
   isActive        Boolean   @default(true)
   role            UserRole  @default(USER)
   recordCreatedAt DateTime? @default(now()) @db.Date

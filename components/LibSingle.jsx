@@ -24,7 +24,7 @@ function TypeSingle({ type }) {
 
 // Get User Detail
 async function getUserDetailById({ userId }) {
-  const singleUser = await getUserById(3);
+  const singleUser = await getUserById(userId);
   return <UserSingle user={singleUser} />;
 }
 
@@ -90,6 +90,16 @@ function UserSingle({ user }) {
             </div>
           </li>
         )}
+
+        {!user.isActive && (
+          <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
+            <div className="flex w-0 flex-1 items-center">
+              <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                <span>No longer serve as record submitter.</span>
+              </div>
+            </div>
+          </li>
+        )}
       </ul>
     </div>
   );
@@ -130,7 +140,9 @@ export default function LibSingle({ libraries }) {
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Contact Person</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getUserDetailById({ userId: libraries.userId })}
+                {getUserDetailById({
+                  userId: libraries.contactPersonId,
+                })}
               </dd>
             </div>
 

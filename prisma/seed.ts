@@ -1,5 +1,6 @@
 import db from "../lib/db";
 import seed_library from "./seed_library";
+import seed_user from "./seed_user";
 
 async function main() {
   const response = await Promise.all([
@@ -38,18 +39,8 @@ async function main() {
     await db.library.createMany({
       data: seed_library,
     }),
-    await db.user.create({
-      data: {
-        id: 3,
-        firstName: "Lena Lee",
-        lastName: "Yang",
-        email: "iaswr@aol.com",
-        positionTitle: "Director of Library",
-        workPhone: "845-225-1445",
-        faxNumber: "845-225-1485",
-        password:"337669",
-        libraryId:2,
-      },
+    await db.user.createMany({
+      data: seed_user,
     }),
   ]);
   console.log(response);
