@@ -1,38 +1,22 @@
+"use client";
+
 import { Container } from "@/components/Container";
-import { redirect } from "next/navigation";
+import { useFormState } from "react-dom";
+import signupAction from "./signupAction";
 
 const SignUpPage = () => {
-  
-  async function signup(formData: FormData) {
-    "use server";
-    // Get data off form
-    const email = formData.get("email");
-    const password = formData.get("password");
-    // Send to our api route
+  const [error, formAction] = useFormState(signupAction, undefined);
 
-    const res = await fetch(process.env.ROOT_URL + "/api/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    const json = await res.json();
-    console.log(json);
-    // Redirect to log in if success
-    if (res.ok) {
-      redirect("/admin");
-    }
-  }
   return (
     <Container>
       <h1>Sign Up Page</h1>
       <div className="text-center">SignUpPage</div>
-      <form action={signup}>
+      <form action={formAction}>
         <input type="email" name="email" />
         <input type="password" name="password" />
         <button type="submit">Sign Up</button>
       </form>
+      {error && <p>{error}</p>}
     </Container>
   );
 };
