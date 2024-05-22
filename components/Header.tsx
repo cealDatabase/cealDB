@@ -106,8 +106,8 @@ export function Header() {
         </Popover.Group>
         <div className="hidden lg:flex lg:justify-end gap-x-4">
           <div className="flex flex-row gap-4">
-            <Button href="/login" variant="outline" color="white">
-              Log in
+            <Button href="/signin" variant="outline" color="white">
+              Sign in
             </Button>
             <Button href="/help">Help</Button>
           </div>
@@ -190,10 +190,10 @@ export function Header() {
               </div>
               <div className="py-6">
                 <Link
-                  href="/login"
+                  href="/signin"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  Log in
+                  Sign in
                 </Link>
                 <Link
                   href="/help"

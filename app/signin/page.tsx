@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   title: "Sign In",
 };
 
-export default function Login() {
+export default function SignIn() {
   return (
     <main>
       <AuthLayout
-        title="Login by Your Email"
+        title="Sign in by Your Email"
         subtitle={
           <>
             <div className="text-sm">
@@ -25,10 +25,10 @@ export default function Login() {
               the database online forms.
             </div>
             <div className="text-xs text-left mt-6">
-              You can login to the CEAL Statistics Database to change
+              You can sign in to the CEAL Statistics Database to change
               information about your institution. Every library contact person
               needs to use your email as your User ID, and the Password that you
-              used since your last log-in. If you forget your password, you can
+              used since your last sign-in. If you forget your password, you can
               request a new password by clicking the &ldquo;Forgot
               Password&ldquo; button. A system assigned password will be sent to
               individual&lsquo;s mail box. CEAL Stats coordinators need to work
