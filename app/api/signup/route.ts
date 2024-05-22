@@ -21,13 +21,13 @@ export async function POST(request: Request) {
   }
 
   // hash the password
-  // const hash = bcrypt.hashSync(password, 8);
+  const hash = bcrypt.hashSync(password, 8);
 
   // create a user in db. Will move to /data/fetchPrisma.ts in the future
   await db.user.create({
     data: {
       email: "vivoequeen@gmail.com",
-      password: "123456",
+      password: hash,
     },
   });
 

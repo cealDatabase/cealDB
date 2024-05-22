@@ -21,7 +21,7 @@ const SignUpPage = () => {
     console.log(json);
     // Redirect to log in if success
     if (res.ok) {
-      redirect("/signin");
+      redirect("/admin");
     }
   }
   return (
