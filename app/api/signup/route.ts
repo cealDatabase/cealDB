@@ -8,8 +8,8 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { email, password } = body;
 
-  // validate data
-  if (!email || !password) {
+  // validate data -> TODO: Validation has problem
+  if (!(email) || !(password)) {
     return Response.json(
       {
         error: "Invalid email or password",
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   // create a user in db. Will move to /data/fetchPrisma.ts in the future
   await db.user.create({
     data: {
-      email: "vivoequeen@gmail.com",
+      email,
       password: hash,
     },
   });
