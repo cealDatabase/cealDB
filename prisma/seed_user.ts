@@ -12,6 +12,7 @@ const seed_user = [
     id: 200,
     firstName: "Robert R",
     lastName: "Britt",
+    email:"unknown",
     isActive: false,
     libraryId: 1,
   },

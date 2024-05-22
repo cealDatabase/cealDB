@@ -51,9 +51,8 @@ model Library {
 
 model User {
   id              Int       @id @default(autoincrement())
-  firstName       String?
-  lastName        String?
-  name            String
+  firstName       String
+  lastName        String
   email           String    @unique
   positionTitle   String?
   workPhone       String?
