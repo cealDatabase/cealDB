@@ -10,8 +10,8 @@ export default function NotFound() {
   return (
     <main>
       <h1 className="max-w-4xl">Page Not Found at {pathname}</h1>
-      <Button variant="solid" color="white">
-        <Link href="/">Back to Homepage</Link>
+      <Button>
+        <Link href="/">Home Page</Link>
       </Button>
     </main>
   );

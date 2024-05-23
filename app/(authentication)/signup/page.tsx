@@ -13,7 +13,7 @@ export default function SignUpPage() {
   return (
     <main>
       <AuthLayout
-        title="Sign up by Email"
+        title="Sign Up New Account by Email"
         subtitle={
           <>
             <div className="text-sm">
