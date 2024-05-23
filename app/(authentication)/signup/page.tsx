@@ -7,7 +7,7 @@ import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
 import signupAction from "./signupAction";
 
-const SignUpPage = () => {
+export default function SignUpPage() {
   const [error, formAction] = useFormState(signupAction, undefined);
 
   return (
@@ -58,5 +58,3 @@ const SignUpPage = () => {
     </main>
   );
 };
-
-export default SignUpPage;

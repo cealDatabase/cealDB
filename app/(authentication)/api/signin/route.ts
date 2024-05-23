@@ -1,4 +1,4 @@
-import * as jose from 'jose';
+import * as jose from "jose";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   // Lookup the user
 
-  const user = db.user.findFirst({
+  const user = await db.user.findFirst({
     where: {
       email,
     },
@@ -39,9 +39,9 @@ export async function POST(request: Request) {
       }
     );
   }
-  // Compare password-> TODO: compare has something wrong
+  // Compare password
 
-  const isCorrectPassword = bcrypt.compareSync(password, password);
+  const isCorrectPassword = bcrypt.compareSync(password, user.password);
 
   if (!isCorrectPassword) {
     return Response.json(
@@ -56,6 +56,17 @@ export async function POST(request: Request) {
 
   // Create jwt token
 
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const alg = "HS256";
+
+  const jwt = await new jose.SignJWT({})
+    .setProtectedHeader({ alg })
+    .setExpirationTime("72h")
+    .setSubject(user.id.toString())
+    .sign(secret);
+
+  console.log(jwt);
+
   // Respond with it
-  return Response.json({});
+  return Response.json({ token: jwt });
 }

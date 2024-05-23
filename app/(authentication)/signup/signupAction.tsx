@@ -20,7 +20,7 @@ export default async function signupAction(
   const json = await res.json();
   // Redirect to log in if success
   if (res.ok) {
-    redirect("/admin");
+    redirect("/confirmed");
   } else {
     return json.error;
   }

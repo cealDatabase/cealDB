@@ -1,15 +1,15 @@
+"use client";
 import Link from "next/link";
 
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
-import { type Metadata } from "next";
+import { useFormState } from "react-dom";
+import signinAction from "./signinAction";
 
-export const metadata: Metadata = {
-  title: "Sign In",
-};
+export default function SignInPage() {
+  const [error, formAction] = useFormState(signinAction, undefined);
 
-export default function SignIn() {
   return (
     <main>
       <AuthLayout
@@ -38,7 +38,7 @@ export default function SignIn() {
           </>
         }
       >
-        <form>
+        <form action={formAction}>
           <div className="space-y-6">
             <TextField
               label="Email address"
@@ -64,7 +64,7 @@ export default function SignIn() {
             type="submit"
             className="mt-8 w-full"
           >
-            Sign in to account
+            Sign in to Account
           </Button>
         </form>
       </AuthLayout>
