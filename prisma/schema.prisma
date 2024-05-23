@@ -57,7 +57,7 @@ model User {
   positionTitle   String?
   workPhone       String?
   faxNumber       String?
-  password        String    @default("cealstat2024")
+  password        String
   isActive        Boolean   @default(true)
   role            UserRole  @default(USER)
   recordCreatedAt DateTime? @default(now()) @db.Date

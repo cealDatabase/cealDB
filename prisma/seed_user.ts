@@ -7,6 +7,7 @@ const seed_user = [
     positionTitle: "East Asian Studies Librarian",
     workPhone: "608-890-1783",
     libraryId: 2,
+    password: '123',
   },
   {
     id: 200,
@@ -15,6 +16,7 @@ const seed_user = [
     email:"unknown",
     isActive: false,
     libraryId: 1,
+    password: '123',
   },
 ];
 

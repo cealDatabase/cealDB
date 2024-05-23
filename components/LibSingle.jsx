@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { getRegionById, getUserById, getTypeById } from "@/data/fetchPrisma";
 import Link from "next/link";
 import { Container } from "./Container";
+import { Button } from "./Button";
 
 // Get Region
 async function getRegionDetailById({ regionId }) {
@@ -107,9 +109,12 @@ function UserSingle({ user }) {
 
 // Present Single Library details
 export default function LibSingle({ libraries }) {
+  const isAdminLoggedIn = cookies().get("Authorization");
   return (
     <main>
       <h1>{libraries.name}</h1>
+      {isAdminLoggedIn ? <Button className="mb-4">Edit</Button> : ""}
+
       <Container className="bg-gray-100 rounded-lg">
         <div className="mt-2">
           <dl className="divide-y divide-gray-400">

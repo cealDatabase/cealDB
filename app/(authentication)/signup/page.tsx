@@ -1,44 +1,30 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
 import { AuthLayout } from "@/components/AuthLayout";
+import { useFormState } from "react-dom";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
-import { type Metadata } from "next";
+import signupAction from "./signupAction";
 
-export const metadata: Metadata = {
-  title: "Sign In",
-};
+export default function SignUpPage() {
+  const [error, formAction] = useFormState(signupAction, undefined);
 
-export default function SignIn() {
   return (
     <main>
       <AuthLayout
-        title="Sign in by Your Email"
+        title="Sign Up New Account by Email"
         subtitle={
           <>
             <div className="text-sm">
-              Click to request a new password if you{" "}
-              <Link href="/forgot">forgot password.</Link>
-              <br />
               CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
               <Link href="/libraries">contact persons</Link> to gain access to
               the database online forms.
             </div>
-            <div className="text-xs text-left mt-6">
-              You can sign in to the CEAL Statistics Database to change
-              information about your institution. Every library contact person
-              needs to use your email as your User ID, and the Password that you
-              used since your last sign-in. If you forget your password, you can
-              request a new password by clicking the &ldquo;Forgot
-              Password&ldquo; button. A system assigned password will be sent to
-              individual&lsquo;s mail box. CEAL Stats coordinators need to work
-              with their libraries&lsquo; contact persons to gain access to the
-              database online forms.
-            </div>
           </>
         }
       >
-        <form>
+        <form action={formAction}>
           <div className="space-y-6">
             <TextField
               label="Email address"
@@ -64,10 +50,11 @@ export default function SignIn() {
             type="submit"
             className="mt-8 w-full"
           >
-            Sign in to account
+            Sign Up
           </Button>
         </form>
       </AuthLayout>
+      {error && <p>{error}</p>}
     </main>
   );
-}
+};
