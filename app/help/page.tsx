@@ -19,7 +19,7 @@ const HelpPage = () => {
             <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lawrence,
             KS, ©2024. Available from{" "}
-            <Link href="/">https://ceal-db.vercel.app/</Link>
+            <Link href="/">https://ceal.ku.edu/</Link>
           </p>
         </section>
         <section>
