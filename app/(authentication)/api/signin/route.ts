@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   if (!isCorrectPassword) {
     return Response.json(
       {
-        error: "User not found",
+        error: "Incorrect password",
       },
       {
         status: 400,
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     .setSubject(user.id.toString())
     .sign(secret);
 
-  console.log(jwt);
+  // console.log(jwt);
 
   // Respond with it
   return Response.json({ token: jwt });
