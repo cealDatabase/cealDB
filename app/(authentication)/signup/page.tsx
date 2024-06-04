@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { AuthLayout } from "@/components/AuthLayout";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
 import signupAction from "./signupAction";
 
 export default function SignUpPage() {
-  const [error, formAction] = useFormState(signupAction, undefined);
+  const [error, formAction] = useActionState(signupAction, undefined);
 
   return (
     <main>
