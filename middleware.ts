@@ -6,6 +6,7 @@ import * as jose from "jose";
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   // check for cookie
+  console.log("cookies: " + JSON.stringify(cookies().getAll()));
 
   const cookie = cookies().get("Authorization");
 
@@ -18,7 +19,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret, {});
-    console.log(payload);
+    console.log("payload: " + JSON.stringify(payload));
   } catch (err) {
     // if not success, redirect them
     return NextResponse.redirect(new URL("/", request.url));

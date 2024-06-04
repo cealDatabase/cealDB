@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     .setSubject(user.id.toString())
     .sign(secret);
 
-  // console.log(jwt);
+  console.log("jwt: " + JSON.stringify(jwt));
 
   // Respond with it
   return Response.json({ token: jwt });

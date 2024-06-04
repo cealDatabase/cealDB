@@ -22,7 +22,7 @@ export async function decrypt(input: string): Promise<any> {
 
 export async function login(formData: FormData) {
   // Verify credentials && get the user
-  const user = { email: formData.get("email"), name: "Meng" };
+  const user = { email: formData.get("email"), name: formData.get("name") };
 
   // Create the session
   const expires = new Date(Date.now() + 30 * 1000);
@@ -47,5 +47,15 @@ export async function updateSession(request: NextRequest) {
   const session = request.cookies.get("session")?.value;
   if (!session) return;
 
-  // Refresh the ssion so it doesn't expire
+  // Refresh the session so it doesn't expire
+  const parsed = await decrypt(session);
+  parsed.expires = new Date(Date.now() + 30 * 1000);
+  const res = NextResponse.next();
+  res.cookies.set({
+    name: "session",
+    value: await encrypt(parsed),
+    httpOnly: true,
+    expires: parsed.expires,
+  });
+  return res;
 }
