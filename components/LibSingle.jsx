@@ -109,7 +109,7 @@ function UserSingle({ user }) {
 
 // Present Single Library details
 export default function LibSingle({ libraries }) {
-  const isAdminLoggedIn = cookies().get("Authorization");
+  const isAdminLoggedIn = cookies().get("session");
   return (
     <main>
       <h1>{libraries.name}</h1>
