@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import clsx from "clsx";
 import Link from "next/link";
 
 import { Button } from "@/components/Button";
@@ -10,8 +9,13 @@ import { StatisticsMenu } from "@/constant/nav";
 import CEALMainWebButton from "@/components/CEALMainWebButton";
 
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
+
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,6 +34,7 @@ export function Header() {
             <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
           </a>
         </div>
+        {/* Mobile hamburger button */}
         <div className="flex lg:hidden">
           <button
             type="button"
@@ -40,6 +45,8 @@ export function Header() {
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
+        {/* End of hamburger button */}
+
         <Popover.Group className="hidden lg:flex lg:gap-x-12">
           <Link
             href="/"
@@ -103,6 +110,7 @@ export function Header() {
             </Link>
           ))}
         </Popover.Group>
+
         <div className="hidden lg:flex lg:justify-end gap-x-4">
           <div className="flex flex-row gap-4">
             <Button href="/signin" variant="outline" color="white">
@@ -154,7 +162,7 @@ export function Header() {
                       <Disclosure.Button className="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                         Statistics
                         <ChevronDownIcon
-                          className={clsx(
+                          className={classNames(
                             open ? "rotate-180" : "",
                             "h-5 w-5 flex-none"
                           )}
@@ -166,10 +174,11 @@ export function Header() {
                           <Disclosure.Button
                             key={item.name}
                             as="a"
-                            href={item.href}
-                            className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                            className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 hover:bg-gray-50"
                           >
-                            {item.name}
+                            <Link href={item.href} className=" text-gray-900">
+                              {item.name}
+                            </Link>
                           </Disclosure.Button>
                         ))}
                       </Disclosure.Panel>
