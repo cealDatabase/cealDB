@@ -20,7 +20,7 @@ export default async function signinAction(
   });
   const json = await res.json();
 
-  cookies().set("Authorization", json.token, {
+  cookies().set("session", json.token, {
     secure: true,
     httpOnly: true,
     expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days

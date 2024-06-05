@@ -11,7 +11,7 @@ export default function SignUpPage() {
   const [error, formAction] = useActionState(signupAction, undefined);
 
   return (
-    <main>
+    <>
       <AuthLayout
         title="Sign Up New Account by Email"
         subtitle={
@@ -55,6 +55,6 @@ export default function SignUpPage() {
         </form>
       </AuthLayout>
       {error && <p>{error}</p>}
-    </main>
+    </>
   );
-};
+}
