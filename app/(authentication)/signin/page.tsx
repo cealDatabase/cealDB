@@ -11,7 +11,6 @@ export default function SignInPage() {
   const [error, formAction] = useActionState(signinAction, undefined);
 
   return (
-    <main>
       <AuthLayout
         title="Sign in by Your Email"
         subtitle={
@@ -68,6 +67,5 @@ export default function SignInPage() {
           </Button>
         </form>
       </AuthLayout>
-    </main>
   );
 }
