@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { Header } from "./Header";
 import { signoutAction } from "@/app/(authentication)/signout/signoutAction";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/Button";
 
 function loginStatus() {
   const loginDetails = cookies().get("session")?.value;
@@ -18,7 +17,7 @@ function loginStatus() {
             redirect("/");
           }}
         >
-          <Button type="submit"><span className="underline">Sign out</span></Button>
+          <button><span className="underline">Sign out</span></button>
         </form>
       }
     />

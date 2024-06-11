@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
-import clsx from "clsx";
 
 export const metadata = {
   metadataBase: new URL("https://ceal-db.vercel.app/"),

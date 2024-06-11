@@ -17,7 +17,13 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function Header({ loggedIn, logoutAction }: { loggedIn: boolean; logoutAction: any }) {
+export function Header({
+  loggedIn,
+  logoutAction,
+}: {
+  loggedIn: boolean;
+  logoutAction: any;
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -118,7 +124,12 @@ export function Header({ loggedIn, logoutAction }: { loggedIn: boolean; logoutAc
                 Sign in
               </Button>
             ) : (
-              logoutAction
+              <div
+                className="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold outline-2 outline-offset-2 transition-colors 
+                bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80"
+              >
+                {logoutAction}
+              </div>
             )}
 
             <Button href="/help">Help</Button>
@@ -202,18 +213,19 @@ export function Header({ loggedIn, logoutAction }: { loggedIn: boolean; logoutAc
                 ))}
               </div>
               <div className="py-6">
-                <Link
-                  href="/signin"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/help"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Help
-                </Link>
+                {!loggedIn ? (
+                  <Link
+                    href="/signin"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  >
+                    Sign in
+                  </Link>
+                ) : (
+                  <div className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                    {logoutAction}
+                  </div>
+                )}
+                <Link href="/help">Help</Link>
                 {/* <div className="max-w-24"> */}
                 <CEALMainWebButton />
                 {/* </div> */}
