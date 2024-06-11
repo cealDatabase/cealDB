@@ -17,7 +17,7 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function Header({ loginDetail }: { loginDetail: boolean }) {
+export function Header({ loggedIn, logoutAction }: { loggedIn: boolean; logoutAction: any }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -113,14 +113,12 @@ export function Header({ loginDetail }: { loginDetail: boolean }) {
 
         <div className="hidden lg:flex lg:justify-end gap-x-4">
           <div className="flex flex-row gap-4">
-            {!loginDetail ? (
+            {!loggedIn ? (
               <Button href="/signin" variant="outline" color="white">
                 Sign in
               </Button>
             ) : (
-              <div>
-                Sign out
-              </div>
+              logoutAction
             )}
 
             <Button href="/help">Help</Button>
