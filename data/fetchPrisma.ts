@@ -27,6 +27,15 @@ export const getUserById = async (id: number) => {
   }
 };
 
+export const getUserByEmail = async (email: string) => {
+  try {
+    const user = await db.user.findUnique({ where: { email } });
+    return user;
+  } catch {
+    return null;
+  }
+};
+
 export const getAllUsers = async () => {
   try {
     const allUsers = await db.user.findMany();
