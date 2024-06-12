@@ -24,9 +24,18 @@ export default async function signinAction(
     secure: true,
     httpOnly: true,
     expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
-    path: '/',
-    sameSite: 'strict',
+    path: "/",
+    sameSite: "strict",
   });
+
+  if (typeof email === "string" && email.length > 5) { //valid email address
+    cookies().set("uinf", email, {
+      secure: true,
+      httpOnly: true,
+      expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
+    });
+  }
+  
   // Redirect to log in if success
   if (res.ok) {
     redirect("/admin");

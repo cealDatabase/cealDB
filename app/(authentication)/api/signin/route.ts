@@ -12,31 +12,21 @@ export async function POST(request: Request) {
   // Validate data
   if (!email || !password) {
     return Response.json(
-      {
-        error: "Invalid email or password",
-      },
-      {
-        status: 400,
-      }
+      { error: "Invalid email or password" },
+      { status: 400 }
     );
   }
 
   // Lookup the user
 
   const user = await db.user.findFirst({
-    where: {
-      email,
-    },
+    where: { email },
   });
 
   if (!user) {
     return Response.json(
-      {
-        error: "User not found",
-      },
-      {
-        status: 400,
-      }
+      { error: "User not found" },
+      { status: 400 }
     );
   }
   // Compare password
@@ -57,15 +47,13 @@ export async function POST(request: Request) {
   // Create jwt token
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const alg = "HS256";
+  const alg = (process.env.ALG || "")
 
   const jwt = await new jose.SignJWT({})
     .setProtectedHeader({ alg })
     .setExpirationTime("72h")
     .setSubject(user.id.toString())
     .sign(secret);
-
-  console.log("jwt: " + JSON.stringify(jwt));
 
   // Respond with it
   return Response.json({ token: jwt });
