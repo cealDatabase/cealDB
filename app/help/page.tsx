@@ -1,7 +1,7 @@
 "use client";
 
 import { Container } from "@/components/Container";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { Button } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import Link from "next/link";
@@ -19,7 +19,7 @@ const HelpPage = () => {
             <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lawrence,
             KS, ©2024. Available from{" "}
-            <Link href="/">https://ceal.ku.edu/</Link>
+            <Link href="https://ceal.ku.edu/">https://ceal.ku.edu/</Link>
           </p>
         </section>
         <section>
@@ -35,7 +35,7 @@ const HelpPage = () => {
                 }}
                 variant="outlined"
                 size="small"
-                endIcon={<ContentCopyIcon />}
+                endIcon={<DocumentDuplicateIcon className="h-6 w-6" />}
                 onClick={() =>
                   navigator.clipboard.writeText("mailto:anlin.yang@wisc.edu")
                 }
@@ -67,14 +67,19 @@ const HelpPage = () => {
           <h2>CEAL Statistics Online Forms</h2>
           <p>
             You may find complete instruction for online form each year in
-            https://ceal.ku.edu/member/forms/instructions access under Members
-            tab.
+            <Link href="https://ceal.ku.edu/member/forms/instructions">
+              https://ceal.ku.edu/member/forms/instructions
+            </Link>{" "}
+            access under Members tab.
           </p>
           <p>
-            Enter and update your Library Information Form
-            (https://ceal.ku.edu/member/library/) which is under Members tab
-            follow the &ldquo;My Account&ldquo; link. This form needs to be
-            filled and updated every year together with all Online Survey Forms.
+            Enter and update your Library Information Form (
+            <Link href="https://ceal.ku.edu/member/library/">
+              https://ceal.ku.edu/member/library/
+            </Link>
+            ) which is under Members tab follow the &ldquo;My Account&ldquo;
+            link. This form needs to be filled and updated every year together
+            with all Online Survey Forms.
           </p>
 
           <p>
@@ -88,7 +93,7 @@ const HelpPage = () => {
                 }}
                 variant="outlined"
                 size="small"
-                endIcon={<ContentCopyIcon />}
+                endIcon={<DocumentDuplicateIcon className="h-6 w-6" />}
                 onClick={() =>
                   navigator.clipboard.writeText("mailto:dni@hawaii.edu")
                 }
