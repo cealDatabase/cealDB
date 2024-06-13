@@ -124,12 +124,15 @@ export function Header({
                 Sign in
               </Button>
             ) : (
-              <div
-                className="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold outline-2 outline-offset-2 transition-colors 
+              <>
+                <Link href="/admin">My Account</Link>
+                <div
+                  className="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold outline-2 outline-offset-2 transition-colors 
                 bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80"
-              >
-                {logoutAction}
-              </div>
+                >
+                  {logoutAction}
+                </div>
+              </>
             )}
 
             <Button href="/help">Help</Button>
