@@ -30,8 +30,6 @@
     "@vercel/speed-insights": "^1.0.12",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
-    "eslint": "^9.4.0",
-    "eslint-config-next": "^14.2.4",
     "framer-motion": "^11.2.10",
     "jose": "^5.4.0",
     "ms": "^2.1.3",

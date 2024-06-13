@@ -4,11 +4,11 @@ import Link from "next/link";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
-import { useActionState } from "react";
+import { useFormState } from "react-dom";
 import signinAction from "./signinAction";
 
 export default function SignInPage() {
-  const [error, formAction] = useActionState(signinAction, undefined);
+  const [error, formAction] = useFormState(signinAction, undefined);
 
   return (
       <AuthLayout
