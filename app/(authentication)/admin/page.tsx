@@ -2,8 +2,6 @@ import { cookies } from "next/headers";
 import { Container } from "@/components/Container";
 import { getUserByEmail } from "@/data/fetchPrisma";
 
-const cookieStore = cookies().get("uinf")?.value;
-
 async function getUserDetailByEmail({
   cookieStore,
 }: {
@@ -29,6 +27,8 @@ function UserSingle({ user }: { user: any }) {
 }
 
 const UserLoggedInPage = () => {
+  const cookieStore = cookies().get("uinf")?.value;
+
   return (
     <main>
       <Container>
