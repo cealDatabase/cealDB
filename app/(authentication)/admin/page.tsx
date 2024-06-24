@@ -28,7 +28,6 @@ function UserSingle({ user }: { user: any }) {
 
 const UserLoggedInPage = () => {
   const cookieStore = cookies().get("uinf")?.value;
-
   return (
     <main>
       <Container>
