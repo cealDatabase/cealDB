@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "dev": "prisma generate && next dev --turbo",
-    "build": "prisma generate && prisma db push --force-reset && prisma db seed",
-    "fullbuild": "prisma generate && prisma db push --force-reset && prisma db seed && next build",
+    "build": "prisma generate && prisma db push --force-reset && prisma db seed && next build",
+    "prismabuild": "prisma generate && prisma db push --force-reset && prisma db seed",
     "start": "next start",
     "lint": "next lint"
   },
