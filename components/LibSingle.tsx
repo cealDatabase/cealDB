@@ -12,7 +12,6 @@ async function getRegionDetailById({ regionId }: { regionId: number }) {
 }
 
 function RegionSingle({ region }: { region: any }) {
-  console.log(region.libraryregion);
   return <>{region.libraryregion}</>;
 }
 
@@ -23,7 +22,6 @@ async function getLibTypeDetailById({ typeId }: { typeId: number }) {
 }
 
 function TypeSingle({ type }: { type: any }) {
-  console.log(type.librarytype);
   return <>{type.librarytype}</>;
 }
 

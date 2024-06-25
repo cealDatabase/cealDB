@@ -11,9 +11,6 @@ const CreateNewLibrary = () => {
     const isLawLibrary = formData.get("isLawLibrary") === "true" ? true : false;
     const isMedLibrary = formData.get("isMedLibrary") === "true" ? true : false;
 
-    console.log("isLawLibrary", isLawLibrary);
-    console.log("isMedLibrary", isMedLibrary);
-
     // Create a new record in the database
     await db.library.create({
       data: {
