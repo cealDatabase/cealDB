@@ -12,7 +12,7 @@ export default function SignInPage() {
 
   return (
     <AuthLayout
-      title="Sign in by Your Email"
+      title="Sign in by Your Username"
       subtitle={
         <>
           <div className="text-sm">
@@ -40,8 +40,8 @@ export default function SignInPage() {
       <form action={formAction}>
         <div className="space-y-6">
           <TextField
-            label="Email address"
-            name="email"
+            label="Username same as email"
+            name="username"
             type="email"
             autoComplete="email"
             required

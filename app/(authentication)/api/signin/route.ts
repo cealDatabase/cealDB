@@ -5,12 +5,12 @@ import bcrypt from "bcryptjs";
 export async function POST(request: Request) {
   // Read data off req body
   const body = await request.json();
-  const { email, password } = body;
+  const { username, password } = body;
 
   // Extract data sent in
 
   // Validate data
-  if (!email || !password) {
+  if (!username || !password) {
     return Response.json(
       { error: "Invalid email or password" },
       { status: 400 }
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   // Lookup the user
 
   const user = await db.user.findFirst({
-    where: { username: email },
+    where: { username: username.toLowerCase() },
   });
 
   if (!user) {
