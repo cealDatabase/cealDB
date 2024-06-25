@@ -1,4 +1,4 @@
-import { Library, User } from "@prisma/client";
+import { Library, User, User_Library, Users_Roles } from "@prisma/client";
 import db from "../lib/db";
 
 async function main() {
@@ -8,6 +8,14 @@ async function main() {
 
   const users = await Promise.all<User[]>([
     await db.$queryRaw`SELECT * FROM ceal.user`,
+  ]);
+
+  const userLibrary = await Promise.all<User_Library[]>([
+    await db.$queryRaw`SELECT * FROM ceal.user_library`,
+  ]);
+
+  const userRole = await Promise.all<Users_Roles[]>([
+    await db.$queryRaw`SELECT * FROM ceal.users_roles`,
   ]);
 
   const response = await Promise.all([
@@ -56,6 +64,12 @@ async function main() {
     }),
     await db.user.createMany({
       data: users[0],
+    }),
+    await db.user_Library.createMany({
+      data: userLibrary[0],
+    }),
+    await db.users_Roles.createMany({
+      data: userRole[0],
     }),
   ]);
 }

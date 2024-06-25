@@ -26,6 +26,13 @@ model Language {
   full  String
 }
 
+model Role {
+  id         Int           @id @default(autoincrement())
+  role       String
+  name       String
+  User_Roles Users_Roles[]
+}
+
 model Library {
   id                             Int       @id @default(autoincrement())
   type                           Int
@@ -71,20 +78,35 @@ model Library {
 
   libraryRegion Reflibraryregion? @relation(fields: [pliregion], references: [id])
   libraryType   Reflibrarytype    @relation(fields: [type], references: [id])
+  User_Library  User_Library[]
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  username     String    @unique
+  id           Int            @id @default(autoincrement())
+  username     String         @unique
   password     String
-  isactive     Boolean   @default(true)
+  isactive     Boolean        @default(true)
   lastlogin_at DateTime?
   firstname    String?
   lastname     String?
+  User_Library User_Library[]
+  User_Roles   Users_Roles[]
 }
 
-model Role {
-  id   Int    @id @default(autoincrement())
-  role String
-  name String
+model User_Library {
+  user_id    Int
+  library_id Int
+  User       User    @relation(fields: [user_id], references: [id])
+  Library    Library @relation(fields: [library_id], references: [id])
+
+  @@unique([user_id, library_id])
+}
+
+model Users_Roles {
+  user_id Int
+  role_id Int
+  User    User @relation(fields: [user_id], references: [id])
+  Role    Role @relation(fields: [role_id], references: [id])
+
+  @@unique([user_id, role_id])
 }

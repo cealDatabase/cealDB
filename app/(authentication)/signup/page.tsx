@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { AuthLayout } from "@/components/AuthLayout";
 import { useFormState } from "react-dom";
+import { XCircleIcon } from "@heroicons/react/20/solid";
+import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
 import signupAction from "./signupAction";
@@ -54,10 +55,22 @@ export default function SignUpPage() {
           </Button>
         </form>
         {error && (
-        <div className="text-center mt-10">
-          <h2 className="text-red-600">Error! {error}</h2>
-        </div>
-      )}
+          <div className="rounded-md bg-red-50 p-4 mt-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <XCircleIcon
+                  className="h-5 w-5 text-red-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-700">
+                  Error! {error}
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
       </AuthLayout>
     </>
   );
