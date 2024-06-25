@@ -1,10 +1,24 @@
+import { Library } from "@prisma/client";
 import db from "../lib/db";
-import seed_library from "./seed_library";
-import seed_user from "./seed_user";
+// import seed_lirbaries from "../prisma/fetchLibrary";
 
 async function main() {
+  const libraries = await Promise.all([
+    await db.$queryRaw`SELECT * FROM ceal.library`,
+  ]);
+
+  // console.log(libraries[0]);
+
   const response = await Promise.all([
-    await db.libraryType.createMany({
+    await db.role.createMany({
+      data: [
+        { role: "ROLE_ADMIN", name: "Super Admin" },
+        { role: "ROLE_MEMBER", name: "Member Institution" },
+        { role: "ROLE_EBOOK_EDITOR", name: "E-Book/E-Journal Editor" },
+        { role: "ROLE_ADMIN_ASSISTANT", name: "Assistant Admin" },
+      ],
+    }),
+    await db.reflibrarytype.createMany({
       data: [
         { typeName: "Canadian University" },
         { typeName: "U.S. Non-University" },
@@ -13,7 +27,7 @@ async function main() {
         { typeName: "Canadian Non-University" },
       ],
     }),
-    await db.libraryRegion.createMany({
+    await db.reflibraryregion.createMany({
       data: [
         { regionName: "New England" },
         { regionName: "Middle Atlantic" },
@@ -37,14 +51,15 @@ async function main() {
       ],
     }),
     await db.library.createMany({
-      data: seed_library,
+      data: libraries[0],
     }),
-    await db.user.createMany({
-      data: seed_user,
-    }),
+    // await db.user.createMany({
+    //   data: seed_user,
+    // }),
   ]);
-  console.log(response);
+  // console.log(response);
 }
+
 main()
   .then(async () => {
     await db.$disconnect();
