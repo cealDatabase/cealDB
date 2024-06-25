@@ -27,7 +27,7 @@ export default function SignUpPage() {
         <form action={formAction}>
           <div className="space-y-6">
             <TextField
-              label="Email address"
+              label="Username Same as Email"
               name="username"
               type="email"
               autoComplete="email"

@@ -6,7 +6,7 @@ export default async function signupAction(
   formData: FormData
 ): Promise<string> {
   // Get data off form
-  const email = formData.get("email");
+  const username = formData.get("username");
   const password = formData.get("password");
   // Send to our api route
 
@@ -15,7 +15,7 @@ export default async function signupAction(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
   });
   const json = await res.json();
   // Redirect to log in if success
