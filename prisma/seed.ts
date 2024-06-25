@@ -1,50 +1,65 @@
+import { Library, User } from "@prisma/client";
 import db from "../lib/db";
-import seed_library from "./seed_library";
-import seed_user from "./seed_user";
 
 async function main() {
+  const libraries = await Promise.all<Library[]>([
+    await db.$queryRaw`SELECT * FROM ceal.library`,
+  ]);
+
+  const users = await Promise.all<User[]>([
+    await db.$queryRaw`SELECT * FROM ceal.user`,
+  ]);
+
   const response = await Promise.all([
-    await db.libraryType.createMany({
+    await db.role.createMany({
       data: [
-        { typeName: "Canadian University" },
-        { typeName: "U.S. Non-University" },
-        { typeName: "Private U.S. University" },
-        { typeName: "Public U.S. University" },
-        { typeName: "Canadian Non-University" },
+        { role: "ROLE_ADMIN", name: "Super Admin" },
+        { role: "ROLE_MEMBER", name: "Member Institution" },
+        { role: "ROLE_EBOOK_EDITOR", name: "E-Book/E-Journal Editor" },
+        { role: "ROLE_ADMIN_ASSISTANT", name: "Assistant Admin" },
       ],
     }),
-    await db.libraryRegion.createMany({
+    await db.reflibrarytype.createMany({
       data: [
-        { regionName: "New England" },
-        { regionName: "Middle Atlantic" },
-        { regionName: "East North Central" },
-        { regionName: "West North Central" },
-        { regionName: "South Atlantic" },
-        { regionName: "East South Central" },
-        { regionName: "West South Central" },
-        { regionName: "Mountain" },
-        { regionName: "Pacific" },
-        { regionName: "Canada" },
-        { regionName: "Mexico" },
+        { librarytype: "Canadian University" },
+        { librarytype: "U.S. Non-University" },
+        { librarytype: "Private U.S. University" },
+        { librarytype: "Public U.S. University" },
+        { librarytype: "Canadian Non-University" },
+      ],
+    }),
+    await db.reflibraryregion.createMany({
+      data: [
+        { libraryregion: "New England" },
+        { libraryregion: "Middle Atlantic" },
+        { libraryregion: "East North Central" },
+        { libraryregion: "West North Central" },
+        { libraryregion: "South Atlantic" },
+        { libraryregion: "East South Central" },
+        { libraryregion: "West South Central" },
+        { libraryregion: "Mountain" },
+        { libraryregion: "Pacific" },
+        { libraryregion: "Canada" },
+        { libraryregion: "Mexico" },
       ],
     }),
     await db.language.createMany({
       data: [
-        { shortLanName: "CHN", longLanName: "Chinese" },
-        { shortLanName: "JPN", longLanName: "Japanese" },
-        { shortLanName: "KOR", longLanName: "Korean" },
-        { shortLanName: "NON", longLanName: "Non-CJK" },
+        { short: "CHN", full: "Chinese" },
+        { short: "JPN", full: "Japanese" },
+        { short: "KOR", full: "Korean" },
+        { short: "NON", full: "Non-CJK" },
       ],
     }),
     await db.library.createMany({
-      data: seed_library,
+      data: libraries[0],
     }),
     await db.user.createMany({
-      data: seed_user,
+      data: users[0],
     }),
   ]);
-  console.log(response);
 }
+
 main()
   .then(async () => {
     await db.$disconnect();

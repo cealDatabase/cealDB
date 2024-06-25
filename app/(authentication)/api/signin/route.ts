@@ -20,14 +20,11 @@ export async function POST(request: Request) {
   // Lookup the user
 
   const user = await db.user.findFirst({
-    where: { email },
+    where: { username: email },
   });
 
   if (!user) {
-    return Response.json(
-      { error: "User not found" },
-      { status: 400 }
-    );
+    return Response.json({ error: "User not found" }, { status: 400 });
   }
   // Compare password
 
@@ -47,7 +44,7 @@ export async function POST(request: Request) {
   // Create jwt token
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const alg = (process.env.ALG || "")
+  const alg = process.env.ALG || "";
 
   const jwt = await new jose.SignJWT({})
     .setProtectedHeader({ alg })

@@ -27,9 +27,9 @@ export const getUserById = async (id: number) => {
   }
 };
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (username: string) => {
   try {
-    const user = await db.user.findUnique({ where: { email } });
+    const user = await db.user.findUnique({ where: { username } });
     return user;
   } catch {
     return null;
@@ -47,7 +47,7 @@ export const getAllUsers = async () => {
 
 export const getRegionById = async (id: number) => {
   try {
-    const region = await db.libraryRegion.findUnique({ where: { id } });
+    const region = await db.reflibraryregion.findUnique({ where: { id } });
     return region;
   } catch {
     return null;
@@ -56,7 +56,7 @@ export const getRegionById = async (id: number) => {
 
 export const getTypeById = async (id: number) => {
   try {
-    const type = await db.libraryType.findUnique({ where: { id } });
+    const type = await db.reflibrarytype.findUnique({ where: { id } });
     return type;
   } catch {
     return null;

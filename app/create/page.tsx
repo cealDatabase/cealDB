@@ -17,19 +17,19 @@ const CreateNewLibrary = () => {
     // Create a new record in the database
     await db.library.create({
       data: {
-        typeId: 5,
-        name: libraryName,
-        isLawLibrary: isLawLibrary,
-        isMedLibrary: isMedLibrary,
-        bibliographic: ["OCLC"],
-        consortia: ["Orbis/Cascade Summit"],
-        systemVendor: ["Innovative III"],
-        opac: true,
-        libraryNumber: 9102,
-        regionId: 9,
-        libHomePage: "https://www.mcgill.ca/library/",
-        onlineCatalogPage: "https://libraryguides.mcgill.ca/az.php",
-        contactPersonId: 127,
+        type: 5,
+        library_name: libraryName,
+        plilaw: isLawLibrary,
+        plimed: isMedLibrary,
+        plie_mail: "test@ceal.org",
+        plibibliographic: "OCLC",
+        pliconsortia: "Orbis/Cascade Summit",
+        plisystem_vendor: "Innovative III",
+        pliopac: true,
+        library_number: 9102,
+        pliregion: 9,
+        plihome_page: "https://www.mcgill.ca/library/",
+        plionline_catalog: "https://libraryguides.mcgill.ca/az.php",
       },
     });
 

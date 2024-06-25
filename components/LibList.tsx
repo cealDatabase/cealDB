@@ -39,7 +39,7 @@ export default function LibList({
               {Array.isArray(libraries) &&
                 libraries.map((library: SingleLibraryType) => (
                   <MenuItem value={library.id} key={library.id}>
-                    {library.name}
+                    {library.library_name}
                   </MenuItem>
                 ))}
             </Select>

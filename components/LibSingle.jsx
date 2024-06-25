@@ -15,7 +15,7 @@ function RegionSingle({ region }) {
 }
 
 // Get Library Type
-async function getTypeDetailById({ typeId }) {
+async function getLibTypeDetailById({ typeId }) {
   const typeItem = await getTypeById(typeId);
   return <TypeSingle type={typeItem} />;
 }
@@ -24,80 +24,79 @@ function TypeSingle({ type }) {
   return <>{type.typeName}</>;
 }
 
-// Get User Detail
-async function getUserDetailById({ userId }) {
-  const singleUser = await getUserById(userId);
-  return <UserSingle user={singleUser} />;
-}
+// async function getUserDetailById({ userId }) {
+//   const singleUser = await getUserById(userId);
+//   return <UserSingle user={singleUser} />;
+// }
 
-function UserSingle({ user }) {
+function UserSingle({
+  plisubmitter_first_name,
+  plisubmitter_last_name,
+  pliposition_title,
+  pliwork_phone,
+  plie_mail,
+  plifax_number,
+}) {
   return (
     <div className="w-80 sm:min-w-96">
       <ul
         role="list"
         className="divide-y divide-gray-100 rounded-md border border-gray-200"
       >
-        <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
-          <div className="flex w-0 flex-1 items-center">
-            <div className="ml-4 flex min-w-0 flex-1 gap-2">
-              <span>Name: </span>
-              <span>
-                {user.firstName} {user.lastName}
-              </span>
+        {(plisubmitter_first_name || plisubmitter_last_name) && (
+          <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
+            <div className="flex w-0 flex-1 items-center">
+              <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                <span>Name: </span>
+                <span>
+                  {plisubmitter_first_name || null}{" "}
+                  {plisubmitter_last_name || null}
+                </span>
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
+        )}
 
-        {user.positionTitle && (
+        {pliposition_title && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Title: </span>
-                <span>{user.positionTitle}</span>
+                <span>{pliposition_title}</span>
               </div>
             </div>
           </li>
         )}
 
-        {user.workPhone && (
+        {pliwork_phone && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Phone: </span>
-                <span>{user.workPhone}</span>
+                <span>{pliwork_phone}</span>
               </div>
             </div>
           </li>
         )}
 
-        {user.email && (
+        {plie_mail && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 Email: <span style={{ display: "none" }}>HIDDEN</span>
-                {user.email}
+                {plie_mail}
                 <span style={{ display: "none" }}>HIDDEN</span>
               </div>
             </div>
           </li>
         )}
 
-        {user.faxNumber && (
+        {plifax_number && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Fax: </span>
-                <span>{user.faxNumber}</span>
-              </div>
-            </div>
-          </li>
-        )}
-
-        {!user.isActive && (
-          <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
-            <div className="flex w-0 flex-1 items-center">
-              <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                <span>No longer serve as record submitter.</span>
+                <span>{plifax_number}</span>
               </div>
             </div>
           </li>
@@ -112,7 +111,7 @@ export default function LibSingle({ libraries }) {
   const isAdminLoggedIn = cookies().get("session");
   return (
     <main>
-      <h1>{libraries.name}</h1>
+      <h1>{libraries.library_name}</h1>
       {isAdminLoggedIn ? <Button className="mb-4">Edit</Button> : ""}
 
       <Container className="bg-gray-100 rounded-lg">
@@ -121,109 +120,114 @@ export default function LibSingle({ libraries }) {
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Library Region</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getRegionDetailById({ regionId: libraries.regionId })}
+                {getRegionDetailById({ regionId: libraries.pliregion })}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Law Library</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {libraries.isLawLibrary ? "Yes" : "No"}
+                {libraries.plilaw ? "Yes" : "No"}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Medical Library</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {libraries.isMedLibrary ? "Yes" : "No"}
+                {libraries.plimed ? "Yes" : "No"}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Library Type</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getTypeDetailById({ typeId: libraries.typeId })}
+                {getLibTypeDetailById({ typeId: libraries.type })}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Contact Person</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getUserDetailById({
-                  userId: libraries.contactPersonId,
-                })}
+                {UserSingle(
+                  libraries.plisubmitter_first_name,
+                  libraries.plisubmitter_last_name,
+                  libraries.pliposition_title,
+                  libraries.pliwork_phone,
+                  libraries.plie_mail,
+                  libraries.plifax_number
+                )}
               </dd>
             </div>
 
-            {libraries.bibliographic && (
+            {libraries.plibibliographic && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">
                   Bibliographic Utilities
                 </dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {libraries.bibliographic}
+                  {libraries.plibibliographic}
                 </dd>
               </div>
             )}
 
-            {libraries.consortia && (
+            {libraries.pliconsortia && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">
                   Networks or Consortia
                 </dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {libraries.consortia}
+                  {libraries.pliconsortia}
                 </dd>
               </div>
             )}
 
-            {libraries.systemVendor && (
+            {libraries.plisystem_vendor && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">
                   Integrated System Vendor
                 </dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {libraries.systemVendor}
+                  {libraries.plisystem_vendor}
                 </dd>
               </div>
             )}
 
-            {libraries.opac && (
+            {libraries.pliopac && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">
                   OPAC Capability of CJK Display
                 </dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {libraries.opac ? "Yes" : "No"}
+                  {libraries.pliopac ? "Yes" : "No"}
                 </dd>
               </div>
             )}
 
-            {libraries.libHomePage && (
+            {libraries.plihome_page && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">Library HomePage</dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  <Link href={libraries.libHomePage}>
-                    {libraries.libHomePage}
+                  <Link href={libraries.plihome_page}>
+                    {libraries.plihome_page}
                   </Link>
                 </dd>
               </div>
             )}
 
-            {libraries.onlineCatalogPage && (
+            {libraries.plionline_catalog && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">
                   Library Online Catalog
                 </dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  <Link href={libraries.onlineCatalogPage}>
-                    {libraries.onlineCatalogPage}
+                  <Link href={libraries.plionline_catalog}>
+                    {libraries.plionline_catalog}
                   </Link>
                 </dd>
               </div>
             )}
 
-            {libraries.establishedAt && (
+            {libraries.pliestablishedyear && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
                 <dt className="text-gray-500 font-medium">Established At</dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {libraries.establishedAt}
+                  {libraries.pliestablishedyear}
                 </dd>
               </div>
             )}
