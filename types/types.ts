@@ -22,7 +22,7 @@ export type Reflibraryregion = {
 
 export type SingleLibraryType = {
   id: number;
-  type: string;
+  type: number;
   library_name: string;
   plilaw: Boolean;
   plimed: Boolean;
@@ -62,6 +62,6 @@ export type SingleLibraryType = {
   date_last_changed: Date | null;
   notes: string | null;
   hideinlibrarylist: Boolean | null;
-  libraryRegion: Reflibraryregion[];
+  libraryRegion: Reflibraryregion[] | null;
   libraryType: Reflibrarytype[];
 };
