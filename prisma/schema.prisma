@@ -9,29 +9,29 @@ datasource db {
 }
 
 model Reflibrarytype {
-  id       Int       @id @default(autoincrement())
-  typeName String
-  library  Library[]
+  id          Int       @id @default(autoincrement())
+  librarytype String
+  library     Library[]
 }
 
 model Reflibraryregion {
-  id         Int       @id @default(autoincrement())
-  regionName String
-  library    Library[]
+  id            Int       @id @default(autoincrement())
+  libraryregion String
+  library       Library[]
 }
 
 model Language {
-  id           Int    @id @default(autoincrement())
-  shortLanName String
-  longLanName  String
+  id    Int    @id @default(autoincrement())
+  short String
+  full  String
 }
 
 model Library {
   id                             Int       @id @default(autoincrement())
   type                           Int
   library_name                   String
-  plilaw                         Boolean?
-  plimed                         Boolean?
+  plilaw                         Boolean
+  plimed                         Boolean
   plisubmitter_first_name        String?
   plisubmitter_last_name         String?
   pliposition_title              String?
@@ -48,7 +48,7 @@ model Library {
   plionline_catalog              String?
   pliunique                      Boolean?
   pliestablishedyear             String?
-  library_number                 Int?
+  library_number                 Int
   pliregion                      Int?
   collection_title               String?
   collection_incharge_title      String?
@@ -71,6 +71,16 @@ model Library {
 
   libraryRegion Reflibraryregion? @relation(fields: [pliregion], references: [id])
   libraryType   Reflibrarytype    @relation(fields: [type], references: [id])
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  password     String
+  isactive     Boolean
+  lastlogin_at DateTime?
+  firstname    String?
+  lastname     String?
 }
 
 model Role {
