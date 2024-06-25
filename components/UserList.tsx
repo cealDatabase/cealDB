@@ -20,15 +20,9 @@ export default async function UserList() {
               <div className="flex items-center space-x-4">
                 <div className="space-y-1">
                   <p className="font-medium leading-none">{user.id}</p>
-                  <p className="font-medium leading-none">{user.firstName}</p>
-                  <p className="font-medium leading-none">{user.lastName}</p>
-                  <p className="font-medium leading-none">{user.email}</p>
-                  <p className="font-medium leading-none">
-                    {user.positionTitle}
-                  </p>
-                  <p className="text-sm text-gray-500">{user.libraryId}</p>
-                  <p className="text-sm text-gray-500">{user.password}</p>
-                  <p className="text-sm text-gray-500">{user.role}</p>
+                  <p className="font-medium leading-none">{user.firstname}</p>
+                  <p className="font-medium leading-none">{user.lastname}</p>
+                  <p className="font-medium leading-none">{user.username}</p>
                 </div>
               </div>
             </div>

@@ -36,7 +36,7 @@ model Library {
   plisubmitter_last_name         String?
   pliposition_title              String?
   pliwork_phone                  String?
-  plie_mail                      String?
+  plie_mail                      String
   plifax_number                  String?
   pliinput_as_of_date            DateTime?
   password                       String?

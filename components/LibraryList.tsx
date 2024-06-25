@@ -11,9 +11,9 @@ export default async function LibraryList() {
             libraries.map((library) => (
               <>
                 <li key={library.id}>
-                  <p>{library.name}</p>
-                  <p>{library.bibliographic[0]}</p>
-                  <p>{library.establishedAt}</p>
+                  <p>{library.library_name}</p>
+                  <p>{library.plibibliographic}</p>
+                  <p>{library.pliestablishedyear}</p>
                 </li>
               </>
             ))}
