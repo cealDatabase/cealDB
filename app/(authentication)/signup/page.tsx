@@ -27,8 +27,8 @@ export default function SignUpPage() {
         <form action={formAction}>
           <div className="space-y-6">
             <TextField
-              label="Email address"
-              name="email"
+              label="Username Same as Email"
+              name="username"
               type="email"
               autoComplete="email"
               required
@@ -53,8 +53,12 @@ export default function SignUpPage() {
             Sign Up
           </Button>
         </form>
+        {error && (
+        <div className="text-center mt-10">
+          <h2 className="text-red-600">Error! {error}</h2>
+        </div>
+      )}
       </AuthLayout>
-      {error && <p>{error}</p>}
     </>
   );
 }

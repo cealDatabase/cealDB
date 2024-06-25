@@ -3,39 +3,44 @@ import { getRegionById, getUserById, getTypeById } from "@/data/fetchPrisma";
 import Link from "next/link";
 import { Container } from "./Container";
 import { Button } from "./Button";
+import { SingleLibraryType } from "@/types/types";
 
 // Get Region
-async function getRegionDetailById({ regionId }) {
+async function getRegionDetailById({ regionId }: { regionId: number }) {
   const regionItem = await getRegionById(regionId);
   return <RegionSingle region={regionItem} />;
 }
 
-function RegionSingle({ region }) {
-  return <>{region.regionName}</>;
+function RegionSingle({ region }: { region: any }) {
+  console.log(region.libraryregion);
+  return <>{region.libraryregion}</>;
 }
 
 // Get Library Type
-async function getLibTypeDetailById({ typeId }) {
+async function getLibTypeDetailById({ typeId }: { typeId: number }) {
   const typeItem = await getTypeById(typeId);
   return <TypeSingle type={typeItem} />;
 }
 
-function TypeSingle({ type }) {
-  return <>{type.typeName}</>;
+function TypeSingle({ type }: { type: any }) {
+  console.log(type.librarytype);
+  return <>{type.librarytype}</>;
 }
 
-// async function getUserDetailById({ userId }) {
-//   const singleUser = await getUserById(userId);
-//   return <UserSingle user={singleUser} />;
-// }
-
-function UserSingle({
-  plisubmitter_first_name,
-  plisubmitter_last_name,
-  pliposition_title,
-  pliwork_phone,
-  plie_mail,
-  plifax_number,
+function ContactSingle({
+  first_name,
+  last_name,
+  title,
+  phone,
+  email,
+  faxnumber,
+}: {
+  first_name: string | null;
+  last_name: string | null;
+  title: string | null;
+  phone: string | null;
+  email: string;
+  faxnumber: string | null;
 }) {
   return (
     <div className="w-80 sm:min-w-96">
@@ -43,60 +48,58 @@ function UserSingle({
         role="list"
         className="divide-y divide-gray-100 rounded-md border border-gray-200"
       >
-        {(plisubmitter_first_name || plisubmitter_last_name) && (
+        {(first_name || last_name) && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Name: </span>
                 <span>
-                  {plisubmitter_first_name || null}{" "}
-                  {plisubmitter_last_name || null}
+                  {first_name || null} {last_name || null}
                 </span>
               </div>
             </div>
           </li>
         )}
 
-        {pliposition_title && (
+        {title && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Title: </span>
-                <span>{pliposition_title}</span>
+                <span>{title}</span>
               </div>
             </div>
           </li>
         )}
 
-        {pliwork_phone && (
+        {phone && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Phone: </span>
-                <span>{pliwork_phone}</span>
+                <span>{phone}</span>
               </div>
             </div>
           </li>
         )}
 
-        {plie_mail && (
+        {email && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                Email: <span style={{ display: "none" }}>HIDDEN</span>
-                {plie_mail}
-                <span style={{ display: "none" }}>HIDDEN</span>
+                <span>Email: </span>
+                <span>{email}</span>
               </div>
             </div>
           </li>
         )}
 
-        {plifax_number && (
+        {faxnumber && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Fax: </span>
-                <span>{plifax_number}</span>
+                <span>{faxnumber}</span>
               </div>
             </div>
           </li>
@@ -107,7 +110,11 @@ function UserSingle({
 }
 
 // Present Single Library details
-export default function LibSingle({ libraries }) {
+export default function LibSingle({
+  libraries,
+}: {
+  libraries: SingleLibraryType;
+}) {
   const isAdminLoggedIn = cookies().get("session");
   return (
     <main>
@@ -117,43 +124,57 @@ export default function LibSingle({ libraries }) {
       <Container className="bg-gray-100 rounded-lg">
         <div className="mt-2">
           <dl className="divide-y divide-gray-400">
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Library Region</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getRegionDetailById({ regionId: libraries.pliregion })}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Law Library</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {libraries.plilaw ? "Yes" : "No"}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Medical Library</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {libraries.plimed ? "Yes" : "No"}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Library Type</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {getLibTypeDetailById({ typeId: libraries.type })}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Contact Person</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                {UserSingle(
-                  libraries.plisubmitter_first_name,
-                  libraries.plisubmitter_last_name,
-                  libraries.pliposition_title,
-                  libraries.pliwork_phone,
-                  libraries.plie_mail,
-                  libraries.plifax_number
-                )}
-              </dd>
-            </div>
+            {libraries.pliregion && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Library Region</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {getRegionDetailById({ regionId: libraries.pliregion })}
+                </dd>
+              </div>
+            )}
+
+            {libraries.plilaw && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Law Library</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {libraries.plilaw ? "Yes" : "No"}
+                </dd>
+              </div>
+            )}
+
+            {libraries.plimed && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Medical Library</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {libraries.plimed ? "Yes" : "No"}
+                </dd>
+              </div>
+            )}
+
+            {libraries.type && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Library Type</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {getLibTypeDetailById({ typeId: Number(libraries.type) })}
+                </dd>
+              </div>
+            )}
+
+            {libraries.plie_mail && (
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                <dt className="text-gray-500 font-medium">Contact Person</dt>
+                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                  {ContactSingle({
+                    first_name: libraries.plisubmitter_first_name,
+                    last_name: libraries.plisubmitter_last_name,
+                    title: libraries.pliposition_title,
+                    phone: libraries.pliwork_phone,
+                    email: libraries.plie_mail,
+                    faxnumber: libraries.plifax_number,
+                  })}
+                </dd>
+              </div>
+            )}
 
             {libraries.plibibliographic && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">

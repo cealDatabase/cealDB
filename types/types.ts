@@ -1,12 +1,12 @@
-// export type SingleUserType = {
-//   id: number;
-//   username: string;
-//   password: string;
-//   isactive: Boolean;
-//   lastlogin_at: Date | null;
-//   firstName: string | null;
-//   lastName: string | null;
-// };
+export type SingleUserType = {
+  id: number;
+  username: string;
+  password: string;
+  isactive: Boolean;
+  lastlogin_at: Date | null;
+  firstName: string | null;
+  lastName: string | null;
+};
 
 export type Reflibrarytype = {
   id: number;
@@ -22,7 +22,7 @@ export type Reflibraryregion = {
 
 export type SingleLibraryType = {
   id: number;
-  type: string;
+  type: number;
   library_name: string;
   plilaw: Boolean;
   plimed: Boolean;
@@ -62,6 +62,6 @@ export type SingleLibraryType = {
   date_last_changed: Date | null;
   notes: string | null;
   hideinlibrarylist: Boolean | null;
-  libraryRegion: Reflibraryregion[];
+  libraryRegion: Reflibraryregion[] | null;
   libraryType: Reflibrarytype[];
 };

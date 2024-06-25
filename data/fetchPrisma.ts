@@ -1,5 +1,6 @@
 import db from "@/lib/db";
 
+// Get libraries
 export const getLibraryById = async (id: number) => {
   try {
     const library = await db.library.findUnique({ where: { id } });
@@ -18,6 +19,7 @@ export const getAllLibraries = async () => {
   }
 };
 
+// Get users
 export const getUserById = async (id: number) => {
   try {
     const user = await db.user.findUnique({ where: { id } });
@@ -27,9 +29,11 @@ export const getUserById = async (id: number) => {
   }
 };
 
-export const getUserByEmail = async (username: string) => {
+export const getUserByUserName = async (username: string) => {
   try {
-    const user = await db.user.findUnique({ where: { username } });
+    const user = await db.user.findUnique({
+      where: { username: username.toLowerCase() },
+    });
     return user;
   } catch {
     return null;
@@ -45,6 +49,7 @@ export const getAllUsers = async () => {
   }
 };
 
+// Get others
 export const getRegionById = async (id: number) => {
   try {
     const region = await db.reflibraryregion.findUnique({ where: { id } });

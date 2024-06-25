@@ -7,7 +7,7 @@ export default async function signinAction(
   formData: FormData
 ): Promise<string> {
   // Get data off form
-  const email = formData.get("email");
+  const username = formData.get("username");
   const password = formData.get("password");
   // Send to our api route
 
@@ -16,7 +16,7 @@ export default async function signinAction(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
   });
   const json = await res.json();
 
@@ -28,8 +28,8 @@ export default async function signinAction(
     sameSite: "strict",
   });
 
-  if (typeof email === "string" && email.length > 5) { //valid email address
-    cookies().set("uinf", email, {
+  if (typeof username === "string" && username.length > 5) { //valid email address
+    cookies().set("uinf", username, {
       secure: true,
       httpOnly: true,
       expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days

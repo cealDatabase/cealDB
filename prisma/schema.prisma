@@ -77,7 +77,7 @@ model User {
   id           Int       @id @default(autoincrement())
   username     String    @unique
   password     String
-  isactive     Boolean
+  isactive     Boolean   @default(true)
   lastlogin_at DateTime?
   firstname    String?
   lastname     String?

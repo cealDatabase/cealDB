@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { Container } from "@/components/Container";
-import { getUserByEmail } from "@/data/fetchPrisma";
+import { getUserByUserName } from "@/data/fetchPrisma";
+import { SingleUserType } from "@/types/types";
 
 async function getUserDetailByEmail({
   cookieStore,
@@ -10,24 +11,24 @@ async function getUserDetailByEmail({
   if (!cookieStore) {
     return null; // or handle the case when cookieStore is undefined
   }
-  const singleUser = await getUserByEmail(cookieStore);
-  return <UserSingle user={singleUser} />;
+  const singleUser = await getUserByUserName(cookieStore);
+  return <UserSingle user={singleUser as unknown as SingleUserType} />;
 }
 
-function UserSingle({ user }: { user: any }) {
+function UserSingle({ user }: { user: SingleUserType }) {
   return (
     <div className="w-80 sm:min-w-96">
       <div className="flex items-center justify-between py-1 pl-4 pr-5">
         <p>First Name: {user?.firstName}</p>
         <p>Last Name: {user?.lastName} </p>
-        <p>Email:{user?.email}</p>
+        <p>Email:{user?.username}</p>
       </div>
     </div>
   );
 }
 
 const UserLoggedInPage = () => {
-  const cookieStore = cookies().get("uinf")?.value;
+  const cookieStore = cookies().get("uinf")?.value.toLowerCase();
   return (
     <main>
       <Container>
