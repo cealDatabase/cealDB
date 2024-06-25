@@ -29,74 +29,66 @@ function TypeSingle({ type }) {
 //   return <UserSingle user={singleUser} />;
 // }
 
-function UserSingle({
-  plisubmitter_first_name,
-  plisubmitter_last_name,
-  pliposition_title,
-  pliwork_phone,
-  plie_mail,
-  plifax_number,
-}) {
+function UserSingle(first_name, last_name, title, phone, email, faxnumber) {
   return (
     <div className="w-80 sm:min-w-96">
       <ul
         role="list"
         className="divide-y divide-gray-100 rounded-md border border-gray-200"
       >
-        {(plisubmitter_first_name || plisubmitter_last_name) && (
+        {(first_name || last_name) && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Name: </span>
                 <span>
-                  {plisubmitter_first_name || null}{" "}
-                  {plisubmitter_last_name || null}
+                  {first_name || null} {last_name || null}
                 </span>
               </div>
             </div>
           </li>
         )}
 
-        {pliposition_title && (
+        {title && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Title: </span>
-                <span>{pliposition_title}</span>
+                <span>{title}</span>
               </div>
             </div>
           </li>
         )}
 
-        {pliwork_phone && (
+        {phone && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Phone: </span>
-                <span>{pliwork_phone}</span>
+                <span>{phone}</span>
               </div>
             </div>
           </li>
         )}
 
-        {plie_mail && (
+        {email && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 Email: <span style={{ display: "none" }}>HIDDEN</span>
-                {plie_mail}
+                {email}
                 <span style={{ display: "none" }}>HIDDEN</span>
               </div>
             </div>
           </li>
         )}
 
-        {plifax_number && (
+        {faxnumber && (
           <li className="flex items-center justify-between py-1 pl-4 pr-5 text-sm leading-6">
             <div className="flex w-0 flex-1 items-center">
               <div className="ml-4 flex min-w-0 flex-1 gap-2">
                 <span>Fax: </span>
-                <span>{plifax_number}</span>
+                <span>{faxnumber}</span>
               </div>
             </div>
           </li>

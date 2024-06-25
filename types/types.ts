@@ -1,12 +1,12 @@
-// export type SingleUserType = {
-//   id: number;
-//   username: string;
-//   password: string;
-//   isactive: Boolean;
-//   lastlogin_at: Date | null;
-//   firstName: string | null;
-//   lastName: string | null;
-// };
+export type SingleUserType = {
+  id: number;
+  username: string;
+  password: string;
+  isactive: Boolean;
+  lastlogin_at: Date | null;
+  firstName: string | null;
+  lastName: string | null;
+};
 
 export type Reflibrarytype = {
   id: number;

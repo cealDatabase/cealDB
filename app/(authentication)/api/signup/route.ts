@@ -6,10 +6,10 @@ import db from "@/lib/db";
 export async function POST(request: Request) {
   // read data off request body
   const body = await request.json();
-  const { email, password } = body;
+  const { username, password } = body;
 
   // validate data -> TODO: Validation has problem
-  if (!email || !password) {
+  if (!username || !password) {
     return Response.json(
       {
         error: "Invalid email or password",
@@ -24,12 +24,13 @@ export async function POST(request: Request) {
   const hash = bcrypt.hashSync(password, 8);
 
   // create a user in db. Will move to /data/fetchPrisma.ts in the future
-  // await db.user.create({
-  //   data: {
-  //     username: email,
-  //     password: hash,
-  //   },
-  // });
+  await db.user.create({
+    data: {
+      username: username,
+      password: hash,
+      isactive: true,
+    },
+  });
 
   // return something
   return Response.json({});
