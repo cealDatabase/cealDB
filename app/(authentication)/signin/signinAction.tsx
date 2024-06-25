@@ -2,6 +2,11 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+const ROOT_URL =
+  process.env.NODE_ENV !== "production"
+    ? "http://localhost:3000"
+    : "https://ceal-db.vercel.app/";
+
 export default async function signinAction(
   currentState: any,
   formData: FormData
@@ -11,7 +16,7 @@ export default async function signinAction(
   const password = formData.get("password");
   // Send to our api route
 
-  const res = await fetch(process.env.ROOT_URL + "/api/signin", {
+  const res = await fetch(ROOT_URL + "/api/signin", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -28,14 +33,15 @@ export default async function signinAction(
     sameSite: "strict",
   });
 
-  if (typeof username === "string" && username.length > 5) { //valid email address
+  if (typeof username === "string" && username.length > 5) {
+    //valid email address
     cookies().set("uinf", username, {
       secure: true,
       httpOnly: true,
       expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
     });
   }
-  
+
   // Redirect to log in if success
   if (res.ok) {
     redirect("/admin");

@@ -1,6 +1,11 @@
 "use server";
 import { redirect } from "next/navigation";
 
+const ROOT_URL =
+  process.env.NODE_ENV !== "production"
+    ? "http://localhost:3000"
+    : "https://ceal-db.vercel.app/";
+
 export default async function signupAction(
   currentState: any,
   formData: FormData
@@ -10,7 +15,7 @@ export default async function signupAction(
   const password = formData.get("password");
   // Send to our api route
 
-  const res = await fetch(process.env.ROOT_URL + "/api/signup", {
+  const res = await fetch(ROOT_URL + "/api/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
