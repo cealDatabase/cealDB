@@ -26,13 +26,6 @@ model Language {
   full  String
 }
 
-model Role {
-  id         Int           @id @default(autoincrement())
-  role       String
-  name       String
-  User_Roles Users_Roles[]
-}
-
 model Library {
   id                             Int       @id @default(autoincrement())
   type                           Int
@@ -100,6 +93,13 @@ model User_Library {
   Library    Library @relation(fields: [library_id], references: [id])
 
   @@unique([user_id, library_id])
+}
+
+model Role {
+  id         Int           @id @default(autoincrement())
+  role       String
+  name       String
+  User_Roles Users_Roles[]
 }
 
 model Users_Roles {

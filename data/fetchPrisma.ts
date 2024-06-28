@@ -67,3 +67,12 @@ export const getTypeById = async (id: number) => {
     return null;
   }
 };
+
+export const getRoleInfoByUserId = async (id: number) => {
+  try {
+    const roleInfo = await db.users_Roles.findMany({ where: { user_id: id } });
+    return roleInfo;
+  } catch {
+    return null;
+  }
+};
