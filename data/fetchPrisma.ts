@@ -68,10 +68,19 @@ export const getTypeById = async (id: number) => {
   }
 };
 
+export const getRoleById = async (id: number) => {
+  try {
+    const role = await db.role.findUnique({ where: { id } });
+    return role;
+  } catch {
+    return null;
+  }
+};
+
 export const getRoleInfoByUserId = async (id: number) => {
   try {
-    const roleInfo = await db.users_Roles.findMany({ where: { user_id: id } });
-    return roleInfo;
+    const roles = await db.users_Roles.findMany({ where: { user_id: id } });
+    return roles.map(async (role) => await getRoleById(role.role_id));
   } catch {
     return null;
   }
