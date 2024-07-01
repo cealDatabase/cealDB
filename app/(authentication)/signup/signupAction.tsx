@@ -13,6 +13,7 @@ export default async function signupAction(
   // Get data off form
   const username = formData.get("username");
   const password = formData.get("password");
+  const role = formData.get("role");
   // Send to our api route
 
   const res = await fetch(ROOT_URL + "/api/signup", {

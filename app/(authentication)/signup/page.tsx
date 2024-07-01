@@ -41,6 +41,13 @@ export default function SignUpPage() {
               autoComplete="current-password"
               required
             />
+            <TextField
+              label="Role Number"
+              name="role"
+              type="number"
+              autoComplete="role"
+              required
+            />
           </div>
           <Button
             variant="outline"
