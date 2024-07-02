@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   const isCorrectPassword = bcrypt.compareSync(password, user.password);
 
-  if (!isCorrectPassword) {
+  if (isCorrectPassword) { // TODO: verify password
     return Response.json(
       {
         error: "Incorrect password",

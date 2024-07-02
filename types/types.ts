@@ -4,8 +4,8 @@ export type SingleUserType = {
   password: string;
   isactive: Boolean;
   lastlogin_at: Date | null;
-  firstName: string | null;
-  lastName: string | null;
+  firstname: string | null;
+  lastname: string | null;
 };
 
 export type Reflibrarytype = {

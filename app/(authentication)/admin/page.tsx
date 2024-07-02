@@ -41,9 +41,9 @@ function UserSingle({ user, role }: { user: SingleUserType; role: any }) {
     <div className="w-80 sm:min-w-96">
       <div className="">
         <p>User Id: {user.id}</p>
-        <p>First Name: {user.firstName}</p>
-        <p>Last Name: {user.lastName} </p>
-        <p>Email:{user.username}</p>
+        <p>First Name: {user.firstname}</p>
+        <p>Last Name: {user.lastname} </p>
+        <p>Email: {user.username}</p>
         <p>Role: {role}</p> {/* Await the role promise */}
       </div>
     </div>
