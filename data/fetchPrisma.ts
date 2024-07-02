@@ -3,7 +3,14 @@ import db from "@/lib/db";
 // Get libraries
 export const getLibraryById = async (id: number) => {
   try {
-    const library = await db.library.findUnique({ where: { id } });
+    const library = await db.library.findUnique({
+      where: { id },
+      include: {
+        libraryRegion: true,
+        libraryType: true,
+        User_Library: true,
+      },
+    });
     return library;
   } catch {
     return null;
@@ -12,7 +19,13 @@ export const getLibraryById = async (id: number) => {
 
 export const getAllLibraries = async () => {
   try {
-    const allLibraries = await db.library.findMany();
+    const allLibraries = await db.library.findMany({
+      include: {
+        libraryRegion: true,
+        libraryType: true,
+        User_Library: true,
+      },
+    });
     return allLibraries;
   } catch {
     return null;
@@ -22,7 +35,13 @@ export const getAllLibraries = async () => {
 // Get users
 export const getUserById = async (id: number) => {
   try {
-    const user = await db.user.findUnique({ where: { id } });
+    const user = await db.user.findUnique({
+      where: { id },
+      include: {
+        User_Library: true,
+        User_Roles: true,
+      },
+    });
     return user;
   } catch {
     return null;
@@ -33,6 +52,10 @@ export const getUserByUserName = async (username: string) => {
   try {
     const user = await db.user.findUnique({
       where: { username: username.toLowerCase() },
+      include: {
+        User_Library: true,
+        User_Roles: true,
+      },
     });
     return user;
   } catch {
@@ -42,7 +65,12 @@ export const getUserByUserName = async (username: string) => {
 
 export const getAllUsers = async () => {
   try {
-    const allUsers = await db.user.findMany();
+    const allUsers = await db.user.findMany({
+      include: {
+        User_Library: true,
+        User_Roles: true,
+      },
+    });
     return allUsers;
   } catch {
     return null;

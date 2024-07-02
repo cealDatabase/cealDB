@@ -6,6 +6,7 @@ export type SingleUserType = {
   lastlogin_at: Date | null;
   firstname: string | null;
   lastname: string | null;
+  User_Library: string[] | null;
 };
 
 export type Reflibrarytype = {
