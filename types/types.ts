@@ -1,13 +1,4 @@
-export type SingleUserType = {
-  id: number;
-  username: string;
-  password: string;
-  isactive: Boolean;
-  lastlogin_at: Date | null;
-  firstname: string | null;
-  lastname: string | null;
-  User_Library: string[] | null;
-};
+import { ReactNode } from "react";
 
 export type Reflibrarytype = {
   id: number;
@@ -19,6 +10,46 @@ export type Reflibraryregion = {
   id: number;
   libraryregion: string;
   library: SingleLibraryType[];
+};
+
+export type SingleLanguageType = {
+  id: number;
+  short: string;
+  full: string;
+};
+
+export type SingleUserType = {
+  User_Library: ReactNode;
+  id: number;
+  username: string;
+  password: string;
+  isactive: Boolean;
+  lastlogin_at: Date | null;
+  firstname: string | null;
+  lastname: string | null;
+  user_library: User_Library_Type[] | null;
+  user_roles: Users_Roles_Type[] | null;
+};
+
+export type User_Library_Type = {
+  user_id: number;
+  library_id: number;
+  user: SingleUserType;
+  library: SingleLibraryType;
+};
+
+export type SingleRoleType = {
+  id: number;
+  role: string;
+  name: string;
+  user_roles: Users_Roles_Type[] | null;
+};
+
+export type Users_Roles_Type = {
+  user_id: number;
+  role_id: number;
+  user: SingleUserType;
+  role: SingleRoleType;
 };
 
 export type SingleLibraryType = {
@@ -63,6 +94,7 @@ export type SingleLibraryType = {
   date_last_changed: Date | null;
   notes: string | null;
   hideinlibrarylist: Boolean | null;
-  libraryRegion: Reflibraryregion[] | null;
-  libraryType: Reflibrarytype[];
+  libraryRegion: Reflibraryregion | null;
+  libraryType: Reflibrarytype;
+  user_library: User_Library_Type;
 };

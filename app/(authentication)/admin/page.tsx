@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { Container } from "@/components/Container";
-import { getUserByUserName, getRoleInfoByUserId } from "@/data/fetchPrisma";
+import { getUserByUserName, getRoleById } from "@/data/fetchPrisma";
 import { SingleUserType } from "@/types/types";
 
 async function getUserDetailByEmail({
@@ -14,14 +14,9 @@ async function getUserDetailByEmail({
   const singleUser = await getUserByUserName(cookieStore);
   async function role() {
     if (singleUser) {
-      const roleIds = await getRoleInfoByUserId(singleUser.id);
-      return roleIds?.map(async (element) => {
-        const resolvedElement = await element; // Await the promise to get the resolved value
-        if (resolvedElement) {
-          return resolvedElement.role + " "; // Access the name property directly
-        } else {
-          return null;
-        }
+      return singleUser.User_Roles.map(async (roles) => {
+        const roleObj = await getRoleById(roles.role_id);
+        return roleObj?.name + ", ";
       });
     }
   }
@@ -37,15 +32,14 @@ function UserSingle({ user, role }: { user: SingleUserType; role: any }) {
   }
   return (
     <>
-    {JSON.stringify(user)}
       <h1>Hello {user.firstname}</h1>
       <div className="w-80 sm:min-w-96">
-        <p>Your Role: {role}</p> {/* Await the role promise */}
         <div className="">
           <p>User Id: {user.id}</p>
           <p>First Name: {user.firstname}</p>
           <p>Last Name: {user.lastname} </p>
           <p>Email: {user.username}</p>
+          <p>Role: {role}</p>
         </div>
       </div>
     </>
