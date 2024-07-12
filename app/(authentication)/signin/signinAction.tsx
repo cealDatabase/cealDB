@@ -1,7 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import getCookiesByEmail from "./fetchCookies"
+import getCookiesByEmail from "./fetchCookies";
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -11,7 +11,8 @@ const ROOT_URL =
 export default async function signinAction(
   currentState: any,
   formData: FormData
-): Promise<string> {
+): Promise<any> {
+  const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
   // Get data off form
   const username = formData.get("username");
   const password = formData.get("password");
@@ -29,27 +30,52 @@ export default async function signinAction(
   cookies().set("session", json.token, {
     secure: true,
     httpOnly: true,
-    expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
+    expires: expireTime,
     path: "/",
     sameSite: "strict",
   });
 
-  if (typeof username === "string" && username.length > 5) {
-    //valid email address
-    cookies().set("uinf", username, {
+  const fetchResult = async function (username: string | null): Promise<
+    | {
+        role: string | null | undefined;
+        library: number | null | undefined;
+      }
+    | null
+    | undefined
+  > {
+    if (typeof username === "string" && username.length > 5) {
+      // Valid email address
+      cookies().set("uinf", username, {
+        secure: true,
+        httpOnly: true,
+        expires: expireTime,
+      });
+      return await getCookiesByEmail({ cookieStore: username });
+    }
+  };
+
+  cookies().set(
+    "library",
+    (await fetchResult(username as string))?.library as unknown as string,
+    {
       secure: true,
       httpOnly: true,
-      expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
-    });
-
-    const fetchResult = await getCookiesByEmail({ cookieStore: username });
-    if (typeof fetchResult?.role === "string") {
-      cookies().set("role", fetchResult?.role);
+      expires: expireTime,
     }
-  }
+  );
+
+  cookies().set(
+    "role",
+    (await fetchResult(username as string))?.role as unknown as string,
+    {
+      secure: true,
+      httpOnly: true,
+      expires: expireTime,
+    }
+  );
 
   // Redirect to log in if success
-  if (res.ok) {
+  if (cookies().has("role") || cookies().has("library")) {
     redirect("/admin");
   } else {
     return json.error;

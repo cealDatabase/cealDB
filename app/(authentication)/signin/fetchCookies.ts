@@ -1,4 +1,4 @@
-import { getLibraryById, getRoleById, getUserByUserName } from "@/data/fetchPrisma";
+import { getUserByUserName } from "@/data/fetchPrisma";
 
 export default async function getCookiesByEmail({
   cookieStore,
@@ -10,38 +10,28 @@ export default async function getCookiesByEmail({
   }
   const singleUser = await getUserByUserName(cookieStore);
 
-  async function findRole() {
+  async function findRole(): Promise<string | undefined> {
     try {
-      const roleInfo = singleUser?.User_Roles;
-      if (roleInfo?.length ?? 0 > 1) {
-        return roleInfo?.map(async (roles) => {
-          const roleObj = await getRoleById(roles.role_id);
-          return roleObj?.name + ", ";
-        });
-      } else {
-        return null;
-      }
+      const roleInfo = singleUser?.User_Roles.map((element) => element.role_id);
+      return roleInfo?.join("; ");
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 
   async function findLibrary() {
     try {
-      const libraryid = singleUser?.User_Library[0].library_id;
-      if (libraryid) {
-        const output = await getLibraryById(libraryid);
-        return output?.library_name;
-      } else {
-        return null;
-      }
+      return singleUser?.User_Library[0].library_id;
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 
+  const role = await findRole(); // Assuming findRole is correctly defined and uses await for asynchronous operations
+  const library = await findLibrary(); // Assuming findLibrary is correctly defined and uses await for asynchronous operations
+
   return {
-    role: findRole(),
-    library: findLibrary(),
+    role,
+    library,
   };
 }
