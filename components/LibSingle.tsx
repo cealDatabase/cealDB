@@ -113,11 +113,17 @@ export default function LibSingle({
 }: {
   libraries: SingleLibraryType;
 }) {
-  const isAdminLoggedIn = cookies().get("session");
+  const cookiesLibraryId = cookies().get("library")?.value;
+  const cookiesRoleId = cookies().get("role")?.value;
+  let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
   return (
     <main>
       <h1>{libraries.library_name}</h1>
-      {isAdminLoggedIn ? <Button className="mb-4">Edit</Button> : ""}
+      {isMatchedUser || cookiesRoleId?.includes("1") ? (
+        <Button className="mb-4">Edit</Button>
+      ) : (
+        ""
+      )}
 
       <Container className="bg-gray-100 rounded-lg">
         <div className="mt-2">
