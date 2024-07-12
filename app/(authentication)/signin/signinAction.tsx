@@ -1,6 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import getCookiesByEmail from "./fetchCookies"
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -40,6 +41,11 @@ export default async function signinAction(
       httpOnly: true,
       expires: Date.now() + 24 * 60 * 60 * 1000 * 3, // 3 days
     });
+
+    const fetchResult = await getCookiesByEmail({ cookieStore: username });
+    if (typeof fetchResult?.role === "string") {
+      cookies().set("role", fetchResult?.role);
+    }
   }
 
   // Redirect to log in if success

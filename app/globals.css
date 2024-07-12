@@ -3,19 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 20 14.3% 4.1%;
+  --foreground-rgb: #f6e9e0;
+  /* --foreground-rgb: 20 14.3% 4.1%; */
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
+  background: rgb(var(--foreground-rgb));
+
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+
 }
 
 main {
@@ -36,15 +40,14 @@ a {
 h1 {
   padding-top: 1rem; /* 16px */
   padding-bottom: 2rem;
-  background-image: linear-gradient(to right, #6366f1,#a855f7 20%,#dd6a6a);
+  color: #075a69;
   /* bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500  */
-  background-clip: text;
   text-align: center;
   font-size: 2.25rem; /* 36px */
   line-height: 2.5rem; /* 40px */
   font-weight: 500;
   letter-spacing: -0.025em;
-  color: transparent;
+  /* color: transparent; */
 }
 @media (min-width: 768px) {
   h1 {
