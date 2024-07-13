@@ -1,22 +1,24 @@
-const RESEND_API_KEY = process.env.RESEND;
+import { EmailTemplate } from "@/components/email-template";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST() {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
-      from: "Acme <onboarding@resend.dev>",
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Meng Qu Admin <admin@vivoequeen.com>",
       to: ["qum@miamioh.edu"],
-      subject: "hello world",
-      html: "<strong>it works!</strong>",
-    }),
-  });
+      subject: "Hello world",
+      react: EmailTemplate({ firstName: "Meng at Miami" }),
+      text: "Hello text", // Add a text property
+    });
 
-  if (res.ok) {
-    const data = await res.json();
+    if (error) {
+      return Response.json({ error }, { status: 500 });
+    }
+
     return Response.json(data);
+  } catch (error) {
+    return Response.json({ error }, { status: 500 });
   }
 }
