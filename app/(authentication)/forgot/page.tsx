@@ -1,36 +1,70 @@
-import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
-import { Container } from "@/components/Container";
+"use client";
 
+import Link from "next/link";
+import { useFormState } from "react-dom";
+import { XCircleIcon } from "@heroicons/react/20/solid";
+import { AuthLayout } from "@/components/AuthLayout";
+import { Button } from "@/components/Button";
+import { TextField } from "@/components/Fields";
+import forgotAction from "./forgotAction";
 
-export default function ForgotPasswordPage() {
+export default function ForgotPage() {
+  const [error, formAction] = useFormState(forgotAction, undefined);
+
   return (
-    <main>
-      <h1>Forgot your password?</h1>
-      <Container>
-        <form>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                aria-describedby="email-description"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+    <AuthLayout
+      title="Reset Password"
+      subtitle={
+        <>
+          <div className="text-xs">
+            Leave your username (same as email) and click the button. Then check your email inbox or spam box.
+            <br/>
+            CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
+            <Link href="/libraries">contact persons</Link> to gain access to the
+            database online forms.
+          </div>
+        </>
+      }
+    >
+      <form action={formAction}>
+        <div className="space-y-6">
+          <TextField
+            label="Username (same as email)"
+            name="username"
+            type="email"
+            autoComplete="email"
+            required
+          />
+        </div>
+        <Button
+          variant="outline"
+          style={{
+            color: "#dd6a6a",
+            borderColor: "#dd6a6a",
+          }}
+          type="submit"
+          className="mt-8 w-full"
+        >
+          Send Reset Email
+        </Button>
+      </form>
+      {error && (
+        <div className="rounded-md bg-red-50 p-4 mt-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <XCircleIcon
+                className="h-5 w-5 text-red-400"
+                aria-hidden="true"
               />
             </div>
-            <p id="email-description" className="mt-2 text-sm text-gray-500">
-              Type your email
-            </p>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-700">
+                Error! {error}
+              </h3>
+            </div>
           </div>
-        </form>
-      </Container>
-    </main>
+        </div>
+      )}
+    </AuthLayout>
   );
 }

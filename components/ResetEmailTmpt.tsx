@@ -10,7 +10,8 @@ export const ResetEmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
   resetLink,
 }) => (
   <div>
-    <h1>Hello, {firstName}. This is your password reset request.</h1>
+    <h1>Hello, {firstName}.</h1>
+    
     <div>
       Please click on this link to reset your password:{" "}
       <a href={resetLink}>{resetLink}</a>
