@@ -4,7 +4,8 @@ export const dynamic = "force-dynamic";
 
 async function UserSinglePage(username: string) {
   const userItem = await getUserByUserName(username);
-  return userItem;
+  if (userItem) return userItem;
+  else return null;
 }
 
 function normalizeUsername(rawUsername: string): string {
@@ -20,7 +21,6 @@ export default async function SingleLibraryInfoHomePage({
   const userItem = await UserSinglePage(normalizeUsername(params.username));
   return (
     <main>
-      here is your info:
       {userItem && (
         <>
           <div>{userItem.id}</div>
@@ -30,6 +30,7 @@ export default async function SingleLibraryInfoHomePage({
           <div>{userItem.password}</div>
         </>
       )}
+      {!userItem && <>User Not Found</>}
     </main>
   );
 }
