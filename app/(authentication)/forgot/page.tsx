@@ -1,4 +1,3 @@
-import { Resend } from "resend";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import { Container } from "@/components/Container";
 
