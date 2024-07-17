@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export type Reflibrarytype = {
   id: number;
   librarytype: string;
@@ -19,7 +17,6 @@ export type SingleLanguageType = {
 };
 
 export type SingleUserType = {
-  User_Library: ReactNode;
   id: number;
   username: string;
   password: string;

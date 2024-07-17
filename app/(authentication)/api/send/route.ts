@@ -1,22 +1,43 @@
-const RESEND_API_KEY = process.env.RESEND;
+import db from "@/lib/db";
+import { ResetEmailTemplate } from "@/components/ResetEmailTmpt";
+import { Resend } from "resend";
 
-export async function POST() {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
-      from: "Acme <onboarding@resend.dev>",
-      to: ["qum@miamioh.edu"],
-      subject: "hello world",
-      html: "<strong>it works!</strong>",
-    }),
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(request: Request) {
+  // Read data off req body
+  const body = await request.json();
+  const { username } = body;
+
+  // Lookup the user
+  const user = await db.user.findFirst({
+    where: { username: username.toLowerCase() },
   });
 
-  if (res.ok) {
-    const data = await res.json();
-    return Response.json(data);
+  if (!user) {
+    return Response.json({ error: "User not found" }, { status: 400 });
+  } else {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: "CEAL Admin <admin@vivoequeen.com>",
+        to: username,
+        subject: "From CEAL - Your password reset request.",
+        react: ResetEmailTemplate({
+          firstName: user.firstname ?? "",
+          resetLink: "https://ceal-db.vercel.app/",
+        }),
+        text: "", // Have to keep this to avoid error
+      });
+
+      if (error) {
+        return Response.json({ error }, { status: 500 });
+      }
+
+      return Response.json({
+        message: data?.id,
+      });
+    } catch (error) {
+      return Response.json({ error }, { status: 500 });
+    }
   }
 }
