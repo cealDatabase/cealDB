@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       const { data, error } = await resend.emails.send({
         from: "CEAL Admin <admin@vivoequeen.com>",
         to: username,
-        subject: "From CEAL: Your password reset request.",
+        subject: "From CEAL - Your password reset request.",
         react: ResetEmailTemplate({
           firstName: user.firstname ?? "",
           resetLink: "https://ceal-db.vercel.app/",

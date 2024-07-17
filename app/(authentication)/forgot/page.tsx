@@ -17,8 +17,9 @@ export default function ForgotPage() {
       subtitle={
         <>
           <div className="text-xs">
-            Leave your username (same as email) and click the button. Then check your email inbox or spam box.
-            <br/>
+            Leave your username (same as email) and click the button. Then check
+            your email inbox or spam box.
+            <br />
             CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
             <Link href="/libraries">contact persons</Link> to gain access to the
             database online forms.
