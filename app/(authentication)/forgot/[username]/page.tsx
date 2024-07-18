@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getUserByUserName } from "../../../../data/fetchPrisma";
 
 export const dynamic = "force-dynamic";
@@ -23,14 +24,23 @@ export default async function SingleLibraryInfoHomePage({
     <main>
       {userItem && (
         <>
-          <div>{userItem.id}</div>
-          <div>{userItem.username}</div>
-          <div>{userItem.firstname}</div>
-          <div>{userItem.lastname}</div>
-          <div>{userItem.password}</div>
+          <div key={userItem.id}>
+            <div>{userItem.id}</div>
+            <div>{userItem.username}</div>
+            <div>{userItem.firstname}</div>
+            <div>{userItem.lastname}</div>
+            <div>{userItem.password}</div>
+          </div>
         </>
       )}
-      {!userItem && <>User Not Found</>}
+      {!userItem && (
+        <div>
+          <h2 className="text-red-600">User Not Found</h2>
+          <div className="mt-8">
+            <Link href="/">Back to Homepage</Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

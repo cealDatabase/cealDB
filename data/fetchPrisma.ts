@@ -50,14 +50,19 @@ export const getUserById = async (id: number) => {
 
 export const getUserByUserName = async (username: string) => {
   try {
-    const user = await db.user.findUnique({
-      where: { username: username.toLowerCase() },
+    const user = await db.user.findMany({
+      where: {
+        username: {
+          equals: username.toLowerCase(),
+          mode: "insensitive",
+        },
+      },
       include: {
         User_Library: true,
         User_Roles: true,
       },
     });
-    return user;
+    return user[0];
   } catch {
     return null;
   }

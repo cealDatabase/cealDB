@@ -14,7 +14,8 @@ export default async function signinAction(
 ): Promise<any> {
   const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
   // Get data off form
-  const username = formData.get("username");
+  const userNameRaw = formData.get("username")?.toString();
+  const username = userNameRaw && userNameRaw.toLowerCase();
   const password = formData.get("password");
   // Send to our api route
 
@@ -45,12 +46,12 @@ export default async function signinAction(
   > {
     if (typeof username === "string" && username.length > 5) {
       // Valid email address
-      cookies().set("uinf", username, {
+      cookies().set("uinf", username.toLowerCase(), {
         secure: true,
         httpOnly: true,
         expires: expireTime,
       });
-      return await getCookiesByEmail({ cookieStore: username });
+      return await getCookiesByEmail({ cookieStore: username.toLowerCase() });
     }
   };
 

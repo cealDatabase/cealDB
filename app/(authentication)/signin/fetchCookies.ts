@@ -8,7 +8,7 @@ export default async function getCookiesByEmail({
   if (!cookieStore) {
     return null; // or handle the case when cookieStore is undefined
   }
-  const singleUser = await getUserByUserName(cookieStore);
+  const singleUser = await getUserByUserName(cookieStore.toLowerCase());
 
   async function findRole(): Promise<string | undefined> {
     try {

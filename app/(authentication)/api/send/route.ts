@@ -1,6 +1,7 @@
 import db from "@/lib/db";
 import { ResetEmailTemplate } from "@/components/ResetEmailTmpt";
 import { Resend } from "resend";
+import exp from "constants";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,6 +15,8 @@ export async function POST(request: Request) {
     where: { username: username.toLowerCase() },
   });
 
+  const expireTime = Date.now() + 60 * 1000 * 15; // 15 minutes
+
   if (!user) {
     return Response.json({ error: "User not found" }, { status: 400 });
   } else {
@@ -24,7 +27,8 @@ export async function POST(request: Request) {
         subject: "From CEAL - Your password reset request.",
         react: ResetEmailTemplate({
           firstName: user.firstname ?? "",
-          resetLink: "https://ceal-db.vercel.app/",
+          expireTime: expireTime,
+          resetLink: `https://ceal-db.vercel.app/forgot/${username}`,
         }),
         text: "", // Have to keep this to avoid error
       });
