@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 function UserRequestTime() {
   const searchParams = useSearchParams();
-  const time = searchParams.get("time");
+  const time = searchParams.get("token");
   return time?.toString();
 }
 
