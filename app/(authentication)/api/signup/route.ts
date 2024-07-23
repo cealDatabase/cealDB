@@ -1,5 +1,5 @@
-import validateEmail from "@/lib/validateEM";
-import validatePassword from "@/lib/validatePW";
+// import validateEmail from "@/lib/validateEM";
+// import validatePassword from "@/lib/validatePW";
 import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
