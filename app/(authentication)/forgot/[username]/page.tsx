@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getUserByUserName } from "../../../../data/fetchPrisma";
+import TimeDiff from "./time";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +21,10 @@ export default async function SingleLibraryInfoHomePage({
   params: { username: string };
 }) {
   const userItem = await UserSinglePage(normalizeUsername(params.username));
+
   return (
     <main>
+      <TimeDiff />
       {userItem && (
         <>
           <div key={userItem.id}>
