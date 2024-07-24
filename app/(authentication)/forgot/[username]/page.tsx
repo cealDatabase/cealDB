@@ -65,8 +65,10 @@ export default async function SingleLibraryInfoHomePage({
       )}
       {!userItem && (
         <div>
-          <p className="text-4xl font-medium text-gray-900 text-center">
-            User Not Found
+          <p className="text-3xl font-medium text-gray-900">
+            User not found.
+            <br/>
+            Please check user information at <Link href="/libraries">here</Link>.
           </p>
           <div className="mt-10 flex items-center gap-x-6">
             <Link
