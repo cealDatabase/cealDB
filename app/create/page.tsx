@@ -247,6 +247,174 @@ const CreateNewLibrary = () => {
                 />
               </div>
             </div>
+            {/* Library Home Page */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='libraryHomePage'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Library Home Page
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='libraryHomePage'
+                  name='libraryHomePage'
+                  type='text'
+                  autoComplete='libraryHomePage'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* Library Online Catalogue */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='libraryOnlineCatalogue'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Library Online Catalogue
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='libraryOnlineCatalogue'
+                  name='libraryOnlineCatalogue'
+                  type='text'
+                  autoComplete='libraryOnlineCatalogue'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* Bibliographic Unitilies */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='bibliographicUtilities'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Bibiliographic Utilities
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='bibliographicUtilities'
+                  name='bibliographicUtilities'
+                  type='text'
+                  autoComplete='bibliographicUtilities'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* Networks or Consortia */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='networksConsortia'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Networks or Consortia
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='networksConsortia'
+                  name='networksConsortia'
+                  type='text'
+                  autoComplete='networksConsortia'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* Integrated System Vendor */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='integratedSystemVendor'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Integrated System Vendor
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='integratedSystemVendor'
+                  name='integratedSystemVendor'
+                  type='text'
+                  autoComplete='integratedSystemVendor'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* OPAC Capability of CJK Display */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='OPACCJK'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                OPAC Capability of CJK Display
+              </label>
+              <div className='mt-2'>
+                <select
+                  id='OPACCJK'
+                  name='OPACCJK'
+                  autoComplete='OPACCJK-name'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                >
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+            {/* Established at (4-digit year) */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='establishedAt'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Established at (4-digit year)
+              </label>
+              <div className='mt-2'>
+                <input
+                  id='establishedAt'
+                  name='establishedAt'
+                  type='text'
+                  autoComplete='establishedAt'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            </div>
+            {/* Law */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='law'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Law
+              </label>
+              <div className='mt-2'>
+                <select
+                  id='law'
+                  name='law'
+                  autoComplete='law-name'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                >
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+            {/* Medical */}
+            <div className='sm:col-span-3'>
+              <label
+                htmlFor='medical'
+                className='block text-sm font-medium leading-6 text-gray-900'
+              >
+                Medical
+              </label>
+              <div className='mt-2'>
+                <select
+                  id='medical'
+                  name='medical'
+                  autoComplete='medical-name'
+                  className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                >
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </form>
