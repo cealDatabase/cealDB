@@ -12,8 +12,9 @@ export default async function signupAction(
 ): Promise<string> {
   // Get data off form
   const username = formData.get("username");
-  const password = formData.get("password");
-  const role = formData.get("role");
+  const password = Math.floor(100000 + Math.random() * 900000);
+  const institution = formData.get("nameinstitution");
+  const userrole = formData.get("namerole");
   // Send to our api route
 
   const res = await fetch(ROOT_URL + "/api/signup", {
@@ -21,7 +22,7 @@ export default async function signupAction(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, institution, userrole }),
   });
   const json = await res.json();
   // Redirect to log in if success

@@ -16,7 +16,6 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
 
 import signupAction from "./signupAction";
-import { Stack } from "@mui/material";
 
 export default function SignUpForm({
   libraries,
@@ -27,7 +26,15 @@ export default function SignUpForm({
 }) {
   const [error, formAction] = useFormState(signupAction, undefined);
   const [institution, setInstitution] = useState("");
-  const [userRole, setRoles] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+  const handleInstitutionChange = (event: SelectChangeEvent) => {
+    setInstitution(event.target.value as string);
+  };
+
+  const handleRoleChange = (event: SelectChangeEvent) => {
+    setUserRole(event.target.value as string);
+  };
 
   return (
     <>
@@ -52,25 +59,19 @@ export default function SignUpForm({
               autoComplete="email"
               required
             />
-            {/* <TextField
-              label="Password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            /> */}
 
             <Box sx={{ minWidth: 240 }}>
               <FormControl fullWidth>
                 <InputLabel id="institution-label">
-                  Select an Institution
+                  Select Institution
                 </InputLabel>
                 <Select
                   labelId="institution-label"
-                  id="institution-select"
+                  id="institution"
+                  name="nameinstitution"
                   value={institution}
                   label="Select an institution"
-                  // onChange={handleChange}
+                  onChange={handleInstitutionChange}
                 >
                   {Array.isArray(libraries) &&
                     libraries.map(
@@ -87,13 +88,13 @@ export default function SignUpForm({
 
             <Box sx={{ minWidth: 240 }}>
               <FormControl fullWidth>
-                <InputLabel id="role-label">Select an Role</InputLabel>
+                <InputLabel id="userrole-label">Select Role</InputLabel>
                 <Select
-                  labelId="role-label"
-                  id="role-select"
+                  labelId="userrole-label"
+                  name="namerole"
                   value={userRole}
                   label="Select an user role"
-                  // onChange={handleChange}
+                  onChange={handleRoleChange}
                 >
                   {Array.isArray(roles) &&
                     roles.map((role: any) => (
@@ -104,13 +105,6 @@ export default function SignUpForm({
                 </Select>
               </FormControl>
             </Box>
-            {/* <TextField
-              label="Role Number"
-              name="role"
-              type="number"
-              autoComplete="role"
-              required
-            /> */}
           </div>
           <Button
             variant="outline"

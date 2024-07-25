@@ -7,7 +7,7 @@ import { getUserByUserName } from "@/data/fetchPrisma";
 export async function POST(request: Request) {
   // read data off request body
   const body = await request.json();
-  const { username, password } = body;
+  const { username, password, insitution, userrole } = body;
 
   const searchUser = await getUserByUserName(username);
   if (searchUser?.username.toLowerCase() === username.toLowerCase()) {
@@ -25,12 +25,15 @@ export async function POST(request: Request) {
     );
   }
 
+  console.log("in route:" + JSON.stringify(body));
+  
   // hash the password
   const hash = bcrypt.hashSync(password, 8);
 
   // create a user in db. Will move to /data/fetchPrisma.ts in the future
   await db.user.create({
     data: {
+      id: 346,
       username: username,
       password: hash,
       isactive: true,
