@@ -110,6 +110,19 @@ export const getRoleById = async (id: number) => {
   }
 };
 
+export const getAllRoles = async () => {
+  try {
+    const allRoles = await db.role.findMany({
+      include: {
+        User_Roles: true,
+      },
+    });
+    return allRoles;
+  } catch {
+    return null;
+  }
+};
+
 export const getRoleInfoByUserId = async (id: number) => {
   try {
     const roles = await db.users_Roles.findMany({ where: { user_id: id } });
