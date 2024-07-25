@@ -256,6 +256,17 @@ export default function LibSingle({
                 </dd>
               </div>
             )}
+
+            {isMatchedUser || cookiesRoleId?.includes("1")
+              ? libraries.notes && (
+                  <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+                    <dt className="text-gray-500 font-medium">Notes</dt>
+                    <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                      {libraries.notes}
+                    </dd>
+                  </div>
+                )
+              : ""}
           </dl>
         </div>
       </Container>
