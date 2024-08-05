@@ -27,8 +27,6 @@ export default async function SingleLibraryInfoHomePage({
       ? true
       : false;
 
-  console.log(isValid);
-
   return (
     <main>
       {userItem && !isValid && (
@@ -67,8 +65,9 @@ export default async function SingleLibraryInfoHomePage({
         <div>
           <p className="text-3xl font-medium text-gray-900">
             User not found.
-            <br/>
-            Please check user information at <Link href="/libraries">here</Link>.
+            <br />
+            Please check user information at <Link href="/libraries">here</Link>
+            .
           </p>
           <div className="mt-10 flex items-center gap-x-6">
             <Link

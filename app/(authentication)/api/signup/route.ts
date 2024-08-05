@@ -3,6 +3,10 @@
 import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
+import { WelcomeEmailTemplate } from "@/components/WelcomeEmailTmpt";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   // read data off request body
@@ -27,12 +31,10 @@ export async function POST(request: Request) {
     );
   }
 
-  console.log("in route:" + JSON.stringify(body));
-
   // hash the password
-  // const hash = bcrypt.hashSync(password, 8);
-  const hash = password.toString();
+  const hash = bcrypt.hashSync(password.toString(), 8);
 
+  // ----------------- Create user in db -----------------
   // create a user in db. Will move to /data/fetchPrisma.ts in the future
   await db.user.create({
     data: {
@@ -75,6 +77,30 @@ export async function POST(request: Request) {
         role_id: userroleId,
       },
     });
+
+    // ----------------- Send email to user -----------------
+    try {
+      const { data, error } = await resend.emails.send({
+        from: "CEAL Admin <admin@vivoequeen.com>",
+        to: username,
+        subject: "Welcome to CEAL Stats",
+        react: WelcomeEmailTemplate({
+          username: username,
+          password: password,
+        }),
+        text: "", // Keep this! To avoid error
+      });
+
+      if (error) {
+        return Response.json({ error }, { status: 500 });
+      }
+
+      return Response.json({
+        message: data?.id,
+      });
+    } catch (error) {
+      return Response.json({ error }, { status: 500 });
+    }
   }
 
   // return something

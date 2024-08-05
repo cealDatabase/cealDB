@@ -28,7 +28,7 @@ export async function POST(request: Request) {
           firstName: user.firstname ?? "",
           resetLink: `https://ceal-db.vercel.app/forgot/${username}?token=${expireTime}`,
         }),
-        text: "", // Have to keep this to avoid error
+        text: "", // Keep this! To avoid error
       });
 
       if (error) {
