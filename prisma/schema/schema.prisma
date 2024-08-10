@@ -27,6 +27,16 @@ model Language {
   full  String
 }
 
+model Library_Year {
+  id                  Int      @id @default(autoincrement())
+  library             Int
+  is_open_for_editing Boolean  @default(false)
+  admin_notes         String?
+  year                Int
+  updated_at          DateTime
+  is_active           Boolean  @default(true)
+}
+
 model User {
   id           Int            @id @default(autoincrement())
   username     String         @unique

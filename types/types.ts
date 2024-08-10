@@ -95,3 +95,13 @@ export type SingleLibraryType = {
   libraryType: Reflibrarytype;
   user_library: User_Library_Type;
 };
+
+export type Library_Year_Type = {
+  id: number;
+  library: number;
+  is_open_for_editing: Boolean;
+  admin_notes: String | null;
+  year: number;
+  updated_at: Date;
+  is_active: Boolean;
+};

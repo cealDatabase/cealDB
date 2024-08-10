@@ -1,9 +1,19 @@
-import { Library, User, User_Library, Users_Roles } from "@prisma/client";
+import {
+  Library,
+  Library_Year,
+  User,
+  User_Library,
+  Users_Roles,
+} from "@prisma/client";
 import db from "../lib/db";
 
 async function main() {
   const libraries = await Promise.all<Library[]>([
     await db.$queryRaw`SELECT * FROM ceal.library`,
+  ]);
+
+  const libraryYear = await Promise.all<Library_Year[]>([
+    await db.$queryRaw`SELECT * FROM ceal.library_year`,
   ]);
 
   const users = await Promise.all<User[]>([
@@ -61,6 +71,11 @@ async function main() {
     }),
     await db.library.createMany({
       data: libraries[0],
+    }),
+    console.log("Seeding data..."),
+    console.log(libraryYear[0]),
+    await db.library_Year.createMany({
+      data: libraryYear[0],
     }),
     await db.user.createMany({
       data: users[0],
