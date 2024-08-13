@@ -1,4 +1,7 @@
 import {
+  Electronic,
+  Electronic_Books,
+  Entry_Status,
   Library,
   Library_Year,
   User,
@@ -14,6 +17,18 @@ async function main() {
 
   const libraryYear = await Promise.all<Library_Year[]>([
     await db.$queryRaw`SELECT * FROM ceal.library_year`,
+  ]);
+
+  const electronic = await Promise.all<Electronic[]>([
+    await db.$queryRaw`SELECT * FROM ceal.electronic`,
+  ]);
+
+  const electronicBooks = await Promise.all<Electronic_Books[]>([
+    await db.$queryRaw`SELECT * FROM ceal.electronic_books`,
+  ]);
+
+  const entryStatus = await Promise.all<Entry_Status[]>([
+    await db.$queryRaw`SELECT * FROM ceal.entryStatus`,
   ]);
 
   const users = await Promise.all<User[]>([
@@ -72,8 +87,15 @@ async function main() {
     await db.library.createMany({
       data: libraries[0],
     }),
-    console.log("Seeding data..."),
-    console.log(libraryYear[0]),
+    await db.electronic.createMany({
+      data: electronic[0],
+    }),
+    await db.electronic_Books.createMany({
+      data: electronicBooks[0],
+    }),
+    await db.entry_Status.createMany({
+      data: entryStatus[0],
+    }),
     await db.library_Year.createMany({
       data: libraryYear[0],
     }),

@@ -1,47 +1,48 @@
 model Library {
-    id                             Int       @id @default(autoincrement())
-    type                           Int
-    library_name                   String
-    plilaw                         Boolean
-    plimed                         Boolean
-    plisubmitter_first_name        String?
-    plisubmitter_last_name         String?
-    pliposition_title              String?
-    pliwork_phone                  String?
-    plie_mail                      String
-    plifax_number                  String?
-    pliinput_as_of_date            DateTime?
-    password                       String?
-    plibibliographic               String?
-    pliconsortia                   String?
-    plisystem_vendor               String?
-    pliopac                        Boolean?
-    plihome_page                   String?
-    plionline_catalog              String?
-    pliunique                      Boolean?
-    pliestablishedyear             String?
-    library_number                 Int
-    pliregion                      Int?
-    collection_title               String?
-    collection_incharge_title      String?
-    collection_organized_under     String?
-    collection_head_reports_to     String?
-    collection_top_department      String?
-    collection_next_position_title String?
-    collection_other_departments   String?
-    collection_librarians_groups   String?
-    collection_type                String?
-    shelving_type                  String?
-    consultation_type              String?
-    teaching_type                  String?
-    acquisition_type               String?
-    cataloging_type                String?
-    circulation_type               String?
-    date_last_changed              DateTime?
-    notes                          String?
-    hideinlibrarylist              Boolean?
+  id                             Int       @id @default(autoincrement())
+  type                           Int
+  library_name                   String
+  plilaw                         Boolean
+  plimed                         Boolean
+  plisubmitter_first_name        String?
+  plisubmitter_last_name         String?
+  pliposition_title              String?
+  pliwork_phone                  String?
+  plie_mail                      String
+  plifax_number                  String?
+  pliinput_as_of_date            DateTime?
+  password                       String?
+  plibibliographic               String?
+  pliconsortia                   String?
+  plisystem_vendor               String?
+  pliopac                        Boolean?
+  plihome_page                   String?
+  plionline_catalog              String?
+  pliunique                      Boolean?
+  pliestablishedyear             String?
+  library_number                 Int
+  pliregion                      Int?
+  collection_title               String?
+  collection_incharge_title      String?
+  collection_organized_under     String?
+  collection_head_reports_to     String?
+  collection_top_department      String?
+  collection_next_position_title String?
+  collection_other_departments   String?
+  collection_librarians_groups   String?
+  collection_type                String?
+  shelving_type                  String?
+  consultation_type              String?
+  teaching_type                  String?
+  acquisition_type               String?
+  cataloging_type                String?
+  circulation_type               String?
+  date_last_changed              DateTime?
+  notes                          String?
+  hideinlibrarylist              Boolean?
 
-    libraryRegion Reflibraryregion? @relation(fields: [pliregion], references: [id])
-    libraryType   Reflibrarytype    @relation(fields: [type], references: [id])
-    User_Library  User_Library[]
+  libraryRegion Reflibraryregion? @relation(fields: [pliregion], references: [id])
+  libraryType   Reflibrarytype    @relation(fields: [type], references: [id])
+  User_Library  User_Library[]
+  Library_Year  Library_Year[]
 }
