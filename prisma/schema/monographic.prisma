@@ -1,0 +1,28 @@
+model Monographic_Acquisitions {
+    id                              Int     @id @default(autoincrement())
+    entryid                         String?
+    mapurchased_titles_chinese      Float?
+    mapurchased_titles_japanese     Float?
+    mapurchased_titles_korean       Float?
+    mapurchased_titles_noncjk       Float?
+    mapurchased_titles_subtotal     Float?
+    mapurchased_volumes_chinese     Float?
+    mapurchased_volumes_japanese    Float?
+    mapurchased_volumes_korean      Float?
+    mapurchased_volumes_noncjk      Float?
+    mapurchased_volumes_subtotal    Float?
+    manonpurchased_titles_chinese   Float?
+    manonpurchased_titles_japanese  Float?
+    manonpurchased_titles_korean    Float?
+    manonpurchased_titles_noncjk    Float?
+    manonpurchased_titles_subtotal  Float?
+    manonpurchased_volumes_chinese  Float?
+    manonpurchased_volumes_japanese Float?
+    manonpurchased_volumes_korean   Float?
+    manonpurchased_volumes_noncjk   Float?
+    manonpurchased_volumes_subtotal Float?
+    matotal_titles                  Float?
+    matotal_volumes                 Float?
+    manotes                         String?
+    libraryyear                     Int?
+}

@@ -9,6 +9,7 @@ import {
   LibraryYear_ListAV,
   LibraryYear_ListEBook,
   LibraryYear_ListEJournal,
+  Monographic_Acquisitions,
   Serials,
   User,
   User_Library,
@@ -57,6 +58,11 @@ async function main() {
   const fiscalSupport = await Promise.all<Fiscal_Support[]>([
     await db.$queryRaw`SELECT * FROM ceal.fiscal_support`,
   ]);
+
+  const monographicAcquisitions = await Promise.all<Monographic_Acquisitions[]>(
+    [await db.$queryRaw`SELECT * FROM ceal.monographic_acquisitions`]
+  );
+
 
   const users = await Promise.all<User[]>([
     await db.$queryRaw`SELECT * FROM ceal.user`,
@@ -149,6 +155,9 @@ async function main() {
     }),
     await db.libraryYear_ListEJournal.createMany({
       data: libraryYearListEJournal[0],
+    }),
+    await db.monographic_Acquisitions.createMany({
+      data: monographicAcquisitions[0],
     }),
     await db.user.createMany({
       data: users[0],
