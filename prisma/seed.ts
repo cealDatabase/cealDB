@@ -2,11 +2,18 @@ import {
   Electronic,
   Electronic_Books,
   Entry_Status,
+  Exclude_Year,
+  Fiscal_Support,
   Library,
   Library_Year,
+  LibraryYear_ListAV,
+  LibraryYear_ListEBook,
+  LibraryYear_ListEJournal,
+  Serials,
   User,
   User_Library,
   Users_Roles,
+  Volume_Holdings,
 } from "@prisma/client";
 import db from "../lib/db";
 
@@ -18,6 +25,18 @@ async function main() {
   const libraryYear = await Promise.all<Library_Year[]>([
     await db.$queryRaw`SELECT * FROM ceal.library_year`,
   ]);
+
+  const libraryYearListAV = await Promise.all<LibraryYear_ListAV[]>([
+    await db.$queryRaw`SELECT * FROM ceal.libraryyear_listav`,
+  ]);
+
+  const libraryYearListEBook = await Promise.all<LibraryYear_ListEBook[]>([
+    await db.$queryRaw`SELECT * FROM ceal.libraryyear_listebook`,
+  ]);
+
+  const libraryYearListEJournal = await Promise.all<LibraryYear_ListEJournal[]>(
+    [await db.$queryRaw`SELECT * FROM ceal.libraryyear_listejournal`]
+  );
 
   const electronic = await Promise.all<Electronic[]>([
     await db.$queryRaw`SELECT * FROM ceal.electronic`,
@@ -31,6 +50,14 @@ async function main() {
     await db.$queryRaw`SELECT * FROM ceal.entryStatus`,
   ]);
 
+  const excludeYear = await Promise.all<Exclude_Year[]>([
+    await db.$queryRaw`SELECT * FROM ceal.exclude_year`,
+  ]);
+
+  const fiscalSupport = await Promise.all<Fiscal_Support[]>([
+    await db.$queryRaw`SELECT * FROM ceal.fiscal_support`,
+  ]);
+
   const users = await Promise.all<User[]>([
     await db.$queryRaw`SELECT * FROM ceal.user`,
   ]);
@@ -41,6 +68,14 @@ async function main() {
 
   const userRole = await Promise.all<Users_Roles[]>([
     await db.$queryRaw`SELECT * FROM ceal.users_roles`,
+  ]);
+
+  const serials = await Promise.all<Serials[]>([
+    await db.$queryRaw`SELECT * FROM ceal.serials`,
+  ]);
+
+  const volumeHoldings = await Promise.all<Volume_Holdings[]>([
+    await db.$queryRaw`SELECT * FROM ceal.volume_holdings`,
   ]);
 
   const response = await Promise.all([
@@ -96,8 +131,24 @@ async function main() {
     await db.entry_Status.createMany({
       data: entryStatus[0],
     }),
+    await db.exclude_Year.createMany({
+      data: excludeYear[0],
+    }),
+    await db.fiscal_Support.createMany({
+      data: fiscalSupport[0],
+    }),
     await db.library_Year.createMany({
       data: libraryYear[0],
+    }),
+
+    await db.libraryYear_ListAV.createMany({
+      data: libraryYearListAV[0],
+    }),
+    await db.libraryYear_ListEBook.createMany({
+      data: libraryYearListEBook[0],
+    }),
+    await db.libraryYear_ListEJournal.createMany({
+      data: libraryYearListEJournal[0],
     }),
     await db.user.createMany({
       data: users[0],
@@ -107,6 +158,12 @@ async function main() {
     }),
     await db.users_Roles.createMany({
       data: userRole[0],
+    }),
+    await db.serials.createMany({
+      data: serials[0],
+    }),
+    await db.volume_Holdings.createMany({
+      data: volumeHoldings[0],
     }),
   ]);
 }

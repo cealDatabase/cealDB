@@ -1,16 +1,34 @@
 
   id
-  Fiscal_Support
-  Monographic_Acquisitions
-  Other_Holdings
-  Participating_Libraries_Information
-  Personnel_Support_FTE
-  Public_Services
-  Serials
-  Unprocessed_Backlog_Materials
-  Volume_Holdings
-  Electronic
-  Electronic_Books
-  esPublished
+  EntryID
+  vhPrevious_Year_Chinese
+  vhPrevious_Year_Japanese
+  vhPrevious_Year_Korean
+  vhPrevious_Year_NonCJK
+  vhPrevious_Year_Subtotal
+  vhAdded_Gross_Chinese
+  vhAdded_Gross_Japanese
+  vhAdded_Gross_Korean
+  vhAdded_Gross_NonCJK
+  vhAdded_Gross_Subtotal
+  vhWithdrawn_Chinese
+  vhWithdrawn_Japanese
+  vhWithdrawn_Korean
+  vhWithdrawn_NonCJK
+  vhWithdrawn_Subtotal
+  vh_Film_Chinese
+  vh_Film_Japanese
+  vh_Film_Korean
+  vh_Film_Subtotal
+  vh_Fiche_Chinese
+  vh_Fiche_Japanese
+  vh_Fiche_Korean
+  vh_Fiche_Subtotal
+  vh_Film_Fiche_Chinese
+  vh_Film_Fiche_Japanese
+  vh_Film_Fiche_Korean
+  vh_Film_Fiche_Subtotal
+  vhGrandTotal
+  vhNotes
   libraryYear
 

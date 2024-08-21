@@ -1,0 +1,34 @@
+model Volume_Holdings {
+    id                       Int     @id @default(autoincrement())
+    entryid                  String?
+    vhprevious_year_chinese  Float?
+    vhprevious_year_japanese Float?
+    vhprevious_year_korean   Float?
+    vhprevious_year_noncjk   Float?
+    vhprevious_year_subtotal Float?
+    vhadded_gross_chinese    Float?
+    vhadded_gross_japanese   Float?
+    vhadded_gross_korean     Float?
+    vhadded_gross_noncjk     Float?
+    vhadded_gross_subtotal   Float?
+    vhwithdrawn_chinese      Float?
+    vhwithdrawn_japanese     Float?
+    vhwithdrawn_korean       Float?
+    vhwithdrawn_noncjk       Float?
+    vhwithdrawn_subtotal     Float?
+    vh_film_chinese          Float?
+    vh_film_japanese         Float?
+    vh_film_korean           Float?
+    vh_film_subtotal         Float?
+    vh_fiche_chinese         Float?
+    vh_fiche_japanese        Float?
+    vh_fiche_korean          Float?
+    vh_fiche_subtotal        Float?
+    vh_film_fiche_chinese    Float?
+    vh_film_fiche_japanese   Float?
+    vh_film_fiche_korean     Float?
+    vh_film_fiche_subtotal   Float?
+    vhgrandtotal             Float?
+    vhnotes                  String?
+    libraryyear              Int?
+}

@@ -9,6 +9,10 @@ generator client {
   previewFeatures = ["prismaSchemaFolder"]
 }
 
+model Exclude_Year {
+  exyear Int @id
+}
+
 model Reflibrarytype {
   id          Int       @id @default(autoincrement())
   librarytype String

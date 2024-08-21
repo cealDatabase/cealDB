@@ -1,0 +1,20 @@
+model LibraryYear_ListAV {
+    libraryyear_id Int
+    listav_id      Int
+
+    @@unique([libraryyear_id, listav_id])
+}
+
+model LibraryYear_ListEBook {
+    libraryyear_id Int
+    listebook_id   Int
+
+    @@unique([libraryyear_id, listebook_id])
+}
+
+model LibraryYear_ListEJournal {
+    libraryyear_id  Int
+    listejournal_id Int
+
+    @@unique([libraryyear_id, listejournal_id])
+}
