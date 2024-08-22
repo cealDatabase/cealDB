@@ -39,7 +39,26 @@ model Library_Year {
   year                Int
   updated_at          DateTime
   is_active           Boolean? @default(true)
-  Library             Library  @relation(fields: [library], references: [id])
+
+  electronicId             Int?
+  electronic_BooksId       Int?
+  entry_StatusId           Int?
+  fiscal_SupportId         Int?
+  serialsId                Int?
+  volume_HoldingsId        Int?
+  Electronic_Books         Electronic_Books?          @relation(fields: [electronic_BooksId], references: [id])
+  Entry_Status             Entry_Status?              @relation(fields: [entry_StatusId], references: [id])
+  Fiscal_Support           Fiscal_Support?            @relation(fields: [fiscal_SupportId], references: [id])
+  Library                  Library                    @relation(fields: [library], references: [id])
+  LibraryYear_ListAV       LibraryYear_ListAV[]
+  LibraryYear_ListEBook    LibraryYear_ListEBook[]
+  LibraryYear_ListEJournal LibraryYear_ListEJournal[]
+  Other_Holdings           Other_Holdings?
+  Monographic_Acquisitions Monographic_Acquisitions?
+  Personnel_Support        Personnel_Support?
+  Electronic               Electronic?                @relation(fields: [electronicId], references: [id])
+  Serials                  Serials?                   @relation(fields: [serialsId], references: [id])
+  Volume_Holdings          Volume_Holdings?           @relation(fields: [volume_HoldingsId], references: [id])
 }
 
 model User {

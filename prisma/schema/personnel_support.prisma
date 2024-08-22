@@ -1,7 +1,7 @@
 model Personnel_Support {
-    id                              Int      @id @default(autoincrement())
+    id                              Int           @id @default(autoincrement())
     entryid                         String?
-    libraryyear                     Int?
+    libraryyear                     Int?          @unique
     psfnotes                        String?
     psfosacquisition                Boolean?
     psfosprocessing                 Boolean?
@@ -22,4 +22,5 @@ model Personnel_Support {
     psfsupport_staff_korean         Float?
     psfsupport_staff_subtotal       Float?
     psftotal                        Float?
+    LibraryYearRef                  Library_Year? @relation(fields: [libraryyear], references: [id])
 }

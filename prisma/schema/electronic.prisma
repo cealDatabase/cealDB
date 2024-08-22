@@ -1,6 +1,6 @@
 model Electronic {
-    id                                        Int      @id @default(autoincrement())
-    libraryyear                               Int?     @unique
+    id                                        Int            @id @default(autoincrement())
+    libraryyear                               Int?           @unique
     entryid                                   String?
     eaccompanied_computer_cd_chinese          Float?
     eaccompanied_computer_cd_japanese         Float?
@@ -117,4 +117,5 @@ model Electronic {
     etotal_expenditure_memo                   String?
     etotal_expenditure_onetime                Decimal?
     etotal_expenditure_ongoing                Decimal?
+    LibraryYearRef                            Library_Year[]
 }

@@ -1,7 +1,7 @@
 model Other_Holdings {
     id                        Int     @id @default(autoincrement())
     entryid                   String?
-    libraryyear               Int?
+    libraryyear               Int?    @unique
     ohaudio_chinese           Float?
     ohaudio_japanese          Float?
     ohaudio_korean            Float?
@@ -89,4 +89,6 @@ model Other_Holdings {
     ohstreamingvideokorean    Float?
     ohstreamingvideononcjk    Float?
     ohstreamingvideosubtotal  Float?
+
+    LibraryYearRef Library_Year? @relation(fields: [libraryyear], references: [id])
 }

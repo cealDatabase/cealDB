@@ -24,5 +24,7 @@ model Monographic_Acquisitions {
     matotal_titles                  Float?
     matotal_volumes                 Float?
     manotes                         String?
-    libraryyear                     Int?
+    libraryyear                     Int?    @unique
+
+    LibraryYearRef Library_Year? @relation(fields: [libraryyear], references: [id])
 }
