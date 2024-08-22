@@ -10,6 +10,8 @@ import {
   LibraryYear_ListEBook,
   LibraryYear_ListEJournal,
   Monographic_Acquisitions,
+  Personnel_Support,
+  Other_Holdings,
   Serials,
   User,
   User_Library,
@@ -19,6 +21,25 @@ import {
 import db from "../lib/db";
 
 async function main() {
+  const electronic = await Promise.all<Electronic[]>([
+    await db.$queryRaw`SELECT * FROM ceal.electronic`,
+  ]);
+
+  const electronicBooks = await Promise.all<Electronic_Books[]>([
+    await db.$queryRaw`SELECT * FROM ceal.electronic_books`,
+  ]);
+
+  const entryStatus = await Promise.all<Entry_Status[]>([
+    await db.$queryRaw`SELECT * FROM ceal.entryStatus`,
+  ]);
+
+  const excludeYear = await Promise.all<Exclude_Year[]>([
+    await db.$queryRaw`SELECT * FROM ceal.exclude_year`,
+  ]);
+
+  const fiscalSupport = await Promise.all<Fiscal_Support[]>([
+    await db.$queryRaw`SELECT * FROM ceal.fiscal_support`,
+  ]);
   const libraries = await Promise.all<Library[]>([
     await db.$queryRaw`SELECT * FROM ceal.library`,
   ]);
@@ -39,30 +60,16 @@ async function main() {
     [await db.$queryRaw`SELECT * FROM ceal.libraryyear_listejournal`]
   );
 
-  const electronic = await Promise.all<Electronic[]>([
-    await db.$queryRaw`SELECT * FROM ceal.electronic`,
-  ]);
-
-  const electronicBooks = await Promise.all<Electronic_Books[]>([
-    await db.$queryRaw`SELECT * FROM ceal.electronic_books`,
-  ]);
-
-  const entryStatus = await Promise.all<Entry_Status[]>([
-    await db.$queryRaw`SELECT * FROM ceal.entryStatus`,
-  ]);
-
-  const excludeYear = await Promise.all<Exclude_Year[]>([
-    await db.$queryRaw`SELECT * FROM ceal.exclude_year`,
-  ]);
-
-  const fiscalSupport = await Promise.all<Fiscal_Support[]>([
-    await db.$queryRaw`SELECT * FROM ceal.fiscal_support`,
-  ]);
-
   const monographicAcquisitions = await Promise.all<Monographic_Acquisitions[]>(
     [await db.$queryRaw`SELECT * FROM ceal.monographic_acquisitions`]
   );
+  const personnelSupport = await Promise.all<Personnel_Support[]>([
+    await db.$queryRaw`SELECT * FROM ceal.personnel_support_fte`,
+  ]);
 
+  const otherHoldings = await Promise.all<Other_Holdings[]>([
+    await db.$queryRaw`SELECT * FROM ceal.other_holdings`,
+  ]);
 
   const users = await Promise.all<User[]>([
     await db.$queryRaw`SELECT * FROM ceal.user`,
@@ -85,6 +92,21 @@ async function main() {
   ]);
 
   const response = await Promise.all([
+    await db.electronic.createMany({
+      data: electronic[0],
+    }),
+    await db.electronic_Books.createMany({
+      data: electronicBooks[0],
+    }),
+    await db.entry_Status.createMany({
+      data: entryStatus[0],
+    }),
+    await db.exclude_Year.createMany({
+      data: excludeYear[0],
+    }),
+    await db.fiscal_Support.createMany({
+      data: fiscalSupport[0],
+    }),
     await db.role.createMany({
       data: [
         { role: "ROLE_ADMIN", name: "Super Admin" },
@@ -128,25 +150,9 @@ async function main() {
     await db.library.createMany({
       data: libraries[0],
     }),
-    await db.electronic.createMany({
-      data: electronic[0],
-    }),
-    await db.electronic_Books.createMany({
-      data: electronicBooks[0],
-    }),
-    await db.entry_Status.createMany({
-      data: entryStatus[0],
-    }),
-    await db.exclude_Year.createMany({
-      data: excludeYear[0],
-    }),
-    await db.fiscal_Support.createMany({
-      data: fiscalSupport[0],
-    }),
     await db.library_Year.createMany({
       data: libraryYear[0],
     }),
-
     await db.libraryYear_ListAV.createMany({
       data: libraryYearListAV[0],
     }),
@@ -158,6 +164,12 @@ async function main() {
     }),
     await db.monographic_Acquisitions.createMany({
       data: monographicAcquisitions[0],
+    }),
+    await db.personnel_Support.createMany({
+      data: personnelSupport[0],
+    }),
+    await db.other_Holdings.createMany({
+      data: otherHoldings[0],
     }),
     await db.user.createMany({
       data: users[0],
