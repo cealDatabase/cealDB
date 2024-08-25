@@ -56,5 +56,5 @@ model Electronic_Books {
   ebooks_purchased_add_volumes_noncjk    Int?
   ebooks_purchased_add_volumes_subtotal  Int?
 
-  LibraryYearRef Library_Year[]
+  Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }

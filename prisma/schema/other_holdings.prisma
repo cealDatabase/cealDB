@@ -90,5 +90,5 @@ model Other_Holdings {
     ohstreamingvideononcjk    Float?
     ohstreamingvideosubtotal  Float?
 
-    LibraryYearRef Library_Year? @relation(fields: [libraryyear], references: [id])
+    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }

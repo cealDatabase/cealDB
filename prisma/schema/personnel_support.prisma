@@ -22,5 +22,5 @@ model Personnel_Support {
     psfsupport_staff_korean         Float?
     psfsupport_staff_subtotal       Float?
     psftotal                        Float?
-    LibraryYearRef                  Library_Year? @relation(fields: [libraryyear], references: [id])
+    Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
 }

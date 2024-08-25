@@ -1,5 +1,5 @@
 model Serials {
-    id                            Int            @id @default(autoincrement())
+    id                            Int           @id @default(autoincrement())
     entryid                       String?
     spurchased_chinese            Float?
     spurchased_japanese           Float?
@@ -52,6 +52,6 @@ model Serials {
     sgrandtotal                   Float?
     s_egrandtotal                 Float?
     snotes                        String?
-    libraryyear                   Int?           @unique
-    LibraryYearRef                Library_Year[]
+    libraryyear                   Int?          @unique
+    Library_Year                  Library_Year? @relation(fields: [libraryyear], references: [id])
 }

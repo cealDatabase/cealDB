@@ -92,21 +92,6 @@ async function main() {
   ]);
 
   const response = await Promise.all([
-    await db.electronic.createMany({
-      data: electronic[0],
-    }),
-    await db.electronic_Books.createMany({
-      data: electronicBooks[0],
-    }),
-    await db.entry_Status.createMany({
-      data: entryStatus[0],
-    }),
-    await db.exclude_Year.createMany({
-      data: excludeYear[0],
-    }),
-    await db.fiscal_Support.createMany({
-      data: fiscalSupport[0],
-    }),
     await db.role.createMany({
       data: [
         { role: "ROLE_ADMIN", name: "Super Admin" },
@@ -179,6 +164,21 @@ async function main() {
     }),
     await db.users_Roles.createMany({
       data: userRole[0],
+    }),
+    await db.electronic.createMany({
+      data: electronic[0],
+    }),
+    await db.electronic_Books.createMany({
+      data: electronicBooks[0],
+    }),
+    await db.entry_Status.createMany({
+      data: entryStatus[0],
+    }),
+    await db.exclude_Year.createMany({
+      data: excludeYear[0],
+    }),
+    await db.fiscal_Support.createMany({
+      data: fiscalSupport[0],
     }),
     await db.serials.createMany({
       data: serials[0],

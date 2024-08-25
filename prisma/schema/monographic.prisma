@@ -26,5 +26,5 @@ model Monographic_Acquisitions {
     manotes                         String?
     libraryyear                     Int?    @unique
 
-    LibraryYearRef Library_Year? @relation(fields: [libraryyear], references: [id])
+    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }
