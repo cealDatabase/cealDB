@@ -36,8 +36,10 @@ model Fiscal_Support {
     fseast_asian_program_support_subtotal    Decimal?
     fstotal_acquisition_budget               Decimal?
     fsnotes                                  String?
-    libraryyear                              Int?
+    libraryyear                              Int?     @unique
     fsendowments_noncjk                      Decimal?
     fsgrants_noncjk                          Decimal?
     fseast_asian_program_support_noncjk      Decimal?
+
+    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }

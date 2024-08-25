@@ -1,6 +1,8 @@
 model LibraryYear_ListAV {
     libraryyear_id Int
     listav_id      Int
+    Library_Year   Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    // List_AV      List_AV?      @relation(fields: [listav_id], references: [id])
 
     @@unique([libraryyear_id, listav_id])
 }
@@ -8,6 +10,8 @@ model LibraryYear_ListAV {
 model LibraryYear_ListEBook {
     libraryyear_id Int
     listebook_id   Int
+    Library_Year   Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    // List_EBook   List_EBook?   @relation(fields: [listebook_id], references: [id])
 
     @@unique([libraryyear_id, listebook_id])
 }
@@ -15,6 +19,8 @@ model LibraryYear_ListEBook {
 model LibraryYear_ListEJournal {
     libraryyear_id  Int
     listejournal_id Int
+    Library_Year    Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    // List_EJournal List_EJournal? @relation(fields: [listejournal_id], references: [id])
 
     @@unique([libraryyear_id, listejournal_id])
 }

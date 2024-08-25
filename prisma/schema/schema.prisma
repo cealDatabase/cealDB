@@ -33,13 +33,26 @@ model Language {
 
 model Library_Year {
   id                  Int      @id @default(autoincrement())
-  library             Int
-  is_open_for_editing Boolean? @default(false)
-  admin_notes         String?
-  year                Int
   updated_at          DateTime
+  year                Int
+  admin_notes         String?
   is_active           Boolean? @default(true)
-  Library             Library  @relation(fields: [library], references: [id])
+  is_open_for_editing Boolean? @default(false)
+  library             Int?
+  Library             Library? @relation(fields: [library], references: [id])
+
+  Electronic               Electronic?
+  Electronic_Books         Electronic_Books?
+  Entry_Status             Entry_Status?
+  Fiscal_Support           Fiscal_Support?
+  LibraryYear_ListAV       LibraryYear_ListAV[]
+  LibraryYear_ListEBook    LibraryYear_ListEBook[]
+  LibraryYear_ListEJournal LibraryYear_ListEJournal[]
+  Monographic_Acquisitions Monographic_Acquisitions?
+  Other_Holdings           Other_Holdings?
+  Personnel_Support        Personnel_Support?
+  Serials                  Serials?
+  Volume_Holdings          Volume_Holdings?
 }
 
 model User {
