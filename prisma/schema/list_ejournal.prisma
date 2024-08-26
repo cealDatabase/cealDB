@@ -1,0 +1,22 @@
+model List_EJournal {
+    id Int @id @default(autoincrement())
+    titles String?
+    sub_series_number String?
+    publisher  String?
+    description String?
+    notes String?
+    updated_at DateTime
+    subtitle String?
+    series String?
+    vendor String?
+    cjk_title String?
+    romanized_title String?
+    data_source String?
+    is_global Boolean?
+    
+    libraryyear_id Int? @unique
+    Library_Year Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    
+    LibraryYear_ListEJournal LibraryYear_ListEJournal[]
+    List_EJournal_Counts List_EJournal_Counts[]
+}

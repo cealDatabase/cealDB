@@ -1,0 +1,10 @@
+model List_AV_Counts {
+    id Int @id @default(autoincrement())
+    titles Int?
+    year Int?
+    updatedat DateTime
+    ishidden Boolean?
+    
+    listav Int? @unique
+    List_AV List_AV? @relation(fields: [listav], references: [id])
+}

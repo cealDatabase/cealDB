@@ -53,6 +53,9 @@ model Library_Year {
   Personnel_Support        Personnel_Support?
   Serials                  Serials?
   Volume_Holdings          Volume_Holdings?
+  List_AV                  List_AV[]
+  List_EBook                List_EBook[]
+  List_EJournal            List_EJournal[]
 }
 
 model User {
