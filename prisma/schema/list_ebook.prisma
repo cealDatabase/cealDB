@@ -17,4 +17,5 @@ model List_EBook{
 
     LibraryYear_ListEBook LibraryYear_ListEBook[]
     List_EBook_Counts List_EBook_Counts[]
+    List_EBook_Language List_EBook_Language[]
 }

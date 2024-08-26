@@ -19,4 +19,5 @@ model List_EJournal {
     
     LibraryYear_ListEJournal LibraryYear_ListEJournal[]
     List_EJournal_Counts List_EJournal_Counts[]
+    List_EJournal_Language List_EJournal_Language[]
 }

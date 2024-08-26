@@ -29,6 +29,10 @@ model Language {
   id    Int    @id @default(autoincrement())
   short String
   full  String
+
+  List_AV_Language List_AV_Language[]
+  List_EBook_Language List_EBook_Language[]
+  List_EJournal_Language List_EJournal_Language[]
 }
 
 model Library_Year {

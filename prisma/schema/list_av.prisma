@@ -17,4 +17,5 @@ model List_AV {
 
     LibraryYear_ListAV LibraryYear_ListAV[]
     List_AV_Counts List_AV_Counts[]
+    List_AV_Language List_AV_Language[]
 }
