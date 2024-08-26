@@ -65,8 +65,6 @@ async function main() {
     await db.$queryRaw`SELECT * FROM ceal.libraryyear_listebook`,
   ]);
 
-  // Draw the original data from the ceal database from online storage
-  // listAV --> listEjournalLanguage
   const listAV = await Promise.all<List_AV[]>([
     await db.$queryRaw`SELECT * FROM ceal.list_av`,
   ]);
@@ -102,7 +100,7 @@ async function main() {
   const ListEJournalLanguage = await Promise.all<List_EJournal_Language>([
     await db.$queryRaw`SELECT * FROM ceal.listejournal_language`,
   ]);
-  //
+  
   const libraryYearListEJournal = await Promise.all<LibraryYear_ListEJournal[]>(
     [await db.$queryRaw`SELECT * FROM ceal.libraryyear_listejournal`]
   );
