@@ -12,8 +12,8 @@ model List_EBook{
     data_source String?
     is_global Boolean?
     
-    libraryyear_id Int? @unique
-    Library_Year   Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    libraryyear Int? 
+    Library_Year   Library_Year? @relation(fields: [libraryyear], references: [id])
 
     LibraryYear_ListEBook LibraryYear_ListEBook[]
     List_EBook_Counts List_EBook_Counts[]

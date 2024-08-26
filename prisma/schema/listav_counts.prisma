@@ -5,6 +5,6 @@ model List_AV_Counts {
     updatedat DateTime
     ishidden Boolean?
     
-    listav Int? @unique
+    listav Int? 
     List_AV List_AV? @relation(fields: [listav], references: [id])
 }

@@ -42,7 +42,8 @@ model Library_Year {
   admin_notes         String?
   is_active           Boolean? @default(true)
   is_open_for_editing Boolean? @default(false)
-  library             Int?
+
+  library             Int?  
   Library             Library? @relation(fields: [library], references: [id])
 
   Electronic               Electronic?
@@ -58,7 +59,7 @@ model Library_Year {
   Serials                  Serials?
   Volume_Holdings          Volume_Holdings?
   List_AV                  List_AV[]
-  List_EBook                List_EBook[]
+  List_EBook               List_EBook[]
   List_EJournal            List_EJournal[]
 }
 

@@ -1,12 +1,12 @@
 model List_EBook_Counts{
     id Int @id @default(autoincrement())
-    titles String?
+    titles Int?
     volumes Int?
     year Int?
     updatedat DateTime
     chapters Int?
     ishidden Boolean?
 
-    listebook Int? @unique
+    listebook Int? 
     List_EBook List_EBook? @relation(fields: [listebook], references: [id])
 }

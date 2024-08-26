@@ -1,6 +1,6 @@
 model List_EJournal {
     id Int @id @default(autoincrement())
-    titles String?
+    title String?
     sub_series_number String?
     publisher  String?
     description String?
@@ -14,8 +14,8 @@ model List_EJournal {
     data_source String?
     is_global Boolean?
     
-    libraryyear_id Int? @unique
-    Library_Year Library_Year? @relation(fields: [libraryyear_id], references: [id])
+    libraryyear Int? 
+    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
     
     LibraryYear_ListEJournal LibraryYear_ListEJournal[]
     List_EJournal_Counts List_EJournal_Counts[]

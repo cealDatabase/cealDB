@@ -9,6 +9,15 @@ import {
   LibraryYear_ListAV,
   LibraryYear_ListEBook,
   LibraryYear_ListEJournal,
+  List_AV,
+  List_AV_Counts,
+  List_EBook,
+  List_EBook_Counts,
+  List_EJournal,
+  List_EJournal_Counts,
+  List_AV_Language,
+  List_EBook_Language,
+  List_EJournal_Language,
   Monographic_Acquisitions,
   Personnel_Support,
   Other_Holdings,
@@ -56,6 +65,44 @@ async function main() {
     await db.$queryRaw`SELECT * FROM ceal.libraryyear_listebook`,
   ]);
 
+  // Draw the original data from the ceal database from online storage
+  // listAV --> listEjournalLanguage
+  const listAV = await Promise.all<List_AV[]>([
+    await db.$queryRaw`SELECT * FROM ceal.list_av`,
+  ]);
+
+  const listAVCounts = await Promise.all<List_AV_Counts[]>([
+    await db.$queryRaw`SELECT * FROM ceal.list_av_counts`,
+  ]);
+
+  const listEBook = await Promise.all<List_EBook[]>([
+    await db.$queryRaw`SELECT * FROM ceal.list_ebook`,
+  ]);
+
+  const listEBookCounts = await Promise.all<List_EBook_Counts>([
+    await db.$queryRaw`SELECT * FROM ceal.list_ebook_counts`,
+  ]);
+
+  const listEJournal = await Promise.all<List_EJournal>([
+    await db.$queryRaw`SELECT * FROM ceal.list_ejournal`,
+  ]);
+
+  const listEJournalCounts = await Promise.all<List_EJournal_Counts>([
+    await db.$queryRaw`SELECT * FROM ceal.list_ejournal_counts`,
+  ]);
+
+  const listAVLanguage = await Promise.all<List_AV_Language>([
+    await db.$queryRaw`SELECT * FROM ceal.listav_language`,
+  ]);
+
+  const ListEBookLanguage = await Promise.all<List_EBook_Language>([
+    await db.$queryRaw`SELECT * FROM ceal.listebook_language`,
+  ]);
+
+  const ListEJournalLanguage = await Promise.all<List_EJournal_Language>([
+    await db.$queryRaw`SELECT * FROM ceal.listejournal_language`,
+  ]);
+  //
   const libraryYearListEJournal = await Promise.all<LibraryYear_ListEJournal[]>(
     [await db.$queryRaw`SELECT * FROM ceal.libraryyear_listejournal`]
   );
@@ -138,6 +185,33 @@ async function main() {
     await db.library_Year.createMany({
       data: libraryYear[0],
     }),
+    await db.list_AV.createMany({
+      data: listAV[0],
+    }),
+    await db.list_AV_Counts.createMany({
+      data: listAVCounts[0],
+    }),
+    await db.list_EBook.createMany({
+      data: listEBook[0],
+    }),
+    await db.list_EBook_Counts.createMany({
+      data: listEBookCounts[0],
+    }),
+    await db.list_EJournal.createMany({
+      data: listEJournal[0],
+    }),
+    await db.list_EJournal_Counts.createMany({
+      data: listEJournalCounts[0],
+    }),
+    await db.list_AV_Language.createMany({
+      data: listAVLanguage[0],
+    }),
+    await db.list_EBook_Language.createMany({
+      data: ListEBookLanguage[0],
+    }),
+    await db.list_EJournal_Language.createMany({
+      data: ListEJournalLanguage[0],
+    }),
     await db.libraryYear_ListAV.createMany({
       data: libraryYearListAV[0],
     }),
@@ -194,7 +268,7 @@ main()
     await db.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e);
+    console.error("Error:", e.message);
     await db.$disconnect();
     process.exit(1);
   });

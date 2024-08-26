@@ -6,6 +6,6 @@ model List_EJournal_Counts {
     updatedat DateTime
     ishidden Boolean?
 
-    listejournal Int? @unique
+    listejournal Int?
     List_EJournal List_EJournal? @relation(fields: [listejournal], references: [id])
 }
