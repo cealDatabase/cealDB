@@ -1,0 +1,11 @@
+model List_EJournal_Counts {
+    id Int @id @default(autoincrement())
+    journals Int?
+    dbs Int?
+    year Int?
+    updatedat DateTime
+    ishidden Boolean?
+
+    listejournal Int?
+    List_EJournal List_EJournal? @relation(fields: [listejournal], references: [id])
+}

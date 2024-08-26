@@ -1,0 +1,21 @@
+model List_AV {
+    id Int @id@default(autoincrement())
+    type String?
+    title String?
+    cjk_title String?
+    romanized_title String?
+    subtitle String?
+    publisher String?
+    description String?
+    notes String?
+    data_source String?
+    updated_at DateTime
+    is_global Boolean?
+
+    libraryyear    Int?
+    Library_Year   Library_Year? @relation(fields: [libraryyear], references: [id])
+
+    LibraryYear_ListAV LibraryYear_ListAV[]
+    List_AV_Counts List_AV_Counts[]
+    List_AV_Language List_AV_Language[]
+}

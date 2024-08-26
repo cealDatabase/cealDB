@@ -1,0 +1,10 @@
+model List_AV_Language {
+    listav_id Int
+    language_id Int
+
+    List_AV List_AV? @relation(fields: [listav_id], references: [id])
+    Language Language? @relation(fields: [language_id], references: [id])
+    
+
+    @@id ([listav_id, language_id])
+}

@@ -1,0 +1,4 @@
+model ListCustomOtherHoldings {
+    id Int @id @default(autoincrement())
+    label String
+}
