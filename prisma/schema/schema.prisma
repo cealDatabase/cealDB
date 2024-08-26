@@ -30,8 +30,8 @@ model Language {
   short String
   full  String
 
-  List_AV_Language List_AV_Language[]
-  List_EBook_Language List_EBook_Language[]
+  List_AV_Language       List_AV_Language[]
+  List_EBook_Language    List_EBook_Language[]
   List_EJournal_Language List_EJournal_Language[]
 }
 
@@ -43,8 +43,8 @@ model Library_Year {
   is_active           Boolean? @default(true)
   is_open_for_editing Boolean? @default(false)
 
-  library             Int?  
-  Library             Library? @relation(fields: [library], references: [id])
+  library Int?
+  Library Library? @relation(fields: [library], references: [id])
 
   Electronic               Electronic?
   Electronic_Books         Electronic_Books?

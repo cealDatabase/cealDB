@@ -1,21 +1,42 @@
 model List_AV {
-    id Int @id@default(autoincrement())
-    type String?
-    title String?
-    cjk_title String?
+    id              Int      @id @default(autoincrement())
+    type            String?
+    title           String?
+    cjk_title       String?
     romanized_title String?
-    subtitle String?
-    publisher String?
-    description String?
-    notes String?
-    data_source String?
-    updated_at DateTime
-    is_global Boolean?
+    subtitle        String?
+    publisher       String?
+    description     String?
+    notes           String?
+    data_source     String?
+    updated_at      DateTime
+    is_global       Boolean?
 
-    libraryyear    Int?
-    Library_Year   Library_Year? @relation(fields: [libraryyear], references: [id])
+    libraryyear  Int?
+    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 
     LibraryYear_ListAV LibraryYear_ListAV[]
-    List_AV_Counts List_AV_Counts[]
-    List_AV_Language List_AV_Language[]
+    List_AV_Counts     List_AV_Counts[]
+    List_AV_Language   List_AV_Language[]
+}
+
+model List_AV_Counts {
+    id        Int      @id @default(autoincrement())
+    titles    Int?
+    year      Int?
+    updatedat DateTime
+    ishidden  Boolean?
+
+    listav  Int?
+    List_AV List_AV? @relation(fields: [listav], references: [id])
+}
+
+model List_AV_Language {
+    listav_id   Int
+    language_id Int
+
+    List_AV  List_AV?  @relation(fields: [listav_id], references: [id])
+    Language Language? @relation(fields: [language_id], references: [id])
+
+    @@id([listav_id, language_id])
 }

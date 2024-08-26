@@ -1,23 +1,45 @@
 model List_EJournal {
-    id Int @id @default(autoincrement())
-    title String?
+    id                Int      @id @default(autoincrement())
+    title             String?
     sub_series_number String?
-    publisher  String?
-    description String?
-    notes String?
-    updated_at DateTime
-    subtitle String?
-    series String?
-    vendor String?
-    cjk_title String?
-    romanized_title String?
-    data_source String?
-    is_global Boolean?
-    
-    libraryyear Int? 
+    publisher         String?
+    description       String?
+    notes             String?
+    updated_at        DateTime
+    subtitle          String?
+    series            String?
+    vendor            String?
+    cjk_title         String?
+    romanized_title   String?
+    data_source       String?
+    is_global         Boolean?
+
+    libraryyear  Int?
     Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
-    
+
     LibraryYear_ListEJournal LibraryYear_ListEJournal[]
-    List_EJournal_Counts List_EJournal_Counts[]
-    List_EJournal_Language List_EJournal_Language[]
+    List_EJournal_Counts     List_EJournal_Counts[]
+    List_EJournal_Language   List_EJournal_Language[]
+}
+
+model List_EJournal_Counts {
+    id        Int      @id @default(autoincrement())
+    journals  Int?
+    dbs       Int?
+    year      Int?
+    updatedat DateTime
+    ishidden  Boolean?
+
+    listejournal  Int?
+    List_EJournal List_EJournal? @relation(fields: [listejournal], references: [id])
+}
+
+model List_EJournal_Language {
+    listejournal_id Int
+    language_id     Int
+
+    List_EJournal List_EJournal? @relation(fields: [listejournal_id], references: [id])
+    Language      Language?      @relation(fields: [language_id], references: [id])
+
+    @@id([listejournal_id, language_id])
 }

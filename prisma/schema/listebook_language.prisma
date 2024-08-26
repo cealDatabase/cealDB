@@ -1,9 +1,0 @@
-model List_EBook_Language {
-    listebook_id Int
-    language_id Int
-
-    Language Language? @relation(fields: [language_id], references: [id])
-    List_EBook  List_EBook? @relation (fields: [listebook_id], references: [id])
-
-    @@id([listebook_id, language_id])
-}
