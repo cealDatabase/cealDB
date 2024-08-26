@@ -1,18 +1,24 @@
 import { Container } from "@/components/Container";
+import LibYearSingle from "@/components/LibYearSingle";
 import { getLibYearByLibIdAndYear } from "@/data/fetchPrisma";
+import { Library_Year_Type } from "@/types/types";
 
 // Get Library Type
 async function getLibYear({ id, year }: { id: number; year: number }) {
-  const typeItem = await getLibYearByLibIdAndYear(5, 2025);
-  console.log(typeItem?.toString());
-  return <LibYear id />;
+  const libYearItem = await getLibYearByLibIdAndYear(id, year);
+  return (
+    <LibYearSingle libyear={libYearItem as unknown as Library_Year_Type[]} />
+  );
 }
+
+const five = 5;
+const twoFive = 2015;
 
 const page = () => {
   return (
     <Container>
       here
-      <getLibYear />
+      <div>{getLibYear({ id: five, year: twoFive })}</div>
     </Container>
   );
 };

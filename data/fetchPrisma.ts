@@ -135,9 +135,21 @@ export const getRoleInfoByUserId = async (id: number) => {
 export const getLibYearByLibIdAndYear = async (id: number, year: number) => {
   try {
     const libyear = await db.library_Year.findMany({
+      include: {
+        Library: true,
+        Electronic: true,
+        Electronic_Books: true,
+        Entry_Status: true,
+        Fiscal_Support: true,
+        Monographic_Acquisitions: true,
+        Other_Holdings: true,
+        Personnel_Support: true,
+        Serials: true,
+        Volume_Holdings: true,
+      },
       where: {
-        library: id,
-        year: year,
+        library: 5,
+        year: 2015,
       },
     });
     return libyear;
