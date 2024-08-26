@@ -131,3 +131,17 @@ export const getRoleInfoByUserId = async (id: number) => {
     return null;
   }
 };
+
+export const getLibYearByLibIdAndYear = async (id: number, year: number) => {
+  try {
+    const libyear = await db.library_Year.findMany({
+      where: {
+        library: id,
+        year: year,
+      },
+    });
+    return libyear;
+  } catch {
+    return null;
+  }
+};

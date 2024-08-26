@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getRegionById, getUserById, getTypeById } from "@/data/fetchPrisma";
+import { getRegionById, getTypeById } from "@/data/fetchPrisma";
 import Link from "next/link";
 import { Container } from "./Container";
 import { Button } from "./Button";
