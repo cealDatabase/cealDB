@@ -148,8 +148,8 @@ export const getLibYearByLibIdAndYear = async (id: number, year: number) => {
         Volume_Holdings: true,
       },
       where: {
-        library: 5,
-        year: 2015,
+        library: id,
+        year: year,
       },
     });
     return libyear;
