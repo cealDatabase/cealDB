@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google";
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 // import { Header } from "@/components/Header";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -27,7 +28,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body>
         <Header />
-        {children}
+        <AntdRegistry>{children}</AntdRegistry>
         <Footer />
         <Analytics />
         <SpeedInsights />

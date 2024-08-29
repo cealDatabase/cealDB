@@ -100,7 +100,8 @@ export default function LibYearSingle({
             <TableCell>$0</TableCell>
             <TableCell className="text-right">$0</TableCell>
           </TableRow>
-          function: {libyear[0].Electronic.etotal_expenditure_grandtotal}
+          function:{" "}
+          {libyear[0].Electronic.etotal_expenditure_grandtotal?.toString()}
         </TableBody>
       </Table>
     </main>
