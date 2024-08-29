@@ -1,19 +1,100 @@
+"use client";
+
 import { Library_Year_Type } from "@/types/types";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table } from "antd";
+import type { TableColumnsType } from "antd";
+
+interface DataType {
+  key: React.Key;
+  GTMTotal_WOEbooks: any;
+  GTMTotal_WEbooks: number;
+  PVH_Previous: number;
+  PVH_Added: number;
+  PVH_Withdrawn: number;
+  PVH_SubTotal: number;
+  OMH_Microform: number;
+  OMH_Cartographic: number;
+  OMH_Audio: number;
+  OMH_FilmVideo: number;
+  OMH_DVD: number;
+  OMH_SubTotal: number;
+}
 
 export default function LibYearSingle({
   libyear,
 }: {
   libyear: Library_Year_Type[];
 }) {
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: "Grand Total Materials",
+      children: [
+        {
+          title: "Total (w/o ebooks)",
+          dataIndex: "GTMTotal_WOEbooks",
+          key: "GTMTotal_WOEbooks",
+          width: 150,
+        },
+        {
+          title: "Total (w ebooks)",
+          dataIndex: "GTMTotal_WEbooks",
+          key: "GTMTotal_WEbooks",
+          width: 150,
+        },
+      ],
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      width: 100,
+      fixed: "left",
+    },
+    {
+      title: "Company",
+      children: [
+        {
+          title: "Company Address",
+          dataIndex: "companyAddress",
+          key: "companyAddress",
+          width: 200,
+        },
+        {
+          title: "Company Name",
+          dataIndex: "companyName",
+          key: "companyName",
+        },
+      ],
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+      width: 80,
+      fixed: "right",
+    },
+  ];
+
+  const data: DataType[] = [];
+
+  for (let i = 0; i < 100; i++) {
+    data.push({
+      key: i,
+      GTMTotal_WOEbooks: `${libyear[0].Electronic.etotal_expenditure_grandtotal}`,
+      GTMTotal_WEbooks: 0,
+      PVH_Previous: 0,
+      PVH_Added: 0,
+      PVH_Withdrawn: 0,
+      PVH_SubTotal: 0,
+      OMH_Microform: 0,
+      OMH_Cartographic: 0,
+      OMH_Audio: 0,
+      OMH_FilmVideo: 0,
+      OMH_DVD: 0,
+      OMH_SubTotal: 0,
+    });
+  }
+
   return (
     <main>
       <h2>
@@ -21,89 +102,15 @@ export default function LibYearSingle({
       </h2>
       {/* {Object.entries(libyear[0].Library).toString()} */}
       {/* {Object.entries(libyear[0].Electronic).toString()} */}
-      <Table>
-        <TableCaption>
-          <p>
-            (*1): Beginning from year 2008, electronic books volumes are
-            calculated separately, and this row refers to physical volumes. For
-            years before 2008, this row refers to all volumes held in the
-            institution.
-          </p>
-          <p>
-            (*2): For year between 1994 and 1998, "Other Materials" includes
-            microfilm reels, microfilm fiches, microform, computer files and
-            CDs, audiovisual, and materials not classified otherwise. Year
-            before 1994, only microfilm reels, microfilm fiches, microform are
-            included.
-          </p>
-        </TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[30%]"> </TableHead>
-            <TableHead className="w-[20%]"> </TableHead>
-            <TableHead>CHN</TableHead>
-            <TableHead>JPN</TableHead>
-            <TableHead>KOR</TableHead>
-            <TableHead>Non-CJK</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">Grand Total Materials</TableCell>
-            <TableCell className="font-medium">Total (w/o ebooks)</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell className="text-right">0</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell className="font-medium"></TableCell>
-            <TableCell className="font-medium">Total (w/ ebooks)</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell className="text-right">0</TableCell>
-          </TableRow>
-        </TableBody>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[30%]"> </TableHead>
-            <TableHead className="w-[20%]"> </TableHead>
-            <TableHead>CHN</TableHead>
-            <TableHead>JPN</TableHead>
-            <TableHead>KOR</TableHead>
-            <TableHead>Non-CJK</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium flex justify-between">
-              <span>Fiscal Support</span> <span>Appropriations</span>
-            </TableCell>
-            <TableCell>Monographic</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell className="text-right">$0</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell></TableCell>
-            <TableCell>Serials</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell>$0</TableCell>
-            <TableCell className="text-right">$0</TableCell>
-          </TableRow>
-          function:{" "}
-          {libyear[0].Electronic.etotal_expenditure_grandtotal?.toString()}
-        </TableBody>
-      </Table>
+      function:{" "}
+      {libyear[0].Electronic.etotal_expenditure_grandtotal?.toString()}
+      <Table
+        columns={columns}
+        dataSource={data}
+        bordered
+        size="middle"
+        scroll={{ x: "calc(700px + 50%)", y: "100vh" }}
+      />
     </main>
   );
 }
