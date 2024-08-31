@@ -6,20 +6,31 @@ import type { TableColumnsType } from "antd";
 
 interface DataType {
   key: React.Key;
-  GTMTotal_WOEbooks: any;
-  GTMTotal_WEbooks: number;
-  PVH_Previous: number;
-  PVH_Added: number;
-  PVH_Withdrawn: number;
-  PVH_SubTotal: number;
-  OMH_Microform: number;
-  OMH_Cartographic: number;
-  OMH_Audio: number;
-  OMH_FilmVideo: number;
-  OMH_DVD: number;
-  OMH_SubTotal: number;
+  GTMTotal_WOEbooks: any | null;
+  GTMTotal_WEbooks: number | null;
+  PVH_Previous: number | null;
+  PVH_Added: number | null;
+  PVH_Withdrawn: number | null;
+  PVH_SubTotal: number | null;
+  OMH_Microform: number | null;
+  OMH_Cartographic: number | null;
+  OMH_Audio: number | null;
+  OMH_FilmVideo: number | null;
+  OMH_DVD: number | null;
+  OMH_SubTotal: number | null;
+  EB_PT_Previous: number | null;
+  EB_PT_Add: number | null;
+  EB_PT_Subtotal: number | null;
+  EB_PT_NPTitles: number | null;
+  EB_PT_SubTitles: number | null;
+  EB_PT_TitlesTotal: number | null;
+  EB_PV_Previous: number | null;
+  EB_PV_Add: number | null;
+  EB_PV_Subtotal: number | null;
+  EB_PV_NPTitles: number | null;
+  EB_PV_SubTitles: number | null;
+  EB_PV_TitlesTotal: number | null;
 }
-
 export default function LibYearSingle({
   libyear,
 }: {
@@ -27,57 +38,146 @@ export default function LibYearSingle({
 }) {
   const columns: TableColumnsType<DataType> = [
     {
+      title: "Language",
+    },
+    {
       title: "Grand Total Materials",
       children: [
         {
           title: "Total (w/o ebooks)",
           dataIndex: "GTMTotal_WOEbooks",
           key: "GTMTotal_WOEbooks",
-          width: 150,
+          width: 80,
         },
         {
           title: "Total (w ebooks)",
           dataIndex: "GTMTotal_WEbooks",
           key: "GTMTotal_WEbooks",
-          width: 150,
+          width: 80,
         },
       ],
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      width: 100,
-      fixed: "left",
-    },
-    {
-      title: "Company",
+      title: "Physical Volumes Held (*1)",
       children: [
         {
-          title: "Company Address",
-          dataIndex: "companyAddress",
-          key: "companyAddress",
-          width: 200,
+          title: "Previous",
+          dataIndex: "PVH_Previous",
+          key: "PVH_Previous",
+          width: 80,
         },
         {
-          title: "Company Name",
-          dataIndex: "companyName",
-          key: "companyName",
+          title: "Previous",
+          dataIndex: "PVH_Added",
+          key: "PVH_Added",
+          width: 80,
+        },
+        {
+          title: "Previous",
+          dataIndex: "PVH_Withdrawn",
+          key: "PVH_Withdrawn",
+          width: 80,
+        },
+        {
+          title: "Previous",
+          dataIndex: "PVH_SubTotal",
+          key: "PVH_SubTotal",
+          width: 80,
         },
       ],
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
-      width: 80,
-      fixed: "right",
+      title: "Electronic Books",
+      children: [
+        {
+          title: "Purchased Titles",
+          children: [
+            {
+              title: "Previous",
+              dataIndex: "EB_PT_Previous",
+              key: "EB_PT_Previous",
+              width: 80,
+            },
+            {
+              title: "Add",
+              dataIndex: "EB_PT_Add",
+              key: "EB_PT_Add",
+              width: 80,
+            },
+            {
+              title: "Subtotal",
+              dataIndex: "EB_PT_Subtotal",
+              key: "EB_PT_Subtotal",
+              width: 80,
+            },
+            {
+              title: "Non-Purchased Titles",
+              dataIndex: "EB_PT_NPTitles",
+              key: "EB_PT_NPTitles",
+              width: 80,
+            },
+            {
+              title: "Subscription Titles",
+              dataIndex: "EB_PT_SubTitles",
+              key: "EB_PT_SubTitles",
+              width: 80,
+            },
+            {
+              title: "Titles Total",
+              dataIndex: "EB_PT_TitlesTotal",
+              key: "EB_PT_TitlesTotal",
+              width: 80,
+            },
+          ],
+        },
+        {
+          title: "Purchased Volume",
+          children: [
+            {
+              title: "Previous",
+              dataIndex: "EB_PV_Previous",
+              key: "EB_PV_Previous",
+              width: 80,
+            },
+            {
+              title: "Add",
+              dataIndex: "EB_PV_Add",
+              key: "EB_PV_Add",
+              width: 80,
+            },
+            {
+              title: "Subtotal",
+              dataIndex: "EB_PV_Subtotal",
+              key: "EB_PV_Subtotal",
+              width: 80,
+            },
+            {
+              title: "Non-Purchased Titles",
+              dataIndex: "EB_PV_NPTitles",
+              key: "EB_PV_NPTitles",
+              width: 80,
+            },
+            {
+              title: "Subscription Titles",
+              dataIndex: "EB_PV_SubTitles",
+              key: "EB_PV_SubTitles",
+              width: 80,
+            },
+            {
+              title: "Volumes Total",
+              dataIndex: "EB_PV_TitlesTotal",
+              key: "EB_PV_TitlesTotal",
+              width: 80,
+            },
+          ],
+        },
+      ],
     },
   ];
 
   const data: DataType[] = [];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 5; i++) {
     data.push({
       key: i,
       GTMTotal_WOEbooks: `${libyear[0].Electronic.etotal_expenditure_grandtotal}`,
@@ -92,6 +192,18 @@ export default function LibYearSingle({
       OMH_FilmVideo: 0,
       OMH_DVD: 0,
       OMH_SubTotal: 0,
+      EB_PT_Previous: 0,
+      EB_PT_Add: 0,
+      EB_PT_Subtotal: 0,
+      EB_PT_NPTitles: 0,
+      EB_PT_SubTitles: 0,
+      EB_PT_TitlesTotal: 0,
+      EB_PV_Previous: 0,
+      EB_PV_Add: 0,
+      EB_PV_Subtotal: 0,
+      EB_PV_NPTitles: 0,
+      EB_PV_SubTitles: 0,
+      EB_PV_TitlesTotal: 0,
     });
   }
 
@@ -109,6 +221,7 @@ export default function LibYearSingle({
         dataSource={data}
         bordered
         size="middle"
+        pagination={false}
         scroll={{ x: "calc(700px + 50%)", y: "100vh" }}
       />
     </main>
