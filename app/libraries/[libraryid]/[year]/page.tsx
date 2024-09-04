@@ -8,7 +8,9 @@ async function getLibYear({ id, year }: { id: number; year: number }) {
   const libYearItem = await getLibYearByLibIdAndYear(id, year);
   // console.log(libYearItem);
   return (
-    <LibYearSingle libyear={libYearItem as unknown as Library_Year_Type[]} />
+    <main>
+      <LibYearSingle libyear={libYearItem as unknown as Library_Year_Type[]} />
+    </main>
   );
 }
 
