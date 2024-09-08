@@ -40,6 +40,7 @@ function TypeSingle({ type }: { type: any }) {
 }
 
 // Get Years of Library Entry
+
 async function getYearArrayByLibId({ libId }: { libId: number }) {
   const yearItem = await getYearsByLibId(libId);
   const years = yearItem?.map((item) => item.year) || [];
@@ -50,14 +51,12 @@ function YearSingle({ years, libId }: { years: number[]; libId: number }) {
   return (
     <>
       {years.map((e) => {
-        if (e.valueOf() >= 2007) {
+        if (e.valueOf() >= 1999) {
           return (
             <Link key={e.valueOf()} href={`/libraries/${libId}/${e.valueOf()}`}>
               {e.valueOf()}
             </Link>
           );
-        } else {
-          return <p>No Data Found</p>;
         }
       })}
     </>
@@ -312,7 +311,7 @@ export default function LibSingle({
               <dt className="text-gray-500 font-medium">
                 Yearly Review
                 <br />
-                <span className="text-sm text-gray-400">After 2016</span>
+                <span className="text-sm text-gray-400">After 2007</span>
               </dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                 <div className="grid grid-cols-6 gap-1">
