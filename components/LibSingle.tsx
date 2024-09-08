@@ -1,19 +1,23 @@
 import { cookies } from "next/headers";
-import { getRegionById, getTypeById } from "@/data/fetchPrisma";
+import {
+  getRegionById,
+  getTypeById,
+  getYearsByLibId,
+} from "@/data/fetchPrisma";
 import Link from "next/link";
 import { Container } from "./Container";
 import { Button } from "./Button";
 import { SingleLibraryType } from "@/types/types";
 
-function generateYears(startYear: number, endYear: number) {
-  let years = [];
-  for (let year = startYear; year <= endYear; year++) {
-    years.push(year);
-  }
-  return years;
-}
+// function generateYears(startYear: number, endYear: number) {
+//   let years = [];
+//   for (let year = startYear; year <= endYear; year++) {
+//     years.push(year);
+//   }
+//   return years;
+// }
 
-let yearsArray = generateYears(1999, 2024);
+// let yearsArray = generateYears(1999, 2024);
 
 // Get Region
 async function getRegionDetailById({ regionId }: { regionId: number }) {
@@ -33,6 +37,31 @@ async function getLibTypeDetailById({ typeId }: { typeId: number }) {
 
 function TypeSingle({ type }: { type: any }) {
   return <>{type.librarytype}</>;
+}
+
+// Get Years of Library Entry
+async function getYearArrayByLibId({ libId }: { libId: number }) {
+  const yearItem = await getYearsByLibId(libId);
+  const years = yearItem?.map((item) => item.year) || [];
+  return <YearSingle years={years} libId={libId} />;
+}
+
+function YearSingle({ years, libId }: { years: number[]; libId: number }) {
+  return (
+    <>
+      {years.map((e) => {
+        if (e.valueOf() >= 2007) {
+          return (
+            <Link key={e.valueOf()} href={`/libraries/${libId}/${e.valueOf()}`}>
+              {e.valueOf()}
+            </Link>
+          );
+        } else {
+          return <p>No Data Found</p>;
+        }
+      })}
+    </>
+  );
 }
 
 function ContactSingle({
@@ -126,6 +155,7 @@ export default function LibSingle({
   const cookiesLibraryId = cookies().get("library")?.value;
   const cookiesRoleId = cookies().get("role")?.value;
   let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
+
   return (
     <main>
       <h1>{libraries.library_name}</h1>
@@ -279,17 +309,14 @@ export default function LibSingle({
               : ""}
 
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Yearly Overview</dt>
+              <dt className="text-gray-500 font-medium">
+                Yearly Review
+                <br />
+                <span className="text-sm text-gray-400">After 2016</span>
+              </dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                 <div className="grid grid-cols-6 gap-1">
-                  {yearsArray.map((year) => (
-                    <Link
-                      key={year}
-                      href={`/libraries/${libraries.id}/${year}`}
-                    >
-                      {year}
-                    </Link>
-                  ))}
+                  {getYearArrayByLibId({ libId: libraries.id })}
                 </div>
               </dd>
             </div>

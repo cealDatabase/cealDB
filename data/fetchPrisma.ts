@@ -157,3 +157,16 @@ export const getLibYearByLibIdAndYear = async (id: number, year: number) => {
     return null;
   }
 };
+
+export const getYearsByLibId = async (id: number) => {
+  try {
+    const years = await db.library_Year.findMany({
+      where: {
+        library: id,
+      },
+    });
+    return years;
+  } catch {
+    return null;
+  }
+};
