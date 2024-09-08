@@ -11,6 +11,16 @@ async function LibrarySinglePage(passId: number) {
   return <LibSingle libraries={libraryItem as unknown as SingleLibraryType} />;
 }
 
+function generateYears(startYear: number, endYear: number) {
+  let years = [];
+  for (let year = startYear; year <= endYear; year++) {
+    years.push(year);
+  }
+  return years;
+}
+
+let yearsArray = generateYears(1999, 2024);
+
 export default function SingleLibraryInfoHomePage({
   params,
 }: {
@@ -20,13 +30,11 @@ export default function SingleLibraryInfoHomePage({
     <main>
       <Suspense>{LibrarySinglePage(Number(params.libraryid))}</Suspense>
       <div className="flex gap-4">
-        <Link href={`/libraries/${params.libraryid}/1999`}>1999</Link>
-        <Link href={`/libraries/${params.libraryid}/2003`}>2003</Link>
-        <Link href={`/libraries/${params.libraryid}/2008`}>2008</Link>
-        <Link href={`/libraries/${params.libraryid}/2010`}>2010</Link>
-        <Link href={`/libraries/${params.libraryid}/2013`}>2013</Link>
-        <Link href={`/libraries/${params.libraryid}/2016`}>2016</Link>
-        <Link href={`/libraries/${params.libraryid}/2018`}>2018</Link>
+        {yearsArray.map((year) => (
+          <Link key={year} href={`/libraries/${params.libraryid}/${year}`}>
+            {year}
+          </Link>
+        ))}
       </div>
     </main>
   );

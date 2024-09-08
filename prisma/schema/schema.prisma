@@ -37,13 +37,13 @@ model Language {
 
 model Library_Year {
   id                  Int      @id @default(autoincrement())
-  updated_at          DateTime
-  year                Int
-  admin_notes         String?
-  is_active           Boolean? @default(true)
+  library             Int?
   is_open_for_editing Boolean? @default(false)
+  admin_notes         String?
+  year                Int
+  updated_at          DateTime
+  is_active           Boolean? @default(true)
 
-  library Int?
   Library Library? @relation(fields: [library], references: [id])
 
   Electronic               Electronic?

@@ -2,6 +2,8 @@ import { SingleElectronicType } from "./SingleElectronicType";
 import { SingleElectronicBookType } from "./SingleElectronicBookType";
 import { SingleFiscalSupportType } from "./SingleFiscalSupportType";
 import { SingleSerialType } from "./SingleSerialType";
+import { SingleEntryStatusType } from "./SingleEntryStatusType";
+import { SingleMonographicType } from "./SingleMonographicType";
 
 export type Reflibrarytype = {
   id: number;
@@ -113,6 +115,8 @@ export type Library_Year_Type = {
   Library: SingleLibraryType;
   Electronic: SingleElectronicType;
   Electronic_Books: SingleElectronicBookType;
+  Entry_Status: SingleEntryStatusType;
   Fiscal_Support: SingleFiscalSupportType;
+  Monographic_Acquisitions: SingleMonographicType;
   Serials: SingleSerialType;
 };

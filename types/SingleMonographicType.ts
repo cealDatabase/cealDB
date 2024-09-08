@@ -1,0 +1,28 @@
+export type SingleMonographicType = {
+  id: number;
+  entryid: String | null;
+  mapurchased_titles_chinese: number | null;
+  mapurchased_titles_japanese: number | null;
+  mapurchased_titles_korean: number | null;
+  mapurchased_titles_noncjk: number | null;
+  mapurchased_titles_subtotal: number | null;
+  mapurchased_volumes_chinese: number | null;
+  mapurchased_volumes_japanese: number | null;
+  mapurchased_volumes_korean: number | null;
+  mapurchased_volumes_noncjk: number | null;
+  mapurchased_volumes_subtotal: number | null;
+  manonpurchased_titles_chinese: number | null;
+  manonpurchased_titles_japanese: number | null;
+  manonpurchased_titles_korean: number | null;
+  manonpurchased_titles_noncjk: number | null;
+  manonpurchased_titles_subtotal: number | null;
+  manonpurchased_volumes_chinese: number | null;
+  manonpurchased_volumes_japanese: number | null;
+  manonpurchased_volumes_korean: number | null;
+  manonpurchased_volumes_noncjk: number | null;
+  manonpurchased_volumes_subtotal: number | null;
+  matotal_titles: number | null;
+  matotal_volumes: number | null;
+  manotes: String | null;
+  libraryyear: number | null;
+};
