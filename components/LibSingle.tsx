@@ -41,17 +41,29 @@ function TypeSingle({ type }: { type: any }) {
 
 // Get Years of Library Entry
 
-async function getYearArrayByLibId({ libId }: { libId: number }) {
+async function getOlderYearArrayByLibId({ libId }: { libId: number }) {
   const yearItem = await getYearsByLibId(libId);
   const years = yearItem?.map((item) => item.year) || [];
-  return <YearSingle years={years} libId={libId} />;
+
+  if (Math.max(...years) < 2007) {
+    return <YearSingle years={years} libId={libId} />;
+  }
+}
+
+async function getRecentYearArrayByLibId({ libId }: { libId: number }) {
+  const yearItem = await getYearsByLibId(libId);
+  const years = yearItem?.map((item) => item.year) || [];
+
+  if (Math.max(...years) < 2007) {
+    return `No Data Found ${[...years]}`;
+  } else return <YearSingle years={years} libId={libId} />;
 }
 
 function YearSingle({ years, libId }: { years: number[]; libId: number }) {
   return (
     <>
       {years.map((e) => {
-        if (e.valueOf() >= 1999) {
+        if (e.valueOf() >= 2007) {
           return (
             <Link key={e.valueOf()} href={`/libraries/${libId}/${e.valueOf()}`}>
               {e.valueOf()}
@@ -315,7 +327,20 @@ export default function LibSingle({
               </dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                 <div className="grid grid-cols-6 gap-1">
-                  {getYearArrayByLibId({ libId: libraries.id })}
+                  {getRecentYearArrayByLibId({ libId: libraries.id })}
+                </div>
+              </dd>
+            </div>
+
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+              <dt className="text-gray-500 font-medium">
+                Yearly Review
+                <br />
+                <span className="text-sm text-gray-400">Before 2007</span>
+              </dt>
+              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                <div className="grid grid-cols-6 gap-1">
+                  {getOlderYearArrayByLibId({ libId: libraries.id })}
                 </div>
               </dd>
             </div>
