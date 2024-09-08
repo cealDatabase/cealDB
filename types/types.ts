@@ -4,6 +4,9 @@ import { SingleFiscalSupportType } from "./SingleFiscalSupportType";
 import { SingleSerialType } from "./SingleSerialType";
 import { SingleEntryStatusType } from "./SingleEntryStatusType";
 import { SingleMonographicType } from "./SingleMonographicType";
+import { SingleOtherHoldingsType } from "./SingleOtherHoldingsType";
+import { SinglePersonnelSupportType } from "./SinglePersonnelSupportType";
+import { SingleVolumeHoldingsType } from "./SingleVolumeHoldingsType";
 
 export type Reflibrarytype = {
   id: number;
@@ -54,6 +57,71 @@ export type Users_Roles_Type = {
   role_id: number;
   user: SingleUserType;
   role: SingleRoleType;
+};
+
+export type LibraryYear_ListAVType = {
+  libraryyear_id: number;
+  listav_id: number;
+};
+
+export type LibraryYear_ListEBookType = {
+  libraryyear_id: number;
+  listebook_id: number;
+};
+
+export type LibraryYear_ListJournalType = {
+  libraryyear_id: number;
+  listjournal_id: number;
+};
+
+export type List_AV_Type = {
+  id: number;
+  type: String | null;
+  title: String | null;
+  cjk_title: String | null;
+  romanized_title: String | null;
+  subtitle: String | null;
+  publisher: String | null;
+  description: String | null;
+  notes: String | null;
+  data_source: String | null;
+  updated_at: Date;
+  is_global: Boolean | null;
+  libraryyear: number | null;
+};
+
+export type List_EBook_Type = {
+  id: number;
+  title: String | null;
+  sub_series_number: String | null;
+  publisher: String | null;
+  description: String | null;
+  notes: String | null;
+  updated_at: Date;
+  subtitle: String | null;
+  cjk_title: String | null;
+  romanized_title: String | null;
+  data_source: String | null;
+  is_global: Boolean | null;
+  libraryyear: number | null;
+};
+
+export type List_EJournal_Type = {
+  id: number;
+  title: String | null;
+  sub_series_number: String | null;
+  publisher: String | null;
+  description: String | null;
+  notes: String | null;
+  updated_at: Date;
+  subtitle: String | null;
+  series: String | null;
+  vendor: String | null;
+  cjk_title: String | null;
+  romanized_title: String | null;
+  data_source: String | null;
+  is_global: Boolean | null;
+  libraryyear: number | null;
 };
 
 export type SingleLibraryType = {
@@ -117,6 +185,15 @@ export type Library_Year_Type = {
   Electronic_Books: SingleElectronicBookType;
   Entry_Status: SingleEntryStatusType;
   Fiscal_Support: SingleFiscalSupportType;
+  LibraryYear_ListAV: LibraryYear_ListAVType[];
+  LibraryYear_ListEBook: LibraryYear_ListEBookType[];
+  LibraryYear_ListJournal: LibraryYear_ListJournalType[];
   Monographic_Acquisitions: SingleMonographicType;
+  Other_Holdings: SingleOtherHoldingsType;
+  Personnel_Support: SinglePersonnelSupportType;
   Serials: SingleSerialType;
+  Volume_Holdings: SingleVolumeHoldingsType;
+  List_AV: List_AV_Type[];
+  List_EBook: List_EBook_Type[];
+  List_EJournal: List_EJournal_Type[];
 };
