@@ -5,6 +5,16 @@ import { Container } from "./Container";
 import { Button } from "./Button";
 import { SingleLibraryType } from "@/types/types";
 
+function generateYears(startYear: number, endYear: number) {
+  let years = [];
+  for (let year = startYear; year <= endYear; year++) {
+    years.push(year);
+  }
+  return years;
+}
+
+let yearsArray = generateYears(1999, 2024);
+
 // Get Region
 async function getRegionDetailById({ regionId }: { regionId: number }) {
   const regionItem = await getRegionById(regionId);
@@ -267,6 +277,22 @@ export default function LibSingle({
                   </div>
                 )
               : ""}
+
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+              <dt className="text-gray-500 font-medium">Yearly Overview</dt>
+              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                <div className="grid grid-cols-6 gap-1">
+                  {yearsArray.map((year) => (
+                    <Link
+                      key={year}
+                      href={`/libraries/${libraries.id}/${year}`}
+                    >
+                      {year}
+                    </Link>
+                  ))}
+                </div>
+              </dd>
+            </div>
           </dl>
         </div>
       </Container>

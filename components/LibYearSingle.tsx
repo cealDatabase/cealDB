@@ -6,40 +6,8 @@ import { Table } from "antd";
 import type { TableColumnsType } from "antd";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import { Button } from "@mui/material";
+import { DataType } from "@/types/SingleLibraryYearOverviewType";
 
-interface DataType {
-  key: React.Key;
-  Languages: string;
-  GTMTotal_WOEbooks: any | null;
-  GTMTotal_WEbooks: number | null;
-  PVH_Previous: number | null;
-  PVH_Added: number | null;
-  PVH_Withdrawn: number | null;
-  PVH_SubTotal: number | null;
-  OMH_Microform: number | null;
-  OMH_Cartographic: number | null;
-  OMH_Audio: number | null;
-  OMH_FilmVideo: number | null;
-  OMH_DVD: number | null;
-  OMH_SubTotal: number | null;
-  EB_PT_Previous: number | null;
-  EB_PT_Add: number | null;
-  EB_PT_Subtotal: number | null;
-  EB_PT_NPTitles: number | null;
-  EB_PT_SubTitles: number | null;
-  EB_PT_TitlesTotal: number | null;
-  EB_PV_Previous: number | null;
-  EB_PV_Add: number | null;
-  EB_PV_Subtotal: number | null;
-  EB_PV_NPTitles: number | null;
-  EB_PV_SubTitles: number | null;
-  EB_PV_TitlesTotal: number | null;
-  UB_Mat_Total: number | null;
-  MGAdd_VolumesPurchased: number | null;
-  MGAdd_VolumesNonPurchased: number | null;
-  MGAdd_VolumesTotal: number | null;
-  MGAdd_TitlesPurchased: number | null;
-}
 export default function LibYearSingle({
   libyear,
 }: {
@@ -291,7 +259,7 @@ export default function LibYearSingle({
       {/* {Object.entries(libyear[0].Library).toString()} */}
       {/* {Object.entries(libyear[0].Electronic).toString()} */}
       {/* {libyear[0].Electronic.etotal_expenditure_grandtotal?.toString()} */}
-      <div className="place-self-start">
+      <div className="place-self-start mb-4">
         <Button
           onClick={onDownload}
           variant="outlined"
