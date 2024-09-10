@@ -7,8 +7,8 @@ const PublishedPDFs = () => {
       <h1>Published Statistics (PDFs)</h1>
       <Container>
         <section>
-          <p><Link href="/">CEAL Statistics PDFs (1999-current)</Link></p>
-          <p><Link href="/">CEAL Statistics PDFs (1957-2019/2020)</Link></p>
+          <p><Link href="/statistics/pdf/">CEAL Statistics PDFs (1999-current)</Link></p>
+          <p><Link href="/statistics/pdf/year-pdf-version">CEAL Statistics PDFs (1957-2019/2020)</Link></p>
           <p>
             CEAL Statistics publications citation (The Committee wishes to thank
             Dr. Tsuen-Hsuin Tsien 錢存訓 for his generous support and permission
