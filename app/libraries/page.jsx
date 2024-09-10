@@ -1,12 +1,20 @@
 import { Suspense } from "react";
 import { getAllLibraries } from "@/data/fetchPrisma";
+import { Skeleton } from "@/components/ui/skeleton";
 import LibList from "@/components/LibList";
-
-// export const dynamic = "force-dynamic";
 
 async function allLibraries() {
   const libraries = await getAllLibraries();
-  return <LibList libraries={libraries}/>;
+  return <LibList libraries={libraries} />;
+}
+
+function SkeletonCard() {
+  return (
+    <div className="flex flex-row space-x-3 mt-8">
+      <Skeleton className="h-[50px] w-[250px] rounded-xl" />
+      <Skeleton className="h-[50px] w-[100px] rounded-xl" />
+    </div>
+  );
 }
 
 export default function LibraiesHomePage() {
@@ -14,7 +22,7 @@ export default function LibraiesHomePage() {
     <main>
       <h1>Library Information</h1>
       <p>This page contains library information of CEAL participants.</p>
-      <Suspense>{allLibraries()}</Suspense>
+      <Suspense fallback={<SkeletonCard />}>{allLibraries()}</Suspense>
     </main>
   );
 }
