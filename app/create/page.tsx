@@ -2,6 +2,7 @@ import db from "@/lib/db";
 import { redirect } from "next/navigation";
 
 import DatePickerDemos from "@/components/DatePicker";
+import { Container } from "@/components/Container";
 
 const CreateNewLibrary = () => {
   async function createLibrary(formData: FormData) {
@@ -38,12 +39,13 @@ const CreateNewLibrary = () => {
 
   return (
     <main>
-      <form action={createLibrary}>
-        <div className='space-y-12'>
-          {/* Library Create General Information */}
-          <h1 className='text-base font-semibold learning-7 text-gray-900'>
+       <h1 className='text-base font-semibold learning-7 text-gray-900'>
             Create a library
           </h1>
+      <Container>
+      <form action={createLibrary} className="bg-gray-100 rounded-lg pb-8">
+        <div className='space-y-12'>
+          {/* Library Create General Information */}         
 
           <div className='mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 mx-10'>
             {/* Starting from Here*/}
@@ -1039,6 +1041,7 @@ const CreateNewLibrary = () => {
           </div>
         </div>
       </form>
+      </Container>
     </main>
   );
 };
