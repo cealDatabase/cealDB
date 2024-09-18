@@ -44,7 +44,7 @@ function PublishedPDFs() {
                   </Link>
                 </li>
                 <li className="flex gap-x-3">
-                  <Link href="/statistics/pdf/">
+                  <Link href="/statistics/pdf/year-pdf-version/">
                     CEAL Statistics PDFs (1957-2019/2020)
                   </Link>
                 </li>
@@ -67,7 +67,7 @@ function PublishedPDFs() {
                   </p>
                   <Link
                     href="https://scholarsarchive.byu.edu/jeal/"
-                    className="block w-full rounded-md bg-rose-700 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-rose-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600"
+                    className="block w-full rounded-md bg-rose-700/80 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-rose-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600"
                   >
                     Get access
                   </Link>
@@ -89,22 +89,27 @@ function PublishedPDFs() {
             {generateYears(1998, 2022)
               .reverse()
               .map((year) => (
-                <div key={year}>
+                <div key={year} className="mt-6">
                   <p className="font-semibold">{year}</p>
-                  <h3>
-                    {" "}
-                    here
-                    {pdfs.map((e) => {
-                      return e.linkValue.map((el) => {
-                        return (
-                          <div>
-                            {e.yearValue}
-                            {el.title};
-                          </div>
-                        );
+                  <ol>
+                    {pdfs.map((pdfitem) => {
+                      return pdfitem.linkValue.map((singleItem) => {
+                        if (pdfitem.yearValue === year) {
+                          return (
+                            <div>
+                              <Link href={singleItem.link}>
+                                {singleItem.title}
+                              </Link>{" "}
+                              <span className="italic">
+                                {singleItem.journal}{" "}
+                              </span>
+                              {singleItem.appendix}
+                            </div>
+                          );
+                        }
                       });
                     })}
-                  </h3>
+                  </ol>
                 </div>
               ))}
           </ul>
