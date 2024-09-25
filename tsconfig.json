@@ -28,10 +28,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/seed.ts", 
-    "app/libraries/page.jsx", 
-    "app/libraries/[libraryid]/page.jsx", 
-    "components/LibSingle.jsx"
+    "prisma/seed.ts",
+    "app/libraries/page.jsx",
+    "app/libraries/[libraryid]/page.jsx",
+    "components/LibSingle.jsx",
+    "components/DatePicker.jsx"
   ],
   "exclude": ["node_modules"]
 }
