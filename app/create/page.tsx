@@ -1,5 +1,5 @@
 import db from "@/lib/db";
-import CreateLibraryForm from "@/components/CreateLibraryForm";
+import CreateLibraryForm from "./CreateLibraryUI";
 
 export default async function CreateNewLibrary() {
   // Pulls db data and map out the options
