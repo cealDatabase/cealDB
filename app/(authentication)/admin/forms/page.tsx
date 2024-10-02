@@ -69,7 +69,7 @@ const FormsPage = () => {
           <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
             Frequently Asked Questions
           </h2>
-          <dl className="mt-10 space-y-6 py-8">
+          <dl className="mt-10 space-y-6">
             {instructions.map((instruction, index) => (
               <div key={index}>
                 {instruction.title && (
