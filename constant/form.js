@@ -42,12 +42,6 @@ export const forms = [
 ];
 
 export const instructions = [
-  {
-    title: "General Instructions",
-    question: "Form Guide",
-    answer:
-      "Check on <a href='https://guides.lib.ku.edu/CEAL_Stats'>https://guides.lib.ku.edu/CEAL_Stats</a>",
-  },
 
   {
     title: "Survey Time Frame and Publication",
@@ -56,6 +50,7 @@ export const instructions = [
       "The 2024 Online Survey input/edit time frame is from October 1 through December 1, 2024 (11:59 pm Central Time)",
   },
   {
+    title: "Survey Time Frame and Publication",
     question: "When will the 2024 CEAL annual statistics be published?",
     answer:
       "The 2024 CEAL annual statistics will be published in the February 2024 online issue of the <i>Journal of East Asian Libraries</i>.",
@@ -68,41 +63,49 @@ export const instructions = [
       "The definitions of the statistical categories used in this questionnaire are based on <i>Information Services and Use: Metrics & Statistics for Libraries and Information Providers — Data Dictionary NISO Z39.7 (2013).</i>",
   },
   {
+    title: "General Instructions for Data Submission",
     question: "What fiscal year does this questionnaire assume?",
     answer:
       "This questionnaire assumes a fiscal year from July 1, 2022 to June 30, 2023.",
   },
   {
+    title: "General Instructions for Data Submission",
     question: "How should numerical figures be entered?",
     answer:
       "All figures should be rounded to the nearest whole number unless otherwise instructed, and decimals should not be used.",
   },
   {
+    title: "General Instructions for Data Submission",
     question: 'What does the term "Non-CJK items" refer to in this survey?',
     answer:
       "Non-CJK items refer to not relating to Chinese, Japanese, and Korean language materials on East Asia.",
   },
   {
+    title: "General Instructions for Data Submission",
     question: "How should currency be reported?",
     answer: "All currencies should be converted to US dollars.",
   },
   {
+    title: "General Instructions for Data Submission",
     question:
       "Should a combined report be submitted for all branches of a library?",
     answer:
       "Each institution should provide one combined library statistics report, including data from all branch libraries, except for law libraries.",
   },
   {
+    title: "General Instructions for Data Submission",
     question:
       "What should I do if an entry in the questionnaire is zero or none?",
     answer: "Use “0” if the appropriate entry is zero or none.",
   },
   {
+    title: "General Instructions for Data Submission",
     question: " Can explanatory footnotes be included?",
     answer:
       "Yes, libraries are encouraged to include explanatory footnotes to clarify the figures submitted.",
   },
   {
+    title: "General Instructions for Data Submission",
     question:
       "What should be done if there are large difference in reported data compared to the previous year?",
     answer:
@@ -120,25 +123,28 @@ export const instructions = [
       "If your name is registered with the system, you can log in using the contact person's email address as the User ID and the password you obtained since the last input. Alternatively, you can follow the “Forgot Password” process to set up a new password.",
   },
   {
+    title: "Accessing the CEAL Statistics Database",
     question: "What happens if I use the 'Forgot Password' process?",
     answer:
       "A system-assigned password will be emailed to you with the subject line 'CEAL Statistics Database.' Statistics Committee members cannot provide passwords, so you must follow the process to get the system-generated password.",
   },
   {
+    title: "Accessing the CEAL Statistics Database",
     question: "Can the Statistics Committee members supply a password?",
     answer:
       "No, passwords must be obtained through the system-generated process, and the committee cannot supply passwords.",
   },
   {
+    title: "Accessing the CEAL Statistics Database",
     question: "Can I change password after logging into the database?",
     answer:
       "Yes, after entering the database, you can change the password at any time by following the “Change Password” instructions.",
   },
   {
-    title: "New Member Libraries",
+    title: "New Library Participation",
     question:
-      "How can new member libraries establish accounts to participate in CEAL statistics?",
+      "How can new library member establish accounts to participate in CEAL statistics?",
     answer:
-      "New member libraries should <a href='/help'>contact us</a> for instructions on how to establish an account to participate in the CEAL annual statistics.",
+      "New library members should <a href='/help'>contact us</a> for instructions on how to establish an account to participate in the CEAL annual statistics.",
   },
 ];

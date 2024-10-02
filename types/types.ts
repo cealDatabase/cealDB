@@ -88,6 +88,23 @@ export type List_AV_Type = {
   updated_at: Date;
   is_global: Boolean | null;
   libraryyear: number | null;
+  Library_Year: Library_Year_Type;
+  LibraryYear_ListAV: LibraryYear_ListAVType[];
+  List_AV_Counts: SingleListAVCountsType[];
+  List_AV_Language: SingleListAVLanguageType[];
+};
+
+export type SingleListAVLanguageType = {
+  listav_id: number;
+  language_id: number;
+};
+
+export type SingleListAVCountsType = {
+  id: number;
+  titles: number | null;
+  year: number | null;
+  updatedat: Date;
+  ishidden: Boolean | null;
 };
 
 export type List_EBook_Type = {

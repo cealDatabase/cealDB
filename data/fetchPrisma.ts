@@ -170,3 +170,18 @@ export const getYearsByLibId = async (id: number) => {
     return null;
   }
 };
+
+export const getAllAVList = async () => {
+  try {
+    const avlist = await db.list_AV.findMany({
+      include: {
+        Library_Year: true,
+        List_AV_Counts: true,
+        List_AV_Language: true,
+      },
+    });
+    return avlist;
+  } catch {
+    return null;
+  }
+};
