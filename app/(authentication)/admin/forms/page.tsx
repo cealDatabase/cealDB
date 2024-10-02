@@ -1,106 +1,39 @@
 import { Container } from "@/components/Container";
 import Link from "next/link";
+import { forms, instructions } from "@/constant/form";
+
 const FormsPage = () => {
-  const forms = [
-    {
-      id: 1,
-      title: "Monographic Acquisitions",
-      href: "",
-    },
-    {
-      id: 2,
-      title: "Physical Volume Holdings",
-      href: "",
-    },
-    {
-      id: 3,
-      title: "Serial Titles: Purchased and Non-Purchased",
-      href: "",
-    },
-    {
-      id: 4,
-      title: "Holdings of Other Materials",
-      href: "",
-    },
-    {
-      id: 5,
-      title: "Unprocessed BackLog Materials (volumes or pieces)",
-      href: "",
-    },
-    {
-      id: 6,
-      title: "Fiscal Support",
-      href: "",
-    },
-    {
-      id: 7,
-      title: "Personnel Support",
-      href: "",
-    },
-    {
-      id: 8,
-      title: "Public Services",
-      href: "",
-    },
-    {
-      id: 9,
-      title: "Electronic",
-      href: "",
-    },
-    {
-      id: 10,
-      title: "Electronic Books",
-      href: "",
-    },
-  ];
-
-  const instructions = [
-    {
-      id: 1,
-      question: "What's the best thing about Switzerland?",
-      answer:
-        "I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
-    },
-    // More questions...
-  ];
-
   return (
     <main>
       <h1>Forms Page</h1>
       <Container className="">
         <div className="bg-white rounded-md">
-          <div className="mx-auto max-w-7xl divide-y divide-gray-900/10 px-6 py-12 sm:py-20 lg:px-8">
-            <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">
+          <div className="mx-auto divide-y divide-gray-900/10 px-6 py-12 sm:py-20 lg:px-8">
+            <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
               Survery Forms
             </h2>
             <div className="mt-10 grid grid-cols-12 gap-x-2">
               <ul className="mt-6 space-y-4 sm:col-start-2 col-span-12 sm:col-span-6">
-                {forms.map((form) => (
-                  <li
-                    key={form.id}
-                    className="list-decimal text-base font-semibold"
-                  >
+                {forms.map((form, index) => (
+                  <li key={index} className="list-decimal">
                     <Link href={form.href}>{form.title}</Link>
                   </li>
                 ))}
               </ul>
               <ul className="mt-6 space-y-4 col-span-12 sm:col-span-4">
-                <li key="ebook" className="list-disc text-base font-semibold">
-                  <Link href="/ebook">
+                <li key="ebook" className="list-disc">
+                  <Link href="/ebookedit">
                     E-Book Database by Subscription for McGill Library in 2024
                   </Link>
                 </li>
-                <li
-                  key="ejournal"
-                  className="list-disc text-base font-semibold"
-                >
-                  <Link href="/ejournal">
+                <li key="ejournal" className="list-disc">
+                  <Link href="/ejournaledit">
                     E-Journal Database by Subscription for McGill Library in
                     2024
                   </Link>
                 </li>
-                <li key="avdb" className="list-disc text-base font-semibold">
-                  <Link href="/avdb">
+                <li key="avdb" className="list-disc">
+                  <Link href="/avdbedit">
                     Audio/Visual Database by Subscription for McGill Library in
                     2024
                   </Link>
@@ -109,29 +42,54 @@ const FormsPage = () => {
             </div>
           </div>
         </div>
-        <div className="">
-          <div className="mx-auto max-w-7xl divide-y divide-gray-900/10 px-6 py-12 lg:px-8 lg:py-24">
-            <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">
-              Instructions
-            </h2>
-            <dl className="mt-10 space-y-8 ">
-              {instructions.map((instruction) => (
-                <div
-                  key={instruction.id}
-                  className="pt-8 lg:grid lg:grid-cols-12 lg:gap-8"
-                >
-                  <dt className="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
-                    {instruction.question}
-                  </dt>
-                  <dd className="mt-4 lg:col-span-7 lg:mt-0">
-                    <p className="text-base leading-7 text-gray-600">
-                      {instruction.answer}
+        <div className="mx-auto divide-y divide-gray-900/10 px-6 lg:px-8 py-8">
+          <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
+            Instruction
+          </h2>
+          <div className="mt-10 grid grid-cols-12">
+            <div className="mt-6 space-y-4 sm:col-start-2 col-span-10 font-medium leading-7">
+              The 2023-2024 CEAL Statistics Online Survey input/edit period is
+              from October 1 to December 1, 2024, with the results published in
+              the February 2024 issue of the Journal of East Asian Libraries.
+              The survey covers the fiscal year from July 1, 2022, to June 30,
+              2023, with all figures rounded to whole numbers and currency
+              converted to US dollars. Non-CJK items refer to non-CJK language
+              materials related to East Asia. Each institution, except law
+              libraries, should submit a combined report, and significant data
+              changes must be footnoted. Participants must log in to the CEAL
+              Statistics Database using the registered contact's email and
+              follow the password setup process if necessary. New libraries
+              wanting to participate should contact vdoll[at]ku.edu for account
+              setup.
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto divide-y divide-gray-900/10 px-6 lg:px-8">
+          <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
+            Frequently Asked Questions
+          </h2>
+          <dl className="mt-10 space-y-6 py-8">
+            {instructions.map((instruction, index) => (
+              <div key={index}>
+                {instruction.title && (
+                  <h3 className="mt-4 py-2 md:py-8 text-stone-900 font-semibold">
+                    {instruction.title}
+                  </h3>
+                )}
+                <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+                  <dt className="lg:col-span-5">{instruction.question}</dt>
+                  <dd className="lg:col-span-7 lg:mt-0">
+                    <p className="text-gray-600/90">
+                      <span
+                        dangerouslySetInnerHTML={{ __html: instruction.answer }}
+                      />
                     </p>
                   </dd>
                 </div>
-              ))}
-            </dl>
-          </div>
+              </div>
+            ))}
+          </dl>
         </div>
       </Container>
     </main>

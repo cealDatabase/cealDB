@@ -1,0 +1,60 @@
+### Group 1: Survey Time Frame and Publication
+**Q: When can data be input or edited for the 2024 CEAL Statistics Online Survey?**  
+A: The input/edit time frame for the 2024 CEAL Statistics Online Survey is from October 1 through December 1, 2024 (11:59 pm Central Time).
+
+**Q: When will the 2024 CEAL annual statistics be published?**  
+A: The 2024 CEAL annual statistics will be published in the February 2024 online issue of the *Journal of East Asian Libraries*.
+
+---
+
+### Group 2: General Instructions for Data Submission
+**Q: What statistical definitions are used in the CEAL questionnaire?**  
+A: The statistical categories are based on *Information Services and Use: Metrics & Statistics for Libraries and Information Providers — Data Dictionary NISO Z39.7 (2013)*.
+
+**Q: What fiscal year does the questionnaire assume?**  
+A: The questionnaire assumes a fiscal year from July 1, 2022, to June 30, 2023.
+
+**Q: How should numerical figures be entered?**  
+A: All figures should be rounded to the nearest whole number unless otherwise instructed, and decimals should not be used.
+
+**Q: What do non-CJK items refer to in this survey?**  
+A: Non-CJK items refer to non-CJK language materials on East Asia.
+
+**Q: How should currency be reported?**  
+A: All currencies should be converted to US dollars.
+
+**Q: Should a combined report be submitted for all branches of a library?**  
+A: Yes, a combined library statistics report should be provided for each institution, except for law libraries.
+
+**Q: What should be done if a data entry is zero or none?**  
+A: Use “0” if the appropriate entry is zero or none.
+
+**Q: How should large shifts in reported data be explained?**  
+A: Any large shifts compared to the previous year should be explained with a footnote.
+
+**Q: Can explanatory footnotes be included?**  
+A: Yes, libraries are encouraged to include explanatory footnotes to clarify the figures submitted.
+
+---
+
+### Group 3: Accessing the CEAL Statistics Database
+**Q: How do institutions access the CEAL Statistics Database?**  
+A: Institutions can access the database by logging in at https://ceal.ku.edu. A login is required to access forms and instructions.
+
+**Q: What is the procedure for logging in as the institutional contact person?**  
+A: If registered, the institutional contact person can log in using their email address as the User ID and the password previously obtained.
+
+**Q: What should be done if the password is forgotten?**  
+A: Follow the "Forgot Password" process to receive a system-generated password via email with the subject "CEAL Statistics Database."
+
+**Q: Can the Statistics Committee members supply a password?**  
+A: No, passwords must be obtained through the system-generated process, and the committee cannot supply passwords.
+
+**Q: Can the password be changed?**  
+A: Yes, once logged in, the password can be changed by following the “Change Password” instructions.
+
+---
+
+### Group 4: New Member Libraries
+**Q: How can new member libraries establish accounts to participate in CEAL statistics?**  
+A: New member libraries should contact vdoll[at]ku.edu for instructions on how to establish an account to participate in the CEAL annual statistics.
