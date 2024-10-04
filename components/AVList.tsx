@@ -21,12 +21,11 @@ const getCountsById = async (id: number) => {
   }
 };
 
-function AVList({ avList }) {
+function AVList({ avList }: { avList: List_AV_Type[] }) {
   return (
     <div>
-      {avList.map(async (item: List_AV_Type, index) => (
+      {avList.map((item: List_AV_Type) => (
         <div key={item.id} className="grid gap-3">
-          {index}
           <span>{item.title}</span>
           <span>{item.type}</span>
           <span>{item.cjk_title}</span>
@@ -39,22 +38,8 @@ function AVList({ avList }) {
           <span>{item.updated_at.getDate()}</span>
           <span>{item.is_global?.valueOf()}</span>
           <span>{item.libraryyear}</span>
-          <span>
-            {await Promise.all(
-              item.List_AV_Language.map(async (e) => {
-                const language = await getLanguageById(e.language_id);
-                return <span key={e.language_id}>{language}</span>;
-              })
-            )}
-          </span>
-          <span>
-            {await Promise.all(
-              item.List_AV_Counts.map(async (e) => {
-                const counts = await getCountsById(e.id);
-                return <span key={e.id} className="p-4">{counts?.titles}</span>;
-              })
-            )}
-          </span>
+          <AsyncLanguage languageId={item.List_AV_Language.language_id} />
+          <AsyncCounts counts={item.List_AV_Counts} />
         </div>
       ))}
     </div>
