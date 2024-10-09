@@ -6,7 +6,6 @@ import * as React from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const FormsPage = () => {
   return (
@@ -87,7 +86,6 @@ const FormsPage = () => {
           <dl className="mt-10 space-y-6">
             <Accordion>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
                 aria-controls="General-Instructions-content"
                 id="General-Instructions"
               >
@@ -122,7 +120,6 @@ const FormsPage = () => {
 
             <Accordion>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
                 aria-controls="Timeline-content"
                 id="Timeline"
               >
@@ -157,7 +154,6 @@ const FormsPage = () => {
 
             <Accordion>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
                 aria-controls="Accessing-content"
                 id="Accessing"
               >
@@ -192,7 +188,6 @@ const FormsPage = () => {
 
             <Accordion>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
                 aria-controls="Participation-content"
                 id="Participation"
               >
