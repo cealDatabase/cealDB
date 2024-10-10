@@ -5,6 +5,7 @@ import { AsyncLanguage } from "./AsyncLanguage";
 
 
 async function AVList({ avList }: { avList: List_AV_Type[] }) {
+  console.log(avList[0]['List_AV_Language'][0]['language_id']);
   return (
     <div>
       {avList.map((item: List_AV_Type) => (
@@ -21,8 +22,8 @@ async function AVList({ avList }: { avList: List_AV_Type[] }) {
           <span>{item.updated_at.getDate()}</span>
           <span>{item.is_global?.valueOf()}</span>
           <span>Library Year ID: {item.libraryyear}</span>
-          <span className="text-amber-800">{item.List_AV_Language.language_id}</span>
-          <AsyncLanguage languageId={item.List_AV_Language.language_id} />
+          {item.List_AV_Language.map((e) =>
+            <AsyncLanguage languageId={e.language_id} key={e.language_id} />)}
         </div>
       ))}
     </div>
