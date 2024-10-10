@@ -194,3 +194,35 @@ export const getAllAVList = async () => {
     return null;
   }
 };
+
+export const getAVListByAVId = async (id: number) => {
+  try {
+    const avlist = await db.list_AV.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Library_Year: true,
+        List_AV_Counts: true,
+        List_AV_Language: true,
+      },
+    });
+    return avlist;
+  } catch {
+    return null;
+  }
+}
+
+export const getAVListIdByLanguageId = async (id: number) => {
+  try {
+    const avlist = await db.list_AV_Language.findMany({
+      where: {
+        language_id: id,
+      },
+    });
+    return avlist;
+  }
+  catch {
+    return null;
+  }
+};
