@@ -3,9 +3,7 @@ import React from "react";
 import { List_AV_Type } from "../types/types";
 import { AsyncLanguage } from "./AsyncLanguage";
 
-
 async function AVList({ avList }: { avList: List_AV_Type[] }) {
-  console.log(avList[0]['List_AV_Language'][0]['language_id']);
   return (
     <div>
       {avList.map((item: List_AV_Type) => (

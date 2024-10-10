@@ -1,14 +1,5 @@
-import db from "../lib/db";
-
-// Get language
-const getLanguageById = async (id: number) => {
-  try {
-    const language = await db.language.findUnique({ where: { id } });
-    return language?.short;
-  } catch {
-    return null;
-  }
-};
+import db from "@/lib/db";
+import { getLanguageById } from "../data/fetchPrisma";
 
 // Get counts
 const getCountsById = async (id: number) => {
@@ -22,5 +13,6 @@ const getCountsById = async (id: number) => {
 
 
 export async function AsyncLanguage({ languageId }: { languageId: number }) {
-  return <span className="text-red-600">{await getLanguageById(languageId)}</span>;
+  const language = await getLanguageById(languageId);
+  return <span className="text-red-600">{language ? language.short : ""}</span>;
 }
