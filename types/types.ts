@@ -90,7 +90,7 @@ export type List_AV_Type = {
   libraryyear: number | null;
   Library_Year: Library_Year_Type;
   LibraryYear_ListAV: LibraryYear_ListAVType[];
-  List_AV_Counts: SingleListAVCountsType[];
+  List_AV_Counts: SingleListAVCountsType;
   List_AV_Language: SingleListAVLanguageType[];
 };
 

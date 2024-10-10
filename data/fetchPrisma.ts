@@ -110,6 +110,15 @@ export const getRoleById = async (id: number) => {
   }
 };
 
+export const getLanguageById = async (id: number) => {
+  try {
+    const language = await db.language.findUnique({ where: { id } });
+    return language;
+  } catch {
+    return null;
+  }
+}
+
 export const getAllRoles = async () => {
   try {
     const allRoles = await db.role.findMany({

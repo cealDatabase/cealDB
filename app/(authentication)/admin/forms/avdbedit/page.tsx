@@ -1,12 +1,13 @@
 import React, { Suspense } from "react";
+import { List_AV_Type } from "../../../../../types/types";
 import { Container } from "../../../../../components/Container";
 import { getAllAVList } from "../../../../../data/fetchPrisma";
 import AVList from "../../../../../components/AVList";
 
-const AVListComponent = React.lazy(async () => {
+async function AVListComponent(): Promise<JSX.Element> {
   const avlist = await getAllAVList();
-  return { default: () => <AVList avList={avlist} /> };
-});
+  return <AVList avList={avlist as unknown as List_AV_Type[]} />;
+}
 
 export default function AvdbEditPage() {
   return (
