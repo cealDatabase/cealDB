@@ -3,10 +3,10 @@ import React from "react";
 import { List_AV_Type } from "../types/types";
 import { AsyncLanguage } from "./AsyncLanguage";
 
-async function AVList({ avList }: { avList: List_AV_Type[] }) {
+async function AVList({ avList }: { avList: List_AV_Type[] | null }) {
   return (
     <div>
-      {avList.map((item: List_AV_Type) => (
+      {avList && avList.map((item: List_AV_Type) => (
         <div key={item.id} className="grid gap-3">
           <span>{item.title}</span>
           <span>{item.type}</span>
