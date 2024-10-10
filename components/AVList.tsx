@@ -4,7 +4,6 @@ import { List_AV_Type } from "../types/types";
 import { AsyncLanguage } from "./AsyncLanguage";
 
 async function AVList({ item }: { item: List_AV_Type | null }) {
-  console.log(item);
   if (!item) {
     return null;
   }

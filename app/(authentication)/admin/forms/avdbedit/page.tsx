@@ -4,15 +4,6 @@ import { getAVListIdByLanguageId, getAVListByAVId } from "../../../../../data/fe
 import AVList from "../../../../../components/AVList";
 import { List_AV_Type } from "@/types/types";
 
-// const AVByLanguage = async () => {
-//   const avIdlist = await getAVListIdByLanguageId(1);
-//   {avIdlist && avIdlist.map((avId) => (
-//       <AVListComponent passInId={avId.listav_id} />
-//   ))}
-// }
-
-
-
 const AVListComponent = async ({ languageId }: { languageId: number }) => {
   const avIdlist = await getAVListIdByLanguageId(languageId);
   return (
@@ -24,7 +15,7 @@ const AVListComponent = async ({ languageId }: { languageId: number }) => {
     </>
   );
 }
- 
+
 
 
 export default function AvdbEditPage() {
