@@ -1,13 +1,13 @@
 
 import React, { Suspense } from "react";
 import { Container } from "../../../../../components/Container";
-import { AVListLanguageComponent } from "../../../../../components/AVListLanguageComponent";
+import AVListByLanguage from "../../../../../components/AVListByLanguage";
 
 export default function AvdbEditPage() {
   return (
     <main>
-      <h1>2024 Audio/Visual Database by Subscription</h1>
       <Container>
+        <h1 className="mt-8">2024 Audio/Visual Database by Subscription</h1>
         <p className="text-sm">
           Please check the boxes next to each subscription your library has, for
           each language Chinese, Japanese, Korean, and Non-CJK. Data in this
@@ -16,9 +16,7 @@ export default function AvdbEditPage() {
           collections, click "customize", and then enter the appropriate counts
           in each of the fields.
         </p>
-        <Suspense fallback={<div>Loading...</div>}>
-        <AVListLanguageComponent />
-         </Suspense>
+        <AVListByLanguage />
       </Container>
     </main>
   );
