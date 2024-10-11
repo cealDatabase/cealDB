@@ -1,13 +1,23 @@
 
-import React from "react";
 import { List_AV_Type } from "../types/types";
-import { AsyncLanguage } from "./AsyncLanguage";
+import { getAVListIdByLanguageId, getAVListByAVId } from "@/data/fetchPrisma";
 
-async function AVList({ item }: { item: List_AV_Type | null }) {
+export const AVListCompo = async ({ languageId }: { languageId: number }) => {
+  const avIdlist = await getAVListIdByLanguageId(languageId);
+  return (
+    <>
+      {avIdlist && avIdlist.map(async (object) => {
+        const avlist = await getAVListByAVId(object.listav_id);
+        return <AVList key={object.listav_id} item={avlist as unknown as List_AV_Type} />;
+      })}
+    </>
+  );
+}
+
+function AVList({ item }: { item: List_AV_Type | null }) {
   if (!item) {
     return null;
   }
-
   return (
     <div key={item.id} className="grid gap-3">
       <span>{item.title}</span>
@@ -24,5 +34,3 @@ async function AVList({ item }: { item: List_AV_Type | null }) {
     </div>
   );
 }
-
-export default AVList;

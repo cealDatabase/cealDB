@@ -1,22 +1,7 @@
+
 import React, { Suspense } from "react";
 import { Container } from "../../../../../components/Container";
-import { getAVListIdByLanguageId, getAVListByAVId } from "../../../../../data/fetchPrisma";
-import AVList from "../../../../../components/AVList";
-import { List_AV_Type } from "@/types/types";
-
-const AVListComponent = async ({ languageId }: { languageId: number }) => {
-  const avIdlist = await getAVListIdByLanguageId(languageId);
-  return (
-    <>
-      {avIdlist && avIdlist.map(async (object) => {
-        const avlist = await getAVListByAVId(object.listav_id);
-        return <AVList key={object.listav_id} item={avlist as unknown as List_AV_Type} />;
-      })}
-    </>
-  );
-}
-
-
+import { AVListLanguageComponent } from "../../../../../components/AVListLanguageComponent";
 
 export default function AvdbEditPage() {
   return (
@@ -32,8 +17,8 @@ export default function AvdbEditPage() {
           in each of the fields.
         </p>
         <Suspense fallback={<div>Loading...</div>}>
-          <AVListComponent languageId={1} />
-        </Suspense>
+        <AVListLanguageComponent />
+         </Suspense>
       </Container>
     </main>
   );
