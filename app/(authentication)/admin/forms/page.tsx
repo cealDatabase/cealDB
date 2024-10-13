@@ -1,6 +1,8 @@
 import { Container } from "@/components/Container";
 import Link from "next/link";
-import { forms, instructions } from "@/constant/form";
+import { forms, instructionGroup } from "@/constant/form";
+
+type InstructionGroupKeys = keyof typeof instructionGroup;
 
 import * as React from "react";
 import Accordion from "@mui/material/Accordion";
@@ -52,7 +54,7 @@ const FormsPage = () => {
             Instruction
           </h2>
           <div className="mt-10 grid grid-cols-12 ">
-            <div className="mt-6 space-y-4 sm:col-start-2 col-span-10 leading-7">
+            <div className="mt-6 space-y-4 md:col-start-2 col-span-12 md:col-span-10 leading-7">
               <p>
                 The 2023-2024 CEAL Statistics Online Survey input/edit period is
                 from October 1 to December 1, 2024, with the results published
@@ -84,144 +86,45 @@ const FormsPage = () => {
             Frequently Asked Questions
           </h2>
           <dl className="mt-10 space-y-6">
-            <Accordion>
-              <AccordionSummary
-                aria-controls="General-Instructions-content"
-                id="General-Instructions"
-              >
-                <h3 className="py-2 md:py-4 font-semibold">
-                  General Instructions for Data Submission
-                </h3>
-              </AccordionSummary>
-              <AccordionDetails>
-                {instructions.map((instruction, index) => (
-                  <div key={index}>
-                    {instruction.title ==
-                      "General Instructions for Data Submission" && (
-                      <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                        <dt className="lg:col-span-5 font-medium">
-                          {instruction.question}
-                        </dt>
-                        <dd className="lg:col-span-7">
-                          <p className="text-gray-600/90">
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: instruction.answer,
-                              }}
-                            />
-                          </p>
-                        </dd>
+            {Object.keys(instructionGroup).map((key, index) => {
+              return (
+                <Accordion key={index} className="rounded-md">
+                  <AccordionSummary
+                    aria-controls={key}
+                    id={key}
+                    key={index}
+                  >
+                    <h3 className="py-2 font-medium">
+                      {key}
+                    </h3>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map((item, index) => (
+                      <div key={index}>
+                        <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
+                          <dt className="lg:col-span-5 font-medium text-gray-800">
+                            {item.question}
+                          </dt>
+                          <dd className="lg:col-span-7">
+                            <p className="text-gray-600/90">
+                              <span
+                                dangerouslySetInnerHTML={{
+                                  __html: item.answer,
+                                }}
+                              />
+                            </p>
+                          </dd>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary
-                aria-controls="Timeline-content"
-                id="Timeline"
-              >
-                <h3 className="py-2 md:py-4 font-semibold">
-                  Survey Time Frame and Publication
-                </h3>
-              </AccordionSummary>
-              <AccordionDetails>
-                {instructions.map((instruction, index) => (
-                  <div key={index}>
-                    {instruction.title ==
-                      "Survey Time Frame and Publication" && (
-                      <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                        <dt className="lg:col-span-5 font-medium">
-                          {instruction.question}
-                        </dt>
-                        <dd className="lg:col-span-7">
-                          <p className="text-gray-600/90">
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: instruction.answer,
-                              }}
-                            />
-                          </p>
-                        </dd>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary
-                aria-controls="Accessing-content"
-                id="Accessing"
-              >
-                <h3 className="py-2 md:py-4 font-semibold">
-                  Accessing the CEAL Statistics Database
-                </h3>
-              </AccordionSummary>
-              <AccordionDetails>
-                {instructions.map((instruction, index) => (
-                  <div key={index}>
-                    {instruction.title ==
-                      "Accessing the CEAL Statistics Database" && (
-                      <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                        <dt className="lg:col-span-5 font-medium">
-                          {instruction.question}
-                        </dt>
-                        <dd className="lg:col-span-7">
-                          <p className="text-gray-600/90">
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: instruction.answer,
-                              }}
-                            />
-                          </p>
-                        </dd>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-
-            <Accordion>
-              <AccordionSummary
-                aria-controls="Participation-content"
-                id="Participation"
-              >
-                <h3 className="py-2 md:py-4 font-semibold">
-                  New Library Participation
-                </h3>
-              </AccordionSummary>
-              <AccordionDetails>
-                {instructions.map((instruction, index) => (
-                  <div key={index}>
-                    {instruction.title == "New Library Participation" && (
-                      <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                        <dt className="lg:col-span-5 font-medium">
-                          {instruction.question}
-                        </dt>
-                        <dd className="lg:col-span-7">
-                          <p className="text-gray-600/90">
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: instruction.answer,
-                              }}
-                            />
-                          </p>
-                        </dd>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </AccordionDetails>
-            </Accordion>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              )
+            })}
           </dl>
-        </div>
-      </Container>
-    </main>
+        </div >
+      </Container >
+    </main >
   );
 };
 
