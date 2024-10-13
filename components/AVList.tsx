@@ -44,7 +44,7 @@ export const AVListComponent = ({ CHNItem, JPNItem, KRNItem, NONCJKItem }:
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} >
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                     <Tab label="Chinese" {...a11yProps(0)} />
@@ -54,19 +54,19 @@ export const AVListComponent = ({ CHNItem, JPNItem, KRNItem, NONCJKItem }:
                     <Tab label="My Custom List" {...a11yProps(4)} />
                 </Tabs>
             </Box>
-            <CustomTabPanel value={value} index={0}>
-                {CHNItem.map((item) => <AVListSingle item={item} />)}
+            <CustomTabPanel value={value} index={0} >
+                {CHNItem.map((item) => <AVListSingle item={item} key={item.id} />)}
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-                {JPNItem.map((item) => <AVListSingle item={item} />)}
+            <CustomTabPanel value={value} index={1} >
+                {JPNItem.map((item) => <AVListSingle item={item} key={item.id} />)}
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-                {KRNItem.map((item) => <AVListSingle item={item} />)}
+            <CustomTabPanel value={value} index={2} >
+                {KRNItem.map((item) => <AVListSingle item={item} key={item.id} />)}
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={3}>
-                {NONCJKItem.map((item) => <AVListSingle item={item} />)}
+            <CustomTabPanel value={value} index={3} >
+                {NONCJKItem.map((item) => <AVListSingle item={item} key={item.id} />)}
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={4}>
+            <CustomTabPanel value={value} index={4} >
                 5
             </CustomTabPanel>
         </Box>

@@ -5,7 +5,7 @@ export default function AVListSingle({ item }: { item: List_AV_Type | null }) {
         return null;
     }
     return (
-        <div key={item.id} className="grid gap-3">
+        <div className="grid gap-3">
             <span>{item.title}</span>
             <span>{item.type}</span>
             <span>{item.cjk_title}</span>
