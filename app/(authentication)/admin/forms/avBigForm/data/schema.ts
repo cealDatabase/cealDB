@@ -13,6 +13,12 @@ export const listAVSchema = z.object({
   data_source: z.string().nullable(),
   is_global: z.boolean().nullable(),
   libraryyear: z.number().nullable(),
+  List_AV_Language: z.array(
+    z.object({
+      listav_id: z.number(),
+      language_id: z.number(),
+    }),
+  ),
 })
 
 export type listAV = z.infer<typeof listAVSchema>

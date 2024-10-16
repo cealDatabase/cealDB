@@ -60,7 +60,22 @@ export const columns: ColumnDef<listAV>[] = [
     },
   },
   {
-    accessorKey: "CJK",
+    accessorKey: "romanized_title",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Romanized" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("romanized_title")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "cjk_title",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="CJK" />
     ),
@@ -75,13 +90,14 @@ export const columns: ColumnDef<listAV>[] = [
     },
   },
   {
-    accessorKey: "language",
+    accessorKey: "List_AV_Language",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Language" />
     ),
     cell: ({ row }) => {
+      console.log(row.getValue("List_AV_Language"))
       const filtered_lang = languages.find(
-        (language) => language.value === row.getValue("language")
+        (language) => language.value === row.getValue("List_AV_Language")[0].language_id
       )
 
       if (!filtered_lang) {
