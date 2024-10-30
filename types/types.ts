@@ -145,8 +145,8 @@ export type SingleLibraryType = {
   id: number;
   type: number;
   library_name: string;
-  plilaw: Boolean;
-  plimed: Boolean;
+  plilaw: boolean;
+  plimed: boolean;
   plisubmitter_first_name: string | null;
   plisubmitter_last_name: string | null;
   pliposition_title: string | null;
@@ -158,10 +158,10 @@ export type SingleLibraryType = {
   plibibliographic: string | null;
   pliconsortia: string | null;
   plisystem_vendor: string | null;
-  pliopac: Boolean | null;
+  pliopac: boolean | null;
   plihome_page: string | null;
   plionline_catalog: string | null;
-  pliunique: Boolean | null;
+  pliunique: boolean | null;
   pliestablishedyear: string | null;
   library_number: number | null;
   pliregion: number | null;
@@ -182,7 +182,7 @@ export type SingleLibraryType = {
   circulation_type: string | null;
   date_last_changed: Date | null;
   notes: string | null;
-  hideinlibrarylist: Boolean | null;
+  hideinlibrarylist: boolean | null;
   libraryRegion: Reflibraryregion | null;
   libraryType: Reflibrarytype;
   user_library: User_Library_Type;
