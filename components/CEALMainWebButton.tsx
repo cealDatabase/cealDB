@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ExpandingArrow from "./expanding-arrow";
+import ExpandingArrow from "./ui/expanding-arrow";
 
 const CEALMainWebButton = () => {
   return (
