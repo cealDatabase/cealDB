@@ -11,19 +11,19 @@ import {
 
 export const languages = [
   {
-    value: "chn",
+    value: "1",
     label: "CHN",
   },
   {
-    value: "jpn",
+    value: "2",
     label: "JPN",
   },
   {
-    value: "kor",
+    value: "3",
     label: "KOR",
   },
   {
-    value: "noncjk",
+    value: "4",
     label: "NONCJK"
   }
 ]

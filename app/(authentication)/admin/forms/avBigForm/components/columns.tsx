@@ -95,20 +95,21 @@ export const columns: ColumnDef<listAV>[] = [
       <DataTableColumnHeader column={column} title="Language" />
     ),
     cell: ({ row }) => {
-      console.log(row.getValue("List_AV_Language"))
+      const languageId = (row.getValue("List_AV_Language") as { language_id: number }[])[0].language_id;
+
       const filtered_lang = languages.find(
-        (language) => language.value === row.getValue("List_AV_Language")[0].language_id
-      )
+        (language) => language.value === languageId.toString()
+      );
 
       if (!filtered_lang) {
-        return null
+        return null;
       }
 
       return (
         <div className="flex w-[100px] items-center">
           <span>{filtered_lang.label}</span>
         </div>
-      )
+      );
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))

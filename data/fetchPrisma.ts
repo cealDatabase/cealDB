@@ -180,9 +180,12 @@ export const getYearsByLibId = async (id: number) => {
   }
 };
 
-export const getAllAVList = async () => {
+// Big Form: Get AV List.
+
+export const getAVListByLibraryYear = async (libraryyear: number) => {
   try {
     const avlist = await db.list_AV.findMany({
+      where: { libraryyear },
       include: {
         Library_Year: true,
         List_AV_Counts: true,
@@ -193,7 +196,22 @@ export const getAllAVList = async () => {
   } catch {
     return null;
   }
-};
+}
+
+export const getAllAVLists = async () => {
+  try {
+    const avlists = await db.list_AV.findMany({
+      include: {
+        Library_Year: true,
+        List_AV_Counts: true,
+        List_AV_Language: true,
+      },
+    });
+    return avlists;
+  } catch {
+    return null;
+  }
+}
 
 export const getAVListByAVId = async (id: number) => {
   try {

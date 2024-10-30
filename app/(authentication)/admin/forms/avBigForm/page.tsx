@@ -1,4 +1,4 @@
-import { getAVListIdByLanguageId, getAVListByAVId, getAllAVList } from "@/data/fetchPrisma"
+import { getLibYearByLibIdAndYear, getAVListByLibraryYear, getAllAVLists } from "@/data/fetchPrisma"
 import { z } from "zod"
 
 import { listAVSchema } from "./data/schema"
@@ -6,68 +6,43 @@ import { listAVSchema } from "./data/schema"
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { Container } from "@/components/Container"
-import { SingleListAVLanguageType } from "@/types/types"
-
-
 
 
 // Simulate a database read for tasks.
-async function getTasks() {
+async function getAVList() {
+    // Fetch all. By Library Year ID. NOT separated by language:
 
-    // Separate by Language:
+    const getLibYear = async (libId: number, year: number) => {
+        const output = await getLibYearByLibIdAndYear(libId, year);
+        return output ? (output[0]?.id as number) : undefined;
+    }
 
-    // type shorten_List_AV_Type = {
-    //     id: number;
-    //     title: string;
-    //     cjk_title: string;
-    //     romanized_title: string;
-    //     subtitle: string;
-    //     type: string;
-    //     publisher: string;
-    //     description: string;
-    //     notes: string;
-    //     data_source: string;
-    //     is_global: boolean;
-    //     libraryyear: number;
-    //     List_AV_Language: SingleListAVLanguageType;
-    // }
-
-    // const AVListCompo = async ({ languageId }: { languageId: number }) => {
-    //     const avIdlist = await getAVListIdByLanguageId(languageId);
-    //     if (!avIdlist) {
-    //         return [];
-    //     }
-    //     const avLists = await Promise.all(avIdlist.map(async (object) => {
-    //         const avlist = await getAVListByAVId(object.listav_id);
-    //         return avlist as unknown as shorten_List_AV_Type[];
-    //     }));
-    //     return avLists.flat();
-    // }
-
-    // const data = await AVListCompo({ languageId: 1 });
-    // if (!data) {
-    //     return [];
-    // }
-    // End
-
-
-    // Fetch all. NOT separated by language:
     const AVListCompo = async () => {
-        const allAVRecords = await getAllAVList();
-        return allAVRecords?.flat()
+        const libYearId = await getLibYear(8, 2023);
+        console.log(libYearId);
+        if (!libYearId) {
+            return [];
+        }
+        const getAVRecordsByLibYearId = await getAVListByLibraryYear(libYearId);
+        const getGlobalAVRecords = await getAllAVLists();
+        if (getGlobalAVRecords) {
+            getGlobalAVRecords.map((object) => {
+                if (object.is_global)
+                    getAVRecordsByLibYearId?.push(object);
+            });
+        }
+
+        return getAVRecordsByLibYearId?.flat()
     }
 
     const data = await AVListCompo();
     if (!data) {
         return [];
     }
-    // End
 
-
-    // The following is the same for both cases:
-    data.map((object) => {
-        // console.log(object.List_AV_Language[0]);
-    });
+    // data.map((object) => {
+    // console.log(object.List_AV_Language[0]);
+    // });
 
     const singleString = JSON.stringify(data);
 
@@ -75,8 +50,8 @@ async function getTasks() {
     return z.array(listAVSchema).parse(tasks)
 }
 
-export default async function TaskPage() {
-    const tasks = await getTasks()
+export default async function AVListPage() {
+    const tasks = await getAVList()
 
     return (
         <main>
