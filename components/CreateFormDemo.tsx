@@ -6,7 +6,6 @@ import {
   Reflibrarytype,
 } from "@/types/types";
 import { useState, useEffect } from "react";
-import db from "@/lib/db";
 
 type MyChildComponentProps = {
   data: any[];
@@ -15,7 +14,7 @@ type MyChildComponentProps = {
 const CreateFormDemo = ({ data }: MyChildComponentProps) => {
   // State for the form
   const [formData, setFormData] = useState<Partial<SingleLibraryType>>({
-    id: 999, //I will try to make it autoincrement
+    // id: 999, //I will try to make it autoincrement
     library_name: "",
     type: 0,
     plilaw: false,
@@ -146,7 +145,7 @@ const CreateFormDemo = ({ data }: MyChildComponentProps) => {
       <div>
         <label htmlFor='library_number'>Library Number</label>
         <input
-          type='number'
+          type='text'
           id='library_number'
           name='library_number'
           value={formData.library_number || 0}

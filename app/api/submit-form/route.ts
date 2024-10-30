@@ -1,13 +1,16 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
+import { findMaxId } from "@/data/fetchPrisma";
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    const maxId = await findMaxId();
+
     // Ensure that the data conforms to the expected schema structure
     const libraryData = {
-      id: data.id,
+      id: maxId !== null ? maxId + 1 : 999,
       type: Number(data.type), // Foreign key or type ID
       library_name: data.library_name,
       plilaw: data.plilaw,
