@@ -1,14 +1,3 @@
-import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CheckCircledIcon,
-  CircleIcon,
-  CrossCircledIcon,
-  QuestionMarkCircledIcon,
-  StopwatchIcon,
-} from "@radix-ui/react-icons"
-
 export const languages = [
   {
     value: "1",
@@ -30,15 +19,15 @@ export const languages = [
 
 export const type = [
   {
-    value: "image",
+    value: "Online Image/Photograph",
     label: "Online Image/Photograph",
   },
   {
-    value: "video",
+    value: "Streaming Film/Video",
     label: "Streaming Film/Video",
   },
   {
-    value: "audio",
+    value: "Streaming Audio/Music",
     label: "Streaming Audio/Music",
   },
   {
@@ -52,5 +41,9 @@ export const type = [
   {
     value: "other",
     label: "Other",
+  },
+  {
+    value: "Online Map",
+    label: "Online Map",
   }
 ]

@@ -46,14 +46,8 @@ const FormsPage = () => {
                   </Link>
                 </li>
                 <li key="avdb" className="list-disc">
-                  <Link href="/admin/forms/avBigForm">
-                    An other - Audio/Visual Database by Subscription for McGill Library in
-                    2024
-                  </Link>
-                </li>
-                <li key="avdb" className="list-disc">
                   <Link href="/admin/forms/tasks">
-                    Template
+                    Template-task
                   </Link>
                 </li>
               </ul>
