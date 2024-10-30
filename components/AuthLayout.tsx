@@ -1,4 +1,5 @@
-import { CirclesBackground } from '@/components/CirclesBackground'
+
+import { CirclesBackground } from "./ui/CirclesBackground"
 
 
 export function AuthLayout({
@@ -27,8 +28,8 @@ export function AuthLayout({
           {children}
         </div>
         {subtitle && (
-            <div className="mt-3 text-center text-lg text-gray-600">{subtitle}</div>
-          )}
+          <div className="mt-3 text-center text-lg text-gray-600">{subtitle}</div>
+        )}
       </div>
     </main>
   )
