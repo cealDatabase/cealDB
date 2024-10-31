@@ -57,21 +57,6 @@ export const columns: ColumnDef<listAV>[] = [
     },
   },
   {
-    accessorKey: "romanized_title",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Romanized" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("romanized_title")}
-          </span>
-        </div>
-      )
-    },
-  },
-  {
     accessorKey: "cjk_title",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="CJK" />
@@ -81,6 +66,36 @@ export const columns: ColumnDef<listAV>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("cjk_title")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "subtitle",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="subtitle" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("subtitle")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "romanized_title",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Romanized" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("romanized_title")}
           </span>
         </div>
       )
@@ -134,6 +149,51 @@ export const columns: ColumnDef<listAV>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
+    },
+  },
+  {
+    accessorKey: "publisher",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Publisher" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("publisher")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "description",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("description")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "notes",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("notes")}
+          </span>
+        </div>
+      )
     },
   },
   {

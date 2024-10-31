@@ -18,7 +18,6 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
-
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -30,9 +29,9 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("language") && (
+        {table.getColumn("List_AV_Language") && (
           <DataTableFacetedFilter
-            column={table.getColumn("language")}
+            column={table.getColumn("List_AV_Language")}
             title="Language"
             options={languages}
           />
