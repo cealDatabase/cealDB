@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getLibYearByLibIdAndYear, getAVListByLibraryYear, getAllAVLists, getLibraryById } from "@/data/fetchPrisma"
+import { getAllAVLists, getAVListbyYear } from "@/data/fetchPrisma";
 import { z } from "zod"
 
 import { listAVSchema } from "./data/schema"
@@ -9,60 +9,59 @@ import { DataTable } from "./components/data-table"
 import { Container } from "@/components/Container"
 import { Suspense } from "react";
 
-async function getAVList(libId: number, year: number) {
-
-    // Fetch all. By Library Year ID. NOT separated by language:
-    const getLibYear = async (libId: number, year: number) => {
-        const output = await getLibYearByLibIdAndYear(libId, year);
-        return output ? (output[0]?.id as number) : undefined;
+async function getAVList(year: number) {
+    // Fetch specific AV records yy year. NOT inlucding global. NOT separated by language:
+    const getSpecificAVListByYear = async (year: number) => {
+        const output = await getAVListbyYear(year);
+        const outputSet = new Set();
+        output?.map((object) => {
+            object.LibraryYear_ListAV.map((av) => 
+                {
+                    outputSet.add(av)}
+                );
+        });
+        return Array.from(outputSet);
     }
 
     const AVListCompo = async () => {
-        const libYearId = await getLibYear(libId, year);
-        if (!libYearId) {
-            return [];
-        }
-        const getAVRecordsByLibYearId = await getAVListByLibraryYear(libYearId);
+        const special = await getSpecificAVListByYear(year);
+        // Get all global AV records:
         const getGlobalAVRecords = await getAllAVLists();
         if (getGlobalAVRecords) {
             getGlobalAVRecords.map((object) => {
                 if (object.is_global)
-                    getAVRecordsByLibYearId?.push(object);
+                    special.push(object);
             });
         }
 
-        return getAVRecordsByLibYearId?.flat()
+        return special?.flat()
     }
 
     const data = await AVListCompo();
+    console.log("data length: " +  data.length);
     if (!data) {
         return [];
     }
 
-    // data.map((object) => {
-    //     object.List_AV_Language.map((language) => {
-    //         console.log(language);
-    //     })
-    // });
-
     const singleString = JSON.stringify(data);
 
     const tasks = JSON.parse(singleString)
+    console.log(tasks);
     return z.array(listAVSchema).parse(tasks)
 }
 
 export default async function AVListPage() {
-    const getLibIdFromCookie = (await cookies()).get("library")?.value;
-    const tasks = await getAVList(Number(getLibIdFromCookie), 2016)
-    const libName = await getLibraryById(Number(getLibIdFromCookie));
+    const selectYear = 2018;
+    // const getLibIdFromCookie = cookies().get("library")?.value;
+    const tasks = await getAVList(selectYear);
+
 
     return (
         <main>
             <Container className="bg-white p-12">
                 <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
                     <div className="space-y-2">
-                        <h2>{libName?.library_name}</h2>
-                        <h2 className="text-2xl font-bold tracking-tight">2024 Audio/Visual Database by Subscription</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">{selectYear} Audio/Visual Database by Subscription</h2>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes next to each subscription your library has, for
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this

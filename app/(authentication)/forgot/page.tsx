@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useFormState } from "react-dom";
+import React from 'react';
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
@@ -9,7 +9,7 @@ import { TextField } from "@/components/Fields";
 import forgotAction from "./forgotAction";
 
 export default function ForgotPage() {
-  const [error, formAction] = useFormState(forgotAction, undefined);
+  const [error, formAction] = React.useActionState(forgotAction, undefined);
 
   return (
     <AuthLayout

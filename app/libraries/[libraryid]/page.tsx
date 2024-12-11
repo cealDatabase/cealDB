@@ -37,11 +37,12 @@ async function LibrarySinglePage(passId: number) {
   return <LibSingle libraries={libraryItem as unknown as SingleLibraryType} />;
 }
 
-export default function SingleLibraryInfoHomePage({
-  params,
-}: {
-  params: { libraryid: string };
-}) {
+export default async function SingleLibraryInfoHomePage(
+  props: {
+    params: Promise<{ libraryid: string }>;
+  }
+) {
+  const params = await props.params;
   return (
     <main>
       <Suspense fallback={<SkeletonCard />}>

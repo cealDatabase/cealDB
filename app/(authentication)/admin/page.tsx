@@ -21,22 +21,22 @@ import {
 
 const actions = [
   {
-    title: 'Request time off',
-    href: '#',
+    title: 'Admin Help',
+    href: '/admin/help',
     icon: ClockIcon,
     iconForeground: 'text-teal-700',
     iconBackground: 'bg-teal-50',
   },
   {
-    title: 'Benefits',
-    href: '#',
+    title: 'Audio/Visual Databases',
+    href: '/admin/forms/avdbedit',
     icon: CheckBadgeIcon,
     iconForeground: 'text-purple-700',
     iconBackground: 'bg-purple-50',
   },
   {
-    title: 'Schedule a one-on-one',
-    href: '#',
+    title: 'Custom Fields for Other Holdings',
+    href: '/admin/custom-other',
     icon: UsersIcon,
     iconForeground: 'text-sky-700',
     iconBackground: 'bg-sky-50',
@@ -186,7 +186,7 @@ function UserSingle({
             {library}
 
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Survey</dt>
+              <dt className="text-gray-500 font-medium">Forms</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                 <Link href={`/admin/forms`}>Forms Page</Link>
               </dd>
@@ -199,24 +199,19 @@ function UserSingle({
   );
 }
 
-function UserLoggedInPage() {
-  const cookieStore = cookies().get("uinf")?.value.toLowerCase();
-  const roleId = cookies().get("role")?.value;
+async function UserLoggedInPage() {
+  const cookieValue = await cookies();
+  const cookieStore = cookieValue.get("uinf")?.value.toLowerCase();
+  const roleId = cookieValue.get("role")?.value;
 
   return (
     <main>
       {getUserDetailByEmail({ cookieStore })}
+      {/* TODO: change back to 1 as Super Admin */}
       {roleId?.includes("2") &&
-
         <div className="container mt-12">
           <h1>Super Admin Toolkit</h1>
-
-
           <div className="grid grid-cols-1 gap-y-12">
-
-
-
-
             <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-gray-200 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
               {actions.map((action, actionIdx) => (
                 <div
@@ -264,12 +259,7 @@ function UserLoggedInPage() {
                 </div>
               ))}
             </div>
-
-
           </div>
-
-
-
         </div>
 
       }

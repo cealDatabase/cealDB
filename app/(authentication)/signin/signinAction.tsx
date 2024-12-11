@@ -28,7 +28,7 @@ export default async function signinAction(
   });
   const json = await res.json();
 
-  cookies().set("session", json.token, {
+  (await cookies()).set("session", json.token, {
     secure: true,
     httpOnly: true,
     expires: expireTime,
@@ -46,7 +46,7 @@ export default async function signinAction(
   > {
     if (typeof username === "string" && username.length > 5) {
       // Valid email address
-      cookies().set("uinf", username.toLowerCase(), {
+      (await cookies()).set("uinf", username.toLowerCase(), {
         secure: true,
         httpOnly: true,
         expires: expireTime,
@@ -55,7 +55,7 @@ export default async function signinAction(
     }
   };
 
-  cookies().set(
+  (await cookies()).set(
     "library",
     (await fetchResult(username as string))?.library as unknown as string,
     {
@@ -65,7 +65,7 @@ export default async function signinAction(
     }
   );
 
-  cookies().set(
+  (await cookies()).set(
     "role",
     (await fetchResult(username as string))?.role as unknown as string,
     {
@@ -76,7 +76,7 @@ export default async function signinAction(
   );
 
   // Redirect to log in if success
-  if (cookies().has("role") || cookies().has("library")) {
+  if ((await cookies()).has("role") || (await cookies()).has("library")) {
     redirect("/admin");
   } else {
     return json.error;

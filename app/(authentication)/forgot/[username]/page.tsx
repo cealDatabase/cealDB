@@ -14,13 +14,14 @@ function normalizeUsername(rawUsername: string): string {
   return rawUsername.trim().replace("%40", "@").toLowerCase();
 }
 
-export default async function SingleLibraryInfoHomePage({
-  params,
-  searchParams,
-}: {
-  params: { username: string };
-  searchParams: { token: number };
-}) {
+export default async function SingleLibraryInfoHomePage(
+  props: {
+    params: Promise<{ username: string }>;
+    searchParams: Promise<{ token: number }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const userItem = await UserSinglePage(normalizeUsername(params.username));
   const isValid =
     Math.abs(Number(Date.now()) - searchParams.token) <= 15 * 60 * 1000 // 15 minutes

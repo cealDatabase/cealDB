@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
 import {
   getRegionById,
   getTypeById,
@@ -163,8 +163,8 @@ export default function LibSingle({
 }: {
   libraries: SingleLibraryType;
 }) {
-  const cookiesLibraryId = cookies().get("library")?.value;
-  const cookiesRoleId = cookies().get("role")?.value;
+  const cookiesLibraryId = (cookies() as unknown as UnsafeUnwrappedCookies).get("library")?.value;
+  const cookiesRoleId = (cookies() as unknown as UnsafeUnwrappedCookies).get("role")?.value;
   let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
 
   return (

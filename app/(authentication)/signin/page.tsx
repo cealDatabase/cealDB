@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useFormState } from "react-dom";
+import React from "react";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
@@ -9,7 +9,7 @@ import { TextField } from "@/components/Fields";
 import signinAction from "./signinAction";
 
 export default function SignInPage() {
-  const [error, formAction] = useFormState(signinAction, undefined);
+  const [error, formAction] = React.useActionState(signinAction, undefined);
 
   return (
     <AuthLayout

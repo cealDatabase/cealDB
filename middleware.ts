@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // check for cookie
   // console.log("cookies: " + JSON.stringify(cookies().getAll()));
 
-  const cookie = cookies().get("session");
+  const cookie = (await cookies()).get("session");
 
   if (!cookie) {
     return NextResponse.redirect(new URL("/", request.url));

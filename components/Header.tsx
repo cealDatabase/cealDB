@@ -6,8 +6,9 @@ import { redirect } from "next/navigation";
 
 
 
-function loginStatus() {
-  const loginDetails = cookies().get("session")?.value;
+async function loginStatus() {
+  const cookieStore = await cookies();
+  const loginDetails = cookieStore.get("session")?.value;
   return (
     <HeaderComponent
       loggedIn={loginDetails ? true : false}

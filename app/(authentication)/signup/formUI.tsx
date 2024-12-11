@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useFormState } from "react-dom";
+import React from "react";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
@@ -24,7 +24,7 @@ export default function SignUpForm({
   libraries: any;
   roles: any;
 }) {
-  const [error, formAction] = useFormState(signupAction, undefined);
+  const [error, formAction] = React.useActionState(signupAction, undefined);
   const [institution, setInstitution] = useState("");
   const [userRole, setUserRole] = useState("");
 
