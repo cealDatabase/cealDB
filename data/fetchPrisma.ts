@@ -32,6 +32,22 @@ export const getAllLibraries = async () => {
   }
 };
 
+export const findMaxId = async () => {
+  try {
+    const maxRecordId = await db.library.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      take: 1,
+    });
+
+    const maxId = maxRecordId[0]?.id;
+    return maxId;
+  } catch {
+    return null;
+  }
+};
+
 // Get users
 export const getUserById = async (id: number) => {
   try {
