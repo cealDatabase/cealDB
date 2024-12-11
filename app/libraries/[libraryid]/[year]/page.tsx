@@ -14,11 +14,12 @@ async function getLibYear({ id, year }: { id: number; year: number }) {
   );
 }
 
-export default async function LibraryYearPage({
-  params,
-}: {
-  params: { libraryid: string; year: string };
-}) {
+export default async function LibraryYearPage(
+  props: {
+    params: Promise<{ libraryid: string; year: string }>;
+  }
+) {
+  const params = await props.params;
   const libId = params.libraryid;
   const year = params.year;
   return (

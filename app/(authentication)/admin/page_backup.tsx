@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
 import { Container } from "@/components/Container";
 import {
   getUserByUserName,
@@ -138,7 +138,7 @@ function UserSingle({
 }
 
 function UserLoggedInPage() {
-  const cookieStore = cookies().get("uinf")?.value.toLowerCase();
+  const cookieStore = (cookies() as unknown as UnsafeUnwrappedCookies).get("uinf")?.value.toLowerCase();
   return (
     <main>
       <Container>{getUserDetailByEmail({ cookieStore })}</Container>

@@ -17,7 +17,7 @@ const FormsPage = () => {
         <div className="bg-white rounded-md">
           <div className="mx-auto divide-y divide-gray-900/10 px-6 py-12 sm:py-20 lg:px-8">
             <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
-              Survery Forms
+              My Forms
             </h2>
             <div className="mt-10 grid grid-cols-12 gap-x-2">
               <ul className="mt-6 space-y-4 sm:col-start-2 col-span-12 sm:col-span-6">
