@@ -171,6 +171,21 @@ export const columns: ColumnDef<listAV>[] = [
     },
   },
   {
+    accessorKey: "List_AV_Language",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Language" />,
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          {(row.getValue("List_AV_Language") as { language_id: string }[])?.map((lang: { language_id: string }) => (
+            <span key={lang.language_id} className="max-w-[500px] truncate font-medium">
+              {languages.find((language) => language.value === lang.language_id)?.label}
+            </span>
+          ))}
+        </div>
+      )
+    }
+  },
+  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
