@@ -20,8 +20,8 @@ export default async function CreateNewLibrary() {
 
   return (
     <div>
-      {/* <CreateLibraryForm data={[typeData, regionData]} /> */}
-      <CreateFormDemo data={[typeData, regionData]} />
+      <CreateLibraryForm data={[typeData, regionData]} />
+      {/* <CreateFormDemo data={[typeData, regionData]} /> */}
     </div>
   );
 };

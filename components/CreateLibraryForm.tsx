@@ -1,12 +1,19 @@
+// Since the data in the form will change in the frontend, therefore it is important to claim the component as a client-side rendered component
 "use client";
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-// import { TextField, Button } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs"; // Import Dayjs for date handling
 import * as dayjs from "dayjs"; // Import as a namespace to use isDayjs
 import { Container } from "@/components/Container";
+
+import {
+  SingleLibraryType,
+  Reflibraryregion,
+  Reflibrarytype,
+} from "@/types/types";
 
 // Dynamically import the DatePicker
 const DatePicker = dynamic(
@@ -22,6 +29,117 @@ type MyChildComponentProps = {
 const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
+  // State for the form
+  const [formData, setFormData] = useState<Partial<SingleLibraryType>>({
+    // Since the library id is autoincrementing, therefore I will be operating the id number directly under api/route.ts
+    library_name: "",
+    type: 0,
+    plilaw: false,
+    plimed: false,
+    plisubmitter_first_name: null,
+    plisubmitter_last_name: null,
+    pliposition_title: null,
+    pliwork_phone: null,
+    plie_mail: "",
+    plifax_number: null,
+    pliinput_as_of_date: null,
+    password: null,
+    hideinlibrarylist: false,
+    pliregion: null,
+    pliestablishedyear: null,
+    plibibliographic: null,
+    pliconsortia: null,
+    pliopac: false,
+    plihome_page: null,
+    plionline_catalog: null,
+    plisystem_vendor: null,
+  });
+
+  // State for dropdown options
+  const [libraryTypes, setLibraryTypes] = useState<Reflibrarytype[]>([]);
+  const [libaryRegions, setLibraryRegions] = useState<Reflibraryregion[]>([]);
+
+  // State for collection_librarian_groups
+  const [librarianGroups, setLibrarianGroups] = useState<string[]>([]);
+
+  // Options for collection_librarian_groups
+  const librarianGroupOptions = [
+    "International/global studies",
+    "Subject librarians/consultant group",
+    "Collection development",
+    "Research and learning group",
+    "Technical processing group",
+    "Public services group",
+    "Special collections group",
+    'Other (input additional information in "Notes" box at the end of this form)',
+  ];
+
+  // load all library types and library regions when page refreshed/rendered
+  useEffect(() => {
+    const fetchLibraryTypesandRegions = async () => {
+      setLibraryTypes(await data[0]);
+      setLibraryRegions(await data[1]);
+    };
+
+    fetchLibraryTypesandRegions();
+  }, []);
+
+  // Handle input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
+
+    // Check if the input is a checkbox
+    if (type === "checkbox") {
+      if (librarianGroups.includes(value)) {
+        setLibrarianGroups(librarianGroups.filter((item) => item === value));
+      } else {
+        setLibrarianGroups([...librarianGroups, value]);
+      }
+
+      console.log("librarian groups:", librarianGroups);
+
+      // Convert the selected options to a comma-separated string
+      const responseString = librarianGroups.join(", ");
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        collection_librarians_groups: responseString,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
+  };
+
+  console.log("Form Data:", formData);
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("/api/submit-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Error submitting the form");
+
+      const result = await res.json();
+      console.log("Library created:", result);
+    } catch (error) {
+      console.error("Error creating library from CreateFormDemo:", error);
+    }
+  };
+
   return (
     <main>
       <h1 className='text-base font-semibold learning-7 text-gray-900'>
@@ -29,8 +147,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
       </h1>
       <Container>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <form className='bg-gray-100 rounded-lg pb-8'>
-            {/* I will  add the createlibrary function afterwards */}
+          <form className='bg-gray-100 rounded-lg pb-8' onSubmit={handleSubmit}>
             <div className='space-y-12'>
               {/* Library Create General Information */}
 
@@ -47,12 +164,14 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   <div className='mt-2'>
                     <div className='flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md'>
                       <input
-                        id='libraryName'
-                        name='libraryName'
+                        id='library_name'
+                        name='library_name'
                         type='text'
                         placeholder='Please input your library full name'
                         autoComplete='libraryName'
                         className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                        value={formData.library_name ?? ""}
+                        onChange={handleInputChange}
                       />
                     </div>
                   </div>
@@ -60,20 +179,21 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Hide in library listing */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='hideInLibraryListing'
+                    htmlFor='hideinlibrarylist'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Hide in library Listing?
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='hideInLibraryListing'
-                      name='hideInLibraryListing'
-                      autoComplete='hideInLibraryListing-choose'
+                      id='hideinlibrarylist'
+                      name='hideinlibrarylist'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.hideinlibrarylist ? "true" : "false"}
+                      onChange={handleInputChange}
                     >
-                      <option>No</option>
-                      <option>Yes</option>
+                      <option value='false'>No</option>
+                      <option value='true'>Yes</option>
                     </select>
                   </div>
                 </div>
@@ -87,81 +207,47 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='libraryType'
-                      name='libraryType'
-                      autoComplete='libraryType-name'
+                      id='type'
+                      name='type'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.type ?? ""}
+                      onChange={handleInputChange}
                     >
                       {/* getLibraryTypes */}
-                      {data[0].map(
-                        (option: {
-                          id: number;
-                          librarytype:
-                            | string
-                            | number
-                            | bigint
-                            | boolean
-                            | React.ReactElement<
-                                any,
-                                string | React.JSXElementConstructor<any>
-                              >
-                            | Iterable<React.ReactNode>
-                            | React.ReactPortal
-                            | Promise<React.AwaitedReactNode>
-                            | null
-                            | undefined;
-                        }) => {
-                          return (
-                            <option key={option.id}>
-                              {option.librarytype}
-                            </option>
-                          );
-                        }
-                      )}
+                      <option value=''>Select a type</option>
+                      {libraryTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.librarytype}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
                 {/* Library Region */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='libraryRegion'
+                    htmlFor='pliregion'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Library Region
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='libraryRegion'
-                      name='libraryRegion'
-                      autoComplete='libraryRegion-name'
+                      id='pliregion'
+                      name='pliregion'
+                      autoComplete='pliregion-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.pliregion ?? ""}
+                      onChange={handleInputChange}
+                      required
                     >
                       {/* getLibraryRegions */}
-                      {data[1].map(
-                        (option: {
-                          id: number;
-                          libraryregion:
-                            | string
-                            | number
-                            | bigint
-                            | boolean
-                            | React.ReactElement<
-                                any,
-                                string | React.JSXElementConstructor<any>
-                              >
-                            | Iterable<React.ReactNode>
-                            | React.ReactPortal
-                            | Promise<React.AwaitedReactNode>
-                            | null
-                            | undefined;
-                        }) => {
-                          return (
-                            <option key={option.id}>
-                              {option.libraryregion}
-                            </option>
-                          );
-                        }
-                      )}
+                      <option value=''>Select a region</option>
+                      {libaryRegions.map((region) => (
+                        <option key={region.id} value={region.id}>
+                          {region.libraryregion}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -169,275 +255,307 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Submitted By */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='first-name'
+                    htmlFor='plisubmitter_first_name'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Submitted By: first name
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='first-name'
-                      name='first-name'
+                      id='plisubmitter_first_name'
+                      name='plisubmitter_first_name'
                       type='text'
                       autoComplete='given-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plisubmitter_first_name ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='last-name'
+                    htmlFor='plisubmitter_last_name'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Submitted by: last name
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='last-name'
-                      name='last-name'
+                      id='plisubmitter_last_name'
+                      name='plisubmitter_last_name'
                       type='text'
                       autoComplete='family-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plisubmitter_last_name ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Title */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='title'
+                    htmlFor='pliposition_title'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Title
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='title'
-                      name='title'
+                      id='pliposition_title'
+                      name='pliposition_title'
                       type='text'
                       autoComplete='title'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.pliposition_title ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Phone */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='phone'
+                    htmlFor='pliwork_phone'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Phone
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='phone'
-                      name='phone'
+                      id='pliwork_phone'
+                      name='pliwork_phone'
                       type='text'
                       autoComplete='phone'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.pliwork_phone ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Email */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='email'
+                    htmlFor='plie_mail'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Email address
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='email'
-                      name='email'
-                      type='email'
+                      id='plie_mail'
+                      name='plie_mail'
+                      type='text'
                       autoComplete='email'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plie_mail ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Fax */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='fax'
+                    htmlFor='plifax_number'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Fax
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='fax'
-                      name='fax'
+                      id='plifax_number'
+                      name='plifax_number'
                       type='text'
                       autoComplete='fax'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plifax_number ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Library Home Page */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='libraryHomePage'
+                    htmlFor='plihome_page'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Library Home Page
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='libraryHomePage'
-                      name='libraryHomePage'
+                      id='plihome_page'
+                      name='plihome_page'
                       type='text'
                       autoComplete='libraryHomePage'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plihome_page ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Library Online Catalogue */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='libraryOnlineCatalogue'
+                    htmlFor='plionline_catalog'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Library Online Catalogue
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='libraryOnlineCatalogue'
-                      name='libraryOnlineCatalogue'
+                      id='plionline_catalog'
+                      name='plionline_catalog'
                       type='text'
                       autoComplete='libraryOnlineCatalogue'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plionline_catalog ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Bibliographic Unitilies */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='bibliographicUtilities'
+                    htmlFor='plibibliographic'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Bibiliographic Utilities
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='bibliographicUtilities'
-                      name='bibliographicUtilities'
+                      id='plibibliographic'
+                      name='plibibliographic'
                       type='text'
                       autoComplete='bibliographicUtilities'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plibibliographic ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Networks or Consortia */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='networksConsortia'
+                    htmlFor='pliconsortia'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Networks or Consortia
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='networksConsortia'
-                      name='networksConsortia'
+                      id='pliconsortia'
+                      name='pliconsortia'
                       type='text'
                       autoComplete='networksConsortia'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.pliconsortia ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Integrated System Vendor */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='integratedSystemVendor'
+                    htmlFor='plisystem_vendor'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Integrated System Vendor
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='integratedSystemVendor'
-                      name='integratedSystemVendor'
+                      id='plisystem_vendor'
+                      name='plisystem_vendor'
                       type='text'
                       autoComplete='integratedSystemVendor'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.plisystem_vendor ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* OPAC Capability of CJK Display */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='OPACCJK'
+                    htmlFor='pliopac'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     OPAC Capability of CJK Display
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='OPACCJK'
-                      name='OPACCJK'
+                      id='pliopac'
+                      name='pliopac'
                       autoComplete='OPACCJK-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.pliopac ? "true" : "false"}
+                      onChange={handleInputChange}
                     >
-                      <option>No</option>
-                      <option>Yes</option>
+                      <option value={"false"}>No</option>
+                      <option value={"true"}>Yes</option>
                     </select>
                   </div>
                 </div>
                 {/* Established at (4-digit year) */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='establishedAt'
+                    htmlFor='pliestablishedyear'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Established at (4-digit year)
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='establishedAt'
-                      name='establishedAt'
+                      id='pliestablishedyear'
+                      name='pliestablishedyear'
                       type='text'
                       autoComplete='establishedAt'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.pliestablishedyear ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Law */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='law'
+                    htmlFor='plilaw'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Law
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='law'
-                      name='law'
+                      id='plilaw'
+                      name='plilaw'
                       autoComplete='law-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.plilaw ? "true" : "false"}
+                      onChange={handleInputChange}
+                      required
                     >
-                      <option>No</option>
-                      <option>Yes</option>
+                      <option value={"false"}>No</option>
+                      <option value={"true"}>Yes</option>
                     </select>
                   </div>
                 </div>
                 {/* Medical */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='medical'
+                    htmlFor='plimed'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Medical
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='medical'
-                      name='medical'
+                      id='plimed'
+                      name='plimed'
                       autoComplete='medical-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.plimed ? "true" : "false"}
+                      onChange={handleInputChange}
+                      required
                     >
-                      <option>No</option>
-                      <option>Yes</option>
+                      <option value={"false"}>No</option>
+                      <option value={"true"}>Yes</option>
                     </select>
                   </div>
                 </div>
@@ -453,18 +571,20 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Full title of East Asian Collection */}
                 <div className='sm:col-span-6'>
                   <label
-                    htmlFor='full-title-of-east-asian-collection'
+                    htmlFor='collection_title'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Full title of East Asian collection
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='full-title-of-east-asian-collection'
-                      name='full-title-of-east-asian-collection'
+                      id='collection_title'
+                      name='collection_title'
                       type='text'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_title ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
@@ -476,62 +596,68 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Position title in charge of the east asian collection */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='position-title-in-charge-of-the-east-asian-collection'
+                    htmlFor='collection_incharge_title'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Position title in charge of the East Asian collection
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='position-title-in-charge-of-the-east-asian-collection'
-                      name='position-title-in-charge-of-the-east-asian-collection'
+                      id='collection_incharge_title'
+                      name='collection_incharge_title'
                       type='text'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_incharge_title ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Head of E.Asian collection reports to what position title */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='head-of-easian-collection-reports-to-what-position'
+                    htmlFor='collection_head_reports_to'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Head of E.Asian collection reports to what position title
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='head-of-easian-collection-reports-to-what-position'
-                      name='head-of-easian-collection-reports-to-what-position'
+                      id='collection_head_reports_to'
+                      name='collection_head_reports_to'
                       type='text'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_head_reports_to ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Collection organized under what department/unit? */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='collection-organized-under-what-department-unit'
+                    htmlFor='collection_organized_under'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Collection organized under what department/unit?
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='collection-organized-under-what-department-unit'
-                      name='collection-organized-under-what-department-unit'
+                      id='collection_organized_under'
+                      name='collection_organized_under'
                       type='text'
                       autoComplete=''
                       placeholder='e.g. International Collections'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_organized_under ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* The top hierarchy department/unit the collection is under (if it is different than previous) */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='the-top-hierarchy-department'
+                    htmlFor='collection_top_department'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     The top hierarchy department/unit the collection is under
@@ -539,18 +665,20 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='the-top-hierarchy-department'
-                      name='the-top-hierarchy-department'
+                      id='collection_top_department'
+                      name='collection_top_department'
                       type='text'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_top_department ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* Except the Univ. Librarian (or the Dean of the Libraries), the title of the next highest position the collection is under */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='except-the-univ-librarian'
+                    htmlFor='collection_next_position_title'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Except the Univ. Librarian (or the Dean of the Libraries),
@@ -559,18 +687,20 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   </label>
                   <div className='mt-2'>
                     <input
-                      id='except-the-univ-librarian'
-                      name='except-the-univ-librarian'
+                      id='collection_next_position_title'
+                      name='collection_next_position_title'
                       type='text'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.collection_next_position_title ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
                 {/* East Asian collection is associated with which other departments/units? */}
                 <div className='sm: col-span-3'>
                   <label
-                    htmlFor='east-asian-collection-associated'
+                    htmlFor='collection_other_departments'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     East Asian collection is associated with which other
@@ -578,11 +708,12 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   </label>
                   <div className='mt-2'>
                     <textarea
-                      id='east-asian-collection-associated'
-                      name='east-asian-collection-associated'
+                      id='collection_other_departments'
+                      name='collection_other_departments'
                       rows={3}
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                      defaultValue={""}
+                      value={formData.collection_other_departments ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                   <p className='mt-3 text-sm leading-6 text-gray-400'>
@@ -594,156 +725,53 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
                 <div className='mt-10 space-y-10 sm: col-span-6'>
                   <fieldset>
-                    <legend className='text-sm font-medium leading-6'>
-                      East Asian librarian(s) are a part of which of the
-                      following group(s)
+                    <legend className='text-base font-semibold text-gray-900'>
+                      Members
                     </legend>
-                    <div className='mt-6 space-y-6'>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='international-global-studies'
-                            name='international-global-studies'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
+                    <div className='mt-4 divide-y divide-gray-200 border-b border-t border-gray-200'>
+                      {librarianGroupOptions.map((option) => (
+                        <div key={option} className='relative flex gap-3 py-4'>
+                          <div className='min-w-0 flex-1 text-sm/6'>
+                            <label
+                              htmlFor={option}
+                              className='select-none font-medium text-gray-900'
+                            >
+                              {option}
+                            </label>
+                          </div>
+                          <div className='flex h-6 shrink-0 items-center'>
+                            <div className='group grid size-4 grid-cols-1'>
+                              <input
+                                value={option}
+                                checked={librarianGroups.includes(option)}
+                                onChange={handleInputChange}
+                                type='checkbox'
+                                className='col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto'
+                              />
+                              <svg
+                                fill='none'
+                                viewBox='0 0 14 14'
+                                className='pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25'
+                              >
+                                <path
+                                  d='M3 8L6 11L11 3.5'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:checked]:opacity-100'
+                                />
+                                <path
+                                  d='M3 7H11'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:indeterminate]:opacity-100'
+                                />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='international-global-studies'
-                            className='font-medium'
-                          >
-                            International/global studies
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='subject-librarian-consultant-group'
-                            name='subject-librarian-consultant-group'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='subject-librarian-consultant-group'
-                            className='font-medium'
-                          >
-                            Subject librarian/consultant group
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='collection-development'
-                            name='collection-development'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='collection-development'
-                            className='font-medium'
-                          >
-                            Collection development
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='research-and-learning-group'
-                            name='research-and-learning-group'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='research-and-learning-group'
-                            className='font-medium'
-                          >
-                            Research and learning group
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='technical-processing-group'
-                            name='technical-processing-group'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='technical-processing-group'
-                            className='font-medium'
-                          >
-                            Technical processing group
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='public-services-group'
-                            name='public-services-group'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='public-services-group'
-                            className='font-medium'
-                          >
-                            Public services group
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='special-collections-group'
-                            name='special-collections-group'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='special-collections-group'
-                            className='font-medium'
-                          >
-                            Special collections group
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='other-in-notes'
-                            name='other-in-notes'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label
-                            htmlFor='other-in-notes'
-                            className='font-medium'
-                          >
-                            Other (input additional information in "Notes" box
-                            at the end of this form)
-                          </label>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </fieldset>
                 </div>
@@ -1067,7 +1095,6 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='notes'
                       rows={3}
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                      defaultValue={""}
                     />
                   </div>
                 </div>
