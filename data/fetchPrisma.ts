@@ -205,7 +205,7 @@ export const getAVListbyYear = async (year: number) => {
         year: year,
       },
       include: {
-        // List_AV: true,
+        List_AV: true,
         LibraryYear_ListAV: true,
       },
     });

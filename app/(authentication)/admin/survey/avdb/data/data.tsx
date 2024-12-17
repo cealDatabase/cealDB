@@ -19,31 +19,51 @@ export const languages = [
 
 export const type = [
   {
-    value: "Online Image/Photograph",
-    label: "Online Image/Photograph",
+    value: 'online image/photograph',
+    label: 'online image/photograph'
   },
   {
-    value: "Streaming Film/Video",
-    label: "Streaming Film/Video",
+    value: 'streaming film/video',
+    label: 'streaming film/video'
   },
   {
-    value: "Streaming Audio/Music",
-    label: "Streaming Audio/Music",
+    value: 'online map',
+    label: 'online map'
   },
   {
-    value: "database",
-    label: "Database",
+    value: 'online video',
+    label: 'online video'
   },
   {
-    value: "file",
-    label: "File",
+    value: '',
+    label: 'not indicated'
   },
   {
-    value: "other",
-    label: "Other",
+    value: 'streaming film/database',
+    label: 'streaming film/database'
   },
   {
-    value: "Online Map",
-    label: "Online Map",
+    value: 'database',
+    label: 'database'
+  },
+  {
+    value: 'streaming audio/music',
+    label: 'streaming audio/music'
+  },
+  {
+    value: 'images&videos',
+    label: 'images&videos'
+  },
+  {
+    value: 'images',
+    label: 'images'
+  },
+  {
+    value: 'data set',
+    label: 'data set'
+  },
+  {
+    value: 'online video/image files',
+    label: 'online video/image files'
   }
 ]

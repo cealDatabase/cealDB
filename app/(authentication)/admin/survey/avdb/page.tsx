@@ -8,7 +8,6 @@ import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { Container } from "@/components/Container"
 import { Suspense } from "react";
-import { stringify } from "postcss";
 
 async function getAVList(year: number) {
     // Fetch specific AV records yy year. NOT inlucding global. NOT separated by language:
@@ -16,7 +15,7 @@ async function getAVList(year: number) {
         const output = await getAVListbyYear(year);
         const outputSet = new Set();
         output?.map((object) => {
-            object.LibraryYear_ListAV.map((av) => {
+            object.List_AV.map((av) => {
                 outputSet.add(av)
             }
             );
@@ -29,26 +28,29 @@ async function getAVList(year: number) {
         // Get all global AV records:
         const getGlobalAVRecords = await getAllAVLists();
         if (getGlobalAVRecords) {
-            return getGlobalAVRecords
-                .filter((object) => object.is_global)
-                .map((object) => ({
-                    id: object.id,
-                    type: object.type,
-                    title: object.title,
-                    cjk_title: object.cjk_title,
-                    romanized_title: object.romanized_title,
-                    subtitle: object.subtitle,
-                    publisher: object.publisher,
-                    description: object.description,
-                    notes: object.notes,
-                    data_source: object.data_source,
-                    is_global: object.is_global,
-                    libraryyear: object.libraryyear,
-                    List_AV_Language: object.List_AV_Language.map((lang) => ({
-                        listav_id: lang.listav_id,
-                        language_id: lang.language_id
+            return special.concat(
+                getGlobalAVRecords
+                    .filter((object) => object.is_global)
+                    .map((object) => ({
+                        id: object.id,
+                        type: object.type?.toLowerCase().replace("/ ", "/"),
+                        title: object.title,
+                        cjk_title: object.cjk_title,
+                        romanized_title: object.romanized_title,
+                        subtitle: object.subtitle,
+                        publisher: object.publisher,
+                        description: object.description,
+                        notes: object.notes,
+                        data_source: object.data_source,
+                        updated_at: object.updated_at,
+                        is_global: object.is_global,
+                        libraryyear: object.libraryyear,
+                        List_AV_Language: object.List_AV_Language.map((lang) => ({
+                            listav_id: lang.listav_id,
+                            language_id: lang.language_id
+                        }))
                     }))
-                }));
+            );
         }
 
         return []
@@ -67,9 +69,9 @@ async function getAVList(year: number) {
 }
 
 export default async function AVListPage() {
-    const selectYear = 2018;
+    const selectYear = 2021;
     // const getLibIdFromCookie = cookies().get("library")?.value;
-    const tasks = await getAVList(selectYear);
+    const tasks = (await getAVList(selectYear)).sort((a, b) => a.id - b.id);
 
 
     return (
