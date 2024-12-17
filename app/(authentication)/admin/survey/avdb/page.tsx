@@ -8,6 +8,7 @@ import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { Container } from "@/components/Container"
 import { Suspense } from "react";
+import SkeletonCard from "@/components/SkeletonCard";
 
 async function getAVList(year: number) {
     // Fetch specific AV records yy year. NOT inlucding global. NOT separated by language:
@@ -89,7 +90,7 @@ export default async function AVListPage() {
                             in each of the fields.
                         </p>
                     </div>
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<SkeletonCard />}>
                         <DataTable data={tasks} columns={columns} />
                     </Suspense>
                 </div>
