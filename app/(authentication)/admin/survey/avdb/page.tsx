@@ -46,10 +46,10 @@ async function getAVList(year: number) {
                         updated_at: object.updated_at,
                         is_global: object.is_global,
                         libraryyear: object.libraryyear,
-                        List_AV_Language: object.List_AV_Language.map((lang) => ({
-                            listav_id: lang.listav_id,
-                            language_id: lang.language_id
-                        }))
+                        // List_AV_Language: object.List_AV_Language.map((lang) => ({
+                        //     listav_id: lang.listav_id,
+                        //     language_id: lang.language_id
+                        // }))
                     }))
             );
         }

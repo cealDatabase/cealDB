@@ -5,12 +5,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "prisma generate && prisma db push --force-reset && prisma db seed && next build",
-    "postinstall": "prisma generate",
-    "prismabuild": "prisma generate && prisma db push --force-reset && prisma db seed",
-    "start": "next start",
-    "lint": "next lint"
+    "dev":          "next dev --turbopack",
+    "build":        "prisma generate && prisma db push --force-reset && prisma db seed && next build",
+    "prismabuild":  "prisma generate && prisma db push --force-reset && prisma db seed",
+    "postinstall":  "prisma generate",
+    "start":        "next start",
+    "lint":         "next lint"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
