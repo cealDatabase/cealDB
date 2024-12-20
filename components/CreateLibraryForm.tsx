@@ -94,11 +94,16 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
     // Check if the input is a checkbox
     if (type === "checkbox") {
+      let updatedLibrarianGroups;
       if (librarianGroups.includes(value)) {
-        setLibrarianGroups(librarianGroups.filter((item) => item === value));
+        updatedLibrarianGroups = librarianGroups.filter(
+          (item) => item === value
+        );
       } else {
-        setLibrarianGroups([...librarianGroups, value]);
+        updatedLibrarianGroups = [...librarianGroups, value];
       }
+
+      setLibrarianGroups(updatedLibrarianGroups);
 
       console.log("librarian groups:", librarianGroups);
 
