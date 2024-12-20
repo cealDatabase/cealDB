@@ -215,6 +215,16 @@ export const getAVListbyYear = async (year: number) => {
   }
 }
 
+export const getLanguageIdByListAvId = async (listavid: number) => {
+  try {
+    const languageIdArray = await db.list_AV_Language.findMany({
+      where: { listav_id: listavid }
+    });
+    return languageIdArray.map((lang) => lang.language_id);
+  } catch {
+    return null;
+  }
+}
 
 export const getAVListByLibraryYear = async (libraryyear: number) => {
   try {

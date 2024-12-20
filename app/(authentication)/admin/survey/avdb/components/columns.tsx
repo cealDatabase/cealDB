@@ -171,12 +171,12 @@ export const columns: ColumnDef<listAV>[] = [
     },
   },
   {
-    accessorKey: "List_AV_Language",
+    accessorKey: "language",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Language" />,
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          {(row.getValue("List_AV_Language") as { language_id: string }[])?.map((lang: { language_id: string }) => (
+          {(row.getValue("language") as { language_id: number }[])?.map((lang) => (
             <span key={lang.language_id} className="max-w-[500px] truncate font-medium">
               {languages.find((language) => language.value === lang.language_id)?.label}
             </span>

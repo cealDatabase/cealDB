@@ -1,18 +1,18 @@
 export const languages = [
   {
-    value: "1",
+    value: 1,
     label: "CHN",
   },
   {
-    value: "2",
+    value: 2,
     label: "JPN",
   },
   {
-    value: "3",
+    value: 3,
     label: "KOR",
   },
   {
-    value: "4",
+    value: 4,
     label: "NONCJK"
   }
 ]
