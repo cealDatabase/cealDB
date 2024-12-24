@@ -94,6 +94,9 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
     // Check if the input is a checkbox
     if (type === "checkbox") {
+      // add an && clause to make sure we have the correct checkbox name
+
+      // Checkbox under "librarian groups"
       let updatedLibrarianGroups;
       if (librarianGroups.includes(value)) {
         updatedLibrarianGroups = librarianGroups.filter(
@@ -105,10 +108,10 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
       setLibrarianGroups(updatedLibrarianGroups);
 
-      console.log("librarian groups:", librarianGroups);
+      console.log("librarian groups:", updatedLibrarianGroups);
 
       // Convert the selected options to a comma-separated string
-      const responseString = librarianGroups.join(", ");
+      const responseString = updatedLibrarianGroups.join(", ");
       setFormData((prevFormData) => ({
         ...prevFormData,
         collection_librarians_groups: responseString,
@@ -195,7 +198,13 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='hideinlibrarylist'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.hideinlibrarylist ? "true" : "false"}
-                      onChange={handleInputChange}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          hideinlibrarylist: value === "true",
+                        }));
+                      }}
                     >
                       <option value='false'>No</option>
                       <option value='true'>Yes</option>
@@ -491,7 +500,13 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       autoComplete='OPACCJK-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.pliopac ? "true" : "false"}
-                      onChange={handleInputChange}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          pliopac: value === "true",
+                        }));
+                      }}
                     >
                       <option value={"false"}>No</option>
                       <option value={"true"}>Yes</option>
@@ -533,7 +548,13 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       autoComplete='law-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.plilaw ? "true" : "false"}
-                      onChange={handleInputChange}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          plilaw: value === "true",
+                        }));
+                      }}
                       required
                     >
                       <option value={"false"}>No</option>
@@ -556,7 +577,13 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       autoComplete='medical-name'
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.plimed ? "true" : "false"}
-                      onChange={handleInputChange}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          plimed: value === "true",
+                        }));
+                      }}
                       required
                     >
                       <option value={"false"}>No</option>
