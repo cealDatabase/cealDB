@@ -29,13 +29,16 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {/* {table.getColumn("language") && (
+        {table.getColumn("language") && (
           <DataTableFacetedFilter
             column={table.getColumn("language")}
-            title="Language"
-            options={languages.map(lang => lang.value).toString()}
+            title="Language (Under Construction)"
+            options={languages.map((language) => ({
+              value: language.value.toString(),
+              label: language.label,
+            }))}
           />
-        )} */}
+        )}
         {table.getColumn("type") && (
           <DataTableFacetedFilter
             column={table.getColumn("type")}
