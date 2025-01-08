@@ -826,28 +826,50 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='collection-physical-location'
-                      name='collection-physical-location'
+                      id='collection_type'
+                      name='collection_type'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.collection_type ?? ""}
+                      onChange={handleInputChange}
                     >
                       <option>- Select -</option>
-                      <option>
+                      <option
+                        value={
+                          "Stand-alone E.Asian library/collection building"
+                        }
+                      >
                         Stand-alone E.Asian library/collection building
                       </option>
-                      <option>
+                      <option
+                        value={
+                          "Seperate E.Asian collection within a library building"
+                        }
+                      >
                         Seperate E.Asian collection within a library building
                       </option>
-                      <option>
+                      <option
+                        value={
+                          "Seperate E.Asian collection with some parts interfiled with some parts iterfiled with other collections (by subject, call number block, size, etc.)"
+                        }
+                      >
                         Seperate E.Asian collection with some parts interfiled
                         with other collections (by subject, call number block,
                         size, etc.)
                       </option>
-                      <option>
+                      <option
+                        value={
+                          "East Asian collection completely interfiled with main library collection"
+                        }
+                      >
                         East Asian collection completely interfiled with main
                         library collection
                       </option>
-                      <option>
+                      <option
+                        value={
+                          "Other (Add additional information in 'Notes' box at the end fo this form.)"
+                        }
+                      >
                         Other (Add additional information in "Notes" box at the
                         end of this form.)
                       </option>
@@ -947,6 +969,8 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                             name='on-site'
                             type='checkbox'
                             className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                            value={formData.acquisition_type ?? ""}
+                            onChange={handleInputChange}
                           />
                         </div>
                         <div className='text-sm leading-6'>
