@@ -21,8 +21,8 @@ export default async function AVListPage(
     return (
         <main>
             <Container className="bg-white p-12">
-                <SelectYear />
-                <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+
+                <div className="flex-1 flex-col p-8 md:flex">
                     <div className="space-y-2">
                         <h2 className="text-2xl font-bold tracking-tight">{params.year} Audio/Visual Database by Subscription</h2>
                         <p className="text-muted-foreground text-sm">
@@ -34,7 +34,7 @@ export default async function AVListPage(
                             in each of the fields.
                         </p>
                     </div>
-
+                    <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonCard />}>
                         {AVSinglePage(Number(params.year))}
                     </Suspense>
