@@ -1,4 +1,4 @@
-import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
+import { cookies } from "next/headers";
 import {
   getRegionById,
   getTypeById,
@@ -9,15 +9,8 @@ import { Container } from "./Container";
 import { Button } from "./Button";
 import { SingleLibraryType } from "@/types/types";
 
-// function generateYears(startYear: number, endYear: number) {
-//   let years = [];
-//   for (let year = startYear; year <= endYear; year++) {
-//     years.push(year);
-//   }
-//   return years;
-// }
-
-// let yearsArray = generateYears(1999, 2024);
+// Force dynamic so cookies can be read each request
+export const dynamic = 'force-dynamic';
 
 // Get Region
 async function getRegionDetailById({ regionId }: { regionId: number }) {
@@ -158,13 +151,14 @@ function ContactSingle({
 }
 
 // Present Single Library details
-export default function LibSingle({
+export default async function LibSingle({
   libraries,
 }: {
   libraries: SingleLibraryType;
 }) {
-  const cookiesLibraryId = (cookies() as unknown as UnsafeUnwrappedCookies).get("library")?.value;
-  const cookiesRoleId = (cookies() as unknown as UnsafeUnwrappedCookies).get("role")?.value;
+  const cookieStore = await cookies();
+  const cookiesLibraryId = cookieStore.get("library")?.value;
+  const cookiesRoleId = cookieStore.get("role")?.value;
   let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
 
   return (

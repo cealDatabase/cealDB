@@ -29,7 +29,7 @@ const actions = [
   },
   {
     title: 'Audio/Visual Databases',
-    href: '/admin/survey/avdb',
+    href:  `/admin/survey/avdb/${new Date().getFullYear()}`,
     icon: CheckBadgeIcon,
     iconForeground: 'text-purple-700',
     iconBackground: 'bg-purple-50',

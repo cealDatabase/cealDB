@@ -2,10 +2,11 @@ import { Suspense } from "react";
 import { getAllLibraries } from "@/data/fetchPrisma";
 import { Skeleton } from "@/components/ui/skeleton";
 import LibList from "@/components/LibList";
+import { SingleLibraryType } from "@/types/types";
 
 async function allLibraries() {
   const libraries = await getAllLibraries();
-  return <LibList libraries={libraries} />;
+  return <LibList libraries={libraries as unknown as SingleLibraryType }/>;
 }
 
 function SkeletonCard() {
