@@ -6,7 +6,10 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonCard from "@/components/SkeletonCard";
 
-export const dynamic = "force-dynamic";
+async function AVSinglePage(yearPassIn: number) {
+    const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+    return <DataTable data={tasks} columns={columns} />;
+}
 
 export default async function AVListPage(
     props: {
@@ -14,7 +17,6 @@ export default async function AVListPage(
     }
 ) {
     const params = await props.params;
-    const data = await GetAVList(Number(params.year));
 
     return (
         <main>
@@ -34,7 +36,7 @@ export default async function AVListPage(
                     </div>
 
                     <Suspense fallback={<SkeletonCard />}>
-                        <DataTable data={data} columns={columns} />
+                        {AVSinglePage(Number(params.year))}
                     </Suspense>
                 </div>
             </Container>

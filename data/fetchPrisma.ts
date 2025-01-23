@@ -198,15 +198,36 @@ export const getYearsByLibId = async (id: number) => {
 
 // Survey: Get AV List.
 
+export const getAllAVLists = async () => {
+  try {
+    const avlists = await db.list_AV.findMany({
+      include: {
+        Library_Year: true,
+        List_AV_Language: true,
+      },
+    });
+    return avlists;
+  } catch {
+    return null;
+  }
+}
+
+export const getListAVByID = async (id: number) => {
+  try {
+    const listAV = await db.list_AV.findUnique({
+      where: { id },
+    });
+    return listAV;
+  } catch {
+    return null;
+  }
+}
+
 export const getAVListbyYear = async (year: number) => {
   try {
     const avList = await db.library_Year.findMany({
       where: {
         year: year,
-      },
-      include: {
-        List_AV: true,
-        LibraryYear_ListAV: true,
       },
     });
     return avList;
@@ -225,47 +246,3 @@ export const getLanguageIdByListAvId = async (listavid: number) => {
     return null;
   }
 }
-
-export const getAVListByLibraryYear = async (libraryyear: number) => {
-  try {
-    const avlist = await db.list_AV.findMany({
-      where: { libraryyear },
-      include: {
-        Library_Year: true,
-        List_AV_Counts: true,
-        List_AV_Language: true,
-      },
-    });
-    return avlist;
-  } catch {
-    return null;
-  }
-}
-
-export const getAllAVLists = async () => {
-  try {
-    const avlists = await db.list_AV.findMany({
-      include: {
-        Library_Year: true,
-        List_AV_Language: true,
-      },
-    });
-    return avlists;
-  } catch {
-    return null;
-  }
-}
-
-export const getAVListIdByLanguageId = async (id: number) => {
-  try {
-    const avlist = await db.list_AV_Language.findMany({
-      where: {
-        language_id: id,
-      },
-    });
-    return avlist;
-  }
-  catch {
-    return null;
-  }
-};

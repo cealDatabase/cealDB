@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SelectYear() {
@@ -8,11 +8,6 @@ export default function SelectYear() {
 
     const [selectedYear, setSelectedYear] = useState("");
     const years = Array.from({ length: 26 }, (_, i) => 2000 + i);
-
-    useEffect(() => {
-        // Perform side effects when selectedYear changes
-        console.log(`Selected year: ${selectedYear}`);
-    }, [selectedYear]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const year = Number(e.target.value);
