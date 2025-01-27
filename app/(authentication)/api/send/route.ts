@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       from: "CEAL Admin <admin@vivoequeen.com>",
       to: username,
       subject: "From CEAL - Your password reset request.",
+      // @ts-ignore
       react: ResetEmailTemplate({
         firstName: user.firstname ?? "CEAL user",
         resetLink: `https://ceal-db.vercel.app/forgot/${username}?token=${expireTime}`,
