@@ -1,3 +1,5 @@
+/// <reference types="react/experimental" />
+
 import db from "@/lib/db";
 import { ResetEmailTemplate } from "@/components/ResetEmailTmpt";
 import { Resend } from "resend";
@@ -17,29 +19,41 @@ export async function POST(request: Request) {
   const expireTime = Date.now() + 60 * 1000 * 15; // 15 minutes
 
   if (!user) {
-    return Response.json({ error: "User not found" }, { status: 400 });
-  } else {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: "CEAL Admin <admin@vivoequeen.com>",
-        to: username,
-        subject: "From CEAL - Your password reset request.",
-        react: ResetEmailTemplate({
-          firstName: user.firstname ?? "",
-          resetLink: `https://ceal-db.vercel.app/forgot/${username}?token=${expireTime}`,
-        }),
-        text: "", // Keep this! To avoid error
-      });
+    return Response.json(
+      { message: "Error. User not found" },
+      { status: 400 }
+    );
+  }
 
-      if (error) {
-        return Response.json({ error }, { status: 500 });
-      }
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "CEAL Admin <admin@vivoequeen.com>",
+      to: username,
+      subject: "From CEAL - Your password reset request.",
+      react: ResetEmailTemplate({
+        firstName: user.firstname ?? "CEAL user",
+        resetLink: `https://ceal-db.vercel.app/forgot/${username}?token=${expireTime}`,
+      }),
+    });
 
-      return Response.json({
-        message: data?.id,
-      });
-    } catch (error) {
-      return Response.json({ error }, { status: 500 });
+    if (error) {
+      // Convert error object to a simple message
+      return Response.json(
+        { message: error.message || "Error. Failed to send email" },
+        { status: 500 }
+      );
     }
+
+    return Response.json({
+      message: "Email sent successfully",
+      id: data?.id,
+    });
+  } catch (error) {
+    // Convert any unexpected errors to simple message
+    const errorMessage = error instanceof Error ? error.message : "Error. An unexpected error occurred";
+    return Response.json(
+      { message: errorMessage },
+      { status: 500 }
+    );
   }
 }

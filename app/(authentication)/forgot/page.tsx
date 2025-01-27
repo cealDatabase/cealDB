@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from 'react';
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
@@ -49,7 +50,26 @@ export default function ForgotPage() {
           Send Reset Email
         </Button>
       </form>
-      {error && (
+      {error && error.includes("successfully") && (
+        <div className="rounded-md bg-green-50 p-4 mt-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <CheckCircleIcon
+                className="h-5 w-5 text-green-400"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-green-700">
+                {error}
+              </h3>
+            </div>
+          </div>
+        </div>
+      )
+      }
+
+      {error && error.includes("Error") && (
         <div className="rounded-md bg-red-50 p-4 mt-8">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -60,7 +80,7 @@ export default function ForgotPage() {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-700">
-                Error! {error}
+                {error}
               </h3>
             </div>
           </div>
