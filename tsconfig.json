@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["react/experimental"]
+    "types": ["react/experimental","node"]
   },
   "include": [
     "next-env.d.ts",
