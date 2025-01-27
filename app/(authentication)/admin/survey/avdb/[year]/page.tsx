@@ -4,7 +4,7 @@ import { DataTable } from "../components/data-table"
 import { Container } from "@/components/Container"
 import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
-import SkeletonCard from "@/components/SkeletonCard";
+import SkeletonTableCard from "@/components/SkeletonTableCard";
 
 async function AVSinglePage(yearPassIn: number) {
     const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
@@ -35,7 +35,7 @@ export default async function AVListPage(
                         </p>
                     </div>
                     <SelectYear yearCurrent={params.year} />
-                    <Suspense fallback={<SkeletonCard />}>
+                    <Suspense fallback={<SkeletonTableCard />}>
                         {AVSinglePage(Number(params.year))}
                     </Suspense>
                 </div>
