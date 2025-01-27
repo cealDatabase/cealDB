@@ -1,5 +1,9 @@
 export const languages = [
   {
+    value: 0,
+    label: "NI"
+  },
+  {
     value: 1,
     label: "CHN",
   },
