@@ -70,7 +70,7 @@ export default function LibYearSingle({
       title: "Electronic Books",
       children: [
         {
-          title: "Purchased Titles",
+          title: "Titles",
           children: [
             {
               title: "Previous",
@@ -111,7 +111,7 @@ export default function LibYearSingle({
           ],
         },
         {
-          title: "Purchased Volume",
+          title: "Volume",
           children: [
             {
               title: "Previous",
@@ -132,25 +132,51 @@ export default function LibYearSingle({
               width: 95,
             },
             {
-              title: "Non-Purchased Titles",
-              dataIndex: "EB_PV_NPTitles",
-              key: "EB_PV_NPTitles",
+              title: "Non-Purchased Volumes",
+              dataIndex: "EB_PV_NPVolumes",
+              key: "EB_PV_NPVolumes",
               width: 95,
             },
             {
-              title: "Subscription Titles",
-              dataIndex: "EB_PV_SubTitles",
-              key: "EB_PV_SubTitles",
+              title: "Subscription Volumes",
+              dataIndex: "EB_PV_SubVolumes",
+              key: "EB_PV_SubVolumes",
               width: 95,
             },
             {
               title: "Volumes Total",
-              dataIndex: "EB_PV_TitlesTotal",
-              key: "EB_PV_TitlesTotal",
+              dataIndex: "EB_PV_VolumesTotal",
+              key: "EB_PV_VolumesTotal",
               width: 95,
             },
           ],
         },
+      ],
+    },
+    {
+      title: "Monograph Additions",
+      children: [
+        {
+          title: "Titles",
+          children: [
+            { title: "Titles Purchased", dataIndex: "MGAdd_TitlesPurchased", key: "MGAdd_TitlesPurchased", width: 95 },
+            { title: "Titles Non-Purchased", dataIndex: "MGAdd_TitlesNonPurchased", key: "MGAdd_TitlesNonPurchased", width: 95 },
+            { title: "Titles Total", dataIndex: "MGAdd_TitlesTotal", key: "MGAdd_TitlesTotal", width: 95 },
+          ]
+        },
+        {
+          title: "Volumes",
+          children: [
+            {
+              title: "Volumes Purchased	",
+              dataIndex: "MGAdd_VolumesPurchased",
+              key: "MGAdd_VolumesPurchased",
+              width: 95,
+            },
+            { title: "Volumes Non-Purchased	", dataIndex: "MGAdd_VolumesNonPurchased", key: "MGAdd_VolumesNonPurchased", width: 95 },
+            { title: "Volumes Total	", dataIndex: "MGAdd_VolumesTotal", key: "MGAdd_VolumesTotal", width: 95 },
+          ]
+        }
       ],
     },
     {
@@ -163,23 +189,7 @@ export default function LibYearSingle({
           width: 95,
         },
       ],
-    },
-    {
-      title: "Monograph Additions",
-      children: [
-        {
-          title: "Volumes Purchased	",
-          dataIndex: "",
-          key: "",
-          width: 95,
-        },
-        { title: "Volumes Non-Purchased	", dataIndex: "", key: "", width: 95 },
-        { title: "Volumes Total	", dataIndex: "", key: "", width: 95 },
-        { title: "Titles Purchased		", dataIndex: "", key: "", width: 95 },
-        { title: "Titles Non-Purchased		", dataIndex: "", key: "", width: 95 },
-        { title: "Titles Total", dataIndex: "", key: "", width: 95 },
-      ],
-    },
+    }
   ];
 
   function capitalizeFirstLetter(somestring: string) {
@@ -188,19 +198,19 @@ export default function LibYearSingle({
 
   const data: DataType[] = [];
   const lanArr = ["CHN", "JPN", "KOR", "NonCJK", "Total"];
-  const EB_PT_Previous_Arr: { [key: string]: number | null } = {
-    CHN: libyear[0].Electronic_Books.ebooks_purchased_prev_titles_chinese,
-    JPN: libyear[0].Electronic_Books.ebooks_purchased_prev_titles_japanese,
-    KOR: libyear[0].Electronic_Books.ebooks_purchased_prev_titles_korean,
-    NonCJK: libyear[0].Electronic_Books.ebooks_purchased_prev_titles_noncjk,
-    Total: libyear[0].Electronic_Books.ebooks_purchased_prev_titles_subtotal,
+  const EB_PT_Previous_Arr: { [key: string]: string } = {
+    CHN: (libyear[0].Electronic_Books.ebooks_purchased_prev_titles_chinese ?? "").toString(),
+    JPN: (libyear[0].Electronic_Books.ebooks_purchased_prev_titles_japanese ?? "").toString(),
+    KOR: (libyear[0].Electronic_Books.ebooks_purchased_prev_titles_korean ?? "").toString(),
+    NonCJK: (libyear[0].Electronic_Books.ebooks_purchased_prev_titles_noncjk ?? "").toString(),
+    Total: (libyear[0].Electronic_Books.ebooks_purchased_prev_titles_subtotal ?? "").toString(),
   };
-  const EB_PT_Add_Arr: { [key: string]: number | null } = {
-    CHN: libyear[0].Electronic_Books.ebooks_purchased_add_titles_chinese,
-    JPN: libyear[0].Electronic_Books.ebooks_purchased_add_titles_japanese,
-    KOR: libyear[0].Electronic_Books.ebooks_purchased_add_titles_korean,
-    NonCJK: libyear[0].Electronic_Books.ebooks_purchased_add_titles_noncjk,
-    Total: libyear[0].Electronic_Books.ebooks_purchased_add_titles_subtotal,
+  const EB_PT_Add_Arr: { [key: string]: string } = {
+    CHN: (libyear[0].Electronic_Books.ebooks_purchased_add_titles_chinese ?? "").toString(),
+    JPN: (libyear[0].Electronic_Books.ebooks_purchased_add_titles_japanese ?? "").toString(),
+    KOR: (libyear[0].Electronic_Books.ebooks_purchased_add_titles_korean ?? "").toString(),
+    NonCJK: (libyear[0].Electronic_Books.ebooks_purchased_add_titles_noncjk ?? "").toString(),
+    Total: (libyear[0].Electronic_Books.ebooks_purchased_add_titles_subtotal ?? "").toString(),
   };
 
   function showLan() {
@@ -208,36 +218,38 @@ export default function LibYearSingle({
       data.push({
         key: index,
         Languages: capitalizeFirstLetter(lan),
-        GTMTotal_WOEbooks: 0,
-        GTMTotal_WEbooks: 0,
-        PVH_Previous: 0,
-        PVH_Added: 0,
-        PVH_Withdrawn: 0,
-        PVH_SubTotal: 0,
-        OMH_Microform: 0,
-        OMH_Cartographic: 0,
-        OMH_Audio: 0,
-        OMH_FilmVideo: 0,
-        OMH_DVD: 0,
-        OMH_SubTotal: 0,
-        EB_PT_Previous: Number(EB_PT_Previous_Arr[lan]),
-        EB_PT_Add: Number(EB_PT_Add_Arr[lan]),
+        GTMTotal_WOEbooks: "0",
+        GTMTotal_WEbooks: "0",
+        PVH_Previous: "0",
+        PVH_Added: "0",
+        PVH_Withdrawn: "0",
+        PVH_SubTotal: "0",
+        OMH_Microform: "0",
+        OMH_Cartographic: "0",
+        OMH_Audio: "0",
+        OMH_FilmVideo: "0",
+        OMH_DVD: "0",
+        OMH_SubTotal: "0",
+        EB_PT_Previous: EB_PT_Previous_Arr[lan],
+        EB_PT_Add: EB_PT_Add_Arr[lan],
         EB_PT_Subtotal:
-          Number(EB_PT_Previous_Arr[lan]) + Number(EB_PT_Add_Arr[lan]),
-        EB_PT_NPTitles: 0,
-        EB_PT_SubTitles: 0,
-        EB_PT_TitlesTotal: 0,
-        EB_PV_Previous: 0,
-        EB_PV_Add: 0,
-        EB_PV_Subtotal: 0,
-        EB_PV_NPTitles: 0,
-        EB_PV_SubTitles: 0,
-        EB_PV_TitlesTotal: 0,
-        UB_Mat_Total: 0,
-        MGAdd_VolumesPurchased: 0,
-        MGAdd_VolumesNonPurchased: 0,
-        MGAdd_VolumesTotal: 0,
-        MGAdd_TitlesPurchased: 0,
+          (Number(EB_PT_Previous_Arr[lan]) + Number(EB_PT_Add_Arr[lan])).toString(),
+        EB_PT_NPTitles: "0",
+        EB_PT_SubTitles: "0",
+        EB_PT_TitlesTotal: "0",
+        EB_PV_Previous: "0",
+        EB_PV_Add: "0",
+        EB_PV_Subtotal: "0",
+        EB_PV_NPVolumes: "0",
+        EB_PV_SubVolumes: "0",
+        EB_PV_VolumesTotal: "0",
+        UB_Mat_Total: "0",
+        MGAdd_VolumesPurchased: "0",
+        MGAdd_VolumesNonPurchased: "0",
+        MGAdd_VolumesTotal: "0",
+        MGAdd_TitlesPurchased: "0",
+        MGAdd_TitlesNonPurchased: "0",
+        MGAdd_TitlesTotal: "0",
       });
     });
   }
