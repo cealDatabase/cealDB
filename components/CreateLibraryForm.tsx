@@ -29,6 +29,8 @@ type MyChildComponentProps = {
 const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
+  // console.log("selected date:", selectedDate);
+
   // State for the form
   const [formData, setFormData] = useState<Partial<SingleLibraryType>>({
     // Since the library id is autoincrementing, therefore I will be operating the id number directly under api/route.ts
@@ -62,6 +64,15 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
   // State for collection_librarian_groups
   const [librarianGroups, setLibrarianGroups] = useState<string[]>([]);
 
+  // State for acquisition type
+  const [acquisitionTypes, setAcquisitionTypes] = useState<string[]>([]);
+
+  // State for cataloging type
+  const [catalogingTypes, setCatalogingTypes] = useState<string[]>([]);
+
+  // State for circulation type
+  const [circulationTypes, setCirculationTypes] = useState<string[]>([]);
+
   // Options for collection_librarian_groups
   const librarianGroupOptions = [
     "International/global studies",
@@ -73,6 +84,12 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     "Special collections group",
     'Other (input additional information in "Notes" box at the end of this form)',
   ];
+
+  const acquisitionOptions = ["On Site", "Centralized", "Out-sourced"];
+
+  const catalogingOptions = ["On Site", "Centralized", "Out-sourced"];
+
+  const circulationOptions = ["On Site", "Centralized"];
 
   // load all library types and library regions when page refreshed/rendered
   useEffect(() => {
@@ -93,7 +110,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     const { name, value, type } = e.target;
 
     // Check if the input is a checkbox
-    if (type === "checkbox") {
+    if (type === "checkbox" && name === "collection_librarians_groups") {
       // add an && clause to make sure we have the correct checkbox name
 
       // Checkbox under "librarian groups"
@@ -108,13 +125,65 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
       setLibrarianGroups(updatedLibrarianGroups);
 
-      console.log("librarian groups:", updatedLibrarianGroups);
-
       // Convert the selected options to a comma-separated string
       const responseString = updatedLibrarianGroups.join(", ");
       setFormData((prevFormData) => ({
         ...prevFormData,
         collection_librarians_groups: responseString,
+      }));
+    } else if (type === "checkbox" && name === "acquisition_type") {
+      // Checkbox under "Acquisitions (Order and Receiving)"
+      let updatedAcquisitionTypes;
+      if (acquisitionTypes.includes(value)) {
+        updatedAcquisitionTypes = acquisitionTypes.filter(
+          (item) => item === value
+        );
+      } else {
+        updatedAcquisitionTypes = [...acquisitionTypes, value];
+      }
+
+      setAcquisitionTypes(updatedAcquisitionTypes);
+
+      const responseStringAcquisition = updatedAcquisitionTypes.join(", ");
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        acquisition_type: responseStringAcquisition,
+      }));
+    } else if (type === "checkbox" && name === "cataloging_type") {
+      // Checkbox under "Cataloging and Processing"
+      let updatedCatalogingTypes;
+      if (catalogingTypes.includes(value)) {
+        updatedCatalogingTypes = catalogingTypes.filter(
+          (item) => item === value
+        );
+      } else {
+        updatedCatalogingTypes = [...catalogingTypes, value];
+      }
+
+      setCatalogingTypes(updatedCatalogingTypes);
+
+      const responseStringCataloging = updatedCatalogingTypes.join(", ");
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        cataloging_type: responseStringCataloging,
+      }));
+    } else if (type === "checkbox" && name === "circulation_type") {
+      // Checkbox under "Circulation"
+      let updatedCirculationTypes;
+      if (circulationTypes.includes(value)) {
+        updatedCirculationTypes = circulationTypes.filter(
+          (item) => item === value
+        );
+      } else {
+        updatedCirculationTypes = [...circulationTypes, value];
+      }
+
+      setCirculationTypes(updatedCirculationTypes);
+
+      const responseStringCirculation = updatedCirculationTypes.join(", ");
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        circulation_type: responseStringCirculation,
       }));
     } else {
       setFormData((prevFormData) => ({
@@ -778,6 +847,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                                 checked={librarianGroups.includes(option)}
                                 onChange={handleInputChange}
                                 type='checkbox'
+                                name='collection_librarians_groups'
                                 className='col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto'
                               />
                               <svg
@@ -891,6 +961,8 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='cjk-languages-shelving'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.shelving_type ?? ""}
+                      onChange={handleInputChange}
                     >
                       <option>- Select -</option>
                       <option>intefiled, no Western language texts</option>
@@ -925,6 +997,8 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='reference-consultation'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.consultation_type ?? ""}
+                      onChange={handleInputChange}
                     >
                       <option>- Select -</option>
                       <option>On Site</option>
@@ -947,6 +1021,8 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='teaching-and-learning'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
+                      value={formData.teaching_type ?? ""}
+                      onChange={handleInputChange}
                     >
                       <option>- Select -</option>
                       <option>EA Appt</option>
@@ -961,54 +1037,51 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                     <legend className='text-sm font-medium leading-6'>
                       Acquisitions (Order and Receiving)
                     </legend>
-                    <div className='mt-6 space-y-6'>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='on-site'
-                            name='on-site'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                            value={formData.acquisition_type ?? ""}
-                            onChange={handleInputChange}
-                          />
+                    <div className='mt-4 divide-y divide-gray-200 border-b border-t border-gray-200'>
+                      {acquisitionOptions.map((option) => (
+                        <div key={option} className='relative flex gap-3 py-4'>
+                          <div className='min-w-0 flex-1 text-sm/6'>
+                            <label
+                              htmlFor={option}
+                              className='select-none font-medium text-gray-900'
+                            >
+                              {option}
+                            </label>
+                          </div>
+                          <div className='flex h-6 shrink-0 items-center'>
+                            <div className='group grid size-4 grid-cols-1'>
+                              <input
+                                value={option}
+                                checked={acquisitionTypes.includes(option)}
+                                onChange={handleInputChange}
+                                type='checkbox'
+                                name='acquisition_type'
+                                className='col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto'
+                              />
+                              <svg
+                                fill='none'
+                                viewBox='0 0 14 14'
+                                className='pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25'
+                              >
+                                <path
+                                  d='M3 8L6 11L11 3.5'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:checked]:opacity-100'
+                                />
+                                <path
+                                  d='M3 7H11'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:indeterminate]:opacity-100'
+                                />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='on-site' className='font-medium'>
-                            On Site
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='centralized'
-                            name='centralized'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='centralized' className='font-medium'>
-                            Centralized
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='out-sourced'
-                            name='out-sourced'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='out-sourced' className='font-medium'>
-                            Out-sourced
-                          </label>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </fieldset>
                 </div>
@@ -1019,52 +1092,51 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                     <legend className='text-sm font-medium leading-6'>
                       Cataloging and Processing
                     </legend>
-                    <div className='mt-6 space-y-6'>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='on-site'
-                            name='on-site'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
+                    <div className='mt-4 divide-y divide-gray-200 border-b border-t border-gray-200'>
+                      {catalogingOptions.map((option) => (
+                        <div key={option} className='relative flex gap-3 py-4'>
+                          <div className='min-w-0 flex-1 text-sm/6'>
+                            <label
+                              htmlFor={option}
+                              className='select-none font-medium text-gray-900'
+                            >
+                              {option}
+                            </label>
+                          </div>
+                          <div className='flex h-6 shrink-0 items-center'>
+                            <div className='group grid size-4 grid-cols-1'>
+                              <input
+                                value={option}
+                                checked={catalogingTypes.includes(option)}
+                                onChange={handleInputChange}
+                                type='checkbox'
+                                name='cataloging_type'
+                                className='col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto'
+                              />
+                              <svg
+                                fill='none'
+                                viewBox='0 0 14 14'
+                                className='pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25'
+                              >
+                                <path
+                                  d='M3 8L6 11L11 3.5'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:checked]:opacity-100'
+                                />
+                                <path
+                                  d='M3 7H11'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:indeterminate]:opacity-100'
+                                />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='on-site' className='font-medium'>
-                            On Site
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='centralized'
-                            name='centralized'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='centralized' className='font-medium'>
-                            Centralized
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='out-sourced'
-                            name='out-sourced'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='out-sourced' className='font-medium'>
-                            Out-sourced
-                          </label>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </fieldset>
                 </div>
@@ -1075,37 +1147,51 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                     <legend className='text-sm font-medium leading-6'>
                       Circulation
                     </legend>
-                    <div className='mt-6 space-y-6'>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='on-site'
-                            name='on-site'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
+                    <div className='mt-4 divide-y divide-gray-200 border-b border-t border-gray-200'>
+                      {circulationOptions.map((option) => (
+                        <div key={option} className='relative flex gap-3 py-4'>
+                          <div className='min-w-0 flex-1 text-sm/6'>
+                            <label
+                              htmlFor={option}
+                              className='select-none font-medium text-gray-900'
+                            >
+                              {option}
+                            </label>
+                          </div>
+                          <div className='flex h-6 shrink-0 items-center'>
+                            <div className='group grid size-4 grid-cols-1'>
+                              <input
+                                value={option}
+                                checked={circulationTypes.includes(option)}
+                                onChange={handleInputChange}
+                                type='checkbox'
+                                name='circulation_type'
+                                className='col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto'
+                              />
+                              <svg
+                                fill='none'
+                                viewBox='0 0 14 14'
+                                className='pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25'
+                              >
+                                <path
+                                  d='M3 8L6 11L11 3.5'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:checked]:opacity-100'
+                                />
+                                <path
+                                  d='M3 7H11'
+                                  strokeWidth={2}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='opacity-0 group-has-[:indeterminate]:opacity-100'
+                                />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='on-site' className='font-medium'>
-                            On Site
-                          </label>
-                        </div>
-                      </div>
-                      <div className='relative flex gap-x-3'>
-                        <div className='flex h-6 items-center'>
-                          <input
-                            id='centralized'
-                            name='centralized'
-                            type='checkbox'
-                            className='h-4 w-4 rounded order-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                          />
-                        </div>
-                        <div className='text-sm leading-6'>
-                          <label htmlFor='centralized' className='font-medium'>
-                            Centralized
-                          </label>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </fieldset>
                 </div>
@@ -1127,14 +1213,21 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                     value={selectedDate}
                     onChange={(newDate) => {
                       // Type-check the newDate to ensure it's a Dayjs object
+                      let isoDate: Date;
                       if (dayjs.isDayjs(newDate)) {
                         setSelectedDate(newDate); // It's a valid Dayjs object
+
+                        isoDate = newDate.toDate();
+                        console.log("selected date iso string: ", isoDate);
                       } else {
                         setSelectedDate(null); // Handle invalid date or null
                       }
+
+                      setFormData((prevFormData) => ({
+                        ...prevFormData,
+                        date_last_changed: isoDate,
+                      }));
                     }}
-                    // Directly use TextField as a child instead of renderInput
-                    // renderInput={(params) => <TextField {...params} />}
                   />
                 </div>
 
