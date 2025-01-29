@@ -117,7 +117,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
       let updatedLibrarianGroups;
       if (librarianGroups.includes(value)) {
         updatedLibrarianGroups = librarianGroups.filter(
-          (item) => item === value
+          (item) => item !== value
         );
       } else {
         updatedLibrarianGroups = [...librarianGroups, value];
@@ -136,7 +136,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
       let updatedAcquisitionTypes;
       if (acquisitionTypes.includes(value)) {
         updatedAcquisitionTypes = acquisitionTypes.filter(
-          (item) => item === value
+          (item) => item !== value
         );
       } else {
         updatedAcquisitionTypes = [...acquisitionTypes, value];
@@ -154,7 +154,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
       let updatedCatalogingTypes;
       if (catalogingTypes.includes(value)) {
         updatedCatalogingTypes = catalogingTypes.filter(
-          (item) => item === value
+          (item) => item !== value
         );
       } else {
         updatedCatalogingTypes = [...catalogingTypes, value];
@@ -172,7 +172,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
       let updatedCirculationTypes;
       if (circulationTypes.includes(value)) {
         updatedCirculationTypes = circulationTypes.filter(
-          (item) => item === value
+          (item) => item !== value
         );
       } else {
         updatedCirculationTypes = [...circulationTypes, value];
@@ -193,7 +193,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     }
   };
 
-  // console.log("Form Data:", formData);
+  console.log("Form Data:", formData);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,6 +230,29 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
               <div className='mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 mx-10'>
                 {/* Starting from Here*/}
+                {/* Library Number */}
+                <div className='sm:col-span-4'>
+                  <label
+                    htmlFor='library_number'
+                    className='block text-sm font-medium leading-6 text-gray-900'
+                  >
+                    Library Number
+                  </label>
+                  <div className='mt-2'>
+                    <div className='flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md'>
+                      <input
+                        id='library_number'
+                        name='library_number'
+                        type='text'
+                        placeholder='Please input your 4-digits library number'
+                        autoComplete='library_number'
+                        className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                        value={formData.library_number ?? ""}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                </div>
                 {/* Library Name */}
                 <div className='sm:col-span-4'>
                   <label
@@ -297,7 +320,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       onChange={handleInputChange}
                     >
                       {/* getLibraryTypes */}
-                      <option value=''>Select a type</option>
+                      <option value=''>Select a library type</option>
                       {libraryTypes.map((type) => (
                         <option key={type.id} value={type.id}>
                           {type.librarytype}
@@ -950,15 +973,15 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* CJK Languages (shelving) */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='cjk-languages-shelving'
+                    htmlFor='shelving_type'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     CJK Languages (shelving)
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='cjk-languages-shelving'
-                      name='cjk-languages-shelving'
+                      id='shelving_type'
+                      name='shelving_type'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.shelving_type ?? ""}
@@ -986,15 +1009,15 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Reference/Consultation */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='reference-consultation'
+                    htmlFor='consultation_type'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Reference/Consultation
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='reference-consultation'
-                      name='reference-consultation'
+                      id='consultation_type'
+                      name='consultation_type'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.consultation_type ?? ""}
@@ -1010,15 +1033,15 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                 {/* Teaching and Learning */}
                 <div className='sm:col-span-3'>
                   <label
-                    htmlFor='teaching-and-learning'
+                    htmlFor='teaching_type'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Teaching and Learning
                   </label>
                   <div className='mt-2'>
                     <select
-                      id='teaching-and-learning'
-                      name='teaching-and-learning'
+                      id='teaching_type'
+                      name='teaching_type'
                       autoComplete=''
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6'
                       value={formData.teaching_type ?? ""}
@@ -1244,6 +1267,8 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       name='notes'
                       rows={3}
                       className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                      value={formData.notes ?? ""}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>

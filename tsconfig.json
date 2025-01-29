@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["react/experimental","node"]
+    "types": ["react/experimental", "node"]
   },
   "include": [
     "next-env.d.ts",
@@ -33,7 +33,8 @@
     "app/libraries/page.jsx",
     "app/libraries/[libraryid]/page.jsx",
     "components/LibSingle.jsx",
-    "components/DatePicker.jsx"
+    "components/DatePicker.jsx",
+    "app/api/submit-form/route.js"
   ],
   "exclude": ["node_modules"]
 }

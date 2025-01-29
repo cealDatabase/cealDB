@@ -142,7 +142,7 @@ export type List_EJournal_Type = {
 };
 
 export type SingleLibraryType = {
-  id: number;
+  // id: number;
   type: number;
   library_name: string;
   plilaw: boolean;
