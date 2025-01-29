@@ -1,8 +1,9 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
 import { findMaxId } from "@/data/fetchPrisma";
+import { connect } from "http2";
 
-export async function POST(request: Request) {
+export async function POST(request) {
   try {
     const data = await request.json();
 
@@ -10,8 +11,7 @@ export async function POST(request: Request) {
 
     // Ensure that the data conforms to the expected schema structure
     const libraryData = {
-      id: maxId !== null ? maxId + 1 : 999,
-      type: Number(data.type), // Foreign key or type ID
+      // id: maxId !== null ? maxId + 1 : 999,
       library_name: data.library_name,
       plilaw: data.plilaw,
       plimed: data.plimed,
@@ -25,10 +25,16 @@ export async function POST(request: Request) {
         ? new Date(data.pliinput_as_of_date)
         : null,
       hideinlibrarylist: data.hideinlibrarylist === "true" ? true : false,
-      pliregion: Number(data.pliregion) || null, // Foreign key if related
       collection_title: data.collection_title || null,
       library_number: Number(data.library_number),
-      // Continue for other fields...
+
+      libraryType: {
+        connect: { id: Number(data.type) }, // Ensure type exists in Reflibrarytype
+      },
+
+      libraryRegion: {
+        connect: { id: Number(data.pliregion) },
+      },
     };
 
     // Create a new library entry
