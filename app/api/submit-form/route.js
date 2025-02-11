@@ -11,7 +11,6 @@ export async function POST(request) {
 
     // Ensure that the data conforms to the expected schema structure
     const libraryData = {
-      // id: maxId !== null ? maxId + 1 : 999,
       library_name: data.library_name,
       plilaw: data.plilaw,
       plimed: data.plimed,
@@ -27,6 +26,7 @@ export async function POST(request) {
       hideinlibrarylist: data.hideinlibrarylist === "true" ? true : false,
       collection_title: data.collection_title || null,
       library_number: Number(data.library_number),
+      date_last_changed: data.date_last_changed,
 
       libraryType: {
         connect: { id: Number(data.type) }, // Ensure type exists in Reflibrarytype
