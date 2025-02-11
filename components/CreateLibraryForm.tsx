@@ -1226,7 +1226,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
               <div className='mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 mx-10 border-b'>
                 <div className='col-span-full'>
                   <label
-                    htmlFor='most-recent-date-change'
+                    htmlFor='date_last_changed'
                     className='block text-sm font-medium leading-6 text-gray-900'
                   >
                     Most recent date of organizational change
