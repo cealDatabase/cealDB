@@ -42,6 +42,7 @@ const getSpecificAVListByYear = async (year: number) => {
         );
     }
 
+    console.log(outputArray.at(-1));
     return Array.from(outputArray);
 }
 
@@ -86,5 +87,6 @@ export async function GetAVList(year: number) {
     const singleString = JSON.stringify(data);
 
     const tasks = JSON.parse(singleString)
+    // console.log(tasks)
     return z.array(listAVSchema).parse(tasks);
 }
