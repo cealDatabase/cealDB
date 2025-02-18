@@ -20,13 +20,36 @@ export async function POST(request) {
       pliwork_phone: data.pliwork_phone || null,
       plie_mail: data.plie_mail,
       plifax_number: data.plifax_number || null,
+      plihome_page: data.plihome_page || null,
+      plionline_catalog: data.plionline_catalog || null,
+      plibibliographic: data.plibibliographic || null,
+      pliconsortia: data.pliconsortia || null,
+      plisystem_vendor: data.plisystem_vendor || null,
+      pliopac: data.pliopac,
+      pliestablishedyear: data.pliestablishedyear || null,
       pliinput_as_of_date: data.pliinput_as_of_date
         ? new Date(data.pliinput_as_of_date)
         : null,
-      hideinlibrarylist: data.hideinlibrarylist === "true" ? true : false,
+      hideinlibrarylist: data.hideinlibrarylist,
       collection_title: data.collection_title || null,
+      collection_incharge_title: data.collection_incharge_title || null,
+      collection_head_reports_to: data.collection_head_reports_to || null,
+      collection_organized_under: data.collection_organized_under || null,
+      collection_top_department: data.collection_top_department || null,
+      collection_next_position_title:
+        data.collection_next_position_title || null,
+      collection_other_departments: data.collection_other_departments || null,
+      collection_librarians_groups: data.collection_librarians_groups || null,
+      collection_type: data.collection_type || null,
+      shelving_type: data.shelving_typoe || null,
+      consultation_type: data.consultation_type || null,
+      teaching_type: data.teaching_type || null,
+      acquisition_type: data.acquisition_type || null,
+      cataloging_type: data.cataloging_type || null,
+      circulation_type: data.circulation_type || null,
       library_number: Number(data.library_number),
-      date_last_changed: data.date_last_changed,
+      date_last_changed: data.date_last_changed || null,
+      notes: data.notes || null,
 
       libraryType: {
         connect: { id: Number(data.type) }, // Ensure type exists in Reflibrarytype
