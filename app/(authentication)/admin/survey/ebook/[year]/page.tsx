@@ -1,4 +1,4 @@
-import { GetAVList } from "../components/getAVList";
+import { GetEBookList } from "../components/getEBookList";
 import { columns } from "../components/columns"
 import { DataTable } from "../components/data-table"
 import { Container } from "@/components/Container"
@@ -6,8 +6,8 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 
-async function AVSinglePage(yearPassIn: number) {
-    const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+async function EBookSinglePage(yearPassIn: number) {
+    const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
     return <DataTable data={tasks} columns={columns} />;
 }
 
@@ -24,7 +24,7 @@ export default async function AVListPage(
 
                 <div className="flex-1 flex-col p-8 md:flex">
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold tracking-tight">Audio/Visual Database by Subscription - {params.year}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">Ebook Database by Subscription - {params.year}</h2>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes next to each subscription your library has, for
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this
@@ -36,7 +36,7 @@ export default async function AVListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {AVSinglePage(Number(params.year))}
+                        {EBookSinglePage(Number(params.year))}
                     </Suspense>
                 </div>
             </Container>

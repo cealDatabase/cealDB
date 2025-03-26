@@ -1,6 +1,7 @@
 // Since the data in the form will change in the frontend, therefore it is important to claim the component as a client-side rendered component
 "use client";
 
+// TODO: Super Admin to control hide
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -46,7 +47,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     plifax_number: null,
     pliinput_as_of_date: null,
     password: null,
-    hideinlibrarylist: false,
+    hideinlibrarylist: false, //TODO: Admin power
     pliregion: null,
     pliestablishedyear: null,
     plibibliographic: null,

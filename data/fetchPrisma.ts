@@ -196,17 +196,27 @@ export const getYearsByLibId = async (id: number) => {
   }
 };
 
-// Survey: Get AV List.
-
-export const getAllAVLists = async () => {
+// Survey: general functions
+export const getLibYearIDbyYear = async (year: number) => {
   try {
-    const avlists = await db.list_AV.findMany({
-      include: {
-        Library_Year: true,
-        List_AV_Language: true,
+    const avList = await db.library_Year.findMany({
+      where: {
+        year: year,
       },
     });
-    return avlists;
+    return avList;
+  } catch {
+    return null;
+  }
+}
+
+// Survey: Get AV List.
+export const getListAVIDByLibYearId = async (libYearId: number) => {
+  try {
+    const listAV = await db.libraryYear_ListAV.findMany({
+      where: { libraryyear_id: libYearId },
+    });
+    return listAV;
   } catch {
     return null;
   }
@@ -223,23 +233,44 @@ export const getListAVByID = async (id: number) => {
   }
 }
 
-export const getAVListbyYear = async (year: number) => {
+export const getLanguageIdByListAvId = async (listavid: number) => {
   try {
-    const avList = await db.library_Year.findMany({
-      where: {
-        year: year,
-      },
+    const languageIdArray = await db.list_AV_Language.findMany({
+      where: { listav_id: listavid }
     });
-    return avList;
+    return languageIdArray.map((lang) => lang.language_id);
   } catch {
     return null;
   }
 }
 
-export const getLanguageIdByListAvId = async (listavid: number) => {
+// Survey: Get EBook List.
+export const getListEBookByLibYearId = async (libYearId: number) => {
   try {
-    const languageIdArray = await db.list_AV_Language.findMany({
-      where: { listav_id: listavid }
+    const listEBook = await db.libraryYear_ListEBook.findMany({
+      where: { libraryyear_id: libYearId },
+    });
+    return listEBook;
+  } catch {
+    return null;
+  }
+}
+
+export const getListEBookByID = async (id: number) => {
+  try {
+    const listEBook = await db.list_EBook.findUnique({
+      where: { id },
+    });
+    return listEBook;
+  } catch {
+    return null;
+  }
+}
+
+export const getLanguageIdByListEBookId = async (listebookid: number) => {
+  try {
+    const languageIdArray = await db.list_EBook_Language.findMany({
+      where: { listebook_id: listebookid }
     });
     return languageIdArray.map((lang) => lang.language_id);
   } catch {
