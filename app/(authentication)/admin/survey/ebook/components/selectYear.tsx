@@ -21,7 +21,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
 
     const handleChange = (year: number) => {
         setSelectedYear(year);
-        router.push(`/admin/survey/avdb/${year}`);
+        router.push(`/admin/survey/ebook/${year}`);
     };
 
 

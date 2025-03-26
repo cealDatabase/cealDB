@@ -1,8 +1,8 @@
 import { getLibYearIDbyYear, getListEBookByLibYearId, getListEBookByID, getLanguageIdByListEBookId } from "@/data/fetchPrisma";
 import { z } from "zod"
-import { listAVSchema } from "../data/schema"
+import { listEbookSchema } from "../data/schema"
 
-const getSpecificAVListByYear = async (year: number) => {
+const getSpecificEBookByYear = async (year: number) => {
     const libYearIDsByYear = await getLibYearIDbyYear(year);
     const outputArray: any[] = [];
     const LibraryYearIdArray: number[] = [];
@@ -15,30 +15,30 @@ const getSpecificAVListByYear = async (year: number) => {
 
     await Promise.all(
         LibraryYearIdArray.map(async (libraryYearId: number) => {
-            const listAVArrayByLibraryYearId = await getListAVIDByLibYearId(libraryYearId);
-            const listAVIds = listAVArrayByLibraryYearId?.map(item => item.listav_id) || [];
+            const listEBookArrayByLibraryYearId = await getListEBookByLibYearId(libraryYearId);
+            const listEbookIds = listEBookArrayByLibraryYearId?.map(item => item.listebook_id) || [];
 
-            await Promise.all(listAVIds.map(async (listAVId: number) => {
-                const listAVItem = await getListAVByID(listAVId);
-                if (!listAVItem) return;
+            await Promise.all(listEbookIds.map(async (listEBookId: number) => {
+                const listItem = await getListEBookByID(listEBookId);
+                if (!listItem) return;
 
-                const languageIDs = await getLanguageIdByListAvId(listAVId);
+                const languageIDs = await getLanguageIdByListEBookId(listEBookId);
                 const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
 
                 outputArray.push({
-                    id: listAVId,
-                    type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
-                    title: listAVItem.title,
-                    cjk_title: listAVItem.cjk_title,
-                    romanized_title: listAVItem.romanized_title,
-                    subtitle: listAVItem.subtitle,
-                    publisher: listAVItem.publisher,
-                    description: listAVItem.description,
-                    notes: listAVItem.notes,
-                    data_source: listAVItem.data_source,
-                    updated_at: listAVItem.updated_at,
-                    is_global: listAVItem.is_global,
-                    libraryyear: listAVItem.libraryyear,
+                    id: listEBookId,
+                    title: listItem.title,
+                    sub_series_number: listItem.sub_series_number,
+                    publisher: listItem.publisher,
+                    description: listItem.description,
+                    notes: listItem.notes,
+                    updated_at: listItem.updated_at,
+                    subtitle: listItem.subtitle,
+                    cjk_title: listItem.cjk_title,
+                    romanized_title: listItem.romanized_title,
+                    data_source: listItem.data_source,
+                    libraryyear: listItem.libraryyear,
+                    is_global: listItem.is_global,
                     language: languageArray,
                 });
             }));
@@ -72,7 +72,7 @@ const getSpecificAVListByYear = async (year: number) => {
     return groupedRecords;
 }
 
-export async function GetAVList(year: number) {
-    const data = await getSpecificAVListByYear(year);
-    return z.array(listAVSchema).parse(data || []);
+export async function GetEBookList(year: number) {
+    const data = await getSpecificEBookByYear(year);
+    return z.array(listEbookSchema).parse(data || []);
 }
