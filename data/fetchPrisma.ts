@@ -197,7 +197,6 @@ export const getYearsByLibId = async (id: number) => {
 };
 
 // Survey: Get AV List.
-
 export const getAllAVLists = async () => {
   try {
     const avlists = await db.list_AV.findMany({
@@ -207,6 +206,30 @@ export const getAllAVLists = async () => {
       },
     });
     return avlists;
+  } catch {
+    return null;
+  }
+}
+
+export const getLibYearIDbyYear = async (year: number) => {
+  try {
+    const avList = await db.library_Year.findMany({
+      where: {
+        year: year,
+      },
+    });
+    return avList;
+  } catch {
+    return null;
+  }
+}
+
+export const getListAVIDByLibYearId = async (libYearId: number) => {
+  try {
+    const listAV = await db.libraryYear_ListAV.findMany({
+      where: { libraryyear_id : libYearId },
+    });
+    return listAV;
   } catch {
     return null;
   }
@@ -223,19 +246,6 @@ export const getListAVByID = async (id: number) => {
   }
 }
 
-export const getAVListbyYear = async (year: number) => {
-  try {
-    const avList = await db.library_Year.findMany({
-      where: {
-        year: year,
-      },
-    });
-    return avList;
-  } catch {
-    return null;
-  }
-}
-
 export const getLanguageIdByListAvId = async (listavid: number) => {
   try {
     const languageIdArray = await db.list_AV_Language.findMany({
@@ -246,3 +256,5 @@ export const getLanguageIdByListAvId = async (listavid: number) => {
     return null;
   }
 }
+
+// Survey: Get EBook List.

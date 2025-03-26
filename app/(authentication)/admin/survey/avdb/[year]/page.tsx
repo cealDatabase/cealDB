@@ -24,7 +24,7 @@ export default async function AVListPage(
 
                 <div className="flex-1 flex-col p-8 md:flex">
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold tracking-tight">{params.year} Audio/Visual Database by Subscription</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">Audio/Visual Database by Subscription - {params.year}</h2>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes next to each subscription your library has, for
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this

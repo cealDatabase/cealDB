@@ -38,7 +38,7 @@ export const columns: ColumnDef<listAV>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -172,7 +172,7 @@ export const columns: ColumnDef<listAV>[] = [
   },
   {
     accessorKey: "language",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Language (NI:None-Indicated)" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Language" />,
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2 justify-center">

@@ -1,92 +1,78 @@
-import { getAllAVLists, getAVListbyYear, getLanguageIdByListAvId, getListAVByID } from "@/data/fetchPrisma";
+import { getLibYearIDbyYear, getLanguageIdByListAvId, getListAVByID, getListAVIDByLibYearId } from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
 
-// Fetch specific AV records yy year. NOT inlucding global. NOT separated by language:
 const getSpecificAVListByYear = async (year: number) => {
-    const AVListByYear = await getAVListbyYear(year);
+    const libYearIDsByYear = await getLibYearIDbyYear(year);
     const outputArray: any[] = [];
     const LibraryYearIdArray: number[] = [];
-    AVListByYear?.map((object) => {
+
+    libYearIDsByYear?.forEach((object) => {
         LibraryYearIdArray.push(object.id);
     });
 
-    if (LibraryYearIdArray.length !== 0) {
-        await Promise.all(
-            LibraryYearIdArray.map(async (libraryYearId: number) => {
-                const listAVSingle = await getListAVByID(libraryYearId)
-                const objectArray: object[] = [{ language_id: 0 }];
-                if (listAVSingle) {
-                    const newObject = {
-                        id: listAVSingle.id,
-                        title: listAVSingle.title,
-                        cjk_title: listAVSingle.cjk_title,
-                        romanized_title: listAVSingle.romanized_title,
-                        subtitle: listAVSingle.subtitle,
-                        type: listAVSingle.type?.toLowerCase().replace("/ ", "/"),
-                        publisher: listAVSingle.publisher,
-                        description: listAVSingle.description,
-                        notes: listAVSingle.notes,
-                        data_source: listAVSingle.data_source,
-                        is_global: listAVSingle.is_global,
-                        libraryyear: listAVSingle.libraryyear,
-                        language: objectArray,
-                    }
-                    let languageID = await getLanguageIdByListAvId(listAVSingle.id)
-                    languageID?.map(languageIDSingle => {
-                        objectArray.push({ language_id: languageIDSingle })
-                    })
-                    outputArray.push(newObject)
-                }
-            })
-        );
-    }
+    if (LibraryYearIdArray.length === 0) return [];
 
-    console.log(outputArray.at(-1));
-    return Array.from(outputArray);
+    await Promise.all(
+        LibraryYearIdArray.map(async (libraryYearId: number) => {
+            const listAVArrayByLibraryYearId = await getListAVIDByLibYearId(libraryYearId);
+            const listAVIds = listAVArrayByLibraryYearId?.map(item => item.listav_id) || [];
+
+            await Promise.all(listAVIds.map(async (listAVId: number) => {
+                const listAVItem = await getListAVByID(listAVId);
+                if (!listAVItem) return;
+
+                const languageIDs = await getLanguageIdByListAvId(listAVId);
+                const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
+
+                outputArray.push({
+                    id: listAVId,
+                    type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
+                    title: listAVItem.title,
+                    cjk_title: listAVItem.cjk_title,
+                    romanized_title: listAVItem.romanized_title,
+                    subtitle: listAVItem.subtitle,
+                    publisher: listAVItem.publisher,
+                    description: listAVItem.description,
+                    notes: listAVItem.notes,
+                    data_source: listAVItem.data_source,
+                    updated_at: listAVItem.updated_at,
+                    is_global: listAVItem.is_global,
+                    libraryyear: listAVItem.libraryyear,
+                    language: languageArray,
+                });
+            }));
+        })
+    );
+
+    // Group records by ID after all processing is complete
+    const groupedRecords = Array.from(
+        outputArray.reduce((map, item) => {
+            const existing = map.get(item.id);
+            if (existing) {
+                // Merge languages and remove duplicates
+                const mergedLanguages = [...existing.language, ...item.language]
+                    .filter((lang, index, self) =>
+                        self.findIndex(l => l.language_id === lang.language_id) === index
+                    );
+                map.set(item.id, {
+                    ...existing,
+                    language: mergedLanguages
+                });
+            } else {
+                map.set(item.id, item);
+            }
+            return map;
+        }, new Map<number, typeof outputArray[0]>())
+    ).map((entry) => {
+        const [_, value] = entry as [number, typeof outputArray[0]];
+        return value;
+    });
+
+    return groupedRecords;
 }
 
 export async function GetAVList(year: number) {
-    const AVListCompo = async () => {
-        const special = await getSpecificAVListByYear(year);
-        // Get all global AV records:
-        const getGlobalAVRecords = await getAllAVLists();
-        if (getGlobalAVRecords) {
-            return special.concat(
-                getGlobalAVRecords
-                    .filter((object) => object.is_global)
-                    .map((object) => ({
-                        id: object.id,
-                        type: object.type?.toLowerCase().replace("/ ", "/"),
-                        title: object.title,
-                        cjk_title: object.cjk_title,
-                        romanized_title: object.romanized_title,
-                        subtitle: object.subtitle,
-                        publisher: object.publisher,
-                        description: object.description,
-                        notes: object.notes,
-                        data_source: object.data_source,
-                        is_global: object.is_global,
-                        libraryyear: object.libraryyear,
-                        language: object.List_AV_Language.map((lang) => ({
-                            language_id: lang.language_id
-                        }))
-                    }))
-            );
-        }
-
-        return []
-    }
-
-    const data = await AVListCompo();
-
-    if (!data) {
-        return [];
-    }
-
-    const singleString = JSON.stringify(data);
-
-    const tasks = JSON.parse(singleString)
-    // console.log(tasks)
-    return z.array(listAVSchema).parse(tasks);
+    const data = await getSpecificAVListByYear(year);
+    return z.array(listAVSchema).parse(data || []);
 }

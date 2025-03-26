@@ -6,7 +6,10 @@ import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { useRouter } from "next/navigation";
 import clsx from 'clsx';
 
-const years = Array.from({ length: 26 }, (_, i) => 2000 + i);
+// Generate list of years option from 2017 to current year
+const beginYear = 2017;
+const yearLength = Number(new Date().getFullYear()) - beginYear + 1;
+const years = Array.from({ length: yearLength }, (_, i) => beginYear + i);
 
 export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     const router = useRouter();
