@@ -1,47 +1,44 @@
-import { getLibYearIDbyYear, getLanguageIdByListAvId, getListAVByID, getListAVIDByLibYearId } from "@/data/fetchPrisma";
+import { getLanguageIdByListAvId, getListAVByID, getListAVCountsByYear } from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
 
-const getSpecificAVListByYear = async (year: number) => {
-    const libYearIDsByYear = await getLibYearIDbyYear(year);
+const getAVListByYear = async (year: number) => {
+    const listAVCountsByYear = await getListAVCountsByYear(year);
     const outputArray: any[] = [];
-    const LibraryYearIdArray: number[] = [];
+    const ListAVIdArray: number[] = [];
 
-    libYearIDsByYear?.forEach((object) => {
-        LibraryYearIdArray.push(object.id);
+    listAVCountsByYear?.forEach((object) => {
+        if (object.listav !== null) {
+            ListAVIdArray.push(object.listav);
+        }
     });
 
-    if (LibraryYearIdArray.length === 0) return [];
+    if (ListAVIdArray.length === 0) return [];
 
     await Promise.all(
-        LibraryYearIdArray.map(async (libraryYearId: number) => {
-            const listAVArrayByLibraryYearId = await getListAVIDByLibYearId(libraryYearId);
-            const listAVIds = listAVArrayByLibraryYearId?.map(item => item.listav_id) || [];
+        ListAVIdArray.map(async (listAVId: number) => {
+            const listAVItem = await getListAVByID(listAVId);
+            if (!listAVItem) return;
 
-            await Promise.all(listAVIds.map(async (listAVId: number) => {
-                const listAVItem = await getListAVByID(listAVId);
-                if (!listAVItem) return;
+            const languageIDs = await getLanguageIdByListAvId(listAVId);
+            const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
 
-                const languageIDs = await getLanguageIdByListAvId(listAVId);
-                const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
-
-                outputArray.push({
-                    id: listAVId,
-                    type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
-                    title: listAVItem.title,
-                    cjk_title: listAVItem.cjk_title,
-                    romanized_title: listAVItem.romanized_title,
-                    subtitle: listAVItem.subtitle,
-                    publisher: listAVItem.publisher,
-                    description: listAVItem.description,
-                    notes: listAVItem.notes,
-                    data_source: listAVItem.data_source,
-                    updated_at: listAVItem.updated_at,
-                    is_global: listAVItem.is_global,
-                    libraryyear: listAVItem.libraryyear,
-                    language: languageArray,
-                });
-            }));
+            outputArray.push({
+                id: listAVId,
+                type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
+                title: listAVItem.title,
+                cjk_title: listAVItem.cjk_title,
+                romanized_title: listAVItem.romanized_title,
+                subtitle: listAVItem.subtitle,
+                publisher: listAVItem.publisher,
+                description: listAVItem.description,
+                notes: listAVItem.notes,
+                data_source: listAVItem.data_source,
+                updated_at: listAVItem.updated_at,
+                is_global: listAVItem.is_global,
+                libraryyear: listAVItem.libraryyear,
+                language: languageArray,
+            });
         })
     );
 
@@ -73,6 +70,6 @@ const getSpecificAVListByYear = async (year: number) => {
 }
 
 export async function GetAVList(year: number) {
-    const data = await getSpecificAVListByYear(year);
+    const data = await getAVListByYear(year);
     return z.array(listAVSchema).parse(data || []);
 }
