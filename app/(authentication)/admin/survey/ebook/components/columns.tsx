@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { languages, type } from "../data/data"
+import { languages} from "../data/data"
 import { listAV } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -99,30 +99,6 @@ export const columns: ColumnDef<listAV>[] = [
           </span>
         </div>
       )
-    },
-  },
-  {
-    accessorKey: "type",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
-    ),
-    cell: ({ row }) => {
-      const filtered_type = type.find(
-        (singleType) => singleType.value === row.getValue("type")
-      )
-
-      if (!filtered_type) {
-        return null
-      }
-
-      return (
-        <div className="flex items-center">
-          <span>{filtered_type.label}</span>
-        </div>
-      )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
     },
   },
   {

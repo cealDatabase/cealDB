@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 
-import { languages, type } from "../data/data"
+import { languages } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 
 interface DataTableToolbarProps<TData> {
@@ -34,13 +34,6 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("language")}
             title="Language (Under Construction)"
             options={languages.map((item) => ({ ...item, value: item.value.toString() }))}
-          />
-        )}
-        {table.getColumn("type") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("type")}
-            title="Type"
-            options={type}
           />
         )}
         {isFiltered && (

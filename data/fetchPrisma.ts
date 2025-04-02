@@ -196,27 +196,16 @@ export const getYearsByLibId = async (id: number) => {
   }
 };
 
-// Survey: general functions
-export const getLibYearIDbyYear = async (year: number) => {
+// Survey: Get AV List.
+export const getListAVCountsByYear = async (year: number) => {
   try {
-    const avList = await db.library_Year.findMany({
+    const listAVCountsArray = await db.list_AV_Counts.findMany({
       where: {
-        year: year,
+        year,
+        ishidden: false,
       },
     });
-    return avList;
-  } catch {
-    return null;
-  }
-}
-
-// Survey: Get AV List.
-export const getListAVIDByLibYearId = async (libYearId: number) => {
-  try {
-    const listAV = await db.libraryYear_ListAV.findMany({
-      where: { libraryyear_id: libYearId },
-    });
-    return listAV;
+    return listAVCountsArray;
   } catch {
     return null;
   }
@@ -225,7 +214,10 @@ export const getListAVIDByLibYearId = async (libYearId: number) => {
 export const getListAVByID = async (id: number) => {
   try {
     const listAV = await db.list_AV.findUnique({
-      where: { id },
+      where: {
+        id,
+        is_global: true,
+      },
     });
     return listAV;
   } catch {
