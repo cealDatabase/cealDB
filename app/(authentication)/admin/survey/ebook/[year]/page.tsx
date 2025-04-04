@@ -6,12 +6,12 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 
-async function EBookSinglePage(yearPassIn: number) {
+async function EbookSinglePage(yearPassIn: number) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
     return <DataTable data={tasks} columns={columns} />;
 }
 
-export default async function AVListPage(
+export default async function EbookListPage(
     props: {
         params: Promise<{ year: string }>;
     }
@@ -24,7 +24,7 @@ export default async function AVListPage(
 
                 <div className="flex-1 flex-col p-8 md:flex">
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold tracking-tight">Ebook Database by Subscription - {params.year}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">E-Book Database by Subscription - {params.year}</h2>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes next to each subscription your library has, for
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this
@@ -36,7 +36,7 @@ export default async function AVListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {EBookSinglePage(Number(params.year))}
+                        {EbookSinglePage(Number(params.year))}
                     </Suspense>
                 </div>
             </Container>

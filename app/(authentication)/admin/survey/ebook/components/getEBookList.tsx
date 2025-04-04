@@ -1,47 +1,44 @@
-import { getLibYearIDbyYear, getListEBookByLibYearId, getListEBookByID, getLanguageIdByListEBookId } from "@/data/fetchPrisma";
+import { getLanguageIdByListEBookId, getListEBookByID, getListEBookCountsByYear } from "@/data/fetchPrisma";
 import { z } from "zod"
-import { listEbookSchema } from "../data/schema"
+import { listEBookSchema } from "../data/schema"
 
-const getSpecificEBookByYear = async (year: number) => {
-    const libYearIDsByYear = await getLibYearIDbyYear(year);
+const getEBookListByYear = async (year: number) => {
+    const listEBookCountsByYear = await getListEBookCountsByYear(year);
     const outputArray: any[] = [];
-    const LibraryYearIdArray: number[] = [];
+    const ListEBookIdArray: number[] = [];
 
-    libYearIDsByYear?.forEach((object) => {
-        LibraryYearIdArray.push(object.id);
+    listEBookCountsByYear?.forEach((object) => {
+        if (object.listebook !== null) {
+            ListEBookIdArray.push(object.listebook);
+        }
     });
 
-    if (LibraryYearIdArray.length === 0) return [];
+    if (ListEBookIdArray.length === 0) return [];
 
     await Promise.all(
-        LibraryYearIdArray.map(async (libraryYearId: number) => {
-            const listEBookArrayByLibraryYearId = await getListEBookByLibYearId(libraryYearId);
-            const listEbookIds = listEBookArrayByLibraryYearId?.map(item => item.listebook_id) || [];
+        ListEBookIdArray.map(async (listEBookId: number) => {
+            const listEBookItem = await getListEBookByID(listEBookId);
+            if (!listEBookItem) return;
 
-            await Promise.all(listEbookIds.map(async (listEBookId: number) => {
-                const listItem = await getListEBookByID(listEBookId);
-                if (!listItem) return;
+            const languageIDs = await getLanguageIdByListEBookId(listEBookId);
+            const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
 
-                const languageIDs = await getLanguageIdByListEBookId(listEBookId);
-                const languageArray = languageIDs?.map(id => ({ language_id: id })) || [];
-
-                outputArray.push({
-                    id: listEBookId,
-                    title: listItem.title,
-                    sub_series_number: listItem.sub_series_number,
-                    publisher: listItem.publisher,
-                    description: listItem.description,
-                    notes: listItem.notes,
-                    updated_at: listItem.updated_at,
-                    subtitle: listItem.subtitle,
-                    cjk_title: listItem.cjk_title,
-                    romanized_title: listItem.romanized_title,
-                    data_source: listItem.data_source,
-                    libraryyear: listItem.libraryyear,
-                    is_global: listItem.is_global,
-                    language: languageArray,
-                });
-            }));
+            outputArray.push({
+                id: listEBookId,
+                title: listEBookItem.title,
+                sub_series_number: listEBookItem.sub_series_number,
+                publisher: listEBookItem.publisher,
+                description: listEBookItem.description,
+                notes: listEBookItem.notes,
+                updated_at: listEBookItem.updated_at,
+                subtitle: listEBookItem.subtitle,
+                cjk_title: listEBookItem.cjk_title,
+                romanized_title: listEBookItem.romanized_title,
+                data_source: listEBookItem.data_source,
+                libraryyear: listEBookItem.libraryyear,
+                is_global: listEBookItem.is_global,
+                language: languageArray,
+            });
         })
     );
 
@@ -73,6 +70,6 @@ const getSpecificEBookByYear = async (year: number) => {
 }
 
 export async function GetEBookList(year: number) {
-    const data = await getSpecificEBookByYear(year);
-    return z.array(listEbookSchema).parse(data || []);
+    const data = await getEBookListByYear(year);
+    return z.array(listEBookSchema).parse(data || []);
 }

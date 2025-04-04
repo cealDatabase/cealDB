@@ -2,12 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { languages} from "../data/data"
-import { listAV } from "../data/schema"
+import { languages } from "../data/data"
+import { listEBook } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
-export const columns: ColumnDef<listAV>[] = [
+export const columns: ColumnDef<listEBook>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -96,6 +96,21 @@ export const columns: ColumnDef<listAV>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("romanized_title")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "sub_series_number",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Sub Series Number" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("sub_series_number")}
           </span>
         </div>
       )
