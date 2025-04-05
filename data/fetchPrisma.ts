@@ -237,12 +237,15 @@ export const getLanguageIdByListAvId = async (listavid: number) => {
 }
 
 // Survey: Get EBook List.
-export const getListEBookByLibYearId = async (libYearId: number) => {
+export const getListEBookCountsByYear = async (year: number) => {
   try {
-    const listEBook = await db.libraryYear_ListEBook.findMany({
-      where: { libraryyear_id: libYearId },
+    const listEBookCountsArray = await db.list_EBook_Counts.findMany({
+      where: {
+        year,
+        ishidden: false,
+      },
     });
-    return listEBook;
+    return listEBookCountsArray;
   } catch {
     return null;
   }
@@ -251,7 +254,10 @@ export const getListEBookByLibYearId = async (libYearId: number) => {
 export const getListEBookByID = async (id: number) => {
   try {
     const listEBook = await db.list_EBook.findUnique({
-      where: { id },
+      where: {
+        id,
+        is_global: true,
+      },
     });
     return listEBook;
   } catch {
@@ -259,10 +265,10 @@ export const getListEBookByID = async (id: number) => {
   }
 }
 
-export const getLanguageIdByListEBookId = async (listebookid: number) => {
+export const getLanguageIdByListEBookId = async (listEBookId: number) => {
   try {
     const languageIdArray = await db.list_EBook_Language.findMany({
-      where: { listebook_id: listebookid }
+      where: { listebook_id: listEBookId }
     });
     return languageIdArray.map((lang) => lang.language_id);
   } catch {
