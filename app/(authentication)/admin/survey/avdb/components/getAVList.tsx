@@ -6,8 +6,14 @@ const getAVListByYear = async (year: number) => {
     const listAVCountsByYear = await getListAVCountsByYear(year);
     const outputArray: any[] = [];
     const ListAVIdArray: number[] = [];
+    const listAVCountNumberArray: number[] = [];
 
     listAVCountsByYear?.forEach((object) => {
+        if (object.titles !== null) {
+            listAVCountNumberArray.push(object.titles);
+        } else {
+            listAVCountNumberArray.push(0);
+        }
         if (object.listav !== null) {
             ListAVIdArray.push(object.listav);
         }
@@ -26,6 +32,7 @@ const getAVListByYear = async (year: number) => {
             outputArray.push({
                 id: listAVId,
                 type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
+                counts: listAVCountNumberArray[ListAVIdArray.indexOf(listAVId)],
                 title: listAVItem.title,
                 cjk_title: listAVItem.cjk_title,
                 romanized_title: listAVItem.romanized_title,

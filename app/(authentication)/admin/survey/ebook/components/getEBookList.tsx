@@ -6,8 +6,14 @@ const getEBookListByYear = async (year: number) => {
     const listEBookCountsByYear = await getListEBookCountsByYear(year);
     const outputArray: any[] = [];
     const ListEBookIdArray: number[] = [];
+    const listEBookCountNumberArray: number[] = [];
 
     listEBookCountsByYear?.forEach((object) => {
+        if (object.titles !== null) {
+            listEBookCountNumberArray.push(object.titles);
+        } else {
+            listEBookCountNumberArray.push(0);
+        }
         if (object.listebook !== null) {
             ListEBookIdArray.push(object.listebook);
         }
@@ -26,6 +32,7 @@ const getEBookListByYear = async (year: number) => {
             outputArray.push({
                 id: listEBookId,
                 title: listEBookItem.title,
+                counts: listEBookCountNumberArray[ListEBookIdArray.indexOf(listEBookId)],
                 sub_series_number: listEBookItem.sub_series_number,
                 publisher: listEBookItem.publisher,
                 description: listEBookItem.description,

@@ -37,7 +37,7 @@ export const columns: ColumnDef<listEBook>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="w-[50px]">{row.getValue("id")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -49,12 +49,21 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("title")}
           </span>
         </div>
       )
     },
+  },
+  {
+    accessorKey: "counts",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Counts" />
+    ),
+    cell: ({ row }) => <div className="max-w-[200px]">{row.getValue("counts")}</div>,
+    enableSorting: true,
+    enableHiding: false,
   },
   {
     accessorKey: "cjk_title",
@@ -64,7 +73,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("cjk_title")}
           </span>
         </div>
@@ -79,7 +88,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("subtitle")}
           </span>
         </div>
@@ -94,7 +103,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("romanized_title")}
           </span>
         </div>
@@ -109,7 +118,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("sub_series_number")}
           </span>
         </div>
@@ -124,7 +133,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("publisher")}
           </span>
         </div>
@@ -139,7 +148,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("description")}
           </span>
         </div>
@@ -154,7 +163,7 @@ export const columns: ColumnDef<listEBook>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px]  font-medium">
             {row.getValue("notes")}
           </span>
         </div>
@@ -168,7 +177,7 @@ export const columns: ColumnDef<listEBook>[] = [
       return (
         <div className="flex space-x-2 justify-center">
           {(row.getValue("language") as { language_id: number }[])?.map((lang) => (
-            <span key={lang.language_id} className="max-w-[500px] truncate font-medium">
+            <span key={lang.language_id} className="max-w-[500px]  font-medium">
               {/* {lang.language_id.toString()} */}
               {languages.find((language) => language.value === lang.language_id)?.label}
             </span>
