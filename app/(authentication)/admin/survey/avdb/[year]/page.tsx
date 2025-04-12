@@ -1,14 +1,14 @@
 import { GetAVList } from "../components/getAVList";
-import { columns } from "../components/columns"
-import { DataTable } from "../components/data-table"
-import { Container } from "@/components/Container"
+import { getColumns } from "../components/columns";
+import AVDataTableClient from "../components/avDataTableClient";
+import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 
 async function AVSinglePage(yearPassIn: number) {
-    const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
-    return <DataTable data={tasks} columns={columns} />;
+  const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+  return <AVDataTableClient data={tasks} year={yearPassIn} />;
 }
 
 export default async function AVListPage(
