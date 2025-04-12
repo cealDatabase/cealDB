@@ -66,6 +66,21 @@ export const columns: ColumnDef<listAV>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "subscribers",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Subscribers" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] font-medium">
+            {row.getValue("subscribers")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: "cjk_title",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="CJK" />
