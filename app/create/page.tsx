@@ -1,9 +1,6 @@
 import db from "@/lib/db";
 import CreateLibraryForm from "@/components/CreateLibraryForm";
 
-// Demo Trials
-import CreateFormDemo from "@/components/CreateFormDemo";
-
 export default async function CreateNewLibrary() {
   // Pulls db data and map out the options
   const typeData = await db.reflibrarytype.findMany();
