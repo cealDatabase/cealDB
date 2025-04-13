@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/Container";
 
-const stats = [
-  { label: "Founded", value: "2021" },
-  { label: "Employees", value: "37" },
-  { label: "Countries", value: "12" },
-  { label: "Raised", value: "$25M" },
-];
+
 
 export default function About() {
   return (
@@ -67,137 +62,70 @@ export default function About() {
               </figure>
             </div>
           </div>
+
           <div>
             <div className="text-base leading-7 text-gray-700 lg:max-w-lg">
-              <p className="text-base font-semibold leading-7 text-indigo-600">
-                Introduction
-              </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-left">
-                About CEAL Statistics Database
-              </h1>
-              <section>
-                <div className="max-w-xl">
-                  <p>
-                    The Council on East Asian Library (CEAL) Statistics is an
-                    annual publication of statistical data of East Asian
-                    libraries and museum collections (volumes held, volumes
-                    added gross, current serials, other materials, electronic
-                    resources), expenditures (expenditures and grant support),
-                    staffing, and services in North America. CEAL annual
-                    statistics have been collected and published annually in
-                    Journal of East Asian Libraries (JEAL) since late 1980s. The
-                    online statistics database covers CEAL statistics from 1999
-                    to present with a parallel hard copy publication of CEAL
-                    statistics in the February issue of JEAL, the CEAL official
-                    publication. Pre-1999 statistics data was added in 2007. The
-                    database includes North America East Asian libraries and
-                    museums collection statistics published from 1957 to current
-                    which contains statistical data from 1869 to current. Quick
-                    Views, Simple Search, Advance Search in Table and Graph
-                    displays, PDF, Log-in Views (collection ranking and peer
-                    comparison) have been added for easy access. Collection data
-                    can be subdivided by region and funding type. CEAL
-                    collection grand total can be viewed from 1957 to current in
-                    addition to collection median and average data. The variety
-                    of statistical data collected is similar to that collected
-                    by the Association of Research Libraries (ARL) and is
-                    included in ARL&lsquo;s annual statistics (
-                    <Link href="http://www.arl.org/stats/arlstat/index.html">
-                      http://www.arl.org/stats/arlstat/index.html
-                    </Link>
-                    ) . CEAL statistics focus on East Asian collections and
-                    especially Chinese, Japanese, and Korean languages
-                    resources, staffing, and service to support East Asian
-                    studies in North America.
-                  </p>
-                  <p>
-                    The database is searchable, with results viewable and
-                    printable in table (numbers) and graph formats. Member
-                    libraries (with password access) can view library rankings
-                    in categories of collection size, expenditures, and grant
-                    funding with filters of library type (public or private),
-                    and/or geographical region, etc. The database is also a
-                    directory of East Asian collections contact information,
-                    URLs of online catalogs, library system utilities, and more.
-                    The data series is the most comprehensive continuing library
-                    statistical dataset among area studies collections in North
-                    America.{" "}
-                    <Link href="/statistics/pdf">
-                      Statistical data published in PDF
-                    </Link>{" "}
-                    are available from the Committee&lsquo;s home page.
-                  </p>
-                  <p>
-                    The CEAL Statistics site has been created and maintained by
-                    the CEAL Statistics Committee located at the University of
-                    Kansas Libraries, Lawrence, KS since 1999.
-                  </p>
-                </div>
-              </section>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-purple-600 sm:text-3xl">
+                Overview
+              </h2>
+              <div className="max-w-xl">
+                <p>
+                  The CEAL Statistics Database stands as the primary and consistently maintained statistical resource on East Asian collections across North America. It provides annual data from dedicated East Asian libraries and collections, as well as East Asian resources holding in other institutions.
+                </p>
+              </div>
             </div>
-            <dl className="mt-10 grid grid-cols-2 gap-8 border-t border-gray-900/10 pt-10 sm:grid-cols-4">
-              {stats.map((stat, statIdx) => (
-                <div key={statIdx}>
-                  <dt className="text-sm font-semibold leading-6 text-gray-600">
-                    {stat.label}
-                  </dt>
-                  <dd className="mt-2 text-3xl font-bold leading-10 tracking-tight text-gray-900">
-                    {stat.value}
-                  </dd>
-                </div>
-              ))}
+            <div className="text-base leading-7 text-gray-700 lg:max-w-lg">
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-purple-600 sm:text-3xl">
+                History
+              </h2>
+              <div className="max-w-xl">
+                <p>
+                  CEAL began publishing statistical data in 1957, with annual reports appearing in the Journal of East Asian Libraries (JEAL) since the late 1980s. The online database was launched in 1999, with earlier data (pre-1999) added in 2007. It includes statistics dating back as far as 1869 and continues to be published annually in parallel with the February issue of JEAL.
+                </p>
+              </div>
+            </div>
+            <dl className="mt-10 grid grid-cols-1 gap-y-10 gap-x-8 border-t border-gray-900/10 pt-10 sm:grid-cols-3">
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-semibold leading-6 text-gray-600">
+                  Founded
+                </dt>
+                <dd className="mt-2 text-3xl font-bold leading-10 tracking-tight text-gray-900">
+                  1999
+                </dd>
+              </div>
+
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-semibold leading-6 text-gray-600">
+                  Institutions
+                </dt>
+                <dd className="mt-2 text-3xl font-bold leading-10 tracking-tight text-gray-900">
+                  39
+                </dd>
+              </div>
+
+              <div className="sm:col-span-1">
+                <dt className="text-sm font-semibold leading-6 text-gray-600">
+                  Total Holdings
+                </dt>
+                <dd className="mt-2 text-3xl font-bold leading-10 tracking-tight text-gray-900">
+                  36,690,040
+                </dd>
+              </div>
             </dl>
+
+            <div className="text-base leading-7 text-gray-700 lg:max-w-lg">
+              <h2 className="mt-8 text-2xl font-semibold tracking-tight text-purple-600 sm:text-3xl">
+                Scope and Significance
+              </h2>
+              <p>
+                The CEAL Statistics Database aligns with the scope of the Association of Research Libraries (ARL) statistics, and focuses specifically on East Asian libraries and collections. It features data related to Chinese, Japanese, and Korean studies, categorized according to library type (public or private), geographic region, and other relevant criteria. The database captures trends in the development of East Asian studies libraries and collections across North America and provides valuable insights for benchmarking, strategic planning, and advocacy in East Asian librarianship.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <Container className="mt-32">
-        <section>
-          <h1 className="text-left text-4xl font-bold">History</h1>
-          <p>
-            The Council on East Asian Libraries (CEAL) Statistics is an annual
-            publication of statistical data of East Asian libraries and museum
-            collections (volumes held, volumes added gross, current serials,
-            other materials, electronic resources), expenditures (expenditures
-            and grant support), staffing, and services in North America. CEAL
-            annual statistics have been collected and published annually in the
-            Journal of East Asian Libraries (JEAL) since the late 1980s. The
-            online statistics database covers CEAL statistics from 1999 to
-            present with a parallel hard copy publication of CEAL statistics in
-            the February issue of JEAL, the CEAL official publication. Pre 1999
-            statistics data was added in 2007. The database includes North
-            American East Asian libraries and museums collection statistics
-            published from 1957 to present and contains statistical data from
-            1869 to present. Quick Views, Simple Search, Advanced Search in
-            Table and Graph displays, PDF, and Log-in Views (collection ranking
-            and peer comparison) have been added for easy access. Collection
-            data can be subdivided by region and funding type. The CEAL
-            collection grand total can be viewed from 1957 to present in
-            addition to collection median and average data. The variety of the
-            statistical data collected is similar to that collected by the{" "}
-            <Link href="https://www.arl.org/">
-              Association of Research Libraries (ARL)
-            </Link>{" "}
-            and is included in ARL&lsquo;s annual statistics. The scope of the
-            CEAL statistics focuses on East Asian libraries and collections and
-            especially Chinese, Japanese, and Korean languages resources,
-            staffing, and service to support East Asian studies in North
-            America.
-          </p>
-          <p>
-            The database is searchable, with results viewable and printable in
-            table (numbers) and graph formats. Member libraries (with password
-            access) can view library rankings in categories of collection size,
-            expenditures, and grant funding with filters for library type
-            (public or private), and/or geographical region, etc. The database
-            is also serves as a directory of East Asian collections information.
-            The data series is the most comprehensive continuing library
-            statistical dataset among area studies collections in North America.{" "}
-            <Link href="statistics/pdf">Statistical data published in PDF</Link>{" "}
-            are available from the web site.
-          </p>
-        </section>
-      </Container>
+
     </div>
   );
 }
