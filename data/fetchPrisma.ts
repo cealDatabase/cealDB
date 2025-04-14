@@ -1,4 +1,5 @@
 import db from "@/lib/db";
+import { list } from "postcss";
 
 // Get libraries
 export const getLibraryById = async (id: number) => {
@@ -235,6 +236,28 @@ export const getLanguageIdByListAvId = async (listavid: number) => {
     return null;
   }
 }
+
+export const getSubscriberIdByListAvId = async (listavid: number) => {
+  try {
+    const result = await db.libraryYear_ListAV.findMany({
+      where: {
+        listav_id: listavid,
+      },
+      include: {
+        Library_Year: {
+          select: {
+            library: true,
+          },
+        },
+      },
+    });
+
+    return result.map((item) => item.Library_Year?.library);
+  } catch {
+    return null;
+  }
+}
+
 
 // Survey: Get EBook List.
 export const getListEBookCountsByYear = async (year: number) => {

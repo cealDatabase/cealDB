@@ -209,6 +209,21 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       },
     },
     {
+      accessorKey: "subscribers",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Subscribers' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='w-[200px] font-medium'>
+              {row.getValue("subscribers")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       id: "actions",
       cell: ({ row }) => <DataTableRowActions row={row} />,
     },
