@@ -1,4 +1,4 @@
-import { getLanguageIdByListAvId, getListAVByID, getListAVCountsByYear } from "@/data/fetchPrisma";
+import { getLanguageIdByListAvId, getLibraryById, getListAVByID, getListAVCountsByYear, getSubscriberIdByListAvId } from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
 
@@ -30,6 +30,21 @@ const getAVListByYear = async (year: number) => {
       const languageArray =
         languageIDs?.map((id) => ({ language_id: id })) || [];
 
+      const subscriberIDs = await getSubscriberIdByListAvId(listAVId);
+
+      const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
+        if (subscriberId != null) {
+          const library = await getLibraryById(subscriberId);
+          return `- ${library?.library_name?.trim()} ` || null;
+        }
+        return null;
+      }))
+
+      // Deduplicate
+      const uniqueSubscriberLibraryNames = Array.from(
+        new Set(subscriberLibraryNames.filter(Boolean))
+      ).sort();
+
       outputArray.push({
         id: listAVId,
         type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
@@ -46,12 +61,13 @@ const getAVListByYear = async (year: number) => {
         is_global: listAVItem.is_global,
         libraryyear: listAVItem.libraryyear,
         language: languageArray,
+        subscribers: uniqueSubscriberLibraryNames,
       });
     })
   );
 
   // Running all the output in website console
-  //   console.log("All output:", outputArray);
+  // console.log("All output:", outputArray);
 
   // Group records by ID after all processing is complete
   const groupedRecords = Array.from(
@@ -81,6 +97,6 @@ const getAVListByYear = async (year: number) => {
 }
 
 export async function GetAVList(year: number) {
-    const data = await getAVListByYear(year);
-    return z.array(listAVSchema).parse(data || []);
+  const data = await getAVListByYear(year);
+  return z.array(listAVSchema).parse(data || []);
 }
