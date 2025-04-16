@@ -1,4 +1,11 @@
-import { getListEJournalCountsByYear, getListEJournalByID, getLanguageIdByListEJournalId, getSubscriberIdByListEJournalId, getLibraryById, getLanguageById } from "@/data/fetchPrisma";
+import {
+  getListEJournalCountsByYear,
+  getListEJournalByID,
+  getLanguageIdByListEJournalId,
+  getSubscriberIdByListEJournalId,
+  getLibraryById,
+  getLanguageById
+} from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listEJournalSchema } from "../data/schema"
 
@@ -68,7 +75,7 @@ const getEJournalListByYear = async (year: number) => {
   );
 
   // Running all the output in website console
-  outputArray.map((item) => console.log(item.language));
+  // outputArray.map((item) => console.log(item.language));
 
   // Group records by ID after all processing is complete
   const groupedRecords = Array.from(

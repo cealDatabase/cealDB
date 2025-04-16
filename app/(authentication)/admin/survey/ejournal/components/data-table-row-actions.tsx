@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import EditAVModal from "../edit-ej-modal"; // We'll create this next
+import EditEJournalModal from "../edit-ej-modal";
 
 export function DataTableRowActions({ row }: { row: Row<any> }) {
   const [openEdit, setOpenEdit] = useState(false);
@@ -33,7 +33,7 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditAVModal
+      <EditEJournalModal
         open={openEdit}
         onOpenChange={setOpenEdit}
         rowData={row.original}
