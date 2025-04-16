@@ -1,7 +1,7 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
 import { findMaxId } from "@/data/fetchPrisma";
-import { connect } from "http2";
+// import { connect } from "http2";
 
 export async function POST(request) {
   try {
