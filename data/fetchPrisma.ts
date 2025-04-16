@@ -298,3 +298,64 @@ export const getLanguageIdByListEBookId = async (listEBookId: number) => {
     return null;
   }
 }
+
+// Survey: Get EJournal List.
+export const getListEJournalCountsByYear = async (year: number) => {
+  try {
+    const listEJournalCountsArray = await db.list_EJournal_Counts.findMany({
+      where: {
+        year,
+        ishidden: false,
+      },
+    });
+    return listEJournalCountsArray;
+  } catch {
+    return null;
+  }
+}
+
+export const getListEJournalByID = async (id: number) => {
+  try {
+    const listEJournal = await db.list_EJournal.findUnique({
+      where: {
+        id,
+        is_global: true,
+      },
+    });
+    return listEJournal;
+  } catch {
+    return null;
+  }
+}
+
+export const getLanguageIdByListEJournalId = async (listEJournalId: number) => {
+  try {
+    const languageIdArray = await db.list_EJournal_Language.findMany({
+      where: { listejournal_id: listEJournalId }
+    });
+    return languageIdArray.map((lang) => lang.language_id);
+  } catch {
+    return null;
+  }
+}
+
+export const getSubscriberIdByListEJournalId = async (listEJournalId: number) => {
+  try {
+    const result = await db.libraryYear_ListEJournal.findMany({
+      where: {
+        listejournal_id: listEJournalId,
+      },
+      include: {
+        Library_Year: {
+          select: {
+            library: true,
+          },
+        },
+      },
+    });
+
+    return result.map((item) => item.Library_Year?.library);
+  } catch {
+    return null;
+  }
+}
