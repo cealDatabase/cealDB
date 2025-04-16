@@ -1,8 +1,3 @@
-import Link from "next/link";
-import { Container } from "@/components/Container";
-
-
-
 export default function About() {
   return (
     <div className="py-24 sm:py-32">
@@ -124,8 +119,6 @@ export default function About() {
           </div>
         </div>
       </div>
-
-
     </div>
   );
 }
