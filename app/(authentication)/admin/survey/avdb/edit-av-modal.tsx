@@ -120,7 +120,8 @@ export default function EditAVModal({
 
           <div>
             <label className='text-sm font-medium'>Description</label>
-            <Input
+            <textarea
+            className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -150,7 +151,8 @@ export default function EditAVModal({
 
           <div>
             <label className='text-sm font-medium'>Notes</label>
-            <Input
+            <textarea
+            className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
               value={formData.notes}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
