@@ -1,6 +1,5 @@
 import { GetEBookList } from "../components/getEBookList";
-import { columns } from "../components/columns"
-import { DataTable } from "../components/data-table"
+import EBookDataTableClient from "../components/ebDataTableClient";
 import { Container } from "@/components/Container"
 import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
@@ -8,7 +7,7 @@ import SkeletonTableCard from "@/components/SkeletonTableCard";
 
 async function EbookSinglePage(yearPassIn: number) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
-    return <DataTable data={tasks} columns={columns} />;
+    return <EBookDataTableClient data={tasks} year={yearPassIn} />;
 }
 
 export default async function EbookListPage(

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { useRouter } from "next/navigation";
-import clsx from 'clsx';
 
 // Generate list of years option from 2017 to current year
 const beginYear = 2017;

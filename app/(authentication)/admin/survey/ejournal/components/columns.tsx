@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { languages } from "../data/data"
 import { listEJournal } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -221,8 +220,6 @@ export function getColumns(year: number): ColumnDef<listEJournal>[] {
         );
       },
     },
-
-
     {
       accessorKey: "language",
       header: ({ column }) => (
@@ -231,16 +228,10 @@ export function getColumns(year: number): ColumnDef<listEJournal>[] {
       cell: ({ row }) => {
         return (
           <div className='flex space-x-2 justify-center'>
-            {(row.getValue("language") as number[])?.map(
-              (lang) => (
-                <span
-                  key={lang}
-                  className='max-w-[500px] font-medium'
-                >
+            {(row.getValue("language") as string[])?.map(
+              (lang) => ( <span key={lang} className='max-w-[500px] font-medium'>
                   {lang}
-                </span>
-              )
-            )}
+                </span> ))}
           </div>
         );
       },

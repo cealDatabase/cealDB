@@ -9,16 +9,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { listAV } from "./data/schema";
+import { listEBook } from "./data/schema";
 
-export default function EditAVModal({
+export default function EditEBookModal({
   open,
   onOpenChange,
   rowData,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  rowData: listAV;
+  rowData: listEBook;
 }) {
   const [formData, setFormData] = useState({
     title: rowData.title,

@@ -299,6 +299,27 @@ export const getLanguageIdByListEBookId = async (listEBookId: number) => {
   }
 }
 
+export const getSubscriberIdByListEBookId = async (listEBookId: number) => {
+  try {
+    const result = await db.libraryYear_ListEBook.findMany({
+      where: {
+        listebook_id: listEBookId,
+      },
+      include: {
+        Library_Year: {
+          select: {
+            library: true,
+          },
+        },
+      },
+    });
+
+    return result.map((item) => item.Library_Year?.library);
+  } catch {
+    return null;
+  }
+}
+
 // Survey: Get EJournal List.
 export const getListEJournalCountsByYear = async (year: number) => {
   try {
