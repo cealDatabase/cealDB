@@ -1,9 +1,16 @@
-import { getLanguageIdByListAvId, getLibraryById, getListAVByID, getListAVCountsByYear, getSubscriberIdByListAvId } from "@/data/fetchPrisma";
+import {
+  getListAVCountsByYear,
+  getListAVByID,
+  getLanguageIdByListAvId,
+  getSubscriberIdByListAvId,
+  getLibraryById,
+  getLanguageById
+} from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
 
-const getAVListByYear = async (year: number) => {
-  const listAVCountsByYear = await getListAVCountsByYear(year);
+const getAVListByYear = async (userSelectedYear: number) => {
+  const listAVCountsByYear = await getListAVCountsByYear(userSelectedYear);
   const outputArray: any[] = [];
   const ListAVIdArray: number[] = [];
   const listAVCountNumberArray: number[] = [];
@@ -27,10 +34,9 @@ const getAVListByYear = async (year: number) => {
       if (!listAVItem) return;
 
       const languageIDs = await getLanguageIdByListAvId(listAVId);
-      const languageArray =
-        languageIDs?.map((id) => ({ language_id: id })) || [];
+      const languageArray = (await Promise.all(languageIDs?.map(async (id) => await getLanguageById(id)) || []))?.map((lang) => lang?.short) || [];
 
-      const subscriberIDs = await getSubscriberIdByListAvId(listAVId, year);
+      const subscriberIDs = await getSubscriberIdByListAvId(listAVId, userSelectedYear);
 
       const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
         if (subscriberId != null) {
@@ -67,25 +73,15 @@ const getAVListByYear = async (year: number) => {
   );
 
   // Running all the output in website console
-  outputArray.forEach((item) => {
-    console.log("id: ", item.id);
-  });
+  // outputArray.forEach((item) => {
+  //   console.log("id: ", item.id);
+  //   console.log("language: ", item.language);
+  // });
 
   // Group records by ID after all processing is complete
   const groupedRecords = Array.from(
     outputArray.reduce((map, item) => {
-      const existing = map.get(item.id);
-      if (existing) {
-        // Merge languages and remove duplicates
-        const mergedLanguages = [...existing.language, ...item.language].filter(
-          (lang, index, self) =>
-            self.findIndex((l) => l.language_id === lang.language_id) === index
-        );
-        map.set(item.id, {
-          ...existing,
-          language: mergedLanguages,
-        });
-      } else {
+      if (!map.has(item.id)) {
         map.set(item.id, item);
       }
       return map;
@@ -98,7 +94,7 @@ const getAVListByYear = async (year: number) => {
   return groupedRecords;
 }
 
-export async function GetAVList(year: number) {
-  const data = await getAVListByYear(year);
+export async function GetAVList(userSelectedYear: number) {
+  const data = await getAVListByYear(userSelectedYear);
   return z.array(listAVSchema).parse(data || []);
 }

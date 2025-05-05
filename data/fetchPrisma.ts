@@ -247,10 +247,10 @@ export const getSubscriberIdByListAvId = async (listavid: number, year: number) 
         Library_Year: {
           where: {
             year: year,
-            is_active: true,
           },
           select: {
             library: true,
+            is_active: true,
           },
         },
       },
@@ -303,7 +303,7 @@ export const getLanguageIdByListEBookId = async (listEBookId: number) => {
   }
 }
 
-export const getSubscriberIdByListEBookId = async (listEBookId: number) => {
+export const getSubscriberIdByListEBookId = async (listEBookId: number, year: number) => {
   try {
     const result = await db.libraryYear_ListEBook.findMany({
       where: {
@@ -311,6 +311,10 @@ export const getSubscriberIdByListEBookId = async (listEBookId: number) => {
       },
       include: {
         Library_Year: {
+          where: {
+            year: year,
+            is_active: true,
+          },
           select: {
             library: true,
           },
@@ -364,7 +368,7 @@ export const getLanguageIdByListEJournalId = async (listEJournalId: number) => {
   }
 }
 
-export const getSubscriberIdByListEJournalId = async (listEJournalId: number) => {
+export const getSubscriberIdByListEJournalId = async (listEJournalId: number, year: number) => {
   try {
     const result = await db.libraryYear_ListEJournal.findMany({
       where: {
@@ -372,6 +376,10 @@ export const getSubscriberIdByListEJournalId = async (listEJournalId: number) =>
       },
       include: {
         Library_Year: {
+          where: {
+            year: year,
+            is_active: true,
+          },
           select: {
             library: true,
           },

@@ -183,6 +183,51 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       },
     },
     {
+      accessorKey: "is_global",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Global' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              {row.getValue("is_global") === true ? "Yes" : "No"}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "libraryyear",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Library Year' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              {row.getValue("libraryyear")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "data_source",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Data Source' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              {row.getValue("data_source")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "language",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Language' />
@@ -190,20 +235,10 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       cell: ({ row }) => {
         return (
           <div className='flex space-x-2 justify-center'>
-            {(row.getValue("language") as { language_id: number }[])?.map(
-              (lang) => (
-                <span
-                  key={lang.language_id}
-                  className='max-w-[500px] font-medium'
-                >
-                  {
-                    languages.find(
-                      (language) => language.value === lang.language_id
-                    )?.label
-                  }
-                </span>
-              )
-            )}
+            {(row.getValue("language") as string[])?.map(
+              (lang) => (<span key={lang} className='max-w-[500px] font-medium'>
+                {lang}
+              </span>))}
           </div>
         );
       },

@@ -9,8 +9,8 @@ import {
 import { z } from "zod"
 import { listEBookSchema } from "../data/schema"
 
-const getEBookListByYear = async (year: number) => {
-    const listEBookCountsByYear = await getListEBookCountsByYear(year);
+const getEBookListByYear = async (userSelectedYear: number) => {
+    const listEBookCountsByYear = await getListEBookCountsByYear(userSelectedYear);
     const outputArray: any[] = [];
     const ListEBookIdArray: number[] = [];
     const listEBookCountNumberArray: number[] = [];
@@ -36,7 +36,7 @@ const getEBookListByYear = async (year: number) => {
             const languageIDs = await getLanguageIdByListEBookId(listEBookId);
             const languageArray = (await Promise.all(languageIDs?.map(async (id) => await getLanguageById(id)) || []))?.map((lang) => lang?.short) || [];
 
-            const subscriberIDs = await getSubscriberIdByListEBookId(listEBookId);
+            const subscriberIDs = await getSubscriberIdByListEBookId(listEBookId, userSelectedYear);
 
             const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
                 if (subscriberId != null) {
@@ -72,26 +72,26 @@ const getEBookListByYear = async (year: number) => {
         })
     );
 
-  // Running all the output in website console
-  // outputArray.map((item) => console.log(item.language));
+    // Running all the output in website console
+    // outputArray.map((item) => console.log(item.language));
 
-  // Group records by ID after all processing is complete
-  const groupedRecords = Array.from(
-    outputArray.reduce((map, item) => {
-      if (!map.has(item.id)) {
-        map.set(item.id, item);
-      }
-      return map;
-    }, new Map<number, (typeof outputArray)[0]>())
-  ).map((entry) => {
-    const [_, value] = entry as [number, (typeof outputArray)[0]];
-    return value;
-  });
+    // Group records by ID after all processing is complete
+    const groupedRecords = Array.from(
+        outputArray.reduce((map, item) => {
+            if (!map.has(item.id)) {
+                map.set(item.id, item);
+            }
+            return map;
+        }, new Map<number, (typeof outputArray)[0]>())
+    ).map((entry) => {
+        const [_, value] = entry as [number, (typeof outputArray)[0]];
+        return value;
+    });
 
-  return groupedRecords;
+    return groupedRecords;
 }
 
-export async function GetEBookList(year: number) {
-    const data = await getEBookListByYear(year);
+export async function GetEBookList(userSelectedYear: number) {
+    const data = await getEBookListByYear(userSelectedYear);
     return z.array(listEBookSchema).parse(data || []);
 }
