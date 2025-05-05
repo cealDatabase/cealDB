@@ -30,7 +30,7 @@ const getAVListByYear = async (year: number) => {
       const languageArray =
         languageIDs?.map((id) => ({ language_id: id })) || [];
 
-      const subscriberIDs = await getSubscriberIdByListAvId(listAVId);
+      const subscriberIDs = await getSubscriberIdByListAvId(listAVId, year);
 
       const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
         if (subscriberId != null) {
@@ -67,7 +67,9 @@ const getAVListByYear = async (year: number) => {
   );
 
   // Running all the output in website console
-  // console.log("All output:", outputArray);
+  outputArray.forEach((item) => {
+    console.log("id: ", item.id);
+  });
 
   // Group records by ID after all processing is complete
   const groupedRecords = Array.from(

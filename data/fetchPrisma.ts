@@ -237,7 +237,7 @@ export const getLanguageIdByListAvId = async (listavid: number) => {
   }
 }
 
-export const getSubscriberIdByListAvId = async (listavid: number) => {
+export const getSubscriberIdByListAvId = async (listavid: number, year: number) => {
   try {
     const result = await db.libraryYear_ListAV.findMany({
       where: {
@@ -245,6 +245,10 @@ export const getSubscriberIdByListAvId = async (listavid: number) => {
       },
       include: {
         Library_Year: {
+          where: {
+            year: year,
+            is_active: true,
+          },
           select: {
             library: true,
           },
