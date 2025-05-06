@@ -51,6 +51,8 @@ const getAVListByYear = async (userSelectedYear: number) => {
         new Set(subscriberLibraryNames.filter(Boolean))
       ).sort();
 
+      console.log("getAVList type:", listAVItem.type);
+
       outputArray.push({
         id: listAVId,
         type: listAVItem.type?.toLowerCase().replace("/ ", "/"),

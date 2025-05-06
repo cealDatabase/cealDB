@@ -32,11 +32,13 @@ export default function EditAVModal({
     publisher: rowData.publisher || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
-    language: rowData.language.map((lang) => lang.language_id) || [],
+    language: Array.isArray(rowData.language) ? rowData.language : [],
     type: rowData.type || "",
   });
 
-  const handleLanguageChange = (id: number, checked: boolean) => {
+  console.log("rowData:", rowData);
+
+  const handleLanguageChange = (id: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
       language: checked
@@ -121,7 +123,7 @@ export default function EditAVModal({
           <div>
             <label className='text-sm font-medium'>Description</label>
             <textarea
-            className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className='w-full border rounded px-2 py-1 min-h-[80px] resize-y'
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -152,7 +154,7 @@ export default function EditAVModal({
           <div>
             <label className='text-sm font-medium'>Notes</label>
             <textarea
-            className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className='w-full border rounded px-2 py-1 min-h-[80px] resize-y'
               value={formData.notes}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
@@ -190,20 +192,24 @@ export default function EditAVModal({
           <div className='space-y-1'>
             <label className='text-sm font-medium'>Languages</label>
             <div className='grid grid-cols-2 gap-2'>
-              {languages.map((lang) => (
-                <div key={lang.value} className='flex items-center space-x-2'>
-                  <Checkbox
-                    id={`lang-${lang.value}`}
-                    checked={formData.language.includes(lang.value)}
-                    onCheckedChange={(checked) =>
-                      handleLanguageChange(lang.value, Boolean(checked))
-                    }
-                  />
-                  <label htmlFor={`lang-${lang.value}`} className='text-sm'>
-                    {lang.label}
-                  </label>
-                </div>
-              ))}
+              {languages.map((lang) => {
+                const langIdStr = String(lang.value); // Convert number to string
+                return (
+                  <div key={langIdStr} className='flex items-center space-x-2'>
+                    <Checkbox
+                      id={`lang-${langIdStr}`}
+                      checked={formData.language.includes(langIdStr)}
+                      onCheckedChange={
+                        (checked) =>
+                          handleLanguageChange(langIdStr, Boolean(checked)) // Pass string, not number
+                      }
+                    />
+                    <label htmlFor={`lang-${langIdStr}`} className='text-sm'>
+                      {lang.label}
+                    </label>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
