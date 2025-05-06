@@ -1,6 +1,6 @@
 import formsPlugin from "@tailwindcss/forms";
 import headlessuiPlugin from "@headlessui/tailwindcss";
-import type { Config } from "tailwindcss";
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config = {
   darkMode: ["class"],
@@ -111,7 +111,12 @@ const config = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate"), formsPlugin, headlessuiPlugin],
+  plugins: {
+    "@tailwindcss/postcss": {},
+	formsPlugin,
+	headlessuiPlugin,
+	tailwindcssAnimate,
+  },
 };
 
 export default config;

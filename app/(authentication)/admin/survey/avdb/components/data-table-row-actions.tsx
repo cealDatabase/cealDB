@@ -23,7 +23,7 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-[160px]'>
+        <DropdownMenuContent align='end' className='w-[160px] bg-white'>
           <DropdownMenuItem onClick={() => setOpenEdit(true)}>
             Edit
           </DropdownMenuItem>
