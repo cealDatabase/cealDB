@@ -1,11 +1,10 @@
+@import "tailwindcss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   :root {
     --foreground-rgb: #f6e9e0;
     /* --foreground-rgb: 20 14.3% 4.1%; */

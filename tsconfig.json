@@ -35,6 +35,6 @@
     "components/LibSingle.jsx",
     "components/DatePicker.jsx",
     "app/api/submit-form/route.js"
-  ],
+, "tailwind.config.mjs"  ],
   "exclude": ["node_modules"]
 }
