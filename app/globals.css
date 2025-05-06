@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @layer base {
+  * {
+    border: border-border;
+  }
   :root {
     --foreground-rgb: #f6e9e0;
     /* --foreground-rgb: 20 14.3% 4.1%; */
