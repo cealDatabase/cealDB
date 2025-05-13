@@ -22,6 +22,12 @@ export default function EditAVModal({
   onOpenChange: (open: boolean) => void;
   rowData: listAV;
 }) {
+
+  const normalizeLabel = (label: string) => {
+    if (label === "NON") return "NONCJK";
+    return label;
+  };
+
   const [formData, setFormData] = useState({
     title: rowData.title,
     cjk_title: rowData.cjk_title || "",
@@ -32,11 +38,18 @@ export default function EditAVModal({
     publisher: rowData.publisher || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
-    language: Array.isArray(rowData.language) ? rowData.language : [],
+    language: Array.isArray(rowData.language)
+      ? rowData.language
+          .map(
+            (langLabel) =>
+              languages.find((l) => l.label === normalizeLabel(langLabel))
+                ?.value
+          )
+          .filter((id) => id !== undefined)
+          .map((id) => String(id))
+      : [],
     type: rowData.type || "",
   });
-
-  console.log("rowData:", rowData);
 
   const handleLanguageChange = (id: string, checked: boolean) => {
     setFormData((prev) => ({
@@ -52,10 +65,7 @@ export default function EditAVModal({
       const res = await fetch("/api/av/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: rowData.id,
-          ...formData,
-        }),
+        body: JSON.stringify({ id: rowData.id, ...formData }),
       });
 
       const data = await res.json();
