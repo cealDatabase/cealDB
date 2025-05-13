@@ -34,24 +34,34 @@ const getAVListByYear = async (userSelectedYear: number) => {
       if (!listAVItem) return;
 
       const languageIDs = await getLanguageIdByListAvId(listAVId);
-      const languageArray = (await Promise.all(languageIDs?.map(async (id) => await getLanguageById(id)) || []))?.map((lang) => lang?.short) || [];
+      const languageArray =
+        (
+          await Promise.all(
+            languageIDs?.map(async (id) => await getLanguageById(id)) || []
+          )
+        )?.map((lang) => lang?.short) || [];
 
-      const subscriberIDs = await getSubscriberIdByListAvId(listAVId, userSelectedYear);
+      const subscriberIDs = await getSubscriberIdByListAvId(
+        listAVId,
+        userSelectedYear
+      );
 
-      const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
-        if (subscriberId != null) {
-          const library = await getLibraryById(subscriberId);
-          return `- ${library?.library_name?.trim()} ` || null;
-        }
-        return null;
-      }))
+      const subscriberLibraryNames = await Promise.all(
+        (subscriberIDs || []).map(async (subscriberId) => {
+          if (subscriberId != null) {
+            const library = await getLibraryById(subscriberId);
+            return `- ${library?.library_name?.trim()} ` || null;
+          }
+          return null;
+        })
+      );
 
       // Deduplicate
       const uniqueSubscriberLibraryNames = Array.from(
         new Set(subscriberLibraryNames.filter(Boolean))
       ).sort();
 
-      console.log("getAVList type:", listAVItem.type);
+      // console.log("getAVList type:", listAVItem.type);
 
       outputArray.push({
         id: listAVId,

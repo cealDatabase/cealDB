@@ -27,7 +27,7 @@ model List_AV_Counts {
     updatedat DateTime
     ishidden  Boolean?
 
-    listav  Int?
+    listav  Int? 
     List_AV List_AV? @relation(fields: [listav], references: [id])
 }
 
