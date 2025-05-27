@@ -33,15 +33,16 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ID' />
-      ),
-      cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
-      enableSorting: true,
-      enableHiding: false,
-    },
+    // 要加水平滚动条，目前太难滚动了
+    // {
+    //   accessorKey: "id",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title='ID' />
+    //   ),
+    //   cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
+    //   enableSorting: true,
+    //   enableHiding: false,
+    // },
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -152,21 +153,21 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
         );
       },
     },
-    {
-      accessorKey: "description",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Description' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("description")}
-            </span>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "description",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title='Description' />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className='flex space-x-2'>
+    //         <span className='max-w-[500px] font-medium'>
+    //           {row.getValue("description")}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // }, // 太占篇幅，但还是要保留
     {
       accessorKey: "notes",
       header: ({ column }) => (
@@ -212,21 +213,21 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
         );
       },
     },
-    {
-      accessorKey: "data_source",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Data Source' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("data_source")}
-            </span>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "data_source",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title='Data Source' />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className='flex space-x-2'>
+    //         <span className='max-w-[500px] font-medium'>
+    //           {row.getValue("data_source")}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // }, // 太占篇幅，但还是要保留
     {
       accessorKey: "language",
       header: ({ column }) => (

@@ -39,3 +39,6 @@ _.env
 # typescript
 *.tsbuildinfo
 prisma/schema/electronic_books.txt
+
+#zipfiles
+*.zip
