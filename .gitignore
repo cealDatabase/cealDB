@@ -43,3 +43,4 @@ prisma/schema/electronic_books.txt
 #zipfiles
 *.zip
 ceal_code_files_db/*
+*.sql
