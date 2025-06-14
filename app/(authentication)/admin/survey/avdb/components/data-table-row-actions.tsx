@@ -10,9 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import EditAVModal from "../edit-av-modal"; // We'll create this next
+import EditAVModal from "../edit-av-modal";
 
-export function DataTableRowActions({ row }: { row: Row<any> }) {
+export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
@@ -24,10 +24,10 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-[160px] bg-white'>
-          <DropdownMenuItem onClick={() => setOpenEdit(true)}>
+          <DropdownMenuItem onClick={() => setOpenEdit(true)} className="hover:bg-blue-100/30">
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => alert("Delete logic here")}>
+          <DropdownMenuItem onClick={() => alert("Delete logic here")} className="hover:bg-blue-100/30">
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -37,6 +37,7 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
         open={openEdit}
         onOpenChange={setOpenEdit}
         rowData={row.original}
+        year={year}
       />
     </>
   );

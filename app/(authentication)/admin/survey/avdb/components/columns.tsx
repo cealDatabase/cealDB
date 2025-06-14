@@ -153,21 +153,21 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
         );
       },
     },
-    // {
-    //   accessorKey: "description",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title='Description' />
-    //   ),
-    //   cell: ({ row }) => {
-    //     return (
-    //       <div className='flex space-x-2'>
-    //         <span className='max-w-[500px] font-medium'>
-    //           {row.getValue("description")}
-    //         </span>
-    //       </div>
-    //     );
-    //   },
-    // }, // 太占篇幅，但还是要保留
+    {
+      accessorKey: "description",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Description' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              {row.getValue("description")}
+            </span>
+          </div>
+        );
+      },
+    }, // 太占篇幅，但还是要保留
     {
       accessorKey: "notes",
       header: ({ column }) => (
@@ -183,51 +183,51 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
         );
       },
     },
-    {
-      accessorKey: "is_global",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Global' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("is_global") === true ? "Yes" : "No"}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "libraryyear",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Library Year' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("libraryyear")}
-            </span>
-          </div>
-        );
-      },
-    },
     // {
-    //   accessorKey: "data_source",
+    //   accessorKey: "is_global",
     //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title='Data Source' />
+    //     <DataTableColumnHeader column={column} title='Global' />
     //   ),
     //   cell: ({ row }) => {
     //     return (
     //       <div className='flex space-x-2'>
     //         <span className='max-w-[500px] font-medium'>
-    //           {row.getValue("data_source")}
+    //           {row.getValue("is_global") === true ? "Yes" : "No"}
     //         </span>
     //       </div>
     //     );
     //   },
-    // }, // 太占篇幅，但还是要保留
+    // },
+    // {
+    //   accessorKey: "libraryyear",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title='Library Year' />
+    //   ),
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className='flex space-x-2'>
+    //         <span className='max-w-[500px] font-medium'>
+    //           {row.getValue("libraryyear")}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // },
+    {
+      accessorKey: "data_source",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Data Source' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              <a href={row.getValue("data_source")} target="_blank">{row.getValue("data_source")}</a>
+            </span>
+          </div>
+        );
+      },
+    }, // 太占篇幅，但还是要保留
     {
       accessorKey: "language",
       header: ({ column }) => (
@@ -261,7 +261,7 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
     },
     {
       id: "actions",
-      cell: ({ row }) => <DataTableRowActions row={row} />,
+      cell: ({ row }) => <DataTableRowActions row={row} year={year}/>,
     },
   ];
 }

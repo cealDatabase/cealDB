@@ -17,10 +17,12 @@ export default function EditAVModal({
   open,
   onOpenChange,
   rowData,
+  year,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   rowData: listAV;
+  year: number;
 }) {
 
   const normalizeLabel = (label: string) => {
@@ -86,7 +88,7 @@ export default function EditAVModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='bg-white text-black max-w-xl'>
         <DialogHeader>
-          <DialogTitle>Edit AV Record</DialogTitle>
+          <DialogTitle>Edit AV Record - {year}</DialogTitle>
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
@@ -208,6 +210,7 @@ export default function EditAVModal({
                   <div key={langIdStr} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`lang-${langIdStr}`}
+                      className='hover:bg-blue-300/30 hover:cursor-pointer'
                       checked={formData.language.includes(langIdStr)}
                       onCheckedChange={
                         (checked) =>
@@ -223,9 +226,15 @@ export default function EditAVModal({
             </div>
           </div>
 
-          <Button onClick={handleSubmit} className='w-full'>
-            Save Changes
-          </Button>
+          <div className='flex justify-end'>
+            <Button
+              onClick={handleSubmit}
+              variant="outline"
+              className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

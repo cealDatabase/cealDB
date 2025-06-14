@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { useRouter } from "next/navigation";
-import clsx from 'clsx';
 
 // Generate list of years option from 2017 to current year
 const beginYear = 2017;
@@ -28,7 +27,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     return (
         <div className='flex flex-row self-end mb-4'>
             <Listbox value={selectedYear} onChange={handleChange}>
-                <Label className="text-sm/6 font-medium text-sky-600">Select Year:</Label>
+                <Label className="text-sm/6 font-medium text-sky-600 mr-2">Select Year:</Label>
                 <div className="relative">
                     <ListboxButton className="grid cursor-default grid-cols-1 rounded-md bg-white pb-1.5 pr-2 pl-3 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                         <span className="col-start-1 row-start-1 truncate pr-6 text-sky-600 font-medium">{selectedYear}</span>
