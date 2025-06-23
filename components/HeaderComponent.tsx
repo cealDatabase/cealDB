@@ -138,7 +138,7 @@ export function HeaderComponent({
                   <UserCircleIcon className="h-10 w-10 text-gray-900" />
                 </Link>
                 <div
-                  className="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold outline-2 outline-offset-2 transition-colors 
+                  className="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold transition-colors 
                 bg-gray-800 text-white hover:bg-gray-900 active:bg-gray-800 active:text-white/80"
                 >
                   {logoutAction}

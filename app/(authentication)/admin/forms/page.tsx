@@ -5,9 +5,13 @@ import { forms, instructionGroup } from "@/constant/form";
 type InstructionGroupKeys = keyof typeof instructionGroup;
 
 import * as React from "react";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const FormsPage = () => {
   return (
@@ -81,46 +85,48 @@ const FormsPage = () => {
           </div>
         </div>
 
-        <div className="mx-auto px-6 lg:px-8">
+        <div className="mx-full px-6 lg:px-8">
           <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
             Frequently Asked Questions
           </h2>
           <dl className="mt-10 space-y-6">
-            {Object.keys(instructionGroup).map((key, index) => {
-              return (
-                <Accordion key={index} className="rounded-md">
-                  <AccordionSummary
-                    aria-controls={key}
-                    id={key}
-                    key={index}
-                  >
-                    <h3 className="py-2 font-medium">
-                      {key}
-                    </h3>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map((item, index) => (
-                      <div key={index}>
-                        <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                          <dt className="lg:col-span-5 font-medium text-gray-800">
-                            {item.question}
-                          </dt>
-                          <dd className="lg:col-span-7">
-                            <p className="text-gray-600/90">
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: item.answer,
-                                }}
-                              />
-                            </p>
-                          </dd>
+            <Accordion type="multiple">
+              {Object.keys(instructionGroup).map((key, index) => {
+                return (
+                  <AccordionItem key={index} value={key}>
+                    <AccordionTrigger
+                      aria-controls={key}
+                      id={key}
+                      key={index}
+                    >
+                      <h3 className="py-2 font-medium">
+                        {key}
+                      </h3>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map((item, index) => (
+                        <div key={index}>
+                          <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
+                            <dt className="lg:col-span-5 font-medium text-gray-800">
+                              {item.question}
+                            </dt>
+                            <dd className="lg:col-span-7">
+                              <p className="text-gray-600/90">
+                                <span
+                                  dangerouslySetInnerHTML={{
+                                    __html: item.answer,
+                                  }}
+                                />
+                              </p>
+                            </dd>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </AccordionDetails>
-                </Accordion>
-              )
-            })}
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                )
+              })}
+            </Accordion>
           </dl>
         </div >
       </Container >

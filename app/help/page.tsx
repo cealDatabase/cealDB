@@ -2,8 +2,11 @@
 
 import { Container } from "@/components/Container";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
-import { Button } from "@mui/material";
-import Tooltip from "@mui/material/Tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import Link from "next/link";
 
 const HelpPage = () => {
@@ -27,21 +30,33 @@ const HelpPage = () => {
           <p>
             New library/institution need to establish an account to join the
             database. Contact Anlin Yang{" "}
-            <Tooltip title="Copy Email Address" placement="top" arrow>
-              <Button
-                style={{
-                  color: "#dd6a6a",
-                  borderColor: "#dd6a6a",
-                }}
-                variant="outlined"
-                size="small"
-                endIcon={<DocumentDuplicateIcon className="h-6 w-6" />}
-                onClick={() =>
-                  navigator.clipboard.writeText("mailto:anlin.yang@wisc.edu")
-                }
-              >
-                Copy
-              </Button>
+
+            <Tooltip>
+              <TooltipTrigger>
+                <Link
+                  href=""
+                  type="button"
+                  style={{
+                    color: "#dd6a6a",
+                    borderColor: "#dd6a6a",
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid #dd6a6a",
+                    borderRadius: "8px",
+                    padding: "2px 8px",
+                    fontSize: "12px",
+                  }}
+                  onClick={() =>
+                    navigator.clipboard.writeText("mailto:anlin.yang@wisc.edu")
+                  }
+                >
+                  <DocumentDuplicateIcon className="w-4 h-4" />
+                  Copy
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy Email Address</p>
+              </TooltipContent>
             </Tooltip>{" "}
             to complete a new Library Information Form. The Library Information
             Form is used as an application to join the CEAL Statistics annual
@@ -85,21 +100,33 @@ const HelpPage = () => {
           <p>
             If you have further questions regarding online forms and this new
             version CEAL Stats database, please contact Dongyun Ni{" "}
-            <Tooltip title="Copy Email Address" placement="top" arrow>
-              <Button
-                style={{
-                  color: "#dd6a6a",
-                  borderColor: "#dd6a6a",
-                }}
-                variant="outlined"
-                size="small"
-                endIcon={<DocumentDuplicateIcon className="h-6 w-6" />}
-                onClick={() =>
-                  navigator.clipboard.writeText("mailto:dni@hawaii.edu")
-                }
-              >
-                Copy
-              </Button>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link
+                  href=""
+                  type="button"
+                  style={{
+                    color: "#dd6a6a",
+                    borderColor: "#dd6a6a",
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid #dd6a6a",
+                    borderRadius: "8px",
+                    padding: "2px 8px",
+                    fontSize: "12px",
+                  }}
+
+                  onClick={() =>
+                    navigator.clipboard.writeText("mailto:dni@hawaii.edu")
+                  }
+                >
+                  <DocumentDuplicateIcon className="w-4 h-4" />
+                  Copy
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy Email Address</p>
+              </TooltipContent>
             </Tooltip>
           </p>
         </section>

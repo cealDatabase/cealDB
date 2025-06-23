@@ -116,7 +116,11 @@ const config = {
 	formsPlugin,
 	headlessuiPlugin,
 	tailwindcssAnimate,
+	tailwindScrollbar,
   },
+  variants: {
+	scrollbar: ['rounded'],
+  }
 };
 
 export default config;

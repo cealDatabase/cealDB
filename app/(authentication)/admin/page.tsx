@@ -251,7 +251,7 @@ async function UserLoggedInPage() {
                   </div>
                   <div className="mt-8">
                     <h3 className="text-base font-semibold text-gray-900">
-                      <a href={action.href} className="focus:outline-none">
+                      <a href={action.href} className="focus:outline-hidden">
                         {/* Extend touch target to entire panel */}
                         <span aria-hidden="true" className="absolute inset-0" />
                         {action.title}
