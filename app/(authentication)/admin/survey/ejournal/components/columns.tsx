@@ -235,6 +235,12 @@ export function getColumns(year: number): ColumnDef<listEJournal>[] {
           </div>
         );
       },
+      filterFn: (row, id, value) => {
+        const rowLanguages = row.getValue(id) as string[] | undefined;
+        if (!Array.isArray(rowLanguages)) return false;
+        const selected = value as string[];
+        return rowLanguages.some((lang) => selected.includes(lang));
+      }
     },
     {
       accessorKey: "subscribers",

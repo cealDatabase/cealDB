@@ -5,10 +5,10 @@ import { Table } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "./data-table-view-options"
+import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions"
 
 import { languages } from "../data/data"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -32,8 +32,8 @@ export function DataTableToolbar<TData>({
         {table.getColumn("language") && (
           <DataTableFacetedFilter
             column={table.getColumn("language")}
-            title="Language (Under Construction)"
-            options={languages}
+            title="Language"
+            options={languages.map((item) => ({ ...item, value: item.label }))}
           />
         )}
         {isFiltered && (
