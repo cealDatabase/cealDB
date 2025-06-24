@@ -32,8 +32,8 @@ export function DataTableToolbar<TData>({
         {table.getColumn("language") && (
           <DataTableFacetedFilter
             column={table.getColumn("language")}
-            title="Language (Under Construction)"
-            options={languages.map((item) => ({ ...item, value: item.value.toString() }))}
+            title="Language"
+            options={languages.map((item) => ({ ...item, value: item.label }))}
           />
         )}
         {table.getColumn("type") && (

@@ -117,11 +117,30 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )}
+                    {(() => {
+                      const facetCount = facets?.get(option.value);
+                      if (facetCount !== undefined) return (
+                        <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                          {facetCount}
+                        </span>
+                      );
+                      // Manual count fallback – useful when cell values are arrays (e.g., language column).
+                      if (column) {
+                        const manual = column.getFacetedRowModel().flatRows.reduce<number>((acc: number, row) => {
+                          const v = row.getValue(column.id) as unknown;
+                          if (Array.isArray(v) ? v.includes(option.value) : v === option.value) {
+                            return acc + 1;
+                          }
+                          return acc;
+                        }, 0);
+                        return manual ? (
+                          <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                            {manual}
+                          </span>
+                        ) : null;
+                      }
+                      return null;
+                    })()}
                   </CommandItem>
                 )
               })}
