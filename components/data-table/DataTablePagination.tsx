@@ -1,3 +1,8 @@
+'use client';
+
+import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -5,6 +10,8 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
+import { copyCounts } from "@/actions/copyCounts";
+import type { ResourceType } from "@/lib/copyRecords";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,13 +26,120 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends { listav_id: number; counts?: number }>({ table }: DataTablePaginationProps<TData>) {
+  // Year options range from 2017 to the current year
+  const beginYear = 2017;
+  const years = Array.from({ length: new Date().getFullYear() - beginYear + 1 }, (_, i) => beginYear + i);
+
+  const [targetYear, setTargetYear] = useState<number>(new Date().getFullYear());
+  const [isCopying, setIsCopying] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"" | "success" | "error">("");
+  const [copyMessage, setCopyMessage] = useState<string>("");
+  const [copiedRecords, setCopiedRecords] = useState<{ listav_id: number; counts: number }[]>([]);
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Determine resource segment (e.g. avdb, ebook, ejournal)
+  const segments = pathname.split("/").filter(Boolean);
+  const resourceSegment = segments[segments.length - 2] ?? "";
+  let apiResource = resourceSegment;
+  // Map folder segment to API resource
+  if (apiResource === "avdb") apiResource = "av";
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+
+  const handleCopy = async () => {
+    if (!selectedRows.length) return;
+    setIsCopying(true);
+    // ===== Monitor Logs: handleCopy invoked =====
+    console.log("[handleCopy] Invoked");
+    console.log("[handleCopy] selectedRows:", selectedRows);
+    console.log("[handleCopy] targetYear:", targetYear);
+    try {
+      const records = selectedRows.map((row: any) => ({
+        listav_id: (row.original as any).id,
+        counts: (row.original as any).counts ?? 0,
+      }));
+
+      console.log("Copy payload:", { targetYear, records });
+      setCopiedRecords(records);
+      setCopyStatus("");
+      setCopyMessage("");
+
+      // Call server action
+      console.log("[handleCopy] calling copyCounts server action...");
+      await copyCounts(apiResource as ResourceType, targetYear, records);
+      console.log("[handleCopy] server action resolved");
+
+      setCopyStatus("success");
+      setCopyMessage("Copy Success");
+
+      // // Navigate to the target year page so the user can immediately see the copied data
+      // const newPath = pathname.replace(/\d{4}$/g, String(targetYear));
+      // // ===== Monitor Logs: navigation =====
+      // console.log("[handleCopy] Navigating to:", newPath);
+      // router.push(newPath);
+      // router.refresh();
+    } catch (error) {
+      console.error("Copy error:", error);
+      setCopyStatus("error");
+      setCopyMessage((error as any)?.message || "Copy failed");
+    } finally {
+      setIsCopying(false);
+    }
+  }
   return (
     <div className="flex items-center justify-between px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of {" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+      <div className="flex-1 text-sm text-muted-foreground flex items-center space-x-2">
+        <span>
+          {selectedRows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
+        </span>
+        {selectedRows.length > 0 && (
+          <>
+            <Select
+              value={String(targetYear)}
+              onValueChange={(value) => setTargetYear(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-[90px]">
+                <SelectValue placeholder={targetYear} />
+              </SelectTrigger>
+              <SelectContent side="top" className="bg-white max-h-56">
+                {years.map((year) => (
+                  <SelectItem key={year} value={String(year)}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCopy}
+              disabled={isCopying}
+            >
+              {isCopying ? "Copying..." : "Copy"}
+            </Button>
+            {/* Feedback message */}
+            {copyStatus && (
+              <span
+                className={`text-sm ${copyStatus === "success" ? "text-green-600" : "text-red-600"}`}
+              >
+                {copyStatus === "success" ? copyMessage : `Copy Failed: ${copyMessage}`}
+              </span>
+            )}
+            {/* Detailed record list */}
+            {copiedRecords.length > 0 && (
+              <div className="text-xs max-h-32 overflow-auto border rounded p-2 bg-gray-50 whitespace-pre-wrap">
+                {copiedRecords.map((rec) => (
+                  <div key={rec.listav_id}>{JSON.stringify(rec)}</div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
+
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>

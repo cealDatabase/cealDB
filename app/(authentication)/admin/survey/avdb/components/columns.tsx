@@ -34,15 +34,15 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       enableHiding: false,
     },
     // 要加水平滚动条，目前太难滚动了
-    // {
-    //   accessorKey: "id",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title='ID' />
-    //   ),
-    //   cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
-    //   enableSorting: true,
-    //   enableHiding: false,
-    // },
+    {
+      accessorKey: "id",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ID' />
+      ),
+      cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
+      enableSorting: true,
+      enableHiding: false,
+    },
     {
       accessorKey: "title",
       header: ({ column }) => (

@@ -28,7 +28,7 @@ import {
 
 import { DataTablePagination } from "@/components/data-table/DataTablePagination";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { listav_id: number; counts?: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   /**
@@ -39,7 +39,7 @@ interface DataTableProps<TData, TValue> {
   Toolbar?: React.ComponentType<{ table: TableInstance<TData> }>;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { listav_id: number; counts?: number }, TValue>({
   columns,
   data,
   Toolbar,
