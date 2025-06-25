@@ -34,15 +34,15 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       enableHiding: false,
     },
     // 要加水平滚动条，目前太难滚动了
-    // {
-    //   accessorKey: "id",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title='ID' />
-    //   ),
-    //   cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
-    //   enableSorting: true,
-    //   enableHiding: false,
-    // },
+    {
+      accessorKey: "id",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ID' />
+      ),
+      cell: ({ row }) => <div className='w-[50px]'>{row.getValue("id")}</div>,
+      enableSorting: true,
+      enableHiding: false,
+    },
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -236,12 +236,19 @@ export function getColumns(year: number): ColumnDef<listAV>[] {
       cell: ({ row }) => {
         return (
           <div className='flex space-x-2 justify-center'>
-            {(row.getValue("language") as string[])?.map(
-              (lang) => (<span key={lang} className='max-w-[500px] font-medium'>
+            {(row.getValue("language") as string[])?.map((lang) => (
+              <span key={lang} className='max-w-[500px] font-medium'>
                 {lang}
-              </span>))}
+              </span>
+            ))}
           </div>
         );
+      },
+      filterFn: (row, id, value) => {
+        const rowLanguages = row.getValue(id) as string[] | undefined;
+        if (!Array.isArray(rowLanguages)) return false;
+        const selected = value as string[];
+        return rowLanguages.some((lang) => selected.includes(lang));
       },
     },
     {

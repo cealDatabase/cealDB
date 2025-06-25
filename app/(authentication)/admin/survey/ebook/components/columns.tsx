@@ -181,10 +181,17 @@ export function getColumns(year: number): ColumnDef<listEBook>[] {
             {(row.getValue("language") as string[])?.map(
               (lang) => (<span key={lang} className='max-w-[500px] font-medium'>
                 {lang}
-              </span>))}
+              </span>
+            ))}
           </div>
         );
       },
+      filterFn: (row, id, value) => {
+        const rowLanguages = row.getValue(id) as string[] | undefined;
+        if (!Array.isArray(rowLanguages)) return false;
+        const selected = value as string[];
+        return rowLanguages.some((lang) => selected.includes(lang));
+      }
     },
     {
       accessorKey: "subscribers",

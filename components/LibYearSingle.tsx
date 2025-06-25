@@ -5,7 +5,7 @@ import { Library_Year_Type } from "@/types/types";
 import { Table } from "antd";
 import type { TableColumnsType } from "antd";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import { Button } from "@mui/material";
+import { Button } from "@/components/Button";
 import { DataType } from "@/types/SingleLibraryYearOverviewType";
 
 export default function LibYearSingle({
@@ -262,9 +262,9 @@ export default function LibYearSingle({
       <div className="place-self-start mb-4">
         <Button
           onClick={onDownload}
-          variant="outlined"
-          color="secondary"
-          size="small"
+          variant="outline"
+          color="orange"
+          className="text-xs"
         >
           Export to Excel
         </Button>

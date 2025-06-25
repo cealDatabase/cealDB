@@ -5,10 +5,10 @@ import { Table } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "./data-table-view-options"
+import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions"
 
 import { languages, type } from "../data/data"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -32,8 +32,8 @@ export function DataTableToolbar<TData>({
         {table.getColumn("language") && (
           <DataTableFacetedFilter
             column={table.getColumn("language")}
-            title="Language (Under Construction)"
-            options={languages.map((item) => ({ ...item, value: item.value.toString() }))}
+            title="Language"
+            options={languages.map((item) => ({ ...item, value: item.label }))}
           />
         )}
         {table.getColumn("type") && (
@@ -47,7 +47,7 @@ export function DataTableToolbar<TData>({
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
+            className="h-8 px-2 lg:px-3 border border-red-400"
           >
             Reset
             <Cross2Icon className="ml-2 h-4 w-4" />

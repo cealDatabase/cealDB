@@ -25,7 +25,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
 
 
     return (
-        <div className='flex flex-row self-end mb-4'>
+        <div className='flex flex-row self-end mb-4 gap-4'>
             <Listbox value={selectedYear} onChange={handleChange}>
                 <Label className="text-sm/6 font-medium text-sky-600">Select Year:</Label>
                 <div className="relative">
