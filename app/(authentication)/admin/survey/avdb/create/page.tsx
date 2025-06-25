@@ -1,9 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from 'react'
 import CreateAVForm from "../components/forms/createAVForm";
 
-export default function CreateAVPage() {
+function SelectYear(){
   const searchParams = useSearchParams();
   const selectedYear = Number(searchParams.get("year"));
 
@@ -14,5 +15,12 @@ export default function CreateAVPage() {
       </h1>
       <CreateAVForm selectedYear={selectedYear} />
     </div>
+  );
+}
+export default function CreateAVPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SelectYear />
+    </Suspense>
   );
 }
