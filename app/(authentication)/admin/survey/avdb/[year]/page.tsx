@@ -19,7 +19,7 @@ export default async function AVListPage(
 
     return (
         <main>
-            <Container className="bg-white p-12">
+            <Container className="bg-white p-12 max-w-full">
 
                 <div className="flex-1 flex-col p-8 md:flex">
                     <div className="space-y-2">

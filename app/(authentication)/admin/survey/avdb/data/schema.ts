@@ -7,7 +7,7 @@ export const listAVSchema = z.object({
   cjk_title: z.string().nullish(),
   romanized_title: z.string().nullish(),
   subtitle: z.string().nullish(),
-  type: z.string().toLowerCase().nullish(),
+  type: z.string().transform((val) => val.toLowerCase()).nullish(),
   publisher: z.string().nullish(),
   description: z.string().nullish(),
   notes: z.string().nullish(),
