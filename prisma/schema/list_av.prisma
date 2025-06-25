@@ -29,6 +29,9 @@ model List_AV_Counts {
 
     listav  Int? 
     List_AV List_AV? @relation(fields: [listav], references: [id])
+
+    // Add unique constraint for listav + year combination
+    @@unique([listav, year], name: "listav_year_unique")
 }
 
 model List_AV_Language {

@@ -13,6 +13,6 @@ export const languages = [
   },
   {
     value: 4,
-    label: "NONCJK",
+    label: "NON",
   },
 ];
