@@ -3,7 +3,7 @@ import db from "@/lib/db";
 export type ResourceType = "av" | "ebook" | "ejournal";
 
 export interface CopyRecord {
-  listav_id: number;
+  id: number;
   counts: number;
 }
 
@@ -47,14 +47,14 @@ export async function copyRecords(
   }
 
   await Promise.all(
-    records.map(async ({ listav_id, counts }) => {
-      console.log("In CopyRecords: Processing record:", { listav_id, counts });
+    records.map(async ({ id, counts }) => {
+      console.log("In CopyRecords: Processing record:", { id, counts });
       const countVal = Number(counts) || 0;
 
       // First try to update an existing row (safer for concurrency)
       const updateRes = await countsModel.updateMany({
         where: {
-          [listRefField]: Number(listav_id),
+          [listRefField]: Number(id),
           year: targetYear,
         },
         data: {
@@ -66,7 +66,7 @@ export async function copyRecords(
 
       if (updateRes.count === 0) {
         // No row for (list item, year) yet – attempt to create.
-        console.log("In CopyRecords: Creating new record:", { listav_id, counts, targetYear });
+        console.log("In CopyRecords: Creating new record:", { id, counts, targetYear });
         try {
           const maxId = await countsModel.findFirst({
             select: {
@@ -80,7 +80,7 @@ export async function copyRecords(
           await countsModel.create({
             data: {
               id: newId,
-              [listRefField]: Number(listav_id),
+              [listRefField]: Number(id),
               [countsField]: countVal,
               year: targetYear,
               updatedat: new Date(),
@@ -91,10 +91,10 @@ export async function copyRecords(
           console.log("In CopyRecords: Create failed:", err);
           if ((err as any)?.code === "P2002") {
             // Someone else inserted the row in between – do the update now.
-            console.warn("Unique constraint hit after create attempt; retrying update", { listav_id, targetYear });
+            console.warn("Unique constraint hit after create attempt; retrying update", { id, targetYear });
             await countsModel.updateMany({
               where: {
-                [listRefField]: Number(listav_id),
+                [listRefField]: Number(id),
                 year: targetYear,
               },
               data: {
