@@ -26,7 +26,7 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTablePagination<TData extends { listav_id: number; counts?: number }>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends { id: number; counts?: number }>({ table }: DataTablePaginationProps<TData>) {
   // Year options range from 2017 to the current year
   const beginYear = 2017;
   const years = Array.from({ length: new Date().getFullYear() - beginYear + 1 }, (_, i) => beginYear + i);
@@ -35,7 +35,7 @@ export function DataTablePagination<TData extends { listav_id: number; counts?: 
   const [isCopying, setIsCopying] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"" | "success" | "error">("");
   const [copyMessage, setCopyMessage] = useState<string>("");
-  const [copiedRecords, setCopiedRecords] = useState<{ listav_id: number; counts: number }[]>([]);
+  const [copiedRecords, setCopiedRecords] = useState<{ id: number; counts: number }[]>([]);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -58,7 +58,7 @@ export function DataTablePagination<TData extends { listav_id: number; counts?: 
     console.log("[handleCopy] targetYear:", targetYear);
     try {
       const records = selectedRows.map((row: any) => ({
-        listav_id: (row.original as any).id,
+        id: (row.original as any).id,
         counts: (row.original as any).counts ?? 0,
       }));
 
@@ -132,7 +132,7 @@ export function DataTablePagination<TData extends { listav_id: number; counts?: 
             {copiedRecords.length > 0 && (
               <div className="text-xs max-h-32 overflow-auto border rounded p-2 bg-gray-50 whitespace-pre-wrap">
                 {copiedRecords.map((rec) => (
-                  <div key={rec.listav_id}>{JSON.stringify(rec)}</div>
+                  <div key={rec.id}>{JSON.stringify(rec)}</div>
                 ))}
               </div>
             )}

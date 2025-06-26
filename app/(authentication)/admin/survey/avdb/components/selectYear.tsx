@@ -32,15 +32,15 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
   };
 
   return (
-    <div className='flex items-center justify-between mb-4 gap-4'>
-      <div className='flex flex-row self-end mb-4'>
+    <div className='flex items-center justify-end my-4 gap-4'>
+      <div className='flex flex-row self-end'>
         <Listbox value={selectedYear} onChange={handleChange}>
-          <Label className='text-sm/6 font-medium text-sky-600 mr-2'>
+          <Label className='text-sky-600 mr-2 text-sm/6 md:text-normal'>
             Select Year:
           </Label>
           <div className='relative'>
-            <ListboxButton className='grid cursor-default grid-cols-1 rounded-md bg-white pb-1.5 pr-2 pl-3 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'>
-              <span className='col-start-1 row-start-1 truncate pr-6 text-sky-600 font-medium'>
+            <ListboxButton className='grid cursor-default grid-cols-1 rounded-md bg-white px-3 pb-0.5 text-left outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'>
+              <span className='col-start-1 row-start-1 truncate pr-6 text-sky-600 text-sm/6 md:text-normal'>
                 {selectedYear}
               </span>
               <ChevronUpDownIcon
@@ -69,7 +69,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
         </Listbox>
       </div>
 
-      <Button onClick={handleCreateClick} className='ml-4'>
+      <Button onClick={handleCreateClick} className='ml-4 text-sm px-4 py-0 md:text-normal'>
         Create New Entry
       </Button>
     </div>
