@@ -15,12 +15,12 @@ import { languages, type } from "./data/data";
 
 export default function EditAVModal({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   rowData,
   year,
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChangeAction: (open: boolean) => void;
   rowData: listAV;
   year: number;
 }) {
@@ -78,14 +78,14 @@ export default function EditAVModal({
       }
 
       console.log("Update successful:", data);
-      onOpenChange(false);
+      onOpenChangeAction(false);
     } catch (error) {
       console.error("Request error:", error);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className='bg-white text-black max-w-xl'>
         <DialogHeader>
           <DialogTitle>Edit AV Record - {year}</DialogTitle>

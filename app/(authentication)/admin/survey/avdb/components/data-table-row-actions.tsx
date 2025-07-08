@@ -35,7 +35,7 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
 
       <EditAVModal
         open={openEdit}
-        onOpenChange={setOpenEdit}
+        onOpenChangeAction={setOpenEdit}
         rowData={row.original}
         year={year}
       />
