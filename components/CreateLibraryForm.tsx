@@ -34,7 +34,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
   // State for the form
   const [formData, setFormData] = useState<Partial<SingleLibraryType>>({
-    // Since the library id is autoincrementing, therefore I will be operating the id number directly under api/route.ts
+    // Since the library id is autoincrementing, therefore I will be operating the id number directly under "app/api/submit-form/route.js"
     library_name: "",
     type: 0,
     plilaw: false,

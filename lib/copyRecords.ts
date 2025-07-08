@@ -1,6 +1,7 @@
-import db from "@/lib/db";
+import db from "./db";
 
-export type ResourceType = "av" | "ebook" | "ejournal";
+export const RESOURCE_TYPES = ["av", "ebook", "ejournal"] as const;
+export type ResourceType = typeof RESOURCE_TYPES[number];
 
 export interface CopyRecord {
   id: number;
@@ -8,107 +9,45 @@ export interface CopyRecord {
 }
 
 /**
- * Copy count records from any list_* table to the given target year.
- * The function upserts the counts row (creates if missing, updates otherwise)
- * and always sets `ishidden` to false and `updatedat` to current time.
- *
- * @param resource   type of resource ("av" | "ebook" | "ejournal")
- * @param targetYear year to copy into
- * @param records    array of {id, counts}
+ * Copies count records from an existing year to a target year
+ * Used by the admin UI to easily copy library stats between years
+ * @param resource Type of resource (av, ebook, ejournal)
+ * @param targetYear Target year to copy counts to
+ * @param records Array of {id, counts} to copy
+ * @returns Object with count of processed records
  */
 export async function copyRecords(
   resource: ResourceType,
   targetYear: number,
   records: CopyRecord[],
-) {
-  // Resolve table names & fields per resource type
-  let countsModel: any;
-  let countsField: string;
-  let listRefField: string; // field name for foreign key to parent list
-
-  switch (resource) {
-    case "av":
-      countsModel = db.list_AV_Counts;
-      countsField = "titles"; // domain-specific naming
-      listRefField = "listav";
-      break;
-    case "ebook":
-      countsModel = db.list_EBook_Counts;
-      countsField = "titles";
-      listRefField = "listebook";
-      break;
-    case "ejournal":
-      countsModel = db.list_EJournal_Counts;
-      countsField = "journals";
-      listRefField = "listejournal";
-      break;
-    default:
-      throw new Error(`Unsupported resource type: ${resource}`);
+): Promise<{ processed: number }> {
+  // Validate input
+  if (!Array.isArray(records) || records.length === 0) return { processed: 0 };
+  if (!targetYear) throw new Error("Target year required");
+  if (!RESOURCE_TYPES.includes(resource)) {
+    throw new Error(`Unsupported resource type: ${resource}`);
   }
 
-  await Promise.all(
-    records.map(async ({ id, counts }) => {
-      console.log("In CopyRecords: Processing record:", { id, counts });
-      const countVal = Number(counts) || 0;
-
-      // First try to update an existing row (safer for concurrency)
-      const updateRes = await countsModel.updateMany({
-        where: {
-          [listRefField]: Number(id),
-          year: targetYear,
-        },
-        data: {
-          [countsField]: countVal,
-          updatedat: new Date(),
-          ishidden: false,
-        },
-      });
-
-      if (updateRes.count === 0) {
-        // No row for (list item, year) yet – attempt to create.
-        console.log("In CopyRecords: Creating new record:", { id, counts, targetYear });
-        try {
-          const maxId = await countsModel.findFirst({
-            select: {
-              id: true,
-            },
-            orderBy: {
-              id: "desc",
-            },
-          });
-          const newId = maxId?.id + 1 || 999;
-          await countsModel.create({
-            data: {
-              id: newId,
-              [listRefField]: Number(id),
-              [countsField]: countVal,
-              year: targetYear,
-              updatedat: new Date(),
-              ishidden: false,
-            },
-          });
-        } catch (err: any) {
-          console.log("In CopyRecords: Create failed:", err);
-          if ((err as any)?.code === "P2002") {
-            // Someone else inserted the row in between – do the update now.
-            console.warn("Unique constraint hit after create attempt; retrying update", { id, targetYear });
-            await countsModel.updateMany({
-              where: {
-                [listRefField]: Number(id),
-                year: targetYear,
-              },
-              data: {
-                [countsField]: countVal,
-                updatedat: new Date(),
-                ishidden: false,
-              },
-            });
-          } else {
-            console.error("Failed to upsert counts record", err);
-            throw err;
-          }
-        }
-      }
-    }),
-  );
+  try {
+    console.log(`In CopyRecords: Processing ${records.length} records for ${resource} year ${targetYear}`);
+    
+    // Call API route with all records at once instead of one by one
+    const baseUrl = typeof window === "undefined" ? process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000" : "";
+    const resp = await fetch(`${baseUrl}/api/copy-records`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resource, targetYear, records }),
+    });
+    
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      throw new Error(`API error: ${resp.status} - ${errorText}`);
+    }
+    
+    const result = await resp.json();
+    return result;
+  } catch (err: any) {
+    console.error("In CopyRecords: API call failed:", err);
+    throw err;
+  }
 }
