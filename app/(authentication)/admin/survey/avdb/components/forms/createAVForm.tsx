@@ -47,15 +47,26 @@ export default function CreateAVForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch("/api/av/create", {
+
+    const payload = {
+      ...form,
+      libraryyear: selectedYear, // 👈 correct key
+      counts: Number(form.counts), // make sure it’s a number
+      language: form.language.map(Number), // ["1","2"] → [1,2]
+    };
+
+    const res = await fetch("/api/av/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, year: selectedYear }),
+      body: JSON.stringify(payload),
     });
-    if (response.ok) {
+
+    const data = await res.json(); // grab the server response
+
+    if (res.ok) {
       router.push(`/admin/survey/avdb/${selectedYear}`);
     } else {
-      alert("Failed to create new AV entry.");
+      alert(`Failed: ${data.error ?? "unknown error"}`);
     }
   };
 
