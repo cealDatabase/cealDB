@@ -13,17 +13,24 @@ import { useState } from "react";
 import { listEBook } from "./data/schema";
 import { languages } from "./data/data";
 
-type EditEbookModalProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  rowData: listEBook;
-};
 
 export default function EditEbookModal({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   rowData,
-}: EditEbookModalProps) {
+  year,
+}: {
+  open: boolean;
+  onOpenChangeAction: (open: boolean) => void;
+  rowData: listEBook;
+  year: number;
+}) {
+
+  const normalizeLabel = (label: string) => {
+    if (label === "NON") return "NONCJK";
+    return label;
+  };
+
   const [formData, setFormData] = useState({
     title: rowData.title,
     subtitle: rowData.subtitle || "",
@@ -38,11 +45,13 @@ export default function EditEbookModal({
     is_global: rowData.is_global || false,
     language: Array.isArray(rowData.language)
       ? rowData.language
-          .map((label) => {
-            const match = languages.find((l) => l.label === label);
-            return match ? String(match.value) : null;
-          })
-          .filter((id): id is string => id !== null)
+          .map(
+            (langLabel) =>
+              languages.find((l) => l.label === normalizeLabel(langLabel))
+                ?.value
+          )
+          .filter((id) => id !== undefined)
+          .map((id) => String(id))
       : [],
   });
 
@@ -71,17 +80,17 @@ export default function EditEbookModal({
       }
 
       console.log("Update successful:", data);
-      onOpenChange(false);
+      onOpenChangeAction(false);
     } catch (error) {
       console.error("Request error:", error);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className='bg-white text-black max-w-xl'>
         <DialogHeader>
-          <DialogTitle>Edit Ebook Record</DialogTitle>
+          <DialogTitle>Edit Ebook Record - {year}</DialogTitle>
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
@@ -138,7 +147,7 @@ export default function EditEbookModal({
             />
           </div>
 
-          <div>
+          <div className='space-y-1'>
             <label className='text-sm font-medium'>Languages</label>
             <div className='grid grid-cols-2 gap-2'>
               {languages.map((lang) => {
@@ -147,9 +156,11 @@ export default function EditEbookModal({
                   <div key={langIdStr} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`lang-${langIdStr}`}
+                      className='hover:bg-blue-300/30 hover:cursor-pointer'
                       checked={formData.language.includes(langIdStr)}
-                      onCheckedChange={(checked) =>
-                        handleLanguageChange(langIdStr, Boolean(checked))
+                      onCheckedChange={
+                        (checked) =>
+                          handleLanguageChange(langIdStr, Boolean(checked))
                       }
                     />
                     <label htmlFor={`lang-${langIdStr}`} className='text-sm'>
@@ -161,9 +172,15 @@ export default function EditEbookModal({
             </div>
           </div>
 
-          <Button onClick={handleSubmit} className='w-full'>
-            Save Changes
-          </Button>
+          <div className='flex justify-end'>
+            <Button
+              onClick={handleSubmit}
+              variant="outline"
+              className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

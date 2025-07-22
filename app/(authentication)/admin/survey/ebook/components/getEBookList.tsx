@@ -34,17 +34,27 @@ const getEBookListByYear = async (userSelectedYear: number) => {
             if (!listEBookItem) return;
 
             const languageIDs = await getLanguageIdByListEBookId(listEBookId);
-            const languageArray = (await Promise.all(languageIDs?.map(async (id) => await getLanguageById(id)) || []))?.map((lang) => lang?.short) || [];
+            const languageArray = 
+            (
+                await Promise.all(
+                    languageIDs?.map(async (id) => await getLanguageById(id)) || []
+                )
+            )?.map((lang) => lang?.short) || [];
 
-            const subscriberIDs = await getSubscriberIdByListEBookId(listEBookId, userSelectedYear);
+            const subscriberIDs = await getSubscriberIdByListEBookId(
+                listEBookId, 
+                userSelectedYear
+            );
 
-            const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
+            const subscriberLibraryNames = await Promise.all(
+                (subscriberIDs || []).map(async (subscriberId) => {
                 if (subscriberId != null) {
                     const library = await getLibraryById(subscriberId);
                     return `- ${library?.library_name?.trim()} ` || null;
                 }
                 return null;
-            }))
+            })
+        );
 
             // Deduplicate
             const uniqueSubscriberLibraryNames = Array.from(

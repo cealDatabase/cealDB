@@ -1,19 +1,18 @@
 "use client"
 
-import { Row } from "@tanstack/react-table"
+import { Row } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import EditEBookModal from "../edit-eb-modal";
 
-export function DataTableRowActions({ row }: { row: Row<any> }) {
+export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
@@ -24,11 +23,11 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-[160px]'>
-          <DropdownMenuItem onClick={() => setOpenEdit(true)}>
+        <DropdownMenuContent align='end' className='w-[160px] bg-white'>
+          <DropdownMenuItem onClick={() => setOpenEdit(true)} className="hover:bg-blue-100/30">
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => alert("Delete logic here")}>
+          <DropdownMenuItem onClick={() => alert("Delete logic here")} className="hover:bg-blue-100/30">
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -36,9 +35,10 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
 
       <EditEBookModal
         open={openEdit}
-        onOpenChange={setOpenEdit}
+        onOpenChangeAction={setOpenEdit}
         rowData={row.original}
+        year={year}
       />
     </>
-  )
+  );
 }

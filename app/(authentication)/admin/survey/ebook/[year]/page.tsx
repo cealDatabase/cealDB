@@ -1,13 +1,14 @@
+import { cookies } from "next/headers";
 import { GetEBookList } from "../components/getEBookList";
 import EBookDataTableClient from "../components/ebDataTableClient";
-import { Container } from "@/components/Container"
+import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 
-async function EbookSinglePage(yearPassIn: number) {
+async function EbookSinglePage(yearPassIn: number, roleIdPassIn: string | undefined) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
-    return <EBookDataTableClient data={tasks} year={yearPassIn} />;
+    return <EBookDataTableClient data={tasks} year={yearPassIn} roleIdPassIn={roleIdPassIn} />;
 }
 
 export default async function EbookListPage(
@@ -16,6 +17,9 @@ export default async function EbookListPage(
     }
 ) {
     const params = await props.params;
+    const cookieStore = await cookies();
+    const roleId = cookieStore.get("role")?.value;
+    console.log("roleId", roleId);
 
     return (
         <main>
@@ -35,7 +39,7 @@ export default async function EbookListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {EbookSinglePage(Number(params.year))}
+                        {await EbookSinglePage(Number(params.year), roleId)}
                     </Suspense>
                 </div>
             </Container>
