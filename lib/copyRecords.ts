@@ -1,5 +1,3 @@
-import db from "./db";
-
 export const RESOURCE_TYPES = ["av", "ebook", "ejournal"] as const;
 export type ResourceType = typeof RESOURCE_TYPES[number];
 

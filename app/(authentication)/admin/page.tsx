@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { Container } from "@/components/Container";
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import {
   getUserByUserName,
   getRoleById,
