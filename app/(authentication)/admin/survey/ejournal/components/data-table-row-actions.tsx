@@ -12,7 +12,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import EditEJournalModal from "../edit-ej-modal";
 
-export function DataTableRowActions({ row }: { row: Row<any> }) {
+export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
@@ -23,11 +23,11 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-[160px]'>
-          <DropdownMenuItem onClick={() => setOpenEdit(true)}>
+        <DropdownMenuContent align='end' className='w-[160px] bg-white'>
+          <DropdownMenuItem onClick={() => setOpenEdit(true)} className="hover:bg-blue-100/30">
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => alert("Delete logic here")}>
+          <DropdownMenuItem onClick={() => alert("Delete logic here")} className="hover:bg-blue-100/30">
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -35,8 +35,9 @@ export function DataTableRowActions({ row }: { row: Row<any> }) {
 
       <EditEJournalModal
         open={openEdit}
-        onOpenChange={setOpenEdit}
+        onOpenChangeAction={setOpenEdit}
         rowData={row.original}
+        year={year}
       />
     </>
   );

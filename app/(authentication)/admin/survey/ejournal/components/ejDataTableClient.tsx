@@ -8,10 +8,12 @@ import { DataTableToolbar } from "./data-table-toolbar";
 export default function EJournalDataTableClient({
   data,
   year,
+  roleIdPassIn,
 }: {
   data: listEJournal[];
   year: number;
+  roleIdPassIn: string | undefined;
 }) {
-  const columns = getColumns(year);
+  const columns = getColumns(year, roleIdPassIn);
   return <DataTable data={data} columns={columns} Toolbar={DataTableToolbar} />;
 }

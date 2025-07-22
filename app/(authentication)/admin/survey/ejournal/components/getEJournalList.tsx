@@ -9,8 +9,8 @@ import {
 import { z } from "zod"
 import { listEJournalSchema } from "../data/schema"
 
-const getEJournalListByYear = async (year: number) => {
-  const listEJournalCountsByYear = await getListEJournalCountsByYear(year);
+const getEJournalListByYear = async (userSelectedYear: number) => {
+  const listEJournalCountsByYear = await getListEJournalCountsByYear(userSelectedYear);
   const outputArray: any[] = [];
   const ListEJournalIdArray: number[] = [];
   const listEJournalCountNumberArray: number[] = [];
@@ -34,17 +34,25 @@ const getEJournalListByYear = async (year: number) => {
       if (!listEJournalItem) return;
 
       const languageIDs = await getLanguageIdByListEJournalId(listEJournalId);
-      const languageArray = (await Promise.all(languageIDs?.map(async (id) => await getLanguageById(id)) || []))?.map((lang) => lang?.short) || [];
+      const languageArray = (
+        await Promise.all(
+          languageIDs?.map(async (id) => await getLanguageById(id)) || []
+        )
+      )?.map((lang) => lang?.short) || [];
 
-      const subscriberIDs = await getSubscriberIdByListEJournalId(listEJournalId);
+      const subscriberIDs = await getSubscriberIdByListEJournalId(
+        listEJournalId, userSelectedYear
+      );
 
-      const subscriberLibraryNames = await Promise.all((subscriberIDs || []).map(async (subscriberId) => {
-        if (subscriberId != null) {
-          const library = await getLibraryById(subscriberId);
-          return `- ${library?.library_name?.trim()} ` || null;
-        }
-        return null;
-      }))
+      const subscriberLibraryNames = await Promise.all(
+        (subscriberIDs || []).map(async (subscriberId) => {
+          if (subscriberId != null) {
+            const library = await getLibraryById(subscriberId);
+            return `- ${library?.library_name?.trim()} ` || null;
+          }
+          return null;
+        })
+      );
 
       // Deduplicate
       const uniqueSubscriberLibraryNames = Array.from(
@@ -93,7 +101,7 @@ const getEJournalListByYear = async (year: number) => {
   return groupedRecords;
 }
 
-export async function GetEJournalList(year: number) {
-  const data = await getEJournalListByYear(year);
+export async function GetEJournalList(userSelectedYear: number) {
+  const data = await getEJournalListByYear(userSelectedYear);
   return z.array(listEJournalSchema).parse(data || []);
 }

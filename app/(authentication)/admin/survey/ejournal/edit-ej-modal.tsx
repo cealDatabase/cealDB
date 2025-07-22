@@ -10,54 +10,51 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { listEJournal } from "./data/schema";
 import { languages } from "./data/data";
 
-export type listEJournal = {
-  id: number;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  notes?: string;
-  publisher?: string;
-  data_source?: string;
-  cjk_title?: string;
-  romanized_title?: string;
-  counts: number;
-  sub_series_number?: string;
-  is_global: boolean;
-  language: string[];
-};
+
 
 type EditEjournalModalProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChangeAction: (open: boolean) => void;
   rowData: listEJournal;
+  year: number;
 };
 
 export default function EditEjournalModal({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   rowData,
+  year,
 }: EditEjournalModalProps) {
+
+  const normalizeLabel = (label: string) => {
+    if (label === "NON") return "NONCJK";
+    return label;
+  };
+
   const [formData, setFormData] = useState({
     title: rowData.title,
-    subtitle: rowData.subtitle || "",
-    description: rowData.description || "",
-    notes: rowData.notes || "",
-    publisher: rowData.publisher || "",
-    data_source: rowData.data_source || "",
     cjk_title: rowData.cjk_title || "",
     romanized_title: rowData.romanized_title || "",
+    subtitle: rowData.subtitle || "",
+    description: rowData.description || "",
     counts: rowData.counts,
+    publisher: rowData.publisher || "",
+    notes: rowData.notes || "",
+    data_source: rowData.data_source || "",
     sub_series_number: rowData.sub_series_number || "",
     is_global: rowData.is_global || false,
     language: Array.isArray(rowData.language)
       ? rowData.language
-          .map((label) => {
-            const match = languages.find((l) => l.label === label);
-            return match ? String(match.value) : null;
-          })
-          .filter((id): id is string => id !== null)
+        .map(
+          (langLabel) =>
+            languages.find((l) => l.label === normalizeLabel(langLabel))
+              ?.value
+        )
+        .filter((id) => id !== undefined)
+        .map((id) => String(id))
       : [],
   });
 
@@ -86,17 +83,17 @@ export default function EditEjournalModal({
       }
 
       console.log("Update successful:", data);
-      onOpenChange(false);
+      onOpenChangeAction(false);
     } catch (error) {
       console.error("Request error:", error);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className='bg-white text-black max-w-xl'>
         <DialogHeader>
-          <DialogTitle>Edit Ejournal Record</DialogTitle>
+          <DialogTitle>Edit Ejournal Record - {year}</DialogTitle>
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
@@ -162,6 +159,7 @@ export default function EditEjournalModal({
                   <div key={langIdStr} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`lang-${langIdStr}`}
+                      className='hover:bg-blue-300/30 hover:cursor-pointer'
                       checked={formData.language.includes(langIdStr)}
                       onCheckedChange={(checked) =>
                         handleLanguageChange(langIdStr, Boolean(checked))
@@ -176,9 +174,15 @@ export default function EditEjournalModal({
             </div>
           </div>
 
-          <Button onClick={handleSubmit} className='w-full'>
-            Save Changes
-          </Button>
+          <div className='flex justify-end'>
+            <Button
+              onClick={handleSubmit}
+              variant="outline"
+              className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

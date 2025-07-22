@@ -137,7 +137,6 @@ const ExpandableSubscribers = ({ subscribers }: { subscribers: string[] | string
     </Popover>
   );
 };
-
 export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listAV>[] {
   return [
     {
@@ -336,21 +335,21 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
     },
     ...(roleIdPassIn?.trim() !== "2"
       ? [{
-      accessorKey: "subscribers",
-      header: ({ column }: { column: any }) => (
-        <DataTableColumnHeader column={column} title='Subscribers' />
-      ),
-      cell: ({ row }: { row: any }) => {
-        const subscribers = row.getValue("subscribers") as string[] | string | null | undefined;
-        if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-          return <span className="text-muted-foreground italic">No subscribers</span>;
-        }
+        accessorKey: "subscribers",
+        header: ({ column }: { column: any }) => (
+          <DataTableColumnHeader column={column} title='Subscribers' />
+        ),
+        cell: ({ row }: { row: any }) => {
+          const subscribers = row.getValue("subscribers") as string[] | string | null | undefined;
+          if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
+            return <span className="text-muted-foreground italic">No subscribers</span>;
+          }
 
-        const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
+          const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
 
-        return <ExpandableSubscribers subscribers={subscriberList} />;
-      },
-    }]
+          return <ExpandableSubscribers subscribers={subscriberList} />;
+        },
+      }]
       : []),
     {
       id: "actions",
