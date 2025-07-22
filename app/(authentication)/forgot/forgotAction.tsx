@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
-    : "https://ceal-db.vercel.app/";
+    : "https://cealstats.org";
 
 interface ApiResponse {
   message: string;

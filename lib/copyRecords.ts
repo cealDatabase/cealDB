@@ -30,7 +30,11 @@ export async function copyRecords(
     console.log(`In CopyRecords: Processing ${records.length} records for ${resource} year ${targetYear}`);
     
     // Call API route with all records at once instead of one by one
-    const baseUrl = typeof window === "undefined" ? process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000" : "";
+    const baseUrl = typeof window === "undefined" ? (
+      process.env.NODE_ENV !== "production" 
+        ? "http://localhost:3000" 
+        : "https://cealstats.org"
+    ) : "";
     const resp = await fetch(`${baseUrl}/api/copy-records`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
