@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,32 +11,35 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 
 const formSchema = z.object({
-  // Purchased Titles
-  purchasedTitlesChinese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedTitlesJapanese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedTitlesKorean: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedTitlesNonCJK: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
+  // Entry ID (optional)
+  entryid: z.string().optional(),
+  
+  // Purchased Titles (matching Prisma field names)
+  mapurchased_titles_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_titles_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_titles_korean: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_titles_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
   // Purchased Volumes
-  purchasedVolumesChinese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedVolumesJapanese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedVolumesKorean: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  purchasedVolumesNonCJK: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_volumes_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_volumes_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_volumes_korean: z.number().min(0, { message: "Must be a non-negative number" }),
+  mapurchased_volumes_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
   // Non-Purchased Titles
-  nonPurchasedTitlesChinese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedTitlesJapanese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedTitlesKorean: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedTitlesNonCJK: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_titles_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_titles_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_titles_korean: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_titles_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
   // Non-Purchased Volumes
-  nonPurchasedVolumesChinese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedVolumesJapanese: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedVolumesKorean: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
-  nonPurchasedVolumesNonCJK: z.coerce.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_volumes_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_volumes_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_volumes_korean: z.number().min(0, { message: "Must be a non-negative number" }),
+  manonpurchased_volumes_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
   // Notes
-  notes: z.string().optional(),
+  manotes: z.string().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -43,25 +47,26 @@ type FormData = z.infer<typeof formSchema>
 export default function MonographicForm() {
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema) as any,
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      purchasedTitlesChinese: 0,
-      purchasedTitlesJapanese: 0,
-      purchasedTitlesKorean: 0,
-      purchasedTitlesNonCJK: 0,
-      purchasedVolumesChinese: 0,
-      purchasedVolumesJapanese: 0,
-      purchasedVolumesKorean: 0,
-      purchasedVolumesNonCJK: 0,
-      nonPurchasedTitlesChinese: 0,
-      nonPurchasedTitlesJapanese: 0,
-      nonPurchasedTitlesKorean: 0,
-      nonPurchasedTitlesNonCJK: 0,
-      nonPurchasedVolumesChinese: 0,
-      nonPurchasedVolumesJapanese: 0,
-      nonPurchasedVolumesKorean: 0,
-      nonPurchasedVolumesNonCJK: 0,
-      notes: "",
+      entryid: "",
+      mapurchased_titles_chinese: 0,
+      mapurchased_titles_japanese: 0,
+      mapurchased_titles_korean: 0,
+      mapurchased_titles_noncjk: 0,
+      mapurchased_volumes_chinese: 0,
+      mapurchased_volumes_japanese: 0,
+      mapurchased_volumes_korean: 0,
+      mapurchased_volumes_noncjk: 0,
+      manonpurchased_titles_chinese: 0,
+      manonpurchased_titles_japanese: 0,
+      manonpurchased_titles_korean: 0,
+      manonpurchased_titles_noncjk: 0,
+      manonpurchased_volumes_chinese: 0,
+      manonpurchased_volumes_japanese: 0,
+      manonpurchased_volumes_korean: 0,
+      manonpurchased_volumes_noncjk: 0,
+      manotes: "",
     },
   })
 
@@ -70,42 +75,71 @@ export default function MonographicForm() {
 
   // Calculate subtotals and totals
   const purchasedTitlesSubtotal =
-    watchedValues.purchasedTitlesChinese +
-    watchedValues.purchasedTitlesJapanese +
-    watchedValues.purchasedTitlesKorean +
-    watchedValues.purchasedTitlesNonCJK
+    watchedValues.mapurchased_titles_chinese +
+    watchedValues.mapurchased_titles_japanese +
+    watchedValues.mapurchased_titles_korean +
+    watchedValues.mapurchased_titles_noncjk
 
   const purchasedVolumesSubtotal =
-    watchedValues.purchasedVolumesChinese +
-    watchedValues.purchasedVolumesJapanese +
-    watchedValues.purchasedVolumesKorean +
-    watchedValues.purchasedVolumesNonCJK
+    watchedValues.mapurchased_volumes_chinese +
+    watchedValues.mapurchased_volumes_japanese +
+    watchedValues.mapurchased_volumes_korean +
+    watchedValues.mapurchased_volumes_noncjk
 
   const nonPurchasedTitlesSubtotal =
-    watchedValues.nonPurchasedTitlesChinese +
-    watchedValues.nonPurchasedTitlesJapanese +
-    watchedValues.nonPurchasedTitlesKorean +
-    watchedValues.nonPurchasedTitlesNonCJK
+    watchedValues.manonpurchased_titles_chinese +
+    watchedValues.manonpurchased_titles_japanese +
+    watchedValues.manonpurchased_titles_korean +
+    watchedValues.manonpurchased_titles_noncjk
 
   const nonPurchasedVolumesSubtotal =
-    watchedValues.nonPurchasedVolumesChinese +
-    watchedValues.nonPurchasedVolumesJapanese +
-    watchedValues.nonPurchasedVolumesKorean +
-    watchedValues.nonPurchasedVolumesNonCJK
+    watchedValues.manonpurchased_volumes_chinese +
+    watchedValues.manonpurchased_volumes_japanese +
+    watchedValues.manonpurchased_volumes_korean +
+    watchedValues.manonpurchased_volumes_noncjk
 
   const titleTotal = purchasedTitlesSubtotal + nonPurchasedTitlesSubtotal
   const volumeTotal = purchasedVolumesSubtotal + nonPurchasedVolumesSubtotal
 
+  const params = useParams()
+  const router = useRouter()
+
   async function onSubmit(values: FormData) {
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Calculate subtotals and totals for submission
+      const submissionData = {
+        ...values,
+        mapurchased_titles_subtotal: purchasedTitlesSubtotal,
+        mapurchased_volumes_subtotal: purchasedVolumesSubtotal,
+        manonpurchased_titles_subtotal: nonPurchasedTitlesSubtotal,
+        manonpurchased_volumes_subtotal: nonPurchasedVolumesSubtotal,
+        matotal_titles: titleTotal,
+        matotal_volumes: volumeTotal,
+        libraryyear: Number(params.libid), // Get from URL params
+      }
 
-      console.log(values)
-      toast("Form submitted successfully")
-    } catch (error) {
-      toast("Something went wrong")
+      const response = await fetch('/api/monographic/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to submit form')
+      }
+
+      const result = await response.json()
+      toast.success('Monographic acquisitions record created successfully!')
+      
+      // Optional: Reset form or redirect
+      form.reset()
+      
+    } catch (error: any) {
+      console.error('Form submission error:', error)
+      toast.error(error.message || 'Something went wrong')
     }
   }
 
@@ -122,7 +156,7 @@ export default function MonographicForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="purchasedTitlesChinese"
+                name="mapurchased_titles_chinese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>01. Purchased Titles Chinese</FormLabel>
@@ -155,7 +189,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedTitlesJapanese"
+                name="mapurchased_titles_japanese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>02. Purchased Titles Japanese</FormLabel>
@@ -188,7 +222,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedTitlesKorean"
+                name="mapurchased_titles_korean"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>03. Purchased Titles Korean</FormLabel>
@@ -221,7 +255,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedTitlesNonCJK"
+                name="mapurchased_titles_noncjk"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>04. Purchased Titles Non-CJK</FormLabel>
@@ -273,7 +307,7 @@ export default function MonographicForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="purchasedVolumesChinese"
+                name="mapurchased_volumes_chinese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>06. Purchased Volumes Chinese</FormLabel>
@@ -306,7 +340,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedVolumesJapanese"
+                name="mapurchased_volumes_japanese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>07. Purchased Volumes Japanese</FormLabel>
@@ -339,7 +373,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedVolumesKorean"
+                name="mapurchased_volumes_korean"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>08. Purchased Volumes Korean</FormLabel>
@@ -372,7 +406,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="purchasedVolumesNonCJK"
+                name="mapurchased_volumes_noncjk"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>09. Purchased Volumes Non-CJK</FormLabel>
@@ -424,7 +458,7 @@ export default function MonographicForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="nonPurchasedTitlesChinese"
+                name="manonpurchased_titles_chinese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>11. Non-Purchased Titles Chinese</FormLabel>
@@ -457,7 +491,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedTitlesJapanese"
+                name="manonpurchased_titles_japanese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>12. Non-Purchased Titles Japanese</FormLabel>
@@ -490,7 +524,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedTitlesKorean"
+                name="manonpurchased_titles_korean"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>13. Non-Purchased Titles Korean</FormLabel>
@@ -523,7 +557,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedTitlesNonCJK"
+                name="manonpurchased_titles_noncjk"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>14. Non-Purchased Titles Non-CJK</FormLabel>
@@ -575,7 +609,7 @@ export default function MonographicForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="nonPurchasedVolumesChinese"
+                name="manonpurchased_volumes_chinese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>16. Non-Purchased Volumes Chinese</FormLabel>
@@ -608,7 +642,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedVolumesJapanese"
+                name="manonpurchased_volumes_japanese"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>17. Non-Purchased Volumes Japanese</FormLabel>
@@ -641,7 +675,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedVolumesKorean"
+                name="manonpurchased_volumes_korean"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>18. Non-Purchased Volumes Korean</FormLabel>
@@ -674,7 +708,7 @@ export default function MonographicForm() {
               />
               <FormField
                 control={form.control}
-                name="nonPurchasedVolumesNonCJK"
+                name="manonpurchased_volumes_noncjk"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>19. Non-Purchased Volumes Non-CJK</FormLabel>
@@ -749,7 +783,7 @@ export default function MonographicForm() {
           <CardContent>
             <FormField
               control={form.control}
-              name="notes"
+              name="manotes"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
