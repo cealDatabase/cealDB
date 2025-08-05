@@ -1,3 +1,4 @@
+
 import { MonographicInstructions } from "@/components/instructions/monographic"
 
 const page = () => {
