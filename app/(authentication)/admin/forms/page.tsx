@@ -70,7 +70,7 @@ const FormsPage = () => {
                 except law libraries, should submit a combined report, and
                 significant data changes must be footnoted. Participants must
                 log in to the CEAL Statistics Database using the registered
-                contact's email and follow the password setup process if
+                contact&apos;s email and follow the password setup process if
                 necessary. New libraries wanting to participate should contact
                 vdoll[at]ku.edu for account setup.
               </p>

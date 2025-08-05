@@ -83,7 +83,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     "Technical processing group",
     "Public services group",
     "Special collections group",
-    'Other (input additional information in "Notes" box at the end of this form)',
+    'Other (input additional information in &quot;Notes&quot; box at the end of this form)',
   ];
 
   const acquisitionOptions = ["On Site", "Centralized", "Out-sourced"];
@@ -100,7 +100,7 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
     };
 
     fetchLibraryTypesandRegions();
-  }, []);
+  }, [data]);
 
   // Handle input changes
   const handleInputChange = (
@@ -220,12 +220,12 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
 
   return (
     <main>
-      <h1 className='text-base font-semibold learning-7 text-gray-900'>
-        Create a library
+      <h1>
+        Create a New Library
       </h1>
       <Container>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <form className='bg-gray-100 rounded-lg pb-8' onSubmit={handleSubmit}>
+          <form className='bg-white rounded-lg pb-8' onSubmit={handleSubmit}>
             <div className='space-y-12'>
               {/* Library Create General Information */}
 
@@ -961,10 +961,10 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                       </option>
                       <option
                         value={
-                          "Other (Add additional information in 'Notes' box at the end fo this form.)"
+                          "Other (Add additional information in &quot;Notes&quot; box at the end of this form.)"
                         }
                       >
-                        Other (Add additional information in "Notes" box at the
+                        Other (Add additional information in &quot;Notes&quot; box at the
                         end of this form.)
                       </option>
                     </select>
@@ -1000,9 +1000,9 @@ const CreateLibraryForm = ({ data }: MyChildComponentProps) => {
                         CJK shelved separately, includes Western language texts
                       </option>
                       <option>
-                        Other (Add additional information in "Notes" box at the
-                        end of this form.)
-                      </option>
+                        Other (Add additional information in &#34;Notes&#34; box at the
+                         end of this form.)
+                       </option>
                     </select>
                   </div>
                 </div>

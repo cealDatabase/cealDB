@@ -42,12 +42,12 @@ export function HeaderComponent({
         aria-label="Global"
       >
         <div className="flex">
-          <a href="/" className="-m-1.5 p-1.5">
+          <Link href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">
               The Council on East Asian Libraries (CEAL) Statistics
             </span>
             <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
-          </a>
+          </Link>
         </div>
         {/* Mobile hamburger button */}
         <div className="flex lg:hidden">
@@ -162,12 +162,12 @@ export function HeaderComponent({
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a href="/" className="-m-1.5 p-1.5">
+            <Link href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">
                 The Council on East Asian Libraries (CEAL) Statistics
               </span>
               <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
-            </a>
+            </Link>
             <button
               type="button"
               className="-m-2.5 rounded-md p-2.5 text-gray-700"

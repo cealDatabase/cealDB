@@ -1,11 +1,7 @@
 export const MonographicInstructions = () => {
   return (
     <>
-      <div className="section text-left text-sky-500" id="monographic">
-        <h3>
-          <strong>Monographic Acquisitions Form (Required)</strong>
-        </h3>
-
+      <div className="section text-left text-stone-600 text-base">
         <p>
           <b><i>Monographic Titles and Volumes Purchased:</i></b><br />
           Report number of titles and volumes purchased.<br />
@@ -50,9 +46,7 @@ export const MonographicInstructions = () => {
         <div className="formitemdesc">
           <p>
             <b>21. Title Total</b>: <span className="sumtxt">(05 + 15)</span><br />
-            <br />
             <b>22. Volume Total</b>: <span className="sumtxt">(10 + 20)</span><br />
-            &nbsp;
           </p>
         </div>
       </div>
