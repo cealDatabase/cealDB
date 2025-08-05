@@ -303,8 +303,10 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
       ),
       cell: ({ row }) => {
         // Gracefully handle missing description / data_source so that rendering never crashes
-        const description = (row.original as { description?: string }).description ?? null;
-        const dataSource = (row.original as { data_source?: string | null }).data_source ?? null;
+        const description =
+          (row.original as { description?: string }).description ?? null;
+        const dataSource =
+          (row.original as { data_source?: string | null }).data_source ?? null;
 
         return (
           <ExpandableTextWithSource
@@ -357,26 +359,43 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
       enableHiding: false,
     },
     ...(roleIdPassIn?.trim() !== "2"
-      ? [{
-        accessorKey: "subscribers",
-        header: ({ column }: { column: any }) => (
-          <DataTableColumnHeader column={column} title='Subscribers' />
-        ),
-        cell: ({ row }: { row: any }) => {
-          const subscribers = row.getValue("subscribers") as string[] | string | null | undefined;
-          if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-            return <span className="text-muted-foreground italic">No subscribers</span>;
-          }
+      ? [
+          {
+            accessorKey: "subscribers",
+            header: ({ column }: { column: any }) => (
+              <DataTableColumnHeader column={column} title='Subscribers' />
+            ),
+            cell: ({ row }: { row: any }) => {
+              const subscribers = row.getValue("subscribers") as
+                | string[]
+                | string
+                | null
+                | undefined;
+              if (
+                !subscribers ||
+                (Array.isArray(subscribers) && subscribers.length === 0)
+              ) {
+                return (
+                  <span className='text-muted-foreground italic'>
+                    No subscribers
+                  </span>
+                );
+              }
 
-          const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
+              const subscriberList = Array.isArray(subscribers)
+                ? subscribers
+                : [String(subscribers)];
 
-          return <ExpandableSubscribers subscribers={subscriberList} />;
-        },
-      }]
+              return <ExpandableSubscribers subscribers={subscriberList} />;
+            },
+          },
+        ]
       : []),
     {
       id: "actions",
-      cell: ({ row }) => <DataTableRowActions row={row} year={year} />,
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} year={year} basePath='ejournal' />
+      ),
     },
   ];
 }
