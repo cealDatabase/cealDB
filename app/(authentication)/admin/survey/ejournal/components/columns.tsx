@@ -177,7 +177,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
         <DataTableColumnHeader column={column} title='Counts' />
       ),
       cell: ({ row }) => (
-        <div className='max-w-[200px]'>{row.getValue("counts")}</div>
+        <div className='max-w-[80px]'>{row.getValue("counts")}</div>
       ),
       enableSorting: true,
       enableHiding: false,
@@ -228,6 +228,21 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
       },
     },
     {
+      accessorKey: "series",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Series' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='max-w-[500px] font-medium'>
+              {row.getValue("series")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "subtitle",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Subtitle' />
@@ -235,9 +250,10 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
       cell: ({ row }) => {
         return (
           <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("subtitle")}
-            </span>
+            <span 
+              className='max-w-[500px] font-medium'
+              dangerouslySetInnerHTML={{ __html: row.getValue("subtitle") || '' }}
+            />
           </div>
         );
       },
@@ -326,21 +342,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listE
       },
     },
 
-    {
-      accessorKey: "series",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Series' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='max-w-[500px] font-medium'>
-              {row.getValue("series")}
-            </span>
-          </div>
-        );
-      },
-    },
+
     {
       accessorKey: "vendor",
       header: ({ column }) => (

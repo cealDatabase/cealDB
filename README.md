@@ -1,57 +1,220 @@
+# cealDB - Library Database Management System
+
+A comprehensive library database management system built with Next.js, Prisma, and PostgreSQL. This application provides forms and interfaces for managing various aspects of library collections including monographic acquisitions, serials, electronic resources, and more.
+
+## 🚀 Features
+
+- **Monographic Acquisitions Management** - Track purchased and non-purchased titles and volumes by language
+- **Serials Management** - Manage serial publications and subscriptions
+- **Electronic Resources** - Handle e-books, e-journals, and other digital collections
+- **Personnel & Fiscal Support** - Track library staffing and budget information
+- **Multi-language Support** - Specialized handling for Chinese, Japanese, Korean, and Non-CJK materials
+- **Responsive UI** - Built with Tailwind CSS and shadcn/ui components
+- **Type-safe Database** - Prisma ORM with TypeScript for robust data handling
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Database**: PostgreSQL with Prisma ORM
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Forms**: React Hook Form with Zod validation
+- **UI Components**: Radix UI primitives
+- **Authentication**: Built-in admin authentication system
+- **Deployment**: Vercel-ready with PostgreSQL
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL database
+- npm/yarn/pnpm package manager
+
+## ⚡ Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd cealDB
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 3. Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/cealdb"
+
+# Next.js
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Add other environment variables as needed
+```
+
+### 4. Database Setup
+
+```bash
+# Generate Prisma client, push schema, and seed database
+npm run prisma
+
+# Or run individually:
+npx prisma generate --schema=./prisma/schema
+npx prisma db push --force-reset --schema=./prisma/schema
+npx prisma db seed
+```
+
+### 5. Start Development Server
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 📁 Project Structure
+
+```
+cealDB/
+├── app/                          # Next.js App Router
+│   ├── (authentication)/         # Protected admin routes
+│   │   └── admin/
+│   │       └── forms/            # Form management pages
+│   └── api/                      # API routes
+│       ├── monographic/          # Monographic acquisitions API
+│       └── [other-apis]/         # Other API endpoints
+├── components/                   # Reusable UI components
+│   ├── forms/                    # Form components
+│   │   └── monographic-form.tsx  # Monographic acquisitions form
+│   └── ui/                       # shadcn/ui components
+├── prisma/                       # Database schema and migrations
+│   └── schema/                   # Modular Prisma schemas
+│       ├── monographic.prisma    # Monographic acquisitions schema
+│       ├── serials.prisma        # Serials schema
+│       ├── electronic.prisma     # Electronic resources schema
+│       └── [other-schemas]/      # Additional schemas
+├── lib/                          # Utility functions
+├── types/                        # TypeScript type definitions
+└── public/                       # Static assets
+```
+
+## 🗄️ Database Schema
+
+The application uses a modular Prisma schema approach with separate files for different domains:
+
+- **Monographic Acquisitions** (`monographic.prisma`) - Books and monographic materials
+- **Serials** (`serials.prisma`) - Periodicals and continuing resources
+- **Electronic Resources** (`electronic.prisma`) - Digital collections
+- **Personnel Support** (`personnel_support.prisma`) - Staffing information
+- **Fiscal Support** (`fiscal_support.prisma`) - Budget and financial data
+- **Library Management** (`library.prisma`) - Library and year information
+
+## 📝 Forms and Data Entry
+
+### Monographic Acquisitions Form
+
+The monographic acquisitions form allows tracking of:
+
+- **Purchased Titles & Volumes** by language (Chinese, Japanese, Korean, Non-CJK)
+- **Non-Purchased Titles & Volumes** by language
+- **Automatic Calculations** for subtotals and totals
+- **Notes** for additional information
+- **Integration** with library year data
+
+**API Endpoint**: `POST /api/monographic/create`
+
+**Form Location**: `/admin/forms/[libid]/monographic`
+
+### Form Validation
+
+All forms use Zod schema validation with:
+- Type-safe field definitions
+- Minimum value constraints
+- Required field validation
+- Custom error messages
+
+## 🔧 Available Scripts
+
+```bash
+# Development
+npm run dev          # Start development server with Turbopack
+
+# Database
+npm run prisma       # Generate client, push schema, and seed
+
+# Production
+npm run build        # Build for production
+npm start           # Start production server
+
+# Code Quality
+npm run lint        # Run ESLint
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Connect your repository to Vercel
+2. Set up environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Manual Deployment
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🔐 Authentication
+
+The application includes an admin authentication system protecting form routes under `/admin`. Configure authentication settings in your environment variables.
+
+## 📊 Data Management
+
+- **Prisma Studio**: Run `npx prisma studio` to view and edit data
+- **Database Migrations**: Use `npx prisma migrate` for schema changes
+- **Seeding**: Custom seed scripts populate initial data
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+
+1. Check the [Issues](../../issues) page
+2. Review the [Documentation](../../wiki)
+3. Contact the development team
+
+## 🔄 Recent Updates
+
+- ✅ **Monographic Form Integration** - Complete form with API integration
+- ✅ **Prisma Schema Alignment** - All field names match database schema
+- ✅ **Type Safety** - Full TypeScript support with Zod validation
+- ✅ **Modern UI** - Updated with shadcn/ui components
+
 ---
-name: Vercel Postgres + Prisma Next.js Starter
-slug: postgres-prisma
-description: Simple Next.js template that uses Vercel Postgres as the database and Prisma as the ORM.
-framework: Next.js
-useCase: Starter
-css: Tailwind
-database: Vercel Postgres
-deployUrl: https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fstorage%2Fpostgres-prisma&project-name=postgres-prisma&repository-name=postgres-prisma&demo-title=Vercel%20Postgres%20%2B%20Prisma%20Next.js%20Starter&demo-description=Simple%20Next.js%20template%20that%20uses%20Vercel%20Postgres%20as%20the%20database%20and%20Prisma%20as%20the%20ORM.&demo-url=https%3A%2F%2Fpostgres-prisma.vercel.app%2F&demo-image=https%3A%2F%2Fpostgres-prisma.vercel.app%2Fopengraph-image.png&stores=%5B%7B"type"%3A"postgres"%7D%5D
-demoUrl: https://postgres-prisma.vercel.app/
-relatedTemplates:
-  - postgres-starter
-  - postgres-kysely
-  - postgres-sveltekit
----
 
-# Vercel Postgres + Prisma Next.js Starter
-
-Simple Next.js template that uses [Vercel Postgres](https://vercel.com/postgres) as the database and [Prisma](https://prisma.io/) as the ORM.
-
-## Demo
-
-https://postgres-prisma.vercel.app/
-
-## How to Use
-
-You can choose from one of the following two methods to use this repository:
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fstorage%2Fpostgres-prisma&project-name=postgres-prisma&repository-name=postgres-prisma&demo-title=Vercel%20Postgres%20%2B%20Prisma%20Next.js%20Starter&demo-description=Simple%20Next.js%20template%20that%20uses%20Vercel%20Postgres%20as%20the%20database%20and%20Prisma%20as%20the%20ORM.&demo-url=https%3A%2F%2Fpostgres-prisma.vercel.app%2F&demo-image=https%3A%2F%2Fpostgres-prisma.vercel.app%2Fopengraph-image.png&stores=%5B%7B"type"%3A"postgres"%7D%5D)
-
-### Clone and Deploy
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [pnpm](https://pnpm.io/installation) to bootstrap the example:
-
-```bash
-pnpm create next-app --example https://github.com/vercel/examples/tree/main/storage/postgres-prisma
-```
-
-Once that's done, copy the .env.example file in this directory to .env.local (which will be ignored by Git):
-
-```bash
-cp .env.example .env.local
-```
-
-Then open `.env.local` and set the environment variables to match the ones in your Vercel Storage Dashboard.
-
-Next, run Next.js in development mode:
-
-```bash
-pnpm dev
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples) ([Documentation](https://nextjs.org/docs/deployment)).
+**Built with ❤️ for library management**
