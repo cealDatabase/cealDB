@@ -1,43 +1,43 @@
 export const forms = [
   {
     title: "Monographic Acquisitions",
-    href: "/admin/forms/monographic",
+    href: "monographic",
   },
   {
     title: "Physical Volume Holdings",
-    href: "/admin/forms/volumeHoldings",
+    href: "volumeHoldings",
   },
   {
     title: "Serial Titles: Purchased and Non-Purchased",
-    href: "/admin/forms/serials",
+    href: "serials",
   },
   {
     title: "Holdings of Other Materials",
-    href: "/admin/forms/otherHoldings",
+    href: "otherHoldings",
   },
   {
     title: "Unprocessed BackLog Materials (volumes or pieces)",
-    href: "/admin/forms/unprocessed",
+    href: "unprocessed",
   },
   {
     title: "Fiscal Support",
-    href: "/admin/forms/fiscal",
+    href: "fiscal",
   },
   {
     title: "Personnel Support",
-    href: "/admin/forms/personnel",
+    href: "personnel",
   },
   {
     title: "Public Services",
-    href: "/admin/forms/publicServices",
+    href: "publicServices",
   },
   {
     title: "Electronic",
-    href: "/admin/forms/electronic",
+    href: "electronic",
   },
   {
     title: "Electronic Books",
-    href: "/admin/forms/electronicBooks",
+    href: "electronicBooks",
   },
 ];
 
