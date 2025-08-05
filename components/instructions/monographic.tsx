@@ -1,11 +1,7 @@
 export const MonographicInstructions = () => {
   return (
     <>
-      <div className="section text-left text-sky-500 text-base" id="monographic">
-        <h3>
-          <strong>Monographic Acquisitions Form (Required)</strong>
-        </h3>
-
+      <div className="section text-left text-stone-600 text-base">
         <p>
           <b><i>Monographic Titles and Volumes Purchased:</i></b><br />
           Report number of titles and volumes purchased.<br />

@@ -28,12 +28,12 @@ export default function Index() {
               </div>
               <div className="mt-10 flex items-center gap-x-6">
                 <Button href="/started" className="bg-red-400 hover:bg-red-600">Get started</Button>
-                <a
+                <Link
                   href="/libraries"
                   className="text-sm font-semibold leading-6 text-gray-900"
                 >
                   Libraries <span aria-hidden="true">→</span>
-                </a>
+                </Link>
               </div>
             </div>
             <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">

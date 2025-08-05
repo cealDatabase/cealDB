@@ -15,7 +15,7 @@ export const VolumeHoldingsInstructions = () => {
                 <p><b><i>Volumes added:</i></b><br />
                     <span className="highlight"><b><u>Include</u>:</b> only volumes cataloged, classified, and made ready for use.</span></p>
 
-                <p><span >*The values of fields 01-05 are automatically filled with previous year's data from CEAL Database (if available). *</span></p>
+                <p><span >*The values of fields 01-05 are automatically filled with previous year&apos;s data from CEAL Database (if available). *</span></p>
 
                 <div className="formitemdesc">
                     <p >01. Previous Chinese*:&nbsp;<br />

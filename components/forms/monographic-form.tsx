@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -44,7 +41,6 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function MonographicForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema) as any,
@@ -73,35 +69,34 @@ export default function MonographicForm() {
   const watchedValues = form.watch()
 
   // Calculate subtotals and totals
-  const purchasedTitlesSubtotal = 
-    watchedValues.purchasedTitlesChinese + 
-    watchedValues.purchasedTitlesJapanese + 
-    watchedValues.purchasedTitlesKorean + 
+  const purchasedTitlesSubtotal =
+    watchedValues.purchasedTitlesChinese +
+    watchedValues.purchasedTitlesJapanese +
+    watchedValues.purchasedTitlesKorean +
     watchedValues.purchasedTitlesNonCJK
 
-  const purchasedVolumesSubtotal = 
-    watchedValues.purchasedVolumesChinese + 
-    watchedValues.purchasedVolumesJapanese + 
-    watchedValues.purchasedVolumesKorean + 
+  const purchasedVolumesSubtotal =
+    watchedValues.purchasedVolumesChinese +
+    watchedValues.purchasedVolumesJapanese +
+    watchedValues.purchasedVolumesKorean +
     watchedValues.purchasedVolumesNonCJK
 
-  const nonPurchasedTitlesSubtotal = 
-    watchedValues.nonPurchasedTitlesChinese + 
-    watchedValues.nonPurchasedTitlesJapanese + 
-    watchedValues.nonPurchasedTitlesKorean + 
+  const nonPurchasedTitlesSubtotal =
+    watchedValues.nonPurchasedTitlesChinese +
+    watchedValues.nonPurchasedTitlesJapanese +
+    watchedValues.nonPurchasedTitlesKorean +
     watchedValues.nonPurchasedTitlesNonCJK
 
-  const nonPurchasedVolumesSubtotal = 
-    watchedValues.nonPurchasedVolumesChinese + 
-    watchedValues.nonPurchasedVolumesJapanese + 
-    watchedValues.nonPurchasedVolumesKorean + 
+  const nonPurchasedVolumesSubtotal =
+    watchedValues.nonPurchasedVolumesChinese +
+    watchedValues.nonPurchasedVolumesJapanese +
+    watchedValues.nonPurchasedVolumesKorean +
     watchedValues.nonPurchasedVolumesNonCJK
 
   const titleTotal = purchasedTitlesSubtotal + nonPurchasedTitlesSubtotal
   const volumeTotal = purchasedVolumesSubtotal + nonPurchasedVolumesSubtotal
 
   async function onSubmit(values: FormData) {
-    setIsSubmitting(true)
 
     try {
       // Simulate API call
@@ -111,8 +106,6 @@ export default function MonographicForm() {
       toast("Form submitted successfully")
     } catch (error) {
       toast("Something went wrong")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -122,7 +115,7 @@ export default function MonographicForm() {
         {/* Purchased Titles */}
         <Card>
           <CardHeader>
-            <CardTitle>Purchased Titles</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Purchased Titles</CardTitle>
             <CardDescription>Enter the number of purchased titles by language.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -139,7 +132,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -158,7 +165,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -177,7 +198,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -196,7 +231,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -217,7 +266,7 @@ export default function MonographicForm() {
         {/* Purchased Volumes */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl text-green-800 font-bold">Purchased Volumes</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Purchased Volumes</CardTitle>
             <CardDescription>Enter the number of purchased volumes by language.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -234,7 +283,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -253,7 +316,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -272,7 +349,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -291,7 +382,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -312,7 +417,7 @@ export default function MonographicForm() {
         {/* Non-Purchased Titles */}
         <Card>
           <CardHeader>
-            <CardTitle>Non-Purchased Titles</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Non-Purchased Titles</CardTitle>
             <CardDescription>Enter the number of non-purchased titles by language.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -329,7 +434,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -348,7 +467,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -367,7 +500,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -386,7 +533,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -407,7 +568,7 @@ export default function MonographicForm() {
         {/* Non-Purchased Volumes */}
         <Card>
           <CardHeader>
-            <CardTitle>Non-Purchased Volumes</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Non-Purchased Volumes</CardTitle>
             <CardDescription>Enter the number of non-purchased volumes by language.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -424,7 +585,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -443,7 +618,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -462,7 +651,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -481,7 +684,21 @@ export default function MonographicForm() {
                         min="0"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value === 0 ? '' : field.value}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                          field.onChange(value)
+                        }}
+                        onFocus={(e) => {
+                          if (e.target.value === '0') {
+                            e.target.value = ''
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === '') {
+                            field.onChange(0)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -502,7 +719,7 @@ export default function MonographicForm() {
         {/* Totals */}
         <Card>
           <CardHeader>
-            <CardTitle>Totals</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Totals</CardTitle>
             <CardDescription>Calculated totals for all categories.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -526,7 +743,7 @@ export default function MonographicForm() {
         {/* Notes */}
         <Card>
           <CardHeader>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle className="text-xl text-sky-600 font-bold">Notes</CardTitle>
             <CardDescription>Additional notes or comments about the library data.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -550,8 +767,8 @@ export default function MonographicForm() {
         </Card>
 
         <div className="flex justify-end mb-4">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Library Data"}
+          <Button type="submit">
+            Submit Monographic Data
           </Button>
         </div>
       </form>

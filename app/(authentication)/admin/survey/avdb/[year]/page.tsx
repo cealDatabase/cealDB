@@ -33,7 +33,7 @@ export default async function AVListPage(
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this
                             list is linked to Form 4: Holdings of Other Materials and Form 9:
                             Electronic Resources. If you subscribe to a subset of one of these
-                            collections, click "customize", and then enter the appropriate counts
+                            collections, click &quot;customize&quot;, and then enter the appropriate counts
                             in each of the fields.
                         </p>
                     </div>
