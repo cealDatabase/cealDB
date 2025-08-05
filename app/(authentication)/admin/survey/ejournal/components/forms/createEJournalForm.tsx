@@ -17,151 +17,148 @@ export default function CreateEJournalForm({
   const [form, setForm] = useState({
     title: "",
     subtitle: "",
+    series: "",
+    sub_series_number: "",
+    vendor: "",
     description: "",
     notes: "",
     publisher: "",
     data_source: "",
     cjk_title: "",
     romanized_title: "",
-    type: "",
-    counts: 0,
-    language: [] as string[],
+    journals: 0,
+    dbs: 0,
+    language: [] as number[],
     is_global: false,
   });
+  const [status, setStatus] = useState("");
 
+  /*──────── input helpers ────────*/
+  const setVal = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  ) => setVal(e.target.name, e.target.value);
+  const toggleLang = (id: number) =>
+    setVal(
+      "language",
+      form.language.includes(id)
+        ? form.language.filter((v) => v !== id)
+        : [...form.language, id]
+    );
 
-  const handleCheckboxChange = (value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      language: prev.language.includes(value)
-        ? prev.language.filter((v) => v !== value)
-        : [...prev.language, value],
-    }));
-  };
-
+  /*──────── submit ───────────────*/
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const payload = {
-      ...form,
-      libraryyear: selectedYear, // 👈 correct key
-      counts: Number(form.counts), // make sure it’s a number
-      language: form.language.map(Number), // ["1","2"] → [1,2]
-    };
-
+    setStatus("Saving…");
     const res = await fetch("/api/ejournal/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...form,
+        libraryyear: selectedYear,
+        journals: Number(form.journals),
+        dbs: form.dbs ? Number(form.dbs) : null,
+      }),
     });
-
-    const data = await res.json(); // grab the server response
-
+    const data = await res.json();
     if (res.ok) {
       router.push(`/admin/survey/ejournal/${selectedYear}`);
     } else {
-      alert(`Failed: ${data.error ?? "unknown error"}`);
+      setStatus(data.error ?? "Failed");
+      alert(`Failed: ${data.detail ?? data.error}`);
     }
   };
 
+  /*──────── UI ──────────────────*/
   return (
-    <form onSubmit={handleSubmit} className='grid gap-4 max-w-2xl'>
-      <Input
-        name='title'
-        value={form.title}
-        onChange={handleChange}
-        placeholder='Title'
-      />
-      <Input
-        name='subtitle'
-        value={form.subtitle}
-        onChange={handleChange}
-        placeholder='Subtitle'
-      />
-      <Input
-        name='description'
-        value={form.description}
-        onChange={handleChange}
-        placeholder='Description'
-      />
-      <Input
-        name='notes'
-        value={form.notes}
-        onChange={handleChange}
-        placeholder='Notes'
-      />
-      <Input
-        name='publisher'
-        value={form.publisher}
-        onChange={handleChange}
-        placeholder='Publisher'
-      />
-      <Input
-        name='data_source'
-        value={form.data_source}
-        onChange={handleChange}
-        placeholder='Data Source'
-      />
-      <Input
-        name='cjk_title'
-        value={form.cjk_title}
-        onChange={handleChange}
-        placeholder='CJK Title'
-      />
-      <Input
-        name='romanized_title'
-        value={form.romanized_title}
-        onChange={handleChange}
-        placeholder='Romanized Title'
-      />
-      <Input
-        name='type'
-        value={form.type}
-        onChange={handleChange}
-        placeholder='Type'
-      />
-      <Input
-        name='counts'
-        type='number'
-        value={form.counts}
-        onChange={handleChange}
-        placeholder='Counts'
-      />
+    <form onSubmit={handleSubmit} className='grid gap-5 max-w-2xl'>
+      {[
+        ["Title", "title"],
+        ["Subtitle", "subtitle"],
+        ["Series", "series"],
+        ["Sub-series No.", "sub_series_number"],
+        ["Vendor", "vendor"],
+        ["Publisher", "publisher"],
+        ["Data Source", "data_source"],
+        ["CJK Title", "cjk_title"],
+        ["Romanized Title", "romanized_title"],
+      ].map(([lbl, key]) => (
+        <div key={key} className='grid gap-1.5'>
+          <Label htmlFor={key}>{lbl}</Label>
+          <Input
+            id={key}
+            name={key}
+            value={(form as any)[key]}
+            onChange={handleChange}
+          />
+        </div>
+      ))}
 
-      <fieldset className='border p-3 rounded'>
-        <legend className='text-sm font-medium text-sky-700 mb-2'>
-          Languages
-        </legend>
+      {/* Description & Notes */}
+      {["description", "notes"].map((k) => (
+        <div key={k} className='grid gap-1.5'>
+          <Label htmlFor={k}>{k.charAt(0).toUpperCase() + k.slice(1)}</Label>
+          <textarea
+            id={k}
+            name={k}
+            className='border rounded p-2 w-full min-h-[80px] resize-y'
+            value={(form as any)[k]}
+            onChange={(e) => setVal(k, e.target.value)}
+          />
+        </div>
+      ))}
+
+      {/* Journals + DBs */}
+      <div className='grid sm:grid-cols-2 gap-5'>
+        <div className='grid gap-1.5'>
+          <Label htmlFor='journals'># Journals</Label>
+          <Input
+            id='journals'
+            name='journals'
+            type='number'
+            value={form.journals}
+            onChange={handleChange}
+          />
+        </div>
+        <div className='grid gap-1.5'>
+          <Label htmlFor='dbs'># Databases</Label>
+          <Input
+            id='dbs'
+            name='dbs'
+            type='number'
+            value={form.dbs}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
+      {/* Languages */}
+      <fieldset className='border p-4 rounded space-y-2'>
+        <legend className='text-sm font-medium text-sky-700'>Languages</legend>
         {languages.map((lang) => (
           <div key={lang.value} className='flex items-center space-x-2'>
             <Checkbox
-              checked={form.language.includes(String(lang.value))}
-              onCheckedChange={() => handleCheckboxChange(String(lang.value))}
+              id={`lang-${lang.value}`}
+              checked={form.language.includes(lang.value)}
+              onCheckedChange={() => toggleLang(lang.value)}
             />
-            <Label>{lang.label}</Label>
+            <Label htmlFor={`lang-${lang.value}`}>{lang.label}</Label>
           </div>
         ))}
       </fieldset>
 
+      {/* Global toggle */}
       <div className='flex items-center space-x-2'>
         <Checkbox
+          id='is_global'
           checked={form.is_global}
-          onCheckedChange={() =>
-            setForm((prev) => ({ ...prev, is_global: !prev.is_global }))
-          }
+          onCheckedChange={() => setVal("is_global", !form.is_global)}
         />
-        <Label>Is Global</Label>
+        <Label htmlFor='is_global'>Is Global</Label>
       </div>
 
-      <Button type='submit' className='mt-4'>
-        Submit New Entry
-      </Button>
+      <Button type='submit'>Create E-Journal Entry</Button>
+      {status && <p className='text-sm text-red-600'>{status}</p>}
     </form>
   );
 }
