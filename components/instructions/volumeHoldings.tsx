@@ -1,7 +1,7 @@
 export const VolumeHoldingsInstructions = () => {
     return (
         <div>
-            <div className="section" id="volumeHoldings"><h3 className="underline"><strong>Physical Total Volume Holdings Form (Required)</strong></h3>
+            <div className="section text-left text-sky-500 text-base" id="volumeHoldings"><h3 className="underline"><strong>Physical Total Volume Holdings Form (Required)</strong></h3>
 
                 <p><strong>Previously reported monographs held by the institution will be supplied by the CEAL database</strong>. <u>New libraries</u>&nbsp;need to&nbsp;fill out the data according to individual collections information. Contact vdoll@ku.edu for questions.</p>
 
