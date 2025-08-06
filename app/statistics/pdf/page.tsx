@@ -96,7 +96,7 @@ function PublishedPDFs() {
                       return pdfitem.linkValue.map((singleItem) => {
                         if (pdfitem.yearValue === year) {
                           return (
-                            <div>
+                            <div key={`${pdfitem.yearValue}-${singleItem.title}`}>
                               <Link href={singleItem.link}>
                                 {singleItem.title}
                               </Link>{" "}

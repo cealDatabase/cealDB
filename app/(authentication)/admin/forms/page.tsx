@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { Container } from "@/components/Container";
 import Link from "next/link";
 import { forms, instructionGroup } from "@/constant/form";
@@ -13,7 +14,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-const FormsPage = () => {
+const FormsPage = async () => {
+  const cookieStore = await cookies();
+  const library = cookieStore.get("library");
+  const libid = library?.value;
+
   return (
     <main>
       <h1>Forms Page</h1>
@@ -27,24 +32,24 @@ const FormsPage = () => {
               <ul className="mt-6 space-y-4 sm:col-start-2 col-span-12 sm:col-span-6">
                 {forms.map((form, index) => (
                   <li key={index} className="list-decimal">
-                    <Link href={form.href}>{form.title}</Link>
+                    <Link href={`/admin/forms/${libid}/${form.href}`}>{form.title}</Link>
                   </li>
                 ))}
               </ul>
               <ul className="mt-6 space-y-4 col-span-12 sm:col-span-4">
                 <li key="ebook" className="list-disc">
-                  <Link href="/admin/forms/ebookedit">
+                  <Link href={`/admin/forms/${libid}/ebookedit`}>
                     E-Book Database by Subscription for McGill Library in 2024
                   </Link>
                 </li>
                 <li key="ejournal" className="list-disc">
-                  <Link href="/admin/forms/ejournaledit">
+                  <Link href={`/admin/forms/${libid}/ejournaledit`}>
                     E-Journal Database by Subscription for McGill Library in
                     2024
                   </Link>
                 </li>
                 <li key="avdb" className="list-disc">
-                  <Link href="/admin/forms/avdbedit">
+                  <Link href={`/admin/forms/${libid}/avdbedit`}>
                     Audio/Visual Database by Subscription for McGill Library in
                     2024
                   </Link>
@@ -70,7 +75,7 @@ const FormsPage = () => {
                 except law libraries, should submit a combined report, and
                 significant data changes must be footnoted. Participants must
                 log in to the CEAL Statistics Database using the registered
-                contact's email and follow the password setup process if
+                contact&apos;s email and follow the password setup process if
                 necessary. New libraries wanting to participate should contact
                 vdoll[at]ku.edu for account setup.
               </p>
