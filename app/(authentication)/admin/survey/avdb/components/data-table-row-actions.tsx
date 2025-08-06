@@ -22,7 +22,7 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
     const ok = confirm(`Delete “${row.original.title}” for ${year}?`);
     if (!ok) return;
 
-    const res = await fetch(`/api/av/${row.original.id}`, { method: "DELETE" });
+    const res = await fetch(`/api/av/delete/${row.original.id}/${year}`, { method: "DELETE" });
     const data = await res.json();
 
     if (res.ok) {
