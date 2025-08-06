@@ -106,11 +106,12 @@ const openNewYearForm = async () => {
 }
 
 const adminHelp = () => {
+    const currentYear = new Date().getFullYear();
     return (
         <>
             <h1>Admin Help</h1>
             <Container>
-                <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for New Year</Button>
+                <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>
