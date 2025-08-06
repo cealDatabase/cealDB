@@ -25,143 +25,165 @@ export default function CreateAVForm({
     romanized_title: "",
     type: "",
     counts: 0,
-    language: [] as string[],
+    language: [] as number[],
     is_global: false,
   });
+  const [status, setStatus] = useState("");
 
+  /*── handlers ───────────────────────────────────────────────*/
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  ) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleCheckboxChange = (value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      language: prev.language.includes(value)
-        ? prev.language.filter((v) => v !== value)
-        : [...prev.language, value],
+  const toggleLang = (id: number) =>
+    setForm((p) => ({
+      ...p,
+      language: p.language.includes(id)
+        ? p.language.filter((v) => v !== id)
+        : [...p.language, id],
     }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const payload = {
-      ...form,
-      libraryyear: selectedYear, // 👈 correct key
-      counts: Number(form.counts), // make sure it’s a number
-      language: form.language.map(Number), // ["1","2"] → [1,2]
-    };
-
     const res = await fetch("/api/av/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...form,
+        libraryyear: selectedYear,
+        counts: Number(form.counts),
+        language: form.language,
+      }),
     });
-
-    const data = await res.json(); // grab the server response
-
-    if (res.ok) {
-      router.push(`/admin/survey/avdb/${selectedYear}`);
-    } else {
-      alert(`Failed: ${data.error ?? "unknown error"}`);
+    const data = await res.json();
+    if (res.ok) router.push(`/admin/survey/avdb/${selectedYear}`);
+    else {
+      setStatus(data.error ?? "Failed");
+      alert(`Failed: ${data.detail ?? data.error}`);
     }
   };
 
+  /*── UI ─────────────────────────────────────────────────────*/
   return (
-    <form onSubmit={handleSubmit} className='grid gap-4 max-w-2xl'>
-      <Input
-        name='title'
-        value={form.title}
-        onChange={handleChange}
-        placeholder='Title'
-      />
-      <Input
-        name='subtitle'
-        value={form.subtitle}
-        onChange={handleChange}
-        placeholder='Subtitle'
-      />
-      <Input
-        name='description'
-        value={form.description}
-        onChange={handleChange}
-        placeholder='Description'
-      />
-      <Input
-        name='notes'
-        value={form.notes}
-        onChange={handleChange}
-        placeholder='Notes'
-      />
-      <Input
-        name='publisher'
-        value={form.publisher}
-        onChange={handleChange}
-        placeholder='Publisher'
-      />
-      <Input
-        name='data_source'
-        value={form.data_source}
-        onChange={handleChange}
-        placeholder='Data Source'
-      />
-      <Input
-        name='cjk_title'
-        value={form.cjk_title}
-        onChange={handleChange}
-        placeholder='CJK Title'
-      />
-      <Input
-        name='romanized_title'
-        value={form.romanized_title}
-        onChange={handleChange}
-        placeholder='Romanized Title'
-      />
-      <Input
-        name='type'
-        value={form.type}
-        onChange={handleChange}
-        placeholder='Type'
-      />
-      <Input
-        name='counts'
-        type='number'
-        value={form.counts}
-        onChange={handleChange}
-        placeholder='Counts'
-      />
+    <form onSubmit={handleSubmit} className='grid gap-5 max-w-2xl'>
+      {/* Title */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='title'>Title</Label>
+        <Input
+          id='title'
+          name='title'
+          value={form.title}
+          onChange={handleChange}
+        />
+      </div>
 
-      <fieldset className='border p-3 rounded'>
-        <legend className='text-sm font-medium text-sky-700 mb-2'>
-          Languages
-        </legend>
+      {/* Subtitle */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='subtitle'>Subtitle</Label>
+        <Input
+          id='subtitle'
+          name='subtitle'
+          value={form.subtitle}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Publisher */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='publisher'>Publisher</Label>
+        <Input
+          id='publisher'
+          name='publisher'
+          value={form.publisher}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Data Source */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='data_source'>Data Source</Label>
+        <Input
+          id='data_source'
+          name='data_source'
+          value={form.data_source}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* CJK + Romanized titles in two-column grid */}
+      <div className='grid sm:grid-cols-2 gap-5'>
+        <div className='grid gap-1.5'>
+          <Label htmlFor='cjk_title'>CJK Title</Label>
+          <Input
+            id='cjk_title'
+            name='cjk_title'
+            value={form.cjk_title}
+            onChange={handleChange}
+          />
+        </div>
+        <div className='grid gap-1.5'>
+          <Label htmlFor='romanized_title'>Romanized Title</Label>
+          <Input
+            id='romanized_title'
+            name='romanized_title'
+            value={form.romanized_title}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
+      {/* Type */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='type'>Type</Label>
+        <Input
+          id='type'
+          name='type'
+          value={form.type}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Counts */}
+      <div className='grid gap-1.5'>
+        <Label htmlFor='counts'>Counts</Label>
+        <Input
+          id='counts'
+          name='counts'
+          type='number'
+          value={form.counts}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Languages */}
+      <fieldset className='border p-4 rounded space-y-2'>
+        <legend className='text-sm font-medium text-sky-700'>Languages</legend>
         {languages.map((lang) => (
           <div key={lang.value} className='flex items-center space-x-2'>
             <Checkbox
-              checked={form.language.includes(String(lang.value))}
-              onCheckedChange={() => handleCheckboxChange(String(lang.value))}
+              id={`lang-${lang.value}`}
+              checked={form.language.includes(lang.value)}
+              onCheckedChange={() => toggleLang(lang.value)}
             />
-            <Label>{lang.label}</Label>
+            <Label htmlFor={`lang-${lang.value}`}>{lang.label}</Label>
           </div>
         ))}
       </fieldset>
 
+      {/* Global toggle */}
       <div className='flex items-center space-x-2'>
         <Checkbox
+          id='is_global'
           checked={form.is_global}
           onCheckedChange={() =>
-            setForm((prev) => ({ ...prev, is_global: !prev.is_global }))
+            setForm((p) => ({ ...p, is_global: !p.is_global }))
           }
         />
-        <Label>Is Global</Label>
+        <Label htmlFor='is_global'>Is Global</Label>
       </div>
 
-      <Button type='submit' className='mt-4'>
-        Submit New Entry
-      </Button>
+      <Button type='submit'>Create AV Entry</Button>
+      {status && <p className='text-sm text-red-600'>{status}</p>}
     </form>
   );
 }
