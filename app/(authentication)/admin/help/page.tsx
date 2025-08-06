@@ -1,13 +1,117 @@
+'use client'
+
+import { Container } from '@/components/Container'
+import { Button } from '@/components/Button'
 import React from 'react'
 
+const openNewYearForm = async () => {
+    // Show loading message
+    const loadingMessage = 'Processing... Opening new year forms for all libraries.';
+    console.log(loadingMessage);
+
+    // You could also show a loading indicator in the UI here
+    const button = document.querySelector('button');
+    const originalText = button?.textContent;
+    if (button) {
+        button.textContent = 'Processing...';
+        button.disabled = true;
+    }
+
+    try {
+        console.log(' Starting new year form opening process...');
+        console.log(' Connecting to database...');
+
+        const response = await fetch('/api/admin/open-new-year', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log(' API Response:', result);
+
+            // Create detailed success message
+            let message = ` Successfully opened ${result.year} forms!\n\n`;
+            message += ` Summary:\n`;
+            message += `• Total Libraries: ${result.totalLibraries}\n`;
+            message += `• New Records Created: ${result.count}\n`;
+            message += `• Existing Records Skipped: ${result.skipped || 0}\n`;
+            message += `• Total Active Records for ${result.year}: ${result.totalActiveRecords}\n\n`;
+
+            if (result.summary) {
+                message += ` Breakdown:\n`;
+                message += `• Created: ${result.summary.created}\n`;
+                message += `• Skipped: ${result.summary.skipped}\n`;
+                if (result.summary.errors > 0) {
+                    message += `• Errors: ${result.summary.errors}\n`;
+                }
+            }
+
+            // Show detailed information in console
+            if (result.details && result.details.length > 0) {
+                console.log(' Detailed Results:');
+                result.details.forEach((detail: any, index: number) => {
+                    console.log(`${index + 1}. ${detail.library_name} (ID: ${detail.library_id}) - ${detail.action.toUpperCase()}`);
+                    if (detail.reason) {
+                        console.log(`   Reason: ${detail.reason}`);
+                    }
+                    if (detail.error) {
+                        console.log(`   Error: ${detail.error}`);
+                    }
+                });
+            }
+
+            alert(message);
+            console.log(' Process completed successfully!');
+
+        } else {
+            // Handle HTTP errors
+            let errorMessage = 'Error opening new year forms.';
+            try {
+                const errorData = await response.json();
+                console.error(' API Error Response:', errorData);
+                errorMessage += `\n\nError Details: ${errorData.error || 'Unknown error'}`;
+                if (errorData.detail) {
+                    errorMessage += `\nDetails: ${errorData.detail}`;
+                }
+            } catch (parseError) {
+                console.error(' Could not parse error response:', parseError);
+                errorMessage += `\n\nHTTP Status: ${response.status} ${response.statusText}`;
+            }
+
+            alert(errorMessage);
+            console.error(' Process failed with HTTP error');
+        }
+    } catch (error) {
+        console.error(' Network/Connection Error:', error);
+        let errorMessage = 'Connection error while opening new year forms.';
+
+        if (error instanceof Error) {
+            errorMessage += `\n\nError: ${error.message}`;
+        }
+
+        errorMessage += '\n\nPlease check your internet connection and try again.';
+        alert(errorMessage);
+        console.error(' Process failed with network error');
+    } finally {
+        // Reset button state
+        if (button && originalText) {
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+        console.log(' Process finished - button reset');
+    }
+}
+
 const adminHelp = () => {
+    const currentYear = new Date().getFullYear();
     return (
-        <div className='main'>
-
-            <div className="container">
-
-                <h1 id="cealstatisticsonlinedatabase">CEAL Statistics Online Database</h1>
-
+        <>
+            <h1>Admin Help</h1>
+            <Container>
+                <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>
@@ -210,8 +314,8 @@ const adminHelp = () => {
                     <li>Using the top navigation, click &quot;Admin&quot; -&gt; Manage Files</li>
                     <li>Find the file in the list, to the right of the file name you will see its URL.&nbsp; Copy and paste this as the link to the file.</li>
                 </ol>
-            </div>
-        </div>
+            </Container>
+        </>
     )
 }
 
