@@ -1,50 +1,65 @@
-// Fix all auto-increment sequences after database reset/seed
-const { PrismaClient } = require('@prisma/client');
-
+// scripts/fix-all-sequences.js
+/* eslint-disable no-console */
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-async function fixAllSequences() {
-  try {
-    console.log('🔧 Fixing all auto-increment sequences after database reset...');
-    
-    // List of tables with auto-increment id fields that need sequence fixes
-    const tables = [
-      'Library_Year',
-      'List_AV',
-      'List_AV_Counts',
-      // Add other tables as needed
-    ];
-    
-    for (const table of tables) {
-      try {
-        console.log(`\n📊 Fixing sequence for table: ${table}`);
-        
-        // Get the maximum ID from the table
-        const maxIdQuery = `SELECT COALESCE(MAX(id), 0) as max_id FROM "${table}"`;
-        const maxIdResult = await prisma.$queryRawUnsafe(maxIdQuery);
-        
-        const maxId = maxIdResult[0].max_id;
-        console.log(`   Current max ID: ${maxId}`);
-        
-        // Reset the sequence to start from max_id + 1
-        const nextId = maxId + 1;
-        const sequenceQuery = `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), ${nextId}, false)`;
-        await prisma.$executeRawUnsafe(sequenceQuery);
-        
-        console.log(`   ✅ Reset sequence to start from: ${nextId}`);
-        
-      } catch (error) {
-        console.error(`   ❌ Error fixing sequence for ${table}:`, error.message);
-      }
-    }
-    
-    console.log('\n🎉 All sequences have been processed!');
-    
-  } catch (error) {
-    console.error('❌ Error fixing sequences:', error);
-  } finally {
-    await prisma.$disconnect();
-  }
+const TABLES = [
+  "Library_Year",
+  "List_AV",
+  "List_AV_Counts",
+  "List_EBook",
+  "List_EBook_Counts",
+  "List_EJournal",
+  "List_EJournal_Counts",
+];
+
+async function resetSequenceFor(table) {
+  // 1) get max(id)
+  const [{ max_id }] = await prisma.$queryRawUnsafe(
+    `SELECT COALESCE(MAX(id), 0) AS max_id FROM "${table}";`
+  );
+
+  // 2) set sequence to max(id), mark as "already called"
+  //    => nextval() will return max(id) + 1
+  await prisma.$executeRawUnsafe(
+    `SELECT setval(
+       pg_get_serial_sequence('"${table}"','id'),
+       ${Number(max_id)},
+       TRUE
+     );`
+  );
+
+  // (optional) print the sequence state for sanity
+  const [{ seq_name }] = await prisma.$queryRawUnsafe(
+    `SELECT pg_get_serial_sequence('"${table}"','id') AS seq_name;`
+  );
+  const [{ last_value, is_called }] = await prisma.$queryRawUnsafe(
+    `SELECT last_value, is_called FROM ${seq_name};`
+  );
+
+  console.log(
+    `   ${table}: max_id=${max_id}  seq=${seq_name}  last_value=${last_value}  is_called=${is_called}`
+  );
 }
 
-fixAllSequences();
+async function main() {
+  console.log("🔧 Fixing auto-increment sequences (idempotent)…");
+  for (const table of TABLES) {
+    try {
+      console.log(`\n📊 ${table}`);
+      await resetSequenceFor(table);
+      console.log("   ✅ done");
+    } catch (e) {
+      console.error(`   ❌ failed: ${e.message}`);
+    }
+  }
+  console.log("\n🎉 All sequences processed.");
+}
+
+main()
+  .catch((e) => {
+    console.error("❌ Script error:", e);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
