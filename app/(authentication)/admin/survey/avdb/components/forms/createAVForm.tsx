@@ -43,7 +43,7 @@ const formSchema = z.object({
   notes: z.string().optional(),
   publisher: z.string().optional(),
   data_source: z.string().optional(),
-  cjk_title: z.string().optional(),
+  cjk_title: z.string().min(1, "CJK Title is required"),
   romanized_title: z.string().optional(),
   type: z.string().min(1, "Type is required"),
   counts: z.number().min(0, "Counts must be 0 or greater"),
@@ -125,34 +125,6 @@ export default function CreateAVForm({
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                 Basic Information
               </h3>
-              
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter the title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="subtitle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subtitle</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter the subtitle (optional)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -160,9 +132,37 @@ export default function CreateAVForm({
                   name="cjk_title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CJK Title</FormLabel>
+                      <FormLabel>CJK Title*</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter CJK title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="subtitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subtitle</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the subtitle (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>English Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -190,7 +190,7 @@ export default function CreateAVForm({
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                 Publication Details
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -274,7 +274,7 @@ export default function CreateAVForm({
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                 Additional Information
               </h3>
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -317,7 +317,7 @@ export default function CreateAVForm({
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                 Languages *
               </h3>
-              
+
               <FormField
                 control={form.control}
                 name="language"
@@ -357,7 +357,7 @@ export default function CreateAVForm({
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                 Settings
               </h3>
-              
+
               <FormField
                 control={form.control}
                 name="is_global"
