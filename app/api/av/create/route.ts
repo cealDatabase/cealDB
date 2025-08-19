@@ -103,6 +103,7 @@ export async function POST(req: Request) {
       if (languageEntries.length > 0) {
         await db.list_AV_Language.createMany({
           data: languageEntries,
+          skipDuplicates: true,
         });
       }
     }
