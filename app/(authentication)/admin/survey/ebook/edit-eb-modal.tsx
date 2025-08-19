@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // ✅ NEW
 import {
   Dialog,
   DialogContent,
@@ -14,17 +15,9 @@ import { Label } from "@/components/ui/label";
 import { listEBook } from "./data/schema";
 import { languages } from "./data/data";
 
-// 👇 put at the top of edit-eb-modal.tsx, after imports
 type EBookWithCounts = listEBook & {
   volumes?: number | null;
   chapters?: number | null;
-};
-
-type Props = {
-  open: boolean;
-  onOpenChangeAction: (open: boolean) => void;
-  rowData: listEBook;
-  year: number;
 };
 
 export default function EditEbookModal({
@@ -35,13 +28,14 @@ export default function EditEbookModal({
 }: {
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
-  rowData: EBookWithCounts; // ⬅️ use the patched type
+  rowData: EBookWithCounts;
   year: number;
 }) {
-  /*───────── util to map NON → NONCJK label ─────────*/
+  const router = useRouter(); // ✅ NEW
+  const [saving, setSaving] = useState(false); // ✅ NEW
+
   const normalizeLabel = (l: string) => (l === "NON" ? "NONCJK" : l);
 
-  /*───────── local form state ─────────*/
   const [form, setForm] = useState({
     title: "",
     subtitle: "",
@@ -55,14 +49,12 @@ export default function EditEbookModal({
     counts: 0,
     volumes: 0,
     chapters: 0,
-    language: [] as string[], // array of language-id strings
+    language: [] as string[],
     is_global: false,
   });
 
-  /*── populate form when modal opens ─────────────────────*/
   useEffect(() => {
     if (!open) return;
-
     setForm({
       title: rowData.title ?? "",
       subtitle: rowData.subtitle ?? "",
@@ -89,7 +81,6 @@ export default function EditEbookModal({
     });
   }, [open, rowData]);
 
-  /*───────── helpers ─────────*/
   const set = (k: string, v: unknown) => setForm((p) => ({ ...p, [k]: v }));
 
   const toggleLang = (id: string, checked: boolean) =>
@@ -100,32 +91,42 @@ export default function EditEbookModal({
         : p.language.filter((x) => x !== id),
     }));
 
-  /*───────── save to API ─────────*/
   async function handleSave() {
-    const res = await fetch("/api/ebook/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: rowData.id,
-        ...form,
-        counts: Number(form.counts),
-        volumes: form.volumes ? Number(form.volumes) : null,
-        chapters: form.chapters ? Number(form.chapters) : null,
-        language: form.language.map(Number), // strings → numbers
-        year,
-      }),
-    });
+    try {
+      setSaving(true);
+      const res = await fetch("/api/ebook/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: rowData.id,
+          ...form,
+          counts: Number(form.counts) || 0,
+          volumes:
+            form.volumes === null || form.volumes === ("" as any)
+              ? null
+              : Number(form.volumes),
+          chapters:
+            form.chapters === null || form.chapters === ("" as any)
+              ? null
+              : Number(form.chapters),
+          language: form.language.map(Number),
+          year, // ✅ include year
+        }),
+      });
 
-    const data = await res.json();
-    if (res.ok) {
+      const data = await res.json();
+      if (!res.ok) {
+        console.error(data?.detail || data?.error || "Update failed");
+        return;
+      }
+
       onOpenChangeAction(false);
-      window.location.reload(); // refresh list
-    } else {
-      alert(data.error ?? "Update failed");
+      router.refresh(); // ✅ instant UI update
+    } finally {
+      setSaving(false);
     }
   }
 
-  /*───────── UI ─────────*/
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className='bg-white text-black max-w-xl'>
@@ -134,7 +135,6 @@ export default function EditEbookModal({
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
-          {/** Simple text inputs */}
           {(
             [
               ["Title", "title"],
@@ -155,7 +155,6 @@ export default function EditEbookModal({
             </div>
           ))}
 
-          {/** Description + Notes */}
           {(["Description", "Notes"] as const).map((lbl) => {
             const k = lbl.toLowerCase() as "description" | "notes";
             return (
@@ -170,7 +169,6 @@ export default function EditEbookModal({
             );
           })}
 
-          {/** Numeric trio */}
           <div className='grid sm:grid-cols-3 gap-4'>
             {(
               [
@@ -190,7 +188,6 @@ export default function EditEbookModal({
             ))}
           </div>
 
-          {/** Languages */}
           <div className='space-y-1'>
             <Label className='text-sm'>Languages</Label>
             <div className='grid grid-cols-2 gap-2'>
@@ -212,7 +209,6 @@ export default function EditEbookModal({
             </div>
           </div>
 
-          {/** Global flag */}
           <div className='flex items-center space-x-2'>
             <Checkbox
               id='is_global'
@@ -222,14 +218,14 @@ export default function EditEbookModal({
             <Label htmlFor='is_global'>Is Global</Label>
           </div>
 
-          {/** Save button */}
           <div className='flex justify-end'>
             <Button
               onClick={handleSave}
               variant='outline'
+              disabled={saving}
               className='hover:bg-gray-900 hover:text-white'
             >
-              Save Changes
+              {saving ? "Saving…" : "Save Changes"}
             </Button>
           </div>
         </div>

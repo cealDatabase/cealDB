@@ -4,64 +4,80 @@ import db from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, counts, language, ...updateData } = body;
-    const numericId = Number(id);
+    const { id, counts, volumes, chapters, language, year, ...updateData } =
+      body;
 
-    // Update the main List_EBook record
-    await db.list_EBook.update({
-      where: { id: numericId },
-      data: {
-        ...updateData,
-        updated_at: new Date(),
-      },
-    });
+    const ebookId = Number(id);
+    if (!Number.isFinite(ebookId)) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
+    const y = Number(year);
+    if (!Number.isFinite(y)) {
+      return NextResponse.json(
+        { error: "Missing or invalid year" },
+        { status: 400 }
+      );
+    }
 
-    // Update or create counts entry
-    const existingCounts = await db.list_EBook_Counts.findFirst({
-      where: { listebook: numericId },
-    });
+    const titles = Number.isFinite(Number(counts)) ? Number(counts) : 0;
+    const vol = volumes == null || volumes === "" ? null : Number(volumes);
+    const ch = chapters == null || chapters === "" ? null : Number(chapters);
 
-    if (existingCounts) {
-      await db.list_EBook_Counts.update({
-        where: { id: existingCounts.id },
-        data: {
-          titles: Number(counts),
-          updatedat: new Date(),
-        },
+    await db.$transaction(async (tx) => {
+      // main
+      await tx.list_EBook.update({
+        where: { id: ebookId },
+        data: { ...updateData, updated_at: new Date() },
       });
-    } else {
-      await db.list_EBook_Counts.create({
+
+      // manual upsert by (listebook, year)
+      const { count } = await tx.list_EBook_Counts.updateMany({
+        where: { listebook: ebookId, year: y },
         data: {
-          listebook: numericId,
-          titles: Number(counts),
+          titles,
+          volumes: vol,
+          chapters: ch,
           updatedat: new Date(),
           ishidden: false,
         },
       });
-    }
+      if (count === 0) {
+        await tx.list_EBook_Counts.create({
+          data: {
+            listebook: ebookId,
+            year: y,
+            titles,
+            volumes: vol,
+            chapters: ch,
+            updatedat: new Date(),
+            ishidden: false,
+          },
+        });
+      }
 
-    // Update language mappings
-    if (Array.isArray(language)) {
-      await db.list_EBook_Language.deleteMany({
-        where: { listebook_id: numericId },
-      });
-
-      await db.list_EBook_Language.createMany({
-        data: language
-          .map((langId: string) => Number(langId))
-          .filter((id) => !isNaN(id))
-          .map((id) => ({
-            listebook_id: numericId,
-            language_id: id,
-          })),
-      });
-    }
+      // languages (replace set)
+      if (Array.isArray(language)) {
+        await tx.list_EBook_Language.deleteMany({
+          where: { listebook_id: ebookId },
+        });
+        const rows = language
+          .map((v: any) => Number(v))
+          .filter((n) => Number.isFinite(n))
+          .map((langId) => ({ listebook_id: ebookId, language_id: langId }));
+        if (rows.length) {
+          await tx.list_EBook_Language.createMany({
+            data: rows,
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("API error:", error);
+  } catch (error: any) {
+    console.error("API error (update Ebook):", error);
     return NextResponse.json(
-      { error: "Failed to update Ebook." },
+      { error: "Failed to update Ebook.", detail: error?.message },
       { status: 500 }
     );
   }
