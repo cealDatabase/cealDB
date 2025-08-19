@@ -1,16 +1,16 @@
-// /app/api/ebook/[id]/route.ts
+// app/api/ebook/[id]/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
+type Params = { id: string };
+
 export async function DELETE(
   _req: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<Params> }
 ) {
-  // ✅ first await, then pull out id in a separate step
-  const { params } = await context;
-  const ebookId = Number(params.id);
-
-  if (isNaN(ebookId)) {
+  const { id } = await params; // ✅ await params
+  const ebookId = Number(id);
+  if (Number.isNaN(ebookId)) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
@@ -21,7 +21,6 @@ export async function DELETE(
       db.libraryYear_ListEBook.deleteMany({ where: { listebook_id: ebookId } }),
       db.list_EBook.delete({ where: { id: ebookId } }),
     ]);
-
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Delete E-Book failed:", err);

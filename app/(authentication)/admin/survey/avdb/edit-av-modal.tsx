@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ NEW
 import { listAV } from "./data/schema";
 import { languages, type } from "./data/data";
 
@@ -24,11 +25,12 @@ export default function EditAVModal({
   rowData: listAV;
   year: number;
 }) {
+  const router = useRouter(); // ✅ NEW
 
-  const normalizeLabel = (label: string) => {
-    if (label === "NON") return "NONCJK";
-    return label;
-  };
+  const normalizeLabel = (label: string) =>
+    label === "NON" ? "NONCJK" : label;
+
+  const [saving, setSaving] = useState(false); // ✅ NEW
 
   const [formData, setFormData] = useState({
     title: rowData.title,
@@ -64,23 +66,27 @@ export default function EditAVModal({
 
   const handleSubmit = async () => {
     try {
+      setSaving(true); // ✅ NEW
       const res = await fetch("/api/av/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: rowData.id, ...formData }),
+        // ✅ include `year` so API can upsert counts by (listav, year) and revalidate tags
+        body: JSON.stringify({ id: rowData.id, year, ...formData }),
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        console.error("Update failed:", data.error);
+        console.error("Update failed:", data?.error || data);
         return;
       }
 
-      console.log("Update successful:", data);
+      // ✅ instant UI update: refetch server components
+      router.refresh();
       onOpenChangeAction(false);
     } catch (error) {
       console.error("Request error:", error);
+    } finally {
+      setSaving(false); // ✅ NEW
     }
   };
 
@@ -146,6 +152,8 @@ export default function EditAVModal({
           <div>
             <label className='text-sm font-medium'>Counts</label>
             <Input
+              type='number' // ✅ ensure numeric
+              inputMode='numeric'
               value={formData.counts}
               onChange={(e) =>
                 setFormData({ ...formData, counts: Number(e.target.value) })
@@ -205,16 +213,15 @@ export default function EditAVModal({
             <label className='text-sm font-medium'>Languages</label>
             <div className='grid grid-cols-2 gap-2'>
               {languages.map((lang) => {
-                const langIdStr = String(lang.value); // Convert number to string
+                const langIdStr = String(lang.value);
                 return (
                   <div key={langIdStr} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`lang-${langIdStr}`}
                       className='hover:bg-blue-300/30 hover:cursor-pointer'
                       checked={formData.language.includes(langIdStr)}
-                      onCheckedChange={
-                        (checked) =>
-                          handleLanguageChange(langIdStr, Boolean(checked)) // Pass string, not number
+                      onCheckedChange={(checked) =>
+                        handleLanguageChange(langIdStr, Boolean(checked))
                       }
                     />
                     <label htmlFor={`lang-${langIdStr}`} className='text-sm'>
@@ -229,10 +236,11 @@ export default function EditAVModal({
           <div className='flex justify-end'>
             <Button
               onClick={handleSubmit}
-              variant="outline"
+              variant='outline'
+              disabled={saving} // ✅
               className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
             >
-              Save Changes
+              {saving ? "Saving…" : "Save Changes"}
             </Button>
           </div>
         </div>

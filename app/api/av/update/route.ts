@@ -1,59 +1,67 @@
+// /app/api/av/update/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, counts, language, ...updateData } = body;
+    const { id, counts, language, year, ...updateData } = body;
 
-    const numericId = Number(id);
-
-    // ✅ Update the main List_AV entry
-    await db.list_AV.update({
-      where: { id: numericId },
-      data: { ...updateData, updated_at: new Date() },
-    });
-
-    // ✅ Update or create a counts record
-    const existingCounts = await db.list_AV_Counts.findFirst({
-      where: { listav: numericId },
-    });
-
-    if (existingCounts) {
-      await db.list_AV_Counts.update({
-        where: { id: existingCounts.id },
-        data: { titles: Number(counts), updatedat: new Date() },
-      });
-    } else {
-      await db.list_AV_Counts.create({
-        data: {
-          listav: numericId,
-          titles: Number(counts),
-          updatedat: new Date(),
-          ishidden: false, // or whatever default value is appropriate
-        },
-      });
+    const avId = Number(id);
+    if (!Number.isFinite(avId)) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
 
-    // ✅ Replace List_AV_Language records
-    if (Array.isArray(language)) {
-      await db.list_AV_Language.deleteMany({ where: { listav_id: numericId } });
+    const y = year == null ? null : Number(year);
+    const safeCounts = Number.isFinite(Number(counts)) ? Number(counts) : 0;
 
-      // console.log("Parsed language IDs:", language);
-
-      await db.list_AV_Language.createMany({
-        data: language
-          .map((langId: string) => Number(langId))
-          .filter((n) => !isNaN(n))
-          .map((validId) => ({ listav_id: numericId, language_id: validId })),
+    const updated = await db.$transaction(async (tx) => {
+      // 1) main row
+      const av = await tx.list_AV.update({
+        where: { id: avId },
+        data: { ...updateData, updated_at: new Date() },
       });
-    }
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("API error:", error);
+      // 2) counts for the selected year (use the composite unique)
+      if (y !== null) {
+        await tx.list_AV_Counts.upsert({
+          where: { listav_year_unique: { listav: avId, year: y } },
+          update: { titles: safeCounts, updatedat: new Date() },
+          create: {
+            listav: avId,
+            year: y,
+            titles: safeCounts,
+            updatedat: new Date(),
+            ishidden: false,
+          },
+        });
+      }
+
+      // 3) languages (replace set)
+      if (Array.isArray(language)) {
+        await tx.list_AV_Language.deleteMany({ where: { listav_id: avId } });
+
+        const rows = language
+          .map((v: any) => Number(v))
+          .filter((n) => Number.isFinite(n))
+          .map((langId) => ({ listav_id: avId, language_id: langId }));
+
+        if (rows.length) {
+          await tx.list_AV_Language.createMany({
+            data: rows,
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      return av;
+    });
+
+    return NextResponse.json({ success: true, id: updated.id });
+  } catch (error: any) {
+    console.error("API error (update AV):", error);
     return NextResponse.json(
-      { error: "Failed to update AV record." },
+      { error: "Failed to update AV record.", detail: error?.message },
       { status: 500 }
     );
   }

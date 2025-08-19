@@ -2,14 +2,16 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
+type Params = { id: string };
+
 export async function DELETE(
   _req: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<Params> } // <- params is a Promise
 ) {
-  /*──── await the whole context first ────*/
-  const ctx = await context;
-  const ejId = Number(ctx.params.id); // no nested destructuring
-  if (isNaN(ejId)) {
+  const { id } = await params; // <- await params itself
+  const ejId = Number(id);
+
+  if (Number.isNaN(ejId)) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
