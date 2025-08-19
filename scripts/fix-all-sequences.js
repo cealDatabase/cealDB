@@ -11,6 +11,7 @@ const TABLES = [
   "List_EBook_Counts",
   "List_EJournal",
   "List_EJournal_Counts",
+  "Monographic_Acquisitions",
 ];
 
 async function resetSequenceFor(table) {

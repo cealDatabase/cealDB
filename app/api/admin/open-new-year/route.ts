@@ -61,7 +61,7 @@ export async function POST(req: Request) {
               year: currentYear,
               is_open_for_editing: true, // Enable editing for the new year
               updated_at: new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})),
-              is_active: true, // ======================TODO: Verify this is correct or not ==========================
+              is_active: false, // ======================NOTE: only when library submitted forms then is_active would turn true ==========================
               admin_notes: ``,
             },
           });

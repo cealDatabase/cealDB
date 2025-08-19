@@ -32,64 +32,131 @@ export async function POST(req: Request) {
       matotal_titles,
       matotal_volumes,
       manotes,
-      libraryyear, // should be a number
+      libid, // library ID from URL params
     } = body;
 
-    // ✅ Validate required fields
-    if (!libraryyear || isNaN(Number(libraryyear))) {
+    // Validate required fields
+    if (!libid || isNaN(Number(libid))) {
       return NextResponse.json(
-        { error: "Missing or invalid libraryyear" },
+        { error: "Missing or invalid library ID" },
         { status: 400 }
       );
     }
 
-    // ✅ Optional: confirm related records exist
-    const existingYear = await db.library_Year.findUnique({
-      where: { id: Number(libraryyear) },
+    const libraryId = Number(libid);
+    const currentYear = new Date().getFullYear();
+
+    console.log(`Looking for Library_Year with library: ${libraryId}, year: ${currentYear}`);
+
+    // Find Library_Year record for current year and library
+    const libraryYear = await db.library_Year.findFirst({
+      where: {
+        library: libraryId,
+        year: currentYear,
+      },
     });
-    if (!existingYear) {
+
+    console.log("Found Library_Year:", libraryYear);
+
+    if (!libraryYear) {
+      console.log("No Library_Year record found");
       return NextResponse.json(
-        { error: "libraryyear ID does not exist" },
+        { 
+          error: "Library year record not found", 
+          message: "No library_year record exists for this library and year. Please contact the administrator to set up the library year record." 
+        },
         { status: 404 }
       );
     }
 
-    // ✅ Create monographic acquisitions record
-    const newMonographic = await db.monographic_Acquisitions.create({
-      data: {
+    console.log(`Library_Year ID: ${libraryYear.id}, is_open_for_editing: ${libraryYear.is_open_for_editing}`);
+
+    // Check if editing is allowed
+    if (!libraryYear.is_open_for_editing) {
+      console.log("Form is not open for editing");
+      return NextResponse.json(
+        { 
+          error: "Form submission not allowed", 
+          message: "This form is not open for editing. Please contact the administrator." 
+        },
+        { status: 403 }
+      );
+    }
+
+    console.log("Processing monographic record with Library_Year ID:", libraryYear.id);
+
+    // Use upsert to handle both create and update scenarios while preserving original ID
+    const monographicRecord = await db.monographic_Acquisitions.upsert({
+      where: { libraryyear: libraryYear.id },
+      update: {
         entryid: entryid || null,
-        mapurchased_titles_chinese: Number(mapurchased_titles_chinese) || null,
-        mapurchased_titles_japanese: Number(mapurchased_titles_japanese) || null,
-        mapurchased_titles_korean: Number(mapurchased_titles_korean) || null,
-        mapurchased_titles_noncjk: Number(mapurchased_titles_noncjk) || null,
-        mapurchased_titles_subtotal: Number(mapurchased_titles_subtotal) || null,
-        mapurchased_volumes_chinese: Number(mapurchased_volumes_chinese) || null,
-        mapurchased_volumes_japanese: Number(mapurchased_volumes_japanese) || null,
-        mapurchased_volumes_korean: Number(mapurchased_volumes_korean) || null,
-        mapurchased_volumes_noncjk: Number(mapurchased_volumes_noncjk) || null,
-        mapurchased_volumes_subtotal: Number(mapurchased_volumes_subtotal) || null,
-        manonpurchased_titles_chinese: Number(manonpurchased_titles_chinese) || null,
-        manonpurchased_titles_japanese: Number(manonpurchased_titles_japanese) || null,
-        manonpurchased_titles_korean: Number(manonpurchased_titles_korean) || null,
-        manonpurchased_titles_noncjk: Number(manonpurchased_titles_noncjk) || null,
-        manonpurchased_titles_subtotal: Number(manonpurchased_titles_subtotal) || null,
-        manonpurchased_volumes_chinese: Number(manonpurchased_volumes_chinese) || null,
-        manonpurchased_volumes_japanese: Number(manonpurchased_volumes_japanese) || null,
-        manonpurchased_volumes_korean: Number(manonpurchased_volumes_korean) || null,
-        manonpurchased_volumes_noncjk: Number(manonpurchased_volumes_noncjk) || null,
-        manonpurchased_volumes_subtotal: Number(manonpurchased_volumes_subtotal) || null,
-        matotal_titles: Number(matotal_titles) || null,
-        matotal_volumes: Number(matotal_volumes) || null,
+        mapurchased_titles_chinese: mapurchased_titles_chinese !== undefined ? Number(mapurchased_titles_chinese) : null,
+        mapurchased_titles_japanese: mapurchased_titles_japanese !== undefined ? Number(mapurchased_titles_japanese) : null,
+        mapurchased_titles_korean: mapurchased_titles_korean !== undefined ? Number(mapurchased_titles_korean) : null,
+        mapurchased_titles_noncjk: mapurchased_titles_noncjk !== undefined ? Number(mapurchased_titles_noncjk) : null,
+        mapurchased_titles_subtotal: mapurchased_titles_subtotal !== undefined ? Number(mapurchased_titles_subtotal) : null,
+        mapurchased_volumes_chinese: mapurchased_volumes_chinese !== undefined ? Number(mapurchased_volumes_chinese) : null,
+        mapurchased_volumes_japanese: mapurchased_volumes_japanese !== undefined ? Number(mapurchased_volumes_japanese) : null,
+        mapurchased_volumes_korean: mapurchased_volumes_korean !== undefined ? Number(mapurchased_volumes_korean) : null,
+        mapurchased_volumes_noncjk: mapurchased_volumes_noncjk !== undefined ? Number(mapurchased_volumes_noncjk) : null,
+        mapurchased_volumes_subtotal: mapurchased_volumes_subtotal !== undefined ? Number(mapurchased_volumes_subtotal) : null,
+        manonpurchased_titles_chinese: manonpurchased_titles_chinese !== undefined ? Number(manonpurchased_titles_chinese) : null,
+        manonpurchased_titles_japanese: manonpurchased_titles_japanese !== undefined ? Number(manonpurchased_titles_japanese) : null,
+        manonpurchased_titles_korean: manonpurchased_titles_korean !== undefined ? Number(manonpurchased_titles_korean) : null,
+        manonpurchased_titles_noncjk: manonpurchased_titles_noncjk !== undefined ? Number(manonpurchased_titles_noncjk) : null,
+        manonpurchased_titles_subtotal: manonpurchased_titles_subtotal !== undefined ? Number(manonpurchased_titles_subtotal) : null,
+        manonpurchased_volumes_chinese: manonpurchased_volumes_chinese !== undefined ? Number(manonpurchased_volumes_chinese) : null,
+        manonpurchased_volumes_japanese: manonpurchased_volumes_japanese !== undefined ? Number(manonpurchased_volumes_japanese) : null,
+        manonpurchased_volumes_korean: manonpurchased_volumes_korean !== undefined ? Number(manonpurchased_volumes_korean) : null,
+        manonpurchased_volumes_noncjk: manonpurchased_volumes_noncjk !== undefined ? Number(manonpurchased_volumes_noncjk) : null,
+        manonpurchased_volumes_subtotal: manonpurchased_volumes_subtotal !== undefined ? Number(manonpurchased_volumes_subtotal) : null,
+        matotal_titles: matotal_titles !== undefined ? Number(matotal_titles) : null,
+        matotal_volumes: matotal_volumes !== undefined ? Number(matotal_volumes) : null,
         manotes: manotes || null,
-        libraryyear: Number(libraryyear),
+      },
+      create: {
+        entryid: entryid || null,
+        mapurchased_titles_chinese: mapurchased_titles_chinese !== undefined ? Number(mapurchased_titles_chinese) : null,
+        mapurchased_titles_japanese: mapurchased_titles_japanese !== undefined ? Number(mapurchased_titles_japanese) : null,
+        mapurchased_titles_korean: mapurchased_titles_korean !== undefined ? Number(mapurchased_titles_korean) : null,
+        mapurchased_titles_noncjk: mapurchased_titles_noncjk !== undefined ? Number(mapurchased_titles_noncjk) : null,
+        mapurchased_titles_subtotal: mapurchased_titles_subtotal !== undefined ? Number(mapurchased_titles_subtotal) : null,
+        mapurchased_volumes_chinese: mapurchased_volumes_chinese !== undefined ? Number(mapurchased_volumes_chinese) : null,
+        mapurchased_volumes_japanese: mapurchased_volumes_japanese !== undefined ? Number(mapurchased_volumes_japanese) : null,
+        mapurchased_volumes_korean: mapurchased_volumes_korean !== undefined ? Number(mapurchased_volumes_korean) : null,
+        mapurchased_volumes_noncjk: mapurchased_volumes_noncjk !== undefined ? Number(mapurchased_volumes_noncjk) : null,
+        mapurchased_volumes_subtotal: mapurchased_volumes_subtotal !== undefined ? Number(mapurchased_volumes_subtotal) : null,
+        manonpurchased_titles_chinese: manonpurchased_titles_chinese !== undefined ? Number(manonpurchased_titles_chinese) : null,
+        manonpurchased_titles_japanese: manonpurchased_titles_japanese !== undefined ? Number(manonpurchased_titles_japanese) : null,
+        manonpurchased_titles_korean: manonpurchased_titles_korean !== undefined ? Number(manonpurchased_titles_korean) : null,
+        manonpurchased_titles_noncjk: manonpurchased_titles_noncjk !== undefined ? Number(manonpurchased_titles_noncjk) : null,
+        manonpurchased_titles_subtotal: manonpurchased_titles_subtotal !== undefined ? Number(manonpurchased_titles_subtotal) : null,
+        manonpurchased_volumes_chinese: manonpurchased_volumes_chinese !== undefined ? Number(manonpurchased_volumes_chinese) : null,
+        manonpurchased_volumes_japanese: manonpurchased_volumes_japanese !== undefined ? Number(manonpurchased_volumes_japanese) : null,
+        manonpurchased_volumes_korean: manonpurchased_volumes_korean !== undefined ? Number(manonpurchased_volumes_korean) : null,
+        manonpurchased_volumes_noncjk: manonpurchased_volumes_noncjk !== undefined ? Number(manonpurchased_volumes_noncjk) : null,
+        manonpurchased_volumes_subtotal: manonpurchased_volumes_subtotal !== undefined ? Number(manonpurchased_volumes_subtotal) : null,
+        matotal_titles: matotal_titles !== undefined ? Number(matotal_titles) : null,
+        matotal_volumes: matotal_volumes !== undefined ? Number(matotal_volumes) : null,
+        manotes: manotes || null,
+        libraryyear: libraryYear.id,
       },
     });
 
-    // ✅ Return response
+    console.log("Successfully processed monographic record with ID:", monographicRecord.id);
+
+    // Update Library_Year is_active to true after successful form submission
+    await db.library_Year.update({
+      where: { id: libraryYear.id },
+      data: { is_active: true },
+    });
+
+    console.log(`Updated Library_Year ${libraryYear.id} is_active to true`);
+
     return NextResponse.json({ 
       success: true, 
-      data: newMonographic,
-      message: "Monographic acquisitions record created successfully"
+      data: monographicRecord,
+      message: "Monographic acquisitions record processed successfully"
     });
   } catch (error: any) {
     console.error("API error (create monographic):", error);
