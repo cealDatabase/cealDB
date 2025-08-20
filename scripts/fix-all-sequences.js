@@ -13,6 +13,7 @@ const TABLES = [
   "List_EJournal_Counts",
   "Monographic_Acquisitions",
   "Volume_Holdings",
+  "Serials",
 ];
 
 async function resetSequenceFor(table) {

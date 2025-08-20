@@ -1,26 +1,26 @@
 model Personnel_Support {
-    id                              Int           @id @default(autoincrement())
-    entryid                         String?
-    libraryyear                     Int?          @unique
-    psfnotes                        String?
-    psfosacquisition                Boolean?
-    psfosprocessing                 Boolean?
-    psfothers                       Float?
-    psfprofessional_chinese         Float?
-    psfprofessional_eastasian       Float?
-    psfprofessional_japanese        Float?
-    psfprofessional_korean          Float?
-    psfprofessional_subtotal        Float?
-    psfstudent_assistants_chinese   Float?
-    psfstudent_assistants_eastasian Float?
-    psfstudent_assistants_japanese  Float?
-    psfstudent_assistants_korean    Float?
-    psfstudent_assistants_subtotal  Float?
-    psfsupport_staff_chinese        Float?
-    psfsupport_staff_eastasian      Float?
-    psfsupport_staff_japanese       Float?
-    psfsupport_staff_korean         Float?
-    psfsupport_staff_subtotal       Float?
-    psftotal                        Float?
-    Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
+  id                              Int           @id @default(autoincrement())
+  entryid                         String?
+  libraryyear                     Int?          @unique
+  psfnotes                        String?
+  psfosacquisition                Boolean?
+  psfosprocessing                 Boolean?
+  psfothers                       Float?
+  psfprofessional_chinese         Float?
+  psfprofessional_eastasian       Float?
+  psfprofessional_japanese        Float?
+  psfprofessional_korean          Float?
+  psfprofessional_subtotal        Float?
+  psfstudent_assistants_chinese   Float?
+  psfstudent_assistants_eastasian Float?
+  psfstudent_assistants_japanese  Float?
+  psfstudent_assistants_korean    Float?
+  psfstudent_assistants_subtotal  Float?
+  psfsupport_staff_chinese        Float?
+  psfsupport_staff_eastasian      Float?
+  psfsupport_staff_japanese       Float?
+  psfsupport_staff_korean         Float?
+  psfsupport_staff_subtotal       Float?
+  psftotal                        Float?
+  Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
 }

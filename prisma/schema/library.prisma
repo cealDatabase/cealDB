@@ -1,5 +1,5 @@
 model Library {
-  id                             Int       @id @default(autoincrement())
+  id                             Int               @id @default(autoincrement())
   type                           Int
   library_name                   String
   plilaw                         Boolean
@@ -40,9 +40,8 @@ model Library {
   date_last_changed              DateTime?
   notes                          String?
   hideinlibrarylist              Boolean?
-
-  libraryRegion Reflibraryregion? @relation(fields: [pliregion], references: [id])
-  libraryType   Reflibrarytype    @relation(fields: [type], references: [id])
-  User_Library  User_Library[]
-  Library_Year  Library_Year[]
+  libraryRegion                  Reflibraryregion? @relation(fields: [pliregion], references: [id])
+  libraryType                    Reflibrarytype    @relation(fields: [type], references: [id])
+  Library_Year                   Library_Year[]
+  User_Library                   User_Library[]
 }

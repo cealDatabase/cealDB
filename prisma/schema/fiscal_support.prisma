@@ -1,45 +1,44 @@
 model Fiscal_Support {
-    id                                       Int      @id @default(autoincrement())
-    entryid                                  String?
-    fschinese_appropriations_monographic     Decimal?
-    fschinese_appropriations_serial          Decimal?
-    fschinese_appropriations_other_material  Decimal?
-    fschinese_appropriations_electronic      Decimal?
-    fschinese_appropriations_subtotal        Decimal?
-    fsjapanese_appropriations_monographic    Decimal?
-    fsjapanese_appropriations_serial         Decimal?
-    fsjapanese_appropriations_other_material Decimal?
-    fsjapanese_appropriations_electronic     Decimal?
-    fsjapanese_appropriations_subtotal       Decimal?
-    fskorean_appropriations_monographic      Decimal?
-    fskorean_appropriations_serial           Decimal?
-    fskorean_appropriations_other_material   Decimal?
-    fskorean_appropriations_electronic       Decimal?
-    fskorean_appropriations_subtotal         Decimal?
-    fsnoncjk_appropriations_monographic      Decimal?
-    fsnoncjk_appropriations_serial           Decimal?
-    fsnoncjk_appropriations_other_material   Decimal?
-    fsnoncjk_appropriations_electronic       Decimal?
-    fsnoncjk_appropriations_subtotal         Decimal?
-    fstotal_appropriations                   Decimal?
-    fsendowments_chinese                     Decimal?
-    fsendowments_japanese                    Decimal?
-    fsendowments_korean                      Decimal?
-    fsendowments_subtotal                    Decimal?
-    fsgrants_chinese                         Decimal?
-    fsgrants_japanese                        Decimal?
-    fsgrants_korean                          Decimal?
-    fsgrants_subtotal                        Decimal?
-    fseast_asian_program_support_chinese     Decimal?
-    fseast_asian_program_support_japanese    Decimal?
-    fseast_asian_program_support_korean      Decimal?
-    fseast_asian_program_support_subtotal    Decimal?
-    fstotal_acquisition_budget               Decimal?
-    fsnotes                                  String?
-    libraryyear                              Int?     @unique
-    fsendowments_noncjk                      Decimal?
-    fsgrants_noncjk                          Decimal?
-    fseast_asian_program_support_noncjk      Decimal?
-
-    Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
+  id                                       Int           @id @default(autoincrement())
+  entryid                                  String?
+  fschinese_appropriations_monographic     Decimal?
+  fschinese_appropriations_serial          Decimal?
+  fschinese_appropriations_other_material  Decimal?
+  fschinese_appropriations_electronic      Decimal?
+  fschinese_appropriations_subtotal        Decimal?
+  fsjapanese_appropriations_monographic    Decimal?
+  fsjapanese_appropriations_serial         Decimal?
+  fsjapanese_appropriations_other_material Decimal?
+  fsjapanese_appropriations_electronic     Decimal?
+  fsjapanese_appropriations_subtotal       Decimal?
+  fskorean_appropriations_monographic      Decimal?
+  fskorean_appropriations_serial           Decimal?
+  fskorean_appropriations_other_material   Decimal?
+  fskorean_appropriations_electronic       Decimal?
+  fskorean_appropriations_subtotal         Decimal?
+  fsnoncjk_appropriations_monographic      Decimal?
+  fsnoncjk_appropriations_serial           Decimal?
+  fsnoncjk_appropriations_other_material   Decimal?
+  fsnoncjk_appropriations_electronic       Decimal?
+  fsnoncjk_appropriations_subtotal         Decimal?
+  fstotal_appropriations                   Decimal?
+  fsendowments_chinese                     Decimal?
+  fsendowments_japanese                    Decimal?
+  fsendowments_korean                      Decimal?
+  fsendowments_subtotal                    Decimal?
+  fsgrants_chinese                         Decimal?
+  fsgrants_japanese                        Decimal?
+  fsgrants_korean                          Decimal?
+  fsgrants_subtotal                        Decimal?
+  fseast_asian_program_support_chinese     Decimal?
+  fseast_asian_program_support_japanese    Decimal?
+  fseast_asian_program_support_korean      Decimal?
+  fseast_asian_program_support_subtotal    Decimal?
+  fstotal_acquisition_budget               Decimal?
+  fsnotes                                  String?
+  libraryyear                              Int?          @unique
+  fsendowments_noncjk                      Decimal?
+  fsgrants_noncjk                          Decimal?
+  fseast_asian_program_support_noncjk      Decimal?
+  Library_Year                             Library_Year? @relation(fields: [libraryyear], references: [id])
 }
