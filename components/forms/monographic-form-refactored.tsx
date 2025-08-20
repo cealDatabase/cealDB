@@ -16,40 +16,29 @@ import {
 } from "./shared"
 
 const formSchema = z.object({
-  // Entry ID (optional)
   entryid: z.string().optional(),
-  
-  // Purchased Titles (matching Prisma field names)
   mapurchased_titles_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_titles_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_titles_korean: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_titles_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
-
-  // Purchased Volumes
   mapurchased_volumes_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_volumes_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_volumes_korean: z.number().min(0, { message: "Must be a non-negative number" }),
   mapurchased_volumes_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
-
-  // Non-Purchased Titles
   manonpurchased_titles_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_titles_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_titles_korean: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_titles_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
-
-  // Non-Purchased Volumes
   manonpurchased_volumes_chinese: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_volumes_japanese: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_volumes_korean: z.number().min(0, { message: "Must be a non-negative number" }),
   manonpurchased_volumes_noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
-
-  // Notes
   manotes: z.string().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-export default function MonographicForm() {
+export default function MonographicFormRefactored() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -82,7 +71,6 @@ export default function MonographicForm() {
     },
   })
 
-  // Watch form values for calculations
   const watchedValues = form.watch()
 
   // Calculate subtotals and totals
@@ -112,7 +100,6 @@ export default function MonographicForm() {
 
   const titleTotal = purchasedTitlesSubtotal + nonPurchasedTitlesSubtotal
   const volumeTotal = purchasedVolumesSubtotal + nonPurchasedVolumesSubtotal
-
 
   async function onSubmit(values: FormData) {
     try {
@@ -257,14 +244,12 @@ export default function MonographicForm() {
           label="21. Title Total"
           value={titleTotal}
           formula="05 + 15"
-          className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />
         <SubtotalDisplay
           label="22. Volume Total"
           value={volumeTotal}
           formula="10 + 20"
-          className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />
       </FormSection>

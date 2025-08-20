@@ -1,10 +1,10 @@
-datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-  provider        = "prisma-client-js"
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Exclude_Year {
@@ -24,26 +24,22 @@ model Reflibraryregion {
 }
 
 model Language {
-  id    Int    @id @default(autoincrement())
-  short String
-  full  String
-
+  id                     Int                      @id @default(autoincrement())
+  short                  String
+  full                   String
   List_AV_Language       List_AV_Language[]
   List_EBook_Language    List_EBook_Language[]
   List_EJournal_Language List_EJournal_Language[]
 }
 
 model Library_Year {
-  id                  Int      @id @default(autoincrement())
-  library             Int?
-  is_open_for_editing Boolean? @default(false)
-  admin_notes         String?
-  year                Int
-  updated_at          DateTime
-  is_active           Boolean? @default(true)
-
-  Library Library? @relation(fields: [library], references: [id])
-
+  id                       Int                        @id @default(autoincrement())
+  library                  Int?
+  is_open_for_editing      Boolean?                   @default(false)
+  admin_notes              String?
+  year                     Int
+  updated_at               DateTime
+  is_active                Boolean?                   @default(true)
   Electronic               Electronic?
   Electronic_Books         Electronic_Books?
   Entry_Status             Entry_Status?
@@ -51,14 +47,15 @@ model Library_Year {
   LibraryYear_ListAV       LibraryYear_ListAV[]
   LibraryYear_ListEBook    LibraryYear_ListEBook[]
   LibraryYear_ListEJournal LibraryYear_ListEJournal[]
+  Library                  Library?                   @relation(fields: [library], references: [id])
+  List_AV                  List_AV[]
+  List_EBook               List_EBook[]
+  List_EJournal            List_EJournal[]
   Monographic_Acquisitions Monographic_Acquisitions?
   Other_Holdings           Other_Holdings?
   Personnel_Support        Personnel_Support?
   Serials                  Serials?
   Volume_Holdings          Volume_Holdings?
-  List_AV                  List_AV[]
-  List_EBook               List_EBook[]
-  List_EJournal            List_EJournal[]
 }
 
 model User {
@@ -76,8 +73,8 @@ model User {
 model User_Library {
   user_id    Int
   library_id Int
-  User       User    @relation(fields: [user_id], references: [id])
   Library    Library @relation(fields: [library_id], references: [id])
+  User       User    @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, library_id])
 }
@@ -92,8 +89,8 @@ model Role {
 model Users_Roles {
   user_id Int
   role_id Int
-  User    User @relation(fields: [user_id], references: [id])
   Role    Role @relation(fields: [role_id], references: [id])
+  User    User @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, role_id])
 }

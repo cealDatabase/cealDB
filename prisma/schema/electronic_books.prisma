@@ -1,6 +1,6 @@
 model Electronic_Books {
-  id                                     Int      @id @default(autoincrement())
-  libraryyear                            Int?     @unique
+  id                                     Int           @id @default(autoincrement())
+  libraryyear                            Int?          @unique
   ebooks_purchased_volumes_chinese       Int?
   ebooks_purchased_volumes_japanese      Int?
   ebooks_purchased_volumes_korean        Int?
@@ -55,6 +55,5 @@ model Electronic_Books {
   ebooks_purchased_add_volumes_korean    Int?
   ebooks_purchased_add_volumes_noncjk    Int?
   ebooks_purchased_add_volumes_subtotal  Int?
-
-  Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
+  Library_Year                           Library_Year? @relation(fields: [libraryyear], references: [id])
 }
