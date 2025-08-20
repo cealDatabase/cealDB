@@ -250,7 +250,7 @@ export const getSubscriberIdByListAvId = async (listavid: number, year: number) 
           },
           select: {
             library: true,
-            is_active: true,
+            // is_active: true,
           },
         },
       },
@@ -313,7 +313,7 @@ export const getSubscriberIdByListEBookId = async (listEBookId: number, year: nu
         Library_Year: {
           where: {
             year: year,
-            is_active: true,
+            // is_active: true,
           },
           select: {
             library: true,
@@ -378,7 +378,7 @@ export const getSubscriberIdByListEJournalId = async (listEJournalId: number, ye
         Library_Year: {
           where: {
             year: year,
-            is_active: true,
+            // is_active: true,
           },
           select: {
             library: true,

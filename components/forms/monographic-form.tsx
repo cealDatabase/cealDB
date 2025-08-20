@@ -6,10 +6,11 @@ import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Form } from "@/components/ui/form"
 import { toast } from "sonner"
+import { ReusableFormField } from "./ReusableFormField"
+import { StatusMessage } from "./StatusMessage"
+import { LoaderCircle } from "lucide-react"
 
 const formSchema = z.object({
   // Entry ID (optional)
@@ -224,137 +225,29 @@ export default function MonographicForm() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_titles_chinese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>01. Purchased Titles Chinese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="01. Purchased Titles Chinese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_titles_japanese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>02. Purchased Titles Japanese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="02. Purchased Titles Japanese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_titles_korean"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>03. Purchased Titles Korean</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="03. Purchased Titles Korean"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_titles_noncjk"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>04. Purchased Titles Non-CJK</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="04. Purchased Titles Non-CJK"
+                type="number"
               />
             </div>
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -375,137 +268,29 @@ export default function MonographicForm() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_volumes_chinese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>06. Purchased Volumes Chinese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="06. Purchased Volumes Chinese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_volumes_japanese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>07. Purchased Volumes Japanese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="07. Purchased Volumes Japanese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_volumes_korean"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>08. Purchased Volumes Korean</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="08. Purchased Volumes Korean"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="mapurchased_volumes_noncjk"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>09. Purchased Volumes Non-CJK</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="09. Purchased Volumes Non-CJK"
+                type="number"
               />
             </div>
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -526,137 +311,29 @@ export default function MonographicForm() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_titles_chinese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>11. Non-Purchased Titles Chinese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="11. Non-Purchased Titles Chinese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_titles_japanese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>12. Non-Purchased Titles Japanese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="12. Non-Purchased Titles Japanese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_titles_korean"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>13. Non-Purchased Titles Korean</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="13. Non-Purchased Titles Korean"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_titles_noncjk"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>14. Non-Purchased Titles Non-CJK</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="14. Non-Purchased Titles Non-CJK"
+                type="number"
               />
             </div>
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -677,137 +354,29 @@ export default function MonographicForm() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_volumes_chinese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>16. Non-Purchased Volumes Chinese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="16. Non-Purchased Volumes Chinese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_volumes_japanese"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>17. Non-Purchased Volumes Japanese</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="17. Non-Purchased Volumes Japanese"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_volumes_korean"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>18. Non-Purchased Volumes Korean</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="18. Non-Purchased Volumes Korean"
+                type="number"
               />
-              <FormField
+              <ReusableFormField
                 control={form.control}
                 name="manonpurchased_volumes_noncjk"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>19. Non-Purchased Volumes Non-CJK</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        value={field.value === 0 ? '' : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
-                          field.onChange(value)
-                        }}
-                        onFocus={(e) => {
-                          if (e.target.value === '0') {
-                            e.target.value = ''
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === '') {
-                            field.onChange(0)
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="19. Non-Purchased Volumes Non-CJK"
+                type="number"
               />
             </div>
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -851,71 +420,27 @@ export default function MonographicForm() {
             <CardDescription>Additional notes or comments about the library data.</CardDescription>
           </CardHeader>
           <CardContent>
-            <FormField
+            <ReusableFormField
               control={form.control}
               name="manotes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter any additional notes or comments..."
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label=""
+              type="textarea"
+              placeholder="Enter any additional notes or comments..."
             />
           </CardContent>
         </Card>
 
-        {/* Success Message */}
-        {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-green-800">
-                  {successMessage}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <StatusMessage
+          type="success"
+          message={successMessage || ""}
+          show={!!successMessage}
+        />
 
-        {/* Error Message */}
-        {errorMessage && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-red-800 mb-2">
-                  Submission Error
-                </p>
-                <p className="text-sm text-red-700 mb-3">
-                  {errorMessage}
-                </p>
-                <div className="text-sm text-red-600">
-                  <p className="mb-1">Please try one of the following:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Click the submit button again to retry</li>
-                    <li>Check your internet connection</li>
-                    <li>Contact the administrator if the problem persists</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <StatusMessage
+          type="error"
+          message={errorMessage || ""}
+          show={!!errorMessage}
+        />
 
         <div className="flex justify-end mb-4">
           <Button 
@@ -925,10 +450,7 @@ export default function MonographicForm() {
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                 Submitting...
               </>
             ) : (
