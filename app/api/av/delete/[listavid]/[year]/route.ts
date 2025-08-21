@@ -17,10 +17,7 @@ export async function DELETE(
   try {
     // delete children first (RESTRICT on FK’s)
     await db.$transaction([
-      // db.list_AV_Language.deleteMany({ where: { listav_id: avId } }),
       db.list_AV_Counts.deleteMany({ where: { listav: avId , year: yearNum} }),
-      // db.libraryYear_ListAV.deleteMany({ where: { listav_id: avId } }),
-      // db.list_AV.delete({ where: { id: avId } }),
     ]);
 
     return NextResponse.json({ success: true });

@@ -1,9 +1,8 @@
-"use client";
+"use client"
 
-import { Row } from "@tanstack/react-table";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner"; // or any toast lib
+import { useRouter } from "next/navigation";
+import { Row } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,37 +11,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import EditAVModal from "../edit-eb-modal"; // keep using same modal
+import { useState } from "react";
+import EditEBModal from "../edit-eb-modal";
 
-type Props = {
-  row: Row<any>;
-  year: number;
-  basePath?: "av" | "ebook" | "ejournal"; // default = "av"
-};
-
-export function DataTableRowActions({ row, year, basePath = "av" }: Props) {
-  const router = useRouter();
+export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
   const [openEdit, setOpenEdit] = useState(false);
+  const router = useRouter();
 
-  /*── Delete handler ──────────────────────────────*/
   async function handleDelete() {
-    const ok = confirm(`Delete “${row.original.title}” (${year})?`);
+    const ok = confirm(`Delete “${row.original.title}” for ${year}?`);
     if (!ok) return;
 
-    const res = await fetch(`/api/${basePath}/${row.original.id}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(`/api/ebook/delete/${row.original.id}/${year}`, { method: "DELETE" });
     const data = await res.json();
 
     if (res.ok) {
       toast.success("Entry deleted");
-      router.refresh(); // revalidate table data
+      router.refresh(); // revalidates the current route so table refetches
     } else {
       toast.error(data.error ?? "Delete failed");
     }
   }
 
-  /*── JSX ─────────────────────────────────────────*/
   return (
     <>
       <DropdownMenu>
@@ -51,17 +41,13 @@ export function DataTableRowActions({ row, year, basePath = "av" }: Props) {
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-
-        <DropdownMenuContent align='end' className='w-40 bg-white'>
-          {/* Edit */}
+        <DropdownMenuContent align='end' className='w-[160px] bg-white'>
           <DropdownMenuItem
             onClick={() => setOpenEdit(true)}
             className='hover:bg-blue-100/30'
           >
             Edit
           </DropdownMenuItem>
-
-          {/* Delete */}
           <DropdownMenuItem
             onClick={handleDelete}
             className='hover:bg-red-100/30 text-red-600'
@@ -71,8 +57,7 @@ export function DataTableRowActions({ row, year, basePath = "av" }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Re-use the existing modal component */}
-      <EditAVModal
+      <EditEBModal
         open={openEdit}
         onOpenChangeAction={setOpenEdit}
         rowData={row.original}
