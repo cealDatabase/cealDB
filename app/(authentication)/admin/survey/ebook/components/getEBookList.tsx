@@ -1,107 +1,120 @@
 import {
-    getListEBookCountsByYear,
-    getListEBookByID,
-    getLanguageIdByListEBookId,
-    getSubscriberIdByListEBookId,
-    getLibraryById,
-    getLanguageById
+  getListEBookCountsByYear,
+  getListEBookByID,
+  getLanguageIdByListEBookId,
+  getSubscriberIdByListEBookId,
+  getLibraryById,
+  getLanguageById,
 } from "@/data/fetchPrisma";
-import { z } from "zod"
-import { listEBookSchema } from "../data/schema"
+import { z } from "zod";
+import { listEBookSchema } from "../data/schema";
+
+/** ⬇️ allow volumes/chapters on each row (local-only, no schema migration) */
+const listEBookRowSchema = listEBookSchema.extend({
+  volumes: z.number().nullable().optional(),
+  chapters: z.number().nullable().optional(),
+});
 
 const getEBookListByYear = async (userSelectedYear: number) => {
-    const listEBookCountsByYear = await getListEBookCountsByYear(userSelectedYear);
-    const outputArray: any[] = [];
-    const ListEBookIdArray: number[] = [];
-    const listEBookCountNumberArray: number[] = [];
+  const listEBookCountsByYear =
+    await getListEBookCountsByYear(userSelectedYear);
 
-    listEBookCountsByYear?.forEach((object) => {
-        if (object.titles !== null) {
-            listEBookCountNumberArray.push(object.titles);
-        } else {
-            listEBookCountNumberArray.push(0);
-        }
-        if (object.listebook !== null) {
-            ListEBookIdArray.push(object.listebook);
-        }
-    });
+  const outputArray: any[] = [];
+  const ListEBookIdArray: number[] = [];
 
-    if (ListEBookIdArray.length === 0) return [];
+  /** ⬇️ keep parallel arrays, like original code */
+  const listEBookCountNumberArray: number[] = [];
+  const volumesNumberArray: (number | null)[] = []; // ⬅️ NEW
+  const chaptersNumberArray: (number | null)[] = []; // ⬅️ NEW
 
-    await Promise.all(
-        ListEBookIdArray.map(async (listEBookId: number) => {
-            const listEBookItem = await getListEBookByID(listEBookId);
-            if (!listEBookItem) return;
+  listEBookCountsByYear?.forEach((object) => {
+    listEBookCountNumberArray.push(object.titles ?? 0);
+    volumesNumberArray.push(object.volumes ?? 0); // ⬅️ NEW
+    chaptersNumberArray.push(object.chapters ?? 0); // ⬅️ NEW
 
-            const languageIDs = await getLanguageIdByListEBookId(listEBookId);
-            const languageArray = 
-            (
-                await Promise.all(
-                    languageIDs?.map(async (id) => await getLanguageById(id)) || []
-                )
-            )?.map((lang) => lang?.short) || [];
+    if (object.listebook !== null) {
+      ListEBookIdArray.push(object.listebook);
+    }
+  });
 
-            const subscriberIDs = await getSubscriberIdByListEBookId(
-                listEBookId, 
-                userSelectedYear
-            );
+  if (ListEBookIdArray.length === 0) return [];
 
-            const subscriberLibraryNames = await Promise.all(
-                (subscriberIDs || []).map(async (subscriberId) => {
-                if (subscriberId != null) {
-                    const library = await getLibraryById(subscriberId);
-                    return `- ${library?.library_name?.trim()} ` || null;
-                }
-                return null;
-            })
-        );
+  await Promise.all(
+    ListEBookIdArray.map(async (listEBookId: number) => {
+      const listEBookItem = await getListEBookByID(listEBookId);
+      if (!listEBookItem) return;
 
-            // Deduplicate
-            const uniqueSubscriberLibraryNames = Array.from(
-                new Set(subscriberLibraryNames.filter(Boolean))
-            ).sort();
+      const languageIDs = await getLanguageIdByListEBookId(listEBookId);
+      const languageArray =
+        (
+          await Promise.all(
+            languageIDs?.map(async (id) => await getLanguageById(id)) || []
+          )
+        )?.map((lang) => lang?.short) || [];
 
-            outputArray.push({
-                id: listEBookId,
-                title: listEBookItem.title,
-                counts: listEBookCountNumberArray[ListEBookIdArray.indexOf(listEBookId)],
-                sub_series_number: listEBookItem.sub_series_number,
-                publisher: listEBookItem.publisher,
-                description: listEBookItem.description,
-                notes: listEBookItem.notes,
-                updated_at: listEBookItem.updated_at.toDateString(),
-                subtitle: listEBookItem.subtitle,
-                cjk_title: listEBookItem.cjk_title,
-                romanized_title: listEBookItem.romanized_title,
-                data_source: listEBookItem.data_source,
-                libraryyear: listEBookItem.libraryyear,
-                is_global: listEBookItem.is_global,
-                subscribers: uniqueSubscriberLibraryNames,
-                language: languageArray,
-            });
+      const subscriberIDs = await getSubscriberIdByListEBookId(
+        listEBookId,
+        userSelectedYear
+      );
+
+      const subscriberLibraryNames = await Promise.all(
+        (subscriberIDs || []).map(async (subscriberId) => {
+          if (subscriberId != null) {
+            const library = await getLibraryById(subscriberId);
+            return `- ${library?.library_name?.trim()} ` || null;
+          }
+          return null;
         })
-    );
+      );
 
-    // Running all the output in website console
-    // outputArray.map((item) => console.log(item.language));
+      // Deduplicate
+      const uniqueSubscriberLibraryNames = Array.from(
+        new Set(subscriberLibraryNames.filter(Boolean))
+      ).sort();
 
-    // Group records by ID after all processing is complete
-    const groupedRecords = Array.from(
-        outputArray.reduce((map, item) => {
-            if (!map.has(item.id)) {
-                map.set(item.id, item);
-            }
-            return map;
-        }, new Map<number, (typeof outputArray)[0]>())
-    ).map((entry) => {
-        const [_, value] = entry as [number, (typeof outputArray)[0]];
-        return value;
-    });
+      const idx = ListEBookIdArray.indexOf(listEBookId); // same pattern as original
 
-    return groupedRecords;
-}
+      outputArray.push({
+        id: listEBookId,
+        title: listEBookItem.title,
+        counts: listEBookCountNumberArray[idx],
+        /** ⬇️ NEW fields surfaced to the table */
+        volumes: volumesNumberArray[idx],
+        chapters: chaptersNumberArray[idx],
+
+        sub_series_number: listEBookItem.sub_series_number,
+        publisher: listEBookItem.publisher,
+        description: listEBookItem.description,
+        notes: listEBookItem.notes,
+        updated_at: listEBookItem.updated_at.toDateString(),
+        subtitle: listEBookItem.subtitle,
+        cjk_title: listEBookItem.cjk_title,
+        romanized_title: listEBookItem.romanized_title,
+        data_source: listEBookItem.data_source,
+        libraryyear: listEBookItem.libraryyear,
+        is_global: listEBookItem.is_global,
+        subscribers: uniqueSubscriberLibraryNames,
+        language: languageArray,
+      });
+    })
+  );
+
+  // Group records by ID after all processing is complete
+  const groupedRecords = Array.from(
+    outputArray.reduce((map, item) => {
+      if (!map.has(item.id)) map.set(item.id, item);
+      return map;
+    }, new Map<number, (typeof outputArray)[0]>())
+  ).map((entry) => {
+    const [_, value] = entry as [number, (typeof outputArray)[0]];
+    return value;
+  });
+
+  return groupedRecords;
+};
 
 export async function GetEBookList(userSelectedYear: number) {
-    const data = await getEBookListByYear(userSelectedYear);
-    return z.array(listEBookSchema).parse(data || []);
+  const data = await getEBookListByYear(userSelectedYear);
+  /** ⬇️ parse with the extended schema so volumes/chapters are preserved */
+  return z.array(listEBookRowSchema).parse(data || []);
 }
