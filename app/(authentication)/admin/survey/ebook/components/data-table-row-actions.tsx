@@ -14,7 +14,15 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import EditEBModal from "../edit-eb-modal";
 
-export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
+export function DataTableRowActions({
+  row,
+  year,
+  basePath,
+}: {
+  row: Row<any>;
+  year: number;
+  basePath?: string;
+}) {
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
 
@@ -22,7 +30,9 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
     const ok = confirm(`Delete “${row.original.title}” for ${year}?`);
     if (!ok) return;
 
-    const res = await fetch(`/api/ebook/delete/${row.original.id}/${year}`, { method: "DELETE" });
+    const res = await fetch(`/api/ebook/delete/${row.original.id}/${year}`, {
+      method: "DELETE",
+    });
     const data = await res.json();
 
     if (res.ok) {
