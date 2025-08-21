@@ -201,46 +201,7 @@ export function getColumns(
       enableHiding: false,
     },
 
-    /** Counts / Volumes / Chapters */
-    {
-      accessorKey: "counts",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Counts' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("counts") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "volumes",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Volumes' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("volumes") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "chapters",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Chapters' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("chapters") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
+    
 
     /** Rest unchanged */
     {
@@ -368,6 +329,47 @@ export function getColumns(
       cell: ({ row }) => (
         <ExpandableText content={row.getValue("notes") as string | null} />
       ),
+    },
+
+    /** Counts / Volumes / Chapters */
+    {
+      accessorKey: "counts",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Counts (# titles)' />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[200px]'>
+          {(row.getValue("counts") as number) ?? 0}
+        </div>
+      ),
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "volumes",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Volumes' />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[200px]'>
+          {(row.getValue("volumes") as number) ?? 0}
+        </div>
+      ),
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "chapters",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Chapters' />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[200px]'>
+          {(row.getValue("chapters") as number) ?? 0}
+        </div>
+      ),
+      enableSorting: true,
+      enableHiding: false,
     },
     ...(roleIdPassIn?.trim() !== "2"
       ? ([
