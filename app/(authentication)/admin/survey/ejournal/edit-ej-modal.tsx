@@ -10,15 +10,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ NEW
 import { listEJournal } from "./data/schema";
 import { languages } from "./data/data";
 
-
-
-type EditEjournalModalProps = {
+type Props = {
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
-  rowData: listEJournal;
+  rowData: listEJournal & {
+    counts?: number | null; // legacy shape (if your table only supplies counts)
+    journals?: number | null;
+    dbs?: number | null;
+  };
   year: number;
 };
 
@@ -27,34 +30,36 @@ export default function EditEjournalModal({
   onOpenChangeAction,
   rowData,
   year,
-}: EditEjournalModalProps) {
+}: Props) {
+  const router = useRouter(); // ✅
+  const [saving, setSaving] = useState(false); // ✅
 
-  const normalizeLabel = (label: string) => {
-    if (label === "NON") return "NONCJK";
-    return label;
-  };
+  const normalizeLabel = (label: string) =>
+    label === "NON" ? "NONCJK" : label;
+
+  // helper near the top of the component
+  const labelToId = (lbl: string): number | undefined =>
+    languages.find((l) => l.label === normalizeLabel(lbl))?.value;
 
   const [formData, setFormData] = useState({
-    title: rowData.title,
+    title: rowData.title || "",
     cjk_title: rowData.cjk_title || "",
     romanized_title: rowData.romanized_title || "",
     subtitle: rowData.subtitle || "",
     description: rowData.description || "",
-    counts: rowData.counts,
     publisher: rowData.publisher || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
-    sub_series_number: rowData.sub_series_number || "",
-    is_global: rowData.is_global || false,
-    language: Array.isArray(rowData.language)
-      ? rowData.language
-        .map(
-          (langLabel) =>
-            languages.find((l) => l.label === normalizeLabel(langLabel))
-              ?.value
-        )
-        .filter((id) => id !== undefined)
-        .map((id) => String(id))
+    sub_series_number: (rowData as any).sub_series_number || "",
+    is_global: !!rowData.is_global,
+    // ↴ Use journals/dbs if present; fall back to counts for journals; dbs default 0
+    journals: (rowData as any).journals ?? (rowData as any).counts ?? 0,
+    dbs: (rowData as any).dbs ?? 0,
+    language: Array.isArray((rowData as any).language)
+      ? ((rowData as any).language as string[])
+          .map(labelToId)
+          .filter((val): val is number => typeof val === "number") // <-- typed filter
+          .map((val) => String(val))
       : [],
   });
 
@@ -69,23 +74,44 @@ export default function EditEjournalModal({
 
   const handleSubmit = async () => {
     try {
+      setSaving(true); // ✅
       const res = await fetch("/api/ejournal/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: rowData.id, ...formData }),
+        body: JSON.stringify({
+          id: (rowData as any).id,
+          year, // ✅ include year
+          // counts alias is not needed anymore; send journals/dbs explicitly
+          journals: Number(formData.journals) || 0,
+          dbs: formData.dbs === "" ? null : Number(formData.dbs),
+          // scalar fields:
+          title: formData.title,
+          cjk_title: formData.cjk_title,
+          romanized_title: formData.romanized_title,
+          subtitle: formData.subtitle,
+          description: formData.description,
+          publisher: formData.publisher,
+          notes: formData.notes,
+          data_source: formData.data_source,
+          sub_series_number: formData.sub_series_number,
+          is_global: !!formData.is_global,
+          // languages as numbers:
+          language: formData.language.map(Number),
+        }),
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        console.error("Update failed:", data.error);
+        console.error("Update failed:", data?.detail || data?.error);
         return;
       }
 
-      console.log("Update successful:", data);
       onOpenChangeAction(false);
+      router.refresh(); // ✅ instant UI update
     } catch (error) {
       console.error("Request error:", error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -139,15 +165,28 @@ export default function EditEjournalModal({
             />
           </div>
 
-          <div>
-            <label className='text-sm font-medium'>Counts</label>
-            <Input
-              type='number'
-              value={formData.counts}
-              onChange={(e) =>
-                setFormData({ ...formData, counts: Number(e.target.value) })
-              }
-            />
+          {/* Replace single "Counts" with Journals + Databases */}
+          <div className='grid sm:grid-cols-2 gap-4'>
+            <div>
+              <label className='text-sm font-medium'>Journals (# titles)</label>
+              <Input
+                type='number'
+                value={(formData as any).journals}
+                onChange={(e) =>
+                  setFormData({ ...formData, journals: Number(e.target.value) })
+                }
+              />
+            </div>
+            <div>
+              <label className='text-sm font-medium'>Databases</label>
+              <Input
+                type='number'
+                value={(formData as any).dbs}
+                onChange={(e) =>
+                  setFormData({ ...formData, dbs: Number(e.target.value) })
+                }
+              />
+            </div>
           </div>
 
           <div>
@@ -177,10 +216,11 @@ export default function EditEjournalModal({
           <div className='flex justify-end'>
             <Button
               onClick={handleSubmit}
-              variant="outline"
+              variant='outline'
+              disabled={saving}
               className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
             >
-              Save Changes
+              {saving ? "Saving…" : "Save Changes"}
             </Button>
           </div>
         </div>
