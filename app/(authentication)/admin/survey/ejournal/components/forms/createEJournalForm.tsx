@@ -1,12 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import * as z from "zod";
 import { languages } from "../../data/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { toast } from "sonner";
+
+// Form validation schema
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  subtitle: z.string().optional(),
+  series: z.string().optional(),
+  sub_series_number: z.string().optional(),
+  vendor: z.string().optional(),
+  description: z.string().optional(),
+  notes: z.string().optional(),
+  publisher: z.string().optional(),
+  data_source: z.string().optional(),
+  cjk_title: z.string().min(1, "CJK Title is required"),
+  romanized_title: z.string().optional(),
+  journals: z.number().min(0, "Journals must be 0 or greater"),
+  dbs: z.number().min(0, "Databases must be 0 or greater").optional(),
+  language: z.array(z.number()).min(1, "At least one language must be selected"),
+  is_global: z.boolean(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateEJournalForm({
   selectedYear,
@@ -14,151 +52,387 @@ export default function CreateEJournalForm({
   selectedYear: number;
 }) {
   const router = useRouter();
-  const [form, setForm] = useState({
-    title: "",
-    subtitle: "",
-    series: "",
-    sub_series_number: "",
-    vendor: "",
-    description: "",
-    notes: "",
-    publisher: "",
-    data_source: "",
-    cjk_title: "",
-    romanized_title: "",
-    journals: 0,
-    dbs: 0,
-    language: [] as number[],
-    is_global: false,
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      subtitle: "",
+      series: "",
+      sub_series_number: "",
+      vendor: "",
+      description: "",
+      notes: "",
+      publisher: "",
+      data_source: "",
+      cjk_title: "",
+      romanized_title: "",
+      journals: 0,
+      dbs: 0,
+      language: [],
+      is_global: false,
+    },
   });
-  const [status, setStatus] = useState("");
 
-  /*──────── input helpers ────────*/
-  const setVal = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setVal(e.target.name, e.target.value);
-  const toggleLang = (id: number) =>
-    setVal(
-      "language",
-      form.language.includes(id)
-        ? form.language.filter((v) => v !== id)
-        : [...form.language, id]
-    );
+  const onSubmit = async (values: FormValues) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/ejournal/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          libraryyear: selectedYear,
+          dbs: values.dbs || null,
+        }),
+      });
 
-  /*──────── submit ───────────────*/
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("Saving…");
-    const res = await fetch("/api/ejournal/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        libraryyear: selectedYear,
-        journals: Number(form.journals),
-        dbs: form.dbs ? Number(form.dbs) : null,
-      }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      router.push(`/admin/survey/ejournal/${selectedYear}`);
-    } else {
-      setStatus(data.error ?? "Failed");
-      alert(`Failed: ${data.detail ?? data.error}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("E-Journal entry created successfully!");
+        router.push(`/admin/survey/ejournal/${selectedYear}`);
+      } else {
+        toast.error(`Failed to create E-Journal entry: ${data.detail || data.error}`);
+      }
+    } catch (error) {
+      console.error("Error creating E-Journal entry:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  /*──────── UI ──────────────────*/
+  const toggleLanguage = (languageId: number, currentLanguages: number[]) => {
+    if (currentLanguages.includes(languageId)) {
+      return currentLanguages.filter((id) => id !== languageId);
+    } else {
+      return [...currentLanguages, languageId];
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className='grid gap-5 max-w-2xl'>
-      {[
-        ["Title", "title"],
-        ["Subtitle", "subtitle"],
-        ["Series", "series"],
-        ["Sub-series No.", "sub_series_number"],
-        ["Vendor", "vendor"],
-        ["Publisher", "publisher"],
-        ["Data Source", "data_source"],
-        ["CJK Title", "cjk_title"],
-        ["Romanized Title", "romanized_title"],
-      ].map(([lbl, key]) => (
-        <div key={key} className='grid gap-1.5'>
-          <Label htmlFor={key}>{lbl}</Label>
-          <Input
-            id={key}
-            name={key}
-            value={(form as any)[key]}
-            onChange={handleChange}
-          />
-        </div>
-      ))}
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Basic Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Basic Information
+              </h3>
 
-      {/* Description & Notes */}
-      {["description", "notes"].map((k) => (
-        <div key={k} className='grid gap-1.5'>
-          <Label htmlFor={k}>{k.charAt(0).toUpperCase() + k.slice(1)}</Label>
-          <textarea
-            id={k}
-            name={k}
-            className='border rounded p-2 w-full min-h-[80px] resize-y'
-            value={(form as any)[k]}
-            onChange={(e) => setVal(k, e.target.value)}
-          />
-        </div>
-      ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="cjk_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CJK Title*</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter CJK title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/* Journals + DBs */}
-      <div className='grid sm:grid-cols-2 gap-5'>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='journals'># Journals</Label>
-          <Input
-            id='journals'
-            name='journals'
-            type='number'
-            value={form.journals}
-            onChange={handleChange}
-          />
-        </div>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='dbs'># Databases</Label>
-          <Input
-            id='dbs'
-            name='dbs'
-            type='number'
-            value={form.dbs}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
+                <FormField
+                  control={form.control}
+                  name="subtitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subtitle</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the subtitle (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/* Languages */}
-      <fieldset className='border p-4 rounded space-y-2'>
-        <legend className='text-sm font-medium text-sky-700'>Languages</legend>
-        {languages.map((lang) => (
-          <div key={lang.value} className='flex items-center space-x-2'>
-            <Checkbox
-              id={`lang-${lang.value}`}
-              checked={form.language.includes(lang.value)}
-              onCheckedChange={() => toggleLang(lang.value)}
-            />
-            <Label htmlFor={`lang-${lang.value}`}>{lang.label}</Label>
-          </div>
-        ))}
-      </fieldset>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>English Title*</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/* Global toggle */}
-      <div className='flex items-center space-x-2'>
-        <Checkbox
-          id='is_global'
-          checked={form.is_global}
-          onCheckedChange={() => setVal("is_global", !form.is_global)}
-        />
-        <Label htmlFor='is_global'>Is Global</Label>
-      </div>
+                <FormField
+                  control={form.control}
+                  name="romanized_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Romanized Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter romanized title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-      <Button type='submit'>Create E-Journal Entry</Button>
-      {status && <p className='text-sm text-red-600'>{status}</p>}
-    </form>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="series"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Series</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter series" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="sub_series_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sub-series Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter sub-series number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Publication Details Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Publication Details
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="publisher"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Publisher</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter publisher" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="vendor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vendor</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter vendor" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="data_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data Source</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter data source" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="journals"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel># Journals</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Enter journal count"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dbs"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel># Databases</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Enter database count"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Additional Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Additional Information
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter description (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter any additional notes (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Languages Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Languages *
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormDescription>
+                      Select all applicable languages for this E-Journal resource.
+                    </FormDescription>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3">
+                      {languages.map((lang) => (
+                        <div key={lang.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`lang-${lang.value}`}
+                            checked={field.value.includes(lang.value)}
+                            onCheckedChange={(checked) => {
+                              const newValue = toggleLanguage(lang.value, field.value);
+                              field.onChange(newValue);
+                            }}
+                          />
+                          <label
+                            htmlFor={`lang-${lang.value}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {lang.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Settings Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Settings
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="is_global"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Global Resource</FormLabel>
+                      <FormDescription>
+                        Check this if this is a globally available resource.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end space-x-4 pt-6 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
+                {isSubmitting ? "Creating..." : "Create E-Journal Entry"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

@@ -3,8 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react'
 import CreateEBookForm from "../components/forms/createEBookForm";
+import { Container } from "@/components/Container";
 
-function SelectYear(){
+function SelectYear() {
   const searchParams = useSearchParams();
   const selectedYear = Number(searchParams.get("year"));
 
@@ -13,7 +14,9 @@ function SelectYear(){
       <h1 className='text-2xl font-semibold mb-4 text-sky-700'>
         Create New EBook Entry for {selectedYear}
       </h1>
-      <CreateEBookForm selectedYear={selectedYear} />
+      <Container>
+        <CreateEBookForm selectedYear={selectedYear} />
+      </Container>
     </div>
   );
 }

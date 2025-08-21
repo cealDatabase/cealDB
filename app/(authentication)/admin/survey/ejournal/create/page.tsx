@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react'
 import CreateEJournalForm from "../components/forms/createEJournalForm";
+import { Container } from "@/components/Container";
 
 function SelectYear(){
   const searchParams = useSearchParams();
@@ -13,7 +14,9 @@ function SelectYear(){
       <h1 className='text-2xl font-semibold mb-4 text-sky-700'>
         Create New E-Journal Entry for {selectedYear}
       </h1>
-      <CreateEJournalForm selectedYear={selectedYear} />
+      <Container>
+        <CreateEJournalForm selectedYear={selectedYear} />
+      </Container>
     </div>
   );
 }

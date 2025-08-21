@@ -1,12 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import * as z from "zod";
 import { languages } from "../../data/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { toast } from "sonner";
+
+// Form validation schema
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  subtitle: z.string().optional(),
+  sub_series_number: z.string().optional(),
+  description: z.string().optional(),
+  notes: z.string().optional(),
+  publisher: z.string().optional(),
+  data_source: z.string().optional(),
+  cjk_title: z.string().min(1, "CJK Title is required"),
+  romanized_title: z.string().optional(),
+  counts: z.number().min(0, "Counts must be 0 or greater"),
+  volumes: z.number().min(0, "Volumes must be 0 or greater").optional(),
+  chapters: z.number().min(0, "Chapters must be 0 or greater").optional(),
+  language: z.array(z.number()).min(1, "At least one language must be selected"),
+  is_global: z.boolean(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateEBookForm({
   selectedYear,
@@ -14,201 +51,377 @@ export default function CreateEBookForm({
   selectedYear: number;
 }) {
   const router = useRouter();
-  const [form, setForm] = useState({
-    title: "",
-    subtitle: "",
-    sub_series_number: "",
-    description: "",
-    notes: "",
-    publisher: "",
-    data_source: "",
-    cjk_title: "",
-    romanized_title: "",
-    counts: 0,
-    volumes: 0,
-    chapters: 0,
-    language: [] as number[],
-    is_global: false,
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      subtitle: "",
+      sub_series_number: "",
+      description: "",
+      notes: "",
+      publisher: "",
+      data_source: "",
+      cjk_title: "",
+      romanized_title: "",
+      counts: 0,
+      volumes: 0,
+      chapters: 0,
+      language: [],
+      is_global: false,
+    },
   });
-  const [status, setStatus] = useState("");
 
-  /*────── handlers ──────*/
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const onSubmit = async (values: FormValues) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/ebook/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          libraryyear: selectedYear,
+          volumes: values.volumes || null,
+          chapters: values.chapters || null,
+        }),
+      });
 
-  const toggleLang = (id: number) =>
-    setForm((p) => ({
-      ...p,
-      language: p.language.includes(id)
-        ? p.language.filter((v) => v !== id)
-        : [...p.language, id],
-    }));
+      const data = await response.json();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/ebook/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        libraryyear: selectedYear,
-        counts: Number(form.counts),
-        volumes: Number(form.volumes) || null,
-        chapters: Number(form.chapters) || null,
-      }),
-    });
-    const data = await res.json();
-    if (res.ok) router.push(`/admin/survey/ebook/${selectedYear}`);
-    else {
-      setStatus(data.error ?? "Failed");
-      alert(`Failed: ${data.detail ?? data.error}`);
+      if (response.ok) {
+        toast.success("E-Book entry created successfully!");
+        router.push(`/admin/survey/ebook/${selectedYear}`);
+      } else {
+        toast.error(`Failed to create E-Book entry: ${data.detail || data.error}`);
+      }
+    } catch (error) {
+      console.error("Error creating E-Book entry:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  /*────── UI ──────*/
+  const toggleLanguage = (languageId: number, currentLanguages: number[]) => {
+    if (currentLanguages.includes(languageId)) {
+      return currentLanguages.filter((id) => id !== languageId);
+    } else {
+      return [...currentLanguages, languageId];
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className='grid gap-5 max-w-2xl'>
-      {/** Title */}
-      <div className='grid gap-1.5'>
-        <Label htmlFor='title'>Title</Label>
-        <Input
-          id='title'
-          name='title'
-          value={form.title}
-          onChange={handleChange}
-        />
-      </div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Basic Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Basic Information
+              </h3>
 
-      {/** Subtitle */}
-      <div className='grid gap-1.5'>
-        <Label htmlFor='subtitle'>Subtitle</Label>
-        <Input
-          id='subtitle'
-          name='subtitle'
-          value={form.subtitle}
-          onChange={handleChange}
-        />
-      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="cjk_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CJK Title*</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter CJK title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/** Series / Number */}
-      <div className='grid gap-1.5'>
-        <Label htmlFor='sub_series_number'>Series / Number</Label>
-        <Input
-          id='sub_series_number'
-          name='sub_series_number'
-          value={form.sub_series_number}
-          onChange={handleChange}
-        />
-      </div>
+                <FormField
+                  control={form.control}
+                  name="subtitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subtitle</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the subtitle (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/** Publisher */}
-      <div className='grid gap-1.5'>
-        <Label htmlFor='publisher'>Publisher</Label>
-        <Input
-          id='publisher'
-          name='publisher'
-          value={form.publisher}
-          onChange={handleChange}
-        />
-      </div>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>English Title*</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter the title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/** Data source */}
-      <div className='grid gap-1.5'>
-        <Label htmlFor='data_source'>Data Source</Label>
-        <Input
-          id='data_source'
-          name='data_source'
-          value={form.data_source}
-          onChange={handleChange}
-        />
-      </div>
+                <FormField
+                  control={form.control}
+                  name="romanized_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Romanized Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter romanized title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-      {/** CJK + Romanized */}
-      <div className='grid sm:grid-cols-2 gap-5'>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='cjk_title'>CJK Title</Label>
-          <Input
-            id='cjk_title'
-            name='cjk_title'
-            value={form.cjk_title}
-            onChange={handleChange}
-          />
-        </div>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='romanized_title'>Romanized Title</Label>
-          <Input
-            id='romanized_title'
-            name='romanized_title'
-            value={form.romanized_title}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
+              <FormField
+                control={form.control}
+                name="sub_series_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Series / Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter series or number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-      {/** Counts / Volumes / Chapters */}
-      <div className='grid sm:grid-cols-3 gap-5'>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='counts'># Titles</Label>
-          <Input
-            id='counts'
-            name='counts'
-            type='number'
-            value={form.counts}
-            onChange={handleChange}
-          />
-        </div>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='volumes'># Volumes</Label>
-          <Input
-            id='volumes'
-            name='volumes'
-            type='number'
-            value={form.volumes}
-            onChange={handleChange}
-          />
-        </div>
-        <div className='grid gap-1.5'>
-          <Label htmlFor='chapters'># Chapters</Label>
-          <Input
-            id='chapters'
-            name='chapters'
-            type='number'
-            value={form.chapters}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
+            {/* Publication Details Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Publication Details
+              </h3>
 
-      {/** Languages */}
-      <fieldset className='border p-4 rounded space-y-2'>
-        <legend className='text-sm font-medium text-sky-700'>Languages</legend>
-        {languages.map((lang) => (
-          <div key={lang.value} className='flex items-center space-x-2'>
-            <Checkbox
-              id={`lang-${lang.value}`}
-              checked={form.language.includes(lang.value)}
-              onCheckedChange={() => toggleLang(lang.value)}
-            />
-            <Label htmlFor={`lang-${lang.value}`}>{lang.label}</Label>
-          </div>
-        ))}
-      </fieldset>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="publisher"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Publisher</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter publisher" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      {/** Global toggle */}
-      <div className='flex items-center space-x-2'>
-        <Checkbox
-          id='is_global'
-          checked={form.is_global}
-          onCheckedChange={() =>
-            setForm((p) => ({ ...p, is_global: !p.is_global }))
-          }
-        />
-        <Label htmlFor='is_global'>Is Global</Label>
-      </div>
+                <FormField
+                  control={form.control}
+                  name="data_source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data Source</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter data source" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-      <Button type='submit'>Create E-Book Entry</Button>
-      {status && <p className='text-sm text-red-600'>{status}</p>}
-    </form>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="counts"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel># Titles</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Enter count"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="volumes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel># Volumes</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Enter volumes"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chapters"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel># Chapters</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="Enter chapters"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Additional Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Additional Information
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter description (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter any additional notes (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Languages Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Languages *
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormDescription>
+                      Select all applicable languages for this E-Book resource.
+                    </FormDescription>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3">
+                      {languages.map((lang) => (
+                        <div key={lang.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`lang-${lang.value}`}
+                            checked={field.value.includes(lang.value)}
+                            onCheckedChange={(checked) => {
+                              const newValue = toggleLanguage(lang.value, field.value);
+                              field.onChange(newValue);
+                            }}
+                          />
+                          <label
+                            htmlFor={`lang-${lang.value}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {lang.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Settings Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                Settings
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="is_global"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Global Resource</FormLabel>
+                      <FormDescription>
+                        Check this if this is a globally available resource.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end space-x-4 pt-6 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
+                {isSubmitting ? "Creating..." : "Create E-Book Entry"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
