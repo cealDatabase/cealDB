@@ -4,104 +4,119 @@ import {
   getLanguageIdByListEJournalId,
   getSubscriberIdByListEJournalId,
   getLibraryById,
-  getLanguageById
+  getLanguageById,
 } from "@/data/fetchPrisma";
-import { z } from "zod"
-import { listEJournalSchema } from "../data/schema"
+import { z } from "zod";
+import { listEJournalSchema } from "../data/schema";
+
+/** Extend base schema so we keep per-year fields */
+// ⬇️ extend: keep legacy `counts` but make it optional + default
+const listEJournalRowSchema = listEJournalSchema.extend({
+  counts: z.number().optional().default(0),
+  journals: z.number().nullable().optional(),
+  dbs: z.number().nullable().optional(),
+});
 
 const getEJournalListByYear = async (userSelectedYear: number) => {
-  const listEJournalCountsByYear = await getListEJournalCountsByYear(userSelectedYear);
-  const outputArray: any[] = [];
-  const ListEJournalIdArray: number[] = [];
-  const listEJournalCountNumberArray: number[] = [];
+  // counts rows: expect listejournal, journals, dbs
+  const counts = await getListEJournalCountsByYear(userSelectedYear);
 
-  listEJournalCountsByYear?.forEach((object) => {
-    if (object.journals !== null) {
-      listEJournalCountNumberArray.push(object.journals);
-    } else {
-      listEJournalCountNumberArray.push(0);
-    }
-    if (object.listejournal !== null) {
-      ListEJournalIdArray.push(object.listejournal);
+  // Map eJournalId -> { journals, dbs }
+  const idToCounts = new Map<number, { journals: number; dbs: number }>();
+  counts?.forEach((c: any) => {
+    if (c?.listejournal != null) {
+      idToCounts.set(c.listejournal, {
+        journals: Number.isFinite(c.journals) ? Number(c.journals) : 0,
+        dbs: Number.isFinite(c.dbs) ? Number(c.dbs) : 0,
+      });
     }
   });
 
-  if (ListEJournalIdArray.length === 0) return [];
+  const ids = [...idToCounts.keys()];
+  if (ids.length === 0) return [];
+
+  const outputArray: any[] = [];
 
   await Promise.all(
-    ListEJournalIdArray.map(async (listEJournalId: number) => {
-      const listEJournalItem = await getListEJournalByID(listEJournalId);
-      if (!listEJournalItem) return;
+    ids.map(async (ejId) => {
+      const ej = await getListEJournalByID(ejId);
+      if (!ej) return;
 
-      const languageIDs = await getLanguageIdByListEJournalId(listEJournalId);
-      const languageArray = (
-        await Promise.all(
-          languageIDs?.map(async (id) => await getLanguageById(id)) || []
+      // languages → labels
+      const langIds = await getLanguageIdByListEJournalId(ejId);
+      const languageArray =
+        (
+          await Promise.all(
+            (langIds ?? []).map(async (id: number) => await getLanguageById(id))
+          )
         )
-      )?.map((lang) => lang?.short) || [];
+          ?.map((lang) => lang?.short)
+          .filter(Boolean) ?? [];
 
-      const subscriberIDs = await getSubscriberIdByListEJournalId(
-        listEJournalId, userSelectedYear
+      // subscribers → names
+      const subIds = await getSubscriberIdByListEJournalId(
+        ejId,
+        userSelectedYear
       );
-
       const subscriberLibraryNames = await Promise.all(
-        (subscriberIDs || []).map(async (subscriberId) => {
+        (subIds ?? []).map(async (subscriberId) => {
           if (subscriberId != null) {
             const library = await getLibraryById(subscriberId);
-            return `- ${library?.library_name?.trim()} ` || null;
+            return library?.library_name
+              ? `- ${library.library_name.trim()} `
+              : null;
           }
           return null;
         })
       );
-
-      // Deduplicate
       const uniqueSubscriberLibraryNames = Array.from(
         new Set(subscriberLibraryNames.filter(Boolean))
       ).sort();
 
+      const c = idToCounts.get(ejId);
+
       outputArray.push({
-        id: listEJournalId,
-        title: listEJournalItem.title,
-        counts: listEJournalCountNumberArray[ListEJournalIdArray.indexOf(listEJournalId)],
-        sub_series_number: listEJournalItem.sub_series_number,
-        publisher: listEJournalItem.publisher,
-        description: listEJournalItem.description,
-        notes: listEJournalItem.notes,
-        updated_at: listEJournalItem.updated_at.toDateString(),
-        subtitle: listEJournalItem.subtitle,
-        series: listEJournalItem.series,
-        vendor: listEJournalItem.vendor,
-        cjk_title: listEJournalItem.cjk_title,
-        romanized_title: listEJournalItem.romanized_title,
-        data_source: listEJournalItem.data_source,
-        libraryyear: listEJournalItem.libraryyear,
-        is_global: listEJournalItem.is_global,
+        id: ejId,
+        title: ej.title,
+
+        // ⬇️ per-year fields
+        journals: c?.journals ?? 0,
+        dbs: c?.dbs ?? 0,
+
+        // ⬅️ keep legacy field so existing Zod/table code is happy
+        counts: c?.journals ?? 0,
+
+        sub_series_number: ej.sub_series_number,
+        publisher: ej.publisher,
+        description: ej.description,
+        notes: ej.notes,
+        updated_at: ej.updated_at.toDateString(),
+        subtitle: ej.subtitle,
+        series: ej.series,
+        vendor: ej.vendor,
+        cjk_title: ej.cjk_title,
+        romanized_title: ej.romanized_title,
+        data_source: ej.data_source,
+        libraryyear: ej.libraryyear,
+        is_global: ej.is_global,
         subscribers: uniqueSubscriberLibraryNames,
         language: languageArray,
       });
     })
   );
 
-  // Running all the output in website console
-  // outputArray.map((item) => console.log(item.language));
-
-  // Group records by ID after all processing is complete
+  // de-dupe by id (keeps your original intent, but type-safe)
   const groupedRecords = Array.from(
-    outputArray.reduce((map, item) => {
-      if (!map.has(item.id)) {
-        map.set(item.id, item);
-      }
-      return map;
-    }, new Map<number, (typeof outputArray)[0]>())
-  ).map((entry) => {
-    const [_, value] = entry as [number, (typeof outputArray)[0]];
-    return value;
-  });
+    new Map<number, (typeof outputArray)[number]>(
+      outputArray.map((item) => [item.id as number, item])
+    ).values()
+  );
 
   return groupedRecords;
-}
+};
 
 export async function GetEJournalList(userSelectedYear: number) {
   const data = await getEJournalListByYear(userSelectedYear);
-  return z.array(listEJournalSchema).parse(data || []);
+  // Use the extended schema so journals/dbs are preserved
+  return z.array(listEJournalRowSchema).parse(data || []);
 }
