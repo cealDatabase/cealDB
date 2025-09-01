@@ -1,3 +1,7 @@
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+const nextYear = currentYear + 1;
+
 export const forms = [
   {
     title: "Monographic Acquisitions",
@@ -44,37 +48,33 @@ export const forms = [
 export const instructionGroup = {
   "Survey Time Frame and Publication": [
     {
-      question: "When can data be input or edited for the survey?",
-      answer:
-        "The 2024 Online Survey input/edit time frame is from October 1 through December 1, 2024 (11:59 pm Central Time)",
+      question: "Input/Edit Time Frame",
+      answer: `The ${currentYear} Online Survey input/edit time frame is from October 1 through December 1, ${currentYear} (11:59 pm Central Time)`,
     },
     {
-      question: "When will the 2024 CEAL annual statistics be published?",
-      answer:
-        "The 2024 CEAL annual statistics will be published in the February 2024 online issue of the <i>Journal of East Asian Libraries</i>.",
+      question: "Publication Date",
+      answer: `The ${currentYear} CEAL annual statistics will be published in the February ${currentYear} online issue of the <i>Journal of East Asian Libraries</i>.`,
     },
   ],
-  "General Instructions for Data Submission": [
+  "Core Guidelines for Completing the Forms": [
     {
       question:
         "What are the definitions of the statistical categories based on?",
       answer:
-        "The definitions of the statistical categories used in this questionnaire are based on <i>Information Services and Use: Metrics & Statistics for Libraries and Information Providers — Data Dictionary NISO Z39.7 (2013).</i>",
+        "The definitions of the statistical categories used in this questionnaire are based on <i><a href='https://groups.niso.org/higherlogic/ws/public/download/11283/Z39-7-2013_metrics.pdf?utm_source=chatgpt.com' target='_blank'>Information Services and Use: Metrics & Statistics for Libraries and Information Providers — Data Dictionary NISO Z39.7 (2013)</a></i>",
     },
     {
-      question: "What fiscal year does this questionnaire assume?",
-      answer:
-        "This questionnaire assumes a fiscal year from July 1, 2022 to June 30, 2023.",
+      question: "Reporting period",
+      answer: `This questionnaire assumes a fiscal year from July 1, ${previousYear} to June 30, ${currentYear}.`,
     },
     {
       question: "How should numerical figures be entered?",
       answer:
-        "All figures should be rounded to the nearest whole number unless otherwise instructed, and decimals should not be used.",
+        "Use whole numbers only unless otherwise instructed. Round to the nearest whole number. For entries requiring decimals, follow instructions for that field.",
     },
     {
       question: 'What does the term "Non-CJK items" refer to in this survey?',
-      answer:
-        "Non-CJK items refer to not relating to Chinese, Japanese, and Korean language materials on East Asia.",
+      answer: `“Non-CJK” = non-CJK language materials on East Asia.`,
     },
     {
       question: "How should currency be reported?",
@@ -84,15 +84,15 @@ export const instructionGroup = {
       question:
         "Should a combined report be submitted for all branches of a library?",
       answer:
-        "Each institution should provide one combined library statistics report, including data from all branch libraries, except for law libraries.",
+        "Please cooperate with all branch libraries in preparing the combined report. Submit one combined report per institution (except law libraries).",
     },
     {
       question:
         "What should I do if an entry in the questionnaire is zero or none?",
-      answer: "Use “0” if the appropriate entry is zero or none.",
+      answer: "Enter 0 if a category has no data.",
     },
     {
-      question: " Can explanatory footnotes be included?",
+      question: "Can explanatory footnotes be included?",
       answer:
         "Yes, libraries are encouraged to include explanatory footnotes to clarify the figures submitted.",
     },
@@ -100,19 +100,18 @@ export const instructionGroup = {
       question:
         "What should be done if there are large difference in reported data compared to the previous year?",
       answer:
-        "Any large difference in reported data compared to the previous year should be explained with a footnote.",
+        "Explain large year-to-year data changes in the footnote section. Footnotes will be published alongside your data.",
     },
   ],
   "Accessing the CEAL Statistics Database": [
     {
       question: "How do institutions access the CEAL Statistics Database?",
-      answer:
-        "Institutions can access the database by logging in at <a href='https://ceal.ku.edu'>https://ceal.ku.edu</a>.  A login is required to access forms and instructions.",
+      answer: "Complete the survey online at <a href='https://www.cealstats.org' target='_blank'>www.cealstats.org</a> (login required)."
     },
     {
       question: "I am an institutional contact person. How do I log in?",
       answer:
-        "If your name is registered with the system, you can log in using the contact person's email address as the User ID and the password you obtained since the last input. Alternatively, you can follow the “Forgot Password” process to set up a new password.",
+        "User ID: your registered email address. Password: use your existing password or request one via “Forgot Password”.",
     },
     {
       question: "What happens if I use the 'Forgot Password' process?",
@@ -127,7 +126,7 @@ export const instructionGroup = {
     {
       question: "Can I change password after logging into the database?",
       answer:
-        "Yes, after entering the database, you can change the password at any time by following the “Change Password” instructions.",
+        "Yes, after logging in, you may change your password under “Change Password”.",
     },
   ],
   "New Library Participation": [
@@ -135,6 +134,7 @@ export const instructionGroup = {
       question:
         "How can new library member establish accounts to participate in CEAL statistics?",
       answer:
-        "New library members should <a href='/help'>contact us</a> for instructions on how to establish an account to participate in the CEAL annual statistics.",
-    }]
+        "New member libraries should email <a href='https://www.eastasianlib.org/newsite/statistics/'>the Chair of CEAL Statistics Committee</a> to request an account.",
+    },
+  ],
 };

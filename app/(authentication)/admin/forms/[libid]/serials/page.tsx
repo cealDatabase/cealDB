@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { SerialsInstructions } from "@/components/instructions/serials"
 import SerialsForm from "@/components/forms/serials-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
@@ -11,7 +12,7 @@ const SerialsPage = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900">
+      <h1 className="text-3xl font-bold text-gray-900 mt-6">
         Serial Titles: Purchased and Non-Purchased
       </h1>
       <Container>
@@ -40,25 +41,7 @@ const SerialsPage = () => {
           {/* Instructions Column - 1/3 width */}
           {showInstructions && (
             <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Serial Titles Form (Required)
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Guidelines and requirements for completing the serial titles form.
-                </p>
-              </div>
-              {/* TODO: Create SerialInstructions component */}
-              <div className="text-sm text-gray-700">
-                <h3 className="font-semibold mb-2">Instructions:</h3>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Enter the number of purchased serials (including subscriptions) in print and other formats</li>
-                  <li>Enter the number of non-purchased electronic serials (includes gifts)</li>
-                  <li>Enter the number of non-purchased print serials (includes gifts)</li>
-                  <li>All calculations are performed automatically</li>
-                  <li>Use the notes section for any additional comments</li>
-                </ul>
-              </div>
+              <SerialsInstructions />
             </div>
           )}
 
