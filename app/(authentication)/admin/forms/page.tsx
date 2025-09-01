@@ -19,6 +19,10 @@ const FormsPage = async () => {
   const library = cookieStore.get("library");
   const libid = library?.value;
 
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+  const nextYear = currentYear + 1;
+
   return (
     <main>
       <h1>Forms Page</h1>
@@ -39,19 +43,17 @@ const FormsPage = async () => {
               <ul className="mt-6 space-y-4 col-span-12 sm:col-span-4">
                 <li key="ebook" className="list-disc">
                   <Link href={`/admin/forms/${libid}/ebookedit`}>
-                    E-Book Database by Subscription for McGill Library in 2024
+                    E-Book Database by Subscription for McGill Library in {currentYear}
                   </Link>
                 </li>
                 <li key="ejournal" className="list-disc">
                   <Link href={`/admin/forms/${libid}/ejournaledit`}>
-                    E-Journal Database by Subscription for McGill Library in
-                    2024
+                    E-Journal Database by Subscription for McGill Library in {currentYear}
                   </Link>
                 </li>
                 <li key="avdb" className="list-disc">
                   <Link href={`/admin/forms/${libid}/avdbedit`}>
-                    Audio/Visual Database by Subscription for McGill Library in
-                    2024
+                    Audio/Visual Database by Subscription for McGill Library in {currentYear}
                   </Link>
                 </li>
               </ul>
@@ -65,11 +67,11 @@ const FormsPage = async () => {
           <div className="mt-10 grid grid-cols-12 ">
             <div className="mt-6 space-y-4 md:col-start-2 col-span-12 md:col-span-10 leading-7">
               <p>
-                The 2023-2024 CEAL Statistics Online Survey input/edit period is
-                from October 1 to December 1, 2024, with the results published
-                in the February 2024 issue of the Journal of East Asian
-                Libraries. The survey covers the fiscal year from July 1, 2022,
-                to June 30, 2023, with all figures rounded to whole numbers and
+                The {previousYear}-{currentYear} CEAL Statistics Online Survey input/edit period is
+                from October 1 to December 1, {currentYear}, with the results published
+                in the February {nextYear} issue of the Journal of East Asian
+                Libraries. The survey covers the fiscal year from July 1, {previousYear},
+                to June 30, {currentYear}, with all figures rounded to whole numbers and
                 currency converted to US dollars. Non-CJK items refer to non-CJK
                 language materials related to East Asia. Each institution,
                 except law libraries, should submit a combined report, and
