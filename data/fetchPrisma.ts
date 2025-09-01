@@ -328,20 +328,27 @@ export const getSubscriberIdByListEBookId = async (listEBookId: number, year: nu
   }
 }
 
-// Survey: Get EJournal List.
 export const getListEJournalCountsByYear = async (year: number) => {
   try {
-    const listEJournalCountsArray = await db.list_EJournal_Counts.findMany({
+    return await db.list_EJournal_Counts.findMany({
       where: {
         year,
-        ishidden: false,
+        NOT: { ishidden: true }, // includes false and null
       },
+      select: {
+        listejournal: true,
+        journals: true,
+        dbs: true, // <-- important
+      },
+      orderBy: { listejournal: "asc" },
     });
-    return listEJournalCountsArray;
-  } catch {
+  } catch (e) {
+    console.error("getListEJournalCountsByYear failed:", e);
     return null;
   }
-}
+};
+
+
 
 export const getListEJournalByID = async (id: number) => {
   try {
