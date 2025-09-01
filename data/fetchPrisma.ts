@@ -242,15 +242,14 @@ export const getSubscriberIdByListAvId = async (listavid: number, year: number) 
     const result = await db.libraryYear_ListAV.findMany({
       where: {
         listav_id: listavid,
+        Library_Year: {
+          year: year,
+        },
       },
       include: {
         Library_Year: {
-          where: {
-            year: year,
-          },
           select: {
             library: true,
-            // is_active: true,
           },
         },
       },
@@ -308,13 +307,12 @@ export const getSubscriberIdByListEBookId = async (listEBookId: number, year: nu
     const result = await db.libraryYear_ListEBook.findMany({
       where: {
         listebook_id: listEBookId,
+        Library_Year: {
+          year: year,
+        },
       },
       include: {
         Library_Year: {
-          where: {
-            year: year,
-            // is_active: true,
-          },
           select: {
             library: true,
           },
@@ -377,25 +375,25 @@ export const getLanguageIdByListEJournalId = async (listEJournalId: number) => {
 
 export const getSubscriberIdByListEJournalId = async (listEJournalId: number, year: number) => {
   try {
-    const result = await db.libraryYear_ListEJournal.findMany({
+    // First get all library-year relationships for this ejournal
+    const relationships = await db.libraryYear_ListEJournal.findMany({
       where: {
         listejournal_id: listEJournalId,
       },
       include: {
-        Library_Year: {
-          where: {
-            year: year,
-            // is_active: true,
-          },
-          select: {
-            library: true,
-          },
-        },
+        Library_Year: true,
       },
     });
 
-    return result.map((item) => item.Library_Year?.library);
-  } catch {
+    // Filter by year and extract library IDs
+    const libraryIds = relationships
+      .filter((rel) => rel.Library_Year?.year === year)
+      .map((rel) => rel.Library_Year?.library)
+      .filter((id) => id !== null && id !== undefined);
+
+    return libraryIds;
+  } catch (error) {
+    console.error('Error fetching subscribers:', error);
     return null;
   }
 }
