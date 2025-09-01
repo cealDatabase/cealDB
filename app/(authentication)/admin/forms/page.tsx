@@ -3,15 +3,31 @@ import { Container } from "@/components/Container"
 import Link from "next/link"
 import { forms, instructionGroup } from "@/constant/form"
 import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
+import { getLibraryById } from "@/data/fetchPrisma"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-const FormsPage = async () => {
+const FormsPage = async ({ searchParams }: { searchParams: { libraryName?: string } }) => {
     const cookieStore = await cookies()
     const library = cookieStore.get("library")
     const libid = library?.value
+
+    // Get library name with fallback logic
+    let libraryName = searchParams.libraryName;
+
+    if (!libraryName && libid) {
+        try {
+            const libraryData = await getLibraryById(parseInt(libid));
+            libraryName = libraryData?.library_name;
+        } catch (error) {
+            console.error("Error fetching library name:", error);
+        }
+    }
+
+    // Final fallback
+    libraryName = libraryName || "your library";
 
     const currentYear = new Date().getFullYear()
     const previousYear = currentYear - 1
@@ -52,7 +68,7 @@ const FormsPage = async () => {
                                     href={`/admin/forms/${libid}/ebookedit`}
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
-                                    📚 E-Book Database by Subscription for McGill Library in {currentYear}
+                                    📚 E-Book Database by Subscription for {libraryName} in {currentYear}
                                 </Link>
                             </div>
                             <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
@@ -60,7 +76,7 @@ const FormsPage = async () => {
                                     href={`/admin/forms/${libid}/ejournaledit`}
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
-                                    📰 E-Journal Database by Subscription for McGill Library in {currentYear}
+                                    📰 E-Journal Database by Subscription for {libraryName} in {currentYear}
                                 </Link>
                             </div>
                             <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
@@ -68,7 +84,7 @@ const FormsPage = async () => {
                                     href={`/admin/forms/${libid}/avdbedit`}
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
-                                    🎵 Audio/Visual Database by Subscription for McGill Library in {currentYear}
+                                    🎵 Audio/Visual Database by Subscription for {libraryName} in {currentYear}
                                 </Link>
                             </div>
                         </div>
@@ -98,7 +114,7 @@ const FormsPage = async () => {
                                         href={`/admin/forms/${libid}/${form.href}`}
                                         className="block text-gray-900 hover:text-purple-600 font-semibold transition-colors group-hover:translate-x-1 transform duration-200 no-underline"
                                     >
-                                        {form.title}
+                                        {index + 1}. {form.title}
                                     </Link>
                                     <div className="mt-2 flex items-center text-sm text-purple-600">
                                         <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>

@@ -121,16 +121,19 @@ async function getUserDetailByEmail({
       const libraryid = singleUser?.User_Library[0].library_id;
       if (libraryid) {
         const output = await getLibraryById(libraryid);
-        return (
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-            <dt className="text-gray-500 font-medium">Library</dt>
-            <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-              <Link href={`/libraries/${output?.id}`}>
-                {output?.library_name}
-              </Link>
-            </dd>
-          </div>
-        );
+        return {
+          component: (
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+              <dt className="text-gray-500 font-medium">Library</dt>
+              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
+                <Link href={`/libraries/${output?.id}`}>
+                  {output?.library_name}
+                </Link>
+              </dd>
+            </div>
+          ),
+          libraryName: output?.library_name
+        };
       } else {
         return null;
       }
@@ -139,11 +142,14 @@ async function getUserDetailByEmail({
     }
   }
 
+  const libraryData = await findLibrary();
+  
   return (
     <UserSingle
       user={singleUser as unknown as SingleUserType}
       role={findRole()}
-      library={findLibrary()}
+      library={libraryData?.component}
+      libraryName={libraryData?.libraryName}
     />
   );
 }
@@ -152,10 +158,12 @@ function UserSingle({
   user,
   role,
   library,
+  libraryName,
 }: {
   user: SingleUserType;
   role: any;
   library: any;
+  libraryName?: string;
 }) {
   if (!user) {
     return null; // or handle the case when user is null
@@ -201,7 +209,7 @@ function UserSingle({
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
               <dt className="text-gray-500 font-medium">Forms</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                <Link href={`/admin/forms`}>Forms Page</Link>
+                <Link href={`/admin/forms?libraryName=${encodeURIComponent(libraryName || '')}`}>Forms Page</Link>
               </dd>
             </div>
 
