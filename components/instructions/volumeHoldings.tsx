@@ -1,46 +1,203 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { CheckCircle, Info, Calculator, BookOpen, Plus, Minus, Database } from "lucide-react"
+
 export const VolumeHoldingsInstructions = () => {
     return (
-        <div>
-            <div className="section text-left text-sky-500 text-base" id="volumeHoldings"><h3 className="underline"><strong>Physical Total Volume Holdings Form (Required)</strong></h3>
+        <div className="space-y-6" id="volumeHoldings">
+            {/* Header Card */}
+            <Card className="border-primary/20">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg text-primary">
+                        <BookOpen className="h-5 w-5 text-blue-500" />
+                        Physical Total Volume Holdings Form
+                        <Badge variant="destructive" className="text-xs">Required</Badge>
+                    </CardTitle>
+                    <CardDescription className="text-base font-medium">
+                        Monographs Held by the Institution
+                    </CardDescription>
+                </CardHeader>
+            </Card>
 
-                <p><strong>Previously reported monographs held by the institution will be supplied by the CEAL database</strong>. <u>New libraries</u>&nbsp;need to&nbsp;fill out the data according to individual collections information. Contact vdoll@ku.edu for questions.</p>
+            {/* Essential Information Card */}
+            <Card className="border-primary/20">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Info className="h-5 w-5 text-blue-500" />
+                        Essential Information
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                            <Database className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">Previously reported holdings are pre-filled from the CEAL database (fields 01–05).</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">New libraries must enter data based on their own collection counts.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">Include duplicates and bound volumes of periodicals.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <Minus className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">Exclude microforms, maps, non-print materials, and uncataloged items.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">For "volumes added," count only those cataloged, classified, and ready for use.</p>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <Calculator className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                            <p className="text-sm">No need to fill in subtotal or total fields. The system will calculate them automatically.</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
-                <p><b><u>Include</u>:</b> duplicates and bound volumes of periodicals. For purposes of this questionnaire, uncataloged/unclassified bound serials arranged in alphabetical order are considered <span className="highlight">classified</span>.<br />
-                    <b><u>Exclude</u>:</b> microforms, maps, non-print materials, and un-cataloged items.</p>
+            {/* Definition Card */}
+            <Card className="border-amber-200 bg-amber-50/50">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base text-amber-700">
+                        <Info className="h-4 w-4" />
+                        Definition of "Volume" (ANSI Z39.7-1995)
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-amber-800 leading-relaxed">
+                        A single physical unit of any printed, typewritten, handwritten, mimeographed, or processed work, 
+                        distinguished from other units by a separate binding, encasement, portfolio, or other clear distinction, 
+                        which has been cataloged, classified, and made ready for use, and which is typically the unit used to 
+                        charge circulation transactions. Either a serial volume is bound, or it comprises the serial issues that 
+                        would be bound together if the library bound all serials.
+                    </p>
+                </CardContent>
+            </Card>
 
-                <p>See the ANSI Z39.7-1995 definition for volume as follows:</p>
+            {/* Field Categories */}
+            <div className="space-y-4">
+                {/* Previous Year Holdings */}
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-primary text-base flex items-center gap-2">
+                            <Database className="h-4 w-4" />
+                            Physical Volume Numbers from Last Year
+                        </CardTitle>
+                        <CardDescription className="text-sm">Auto-filled from database if available</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-1 text-xs">
+                            <div className="flex justify-between items-center py-1">
+                                <span>Previous Chinese</span>
+                                <Badge variant="outline" className="text-xs">01</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Previous Japanese</span>
+                                <Badge variant="outline" className="text-xs">02</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Previous Korean</span>
+                                <Badge variant="outline" className="text-xs">03</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Previous Non-CJK</span>
+                                <Badge variant="outline" className="text-xs">04</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                                <span className="font-medium text-xs">Subtotal</span>
+                                <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto Calculated: 01+02+03+04</Badge>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                <p><b><i>Volume</i></b>. <i>A single physical unit of any printed, typewritten, handwritten, mimeographed, or processed work, distinguished from other units by a separate binding, encasement, portfolio, or other clear distinction, which has been cataloged, classified, and made ready for use, and which is typically the unit used to charge circulation transactions. Either a serial volume is bound, or it comprises the serial issues that would be bound together if the library bound all serials</i>.</p>
+                {/* Volumes Added This Year */}
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Plus className="h-4 w-4 text-green-600" />
+                            Physical Volumes Added This Year
+                        </CardTitle>
+                        <CardDescription className="text-sm">Cataloged, including bound serials arranged in alphabetical order</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-1 text-xs">
+                            <div className="flex justify-between items-center py-1">
+                                <span>Added Chinese</span>
+                                <Badge variant="outline" className="text-xs">06</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Added Japanese</span>
+                                <Badge variant="outline" className="text-xs">07</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Added Korean</span>
+                                <Badge variant="outline" className="text-xs">08</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Added Non-CJK</span>
+                                <Badge variant="outline" className="text-xs">09</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                                <span className="font-medium text-xs">Added Subtotal</span>
+                                <Badge className="bg-green-100/90 text-green-600 text-xs">Auto Calculated: 06+07+08+09</Badge>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                <p><b><i>Volumes added:</i></b><br />
-                    <span className="highlight"><b><u>Include</u>:</b> only volumes cataloged, classified, and made ready for use.</span></p>
+                {/* Volumes Withdrawn This Year */}
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Minus className="h-4 w-4 text-red-600" />
+                            Physical Volumes Withdrawn This Year
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-1 text-xs">
+                            <div className="flex justify-between items-center py-1">
+                                <span>Withdrawn Chinese</span>
+                                <Badge variant="outline" className="text-xs">11</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Withdrawn Japanese</span>
+                                <Badge variant="outline" className="text-xs">12</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Withdrawn Korean</span>
+                                <Badge variant="outline" className="text-xs">13</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1">
+                                <span>Withdrawn Non-CJK</span>
+                                <Badge variant="outline" className="text-xs">14</Badge>
+                            </div>
+                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                                <span className="font-medium text-xs">Withdrawn Subtotal</span>
+                                <Badge className="bg-red-100/90 text-red-600 text-xs">Auto Calculated: 11+12+13+14</Badge>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                <p><span >*The values of fields 01-05 are automatically filled with previous year&apos;s data from CEAL Database (if available). *</span></p>
-
-                <div className="formitemdesc">
-                    <p >01. Previous Chinese*:&nbsp;<br />
-                        02. Previous Japanese*:&nbsp;<br />
-                        03. Previous Korean*:&nbsp;<br />
-                        04. Previous Non-CJK*:<br />
-                        <b>05. Previous Subtotal*</b>: <span className="sumtxt">(01 + 02 + 03 + 04)</span><br />
-                        &nbsp;</p>
-
-                    <p >06. Added Chinese<br />
-                        07. Added Japanese<br />
-                        08. Added Korean<br />
-                        09. Added Non-CJK<br />
-                        <b>10. Added Subtotal</b>: <span className="sumtxt">(06 + 07 + 08 + 09)</span><br />
-                        &nbsp;</p>
-                </div>
-
-                <div className="formitemdesc">
-                    <p>11. Withdrawn Chinese<br />
-                        12. Withdrawn Japanese<br />
-                        13. Withdrawn Korean<br />
-                        14. Withdrawn Non-CJK<br />
-                        <b>15. Withdrawn Subtotal</b>: <span className="sumtxt">(11 + 12 + 13 + 14)</span><br />
-                        <b>16. Grand Total</b>: <span className="sumtxt">(05 + 10 - 15)</span></p>
-                </div>
+                {/* Grand Total */}
+                <Card className="border-accent bg-white">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Calculator className="h-4 w-4 text-blue-500" />
+                            Total Physical Volume Holdings
+                        </CardTitle>
+                        <CardDescription className="text-sm">Automatically calculated by the system</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                            <span className="font-medium text-sm">Grand Total (Physical Vols)</span>
+                            <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto Calculated: 05 + 10 − 15</Badge>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
