@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Info, Calculator, BookOpen, Plus, Minus, Database } from "lucide-react"
 
-export const VolumeHoldingsInstructions = () => {
+export function VolumeHoldingsInstructions() {
     return (
         <div className="space-y-6" id="volumeHoldings">
             {/* Header Card */}
@@ -13,7 +13,7 @@ export const VolumeHoldingsInstructions = () => {
                         Physical Total Volume Holdings Form
                         <Badge variant="destructive" className="text-xs">Required</Badge>
                     </CardTitle>
-                    <CardDescription className="text-base font-medium">
+                    <CardDescription className="text-base font-medium pl-6">
                         Monographs Held by the Institution
                     </CardDescription>
                 </CardHeader>
@@ -67,10 +67,10 @@ export const VolumeHoldingsInstructions = () => {
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-amber-800 leading-relaxed">
-                        A single physical unit of any printed, typewritten, handwritten, mimeographed, or processed work, 
-                        distinguished from other units by a separate binding, encasement, portfolio, or other clear distinction, 
-                        which has been cataloged, classified, and made ready for use, and which is typically the unit used to 
-                        charge circulation transactions. Either a serial volume is bound, or it comprises the serial issues that 
+                        A single physical unit of any printed, typewritten, handwritten, mimeographed, or processed work,
+                        distinguished from other units by a separate binding, encasement, portfolio, or other clear distinction,
+                        which has been cataloged, classified, and made ready for use, and which is typically the unit used to
+                        charge circulation transactions. Either a serial volume is bound, or it comprises the serial issues that
                         would be bound together if the library bound all serials.
                     </p>
                 </CardContent>

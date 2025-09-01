@@ -13,8 +13,8 @@ export function MonographicInstructions() {
             Monographic Acquisitions Form
             <Badge variant="destructive" className="text-xs">Required</Badge>
           </CardTitle>
-          <CardDescription className="text-base font-medium">
-            Report titles and volumes purchased during the fiscal year
+          <CardDescription className="text-base font-medium pl-6">
+            Monographic Titles and Volumes Purchased
           </CardDescription>
         </CardHeader>
       </Card>

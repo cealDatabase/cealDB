@@ -1,144 +1,209 @@
-import { cookies } from "next/headers";
-import { Container } from "@/components/Container";
-import Link from "next/link";
-import { forms, instructionGroup } from "@/constant/form";
+import { cookies } from "next/headers"
+import { Container } from "@/components/Container"
+import Link from "next/link"
+import { forms, instructionGroup } from "@/constant/form"
+import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
 
-type InstructionGroupKeys = keyof typeof instructionGroup;
+type InstructionGroupKeys = keyof typeof instructionGroup
 
-import * as React from "react";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 const FormsPage = async () => {
-  const cookieStore = await cookies();
-  const library = cookieStore.get("library");
-  const libid = library?.value;
+    const cookieStore = await cookies()
+    const library = cookieStore.get("library")
+    const libid = library?.value
 
-  const currentYear = new Date().getFullYear();
-  const previousYear = currentYear - 1;
-  const nextYear = currentYear + 1;
+    const currentYear = new Date().getFullYear()
+    const previousYear = currentYear - 1
+    const nextYear = currentYear + 1
 
-  return (
-    <main>
-      <h1>Forms Page</h1>
-      <Container className="">
-        <div className="bg-white rounded-md">
-          <div className="mx-auto divide-y divide-gray-900/10 px-6 py-12 sm:py-20 lg:px-8">
-            <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
-              My Forms
-            </h2>
-            <div className="mt-10 grid grid-cols-12 gap-x-2">
-              <ul className="mt-6 space-y-4 sm:col-start-2 col-span-12 sm:col-span-6">
-                {forms.map((form, index) => (
-                  <li key={index} className="list-decimal">
-                    <Link href={`/admin/forms/${libid}/${form.href}`}>{form.title}</Link>
-                  </li>
-                ))}
-              </ul>
-              <ul className="mt-6 space-y-4 col-span-12 sm:col-span-4">
-                <li key="ebook" className="list-disc">
-                  <Link href={`/admin/forms/${libid}/ebookedit`}>
-                    E-Book Database by Subscription for McGill Library in {currentYear}
-                  </Link>
-                </li>
-                <li key="ejournal" className="list-disc">
-                  <Link href={`/admin/forms/${libid}/ejournaledit`}>
-                    E-Journal Database by Subscription for McGill Library in {currentYear}
-                  </Link>
-                </li>
-                <li key="avdb" className="list-disc">
-                  <Link href={`/admin/forms/${libid}/avdbedit`}>
-                    Audio/Visual Database by Subscription for McGill Library in {currentYear}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="mx-auto divide-y divide-gray-900/10 px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
-            Instruction
-          </h2>
-          <div className="mt-10 grid grid-cols-12 ">
-            <div className="mt-6 space-y-4 md:col-start-2 col-span-12 md:col-span-10 leading-7">
-              <p>
-                The {previousYear}-{currentYear} CEAL Statistics Online Survey input/edit period is
-                from October 1 to December 1, {currentYear}, with the results published
-                in the February {nextYear} issue of the Journal of East Asian
-                Libraries. The survey covers the fiscal year from July 1, {previousYear},
-                to June 30, {currentYear}, with all figures rounded to whole numbers and
-                currency converted to US dollars. Non-CJK items refer to non-CJK
-                language materials related to East Asia. Each institution,
-                except law libraries, should submit a combined report, and
-                significant data changes must be footnoted. Participants must
-                log in to the CEAL Statistics Database using the registered
-                contact&apos;s email and follow the password setup process if
-                necessary. New libraries wanting to participate should contact
-                vdoll[at]ku.edu for account setup.
-              </p>
-              <p className="font-medium">
-                Check on{" "}
-                <a href="https://guides.lib.ku.edu/CEAL_Stats">
-                  https://guides.lib.ku.edu/CEAL_Stats
-                </a>{" "}
-                for detailed instructions.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-full px-6 lg:px-8">
-          <h2 className="text-2xl font-medium leading-10 tracking-tight text-gray-900">
-            Frequently Asked Questions
-          </h2>
-          <dl className="mt-10 space-y-6">
-            <Accordion type="multiple">
-              {Object.keys(instructionGroup).map((key, index) => {
-                return (
-                  <AccordionItem key={index} value={key}>
-                    <AccordionTrigger
-                      aria-controls={key}
-                      id={key}
-                      key={index}
-                    >
-                      <h3 className="py-2 font-medium">
-                        {key}
-                      </h3>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map((item, index) => (
-                        <div key={index}>
-                          <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4">
-                            <dt className="lg:col-span-5 font-medium text-gray-800">
-                              {item.question}
-                            </dt>
-                            <dd className="lg:col-span-7">
-                              <p className="text-gray-600/90">
-                                <span
-                                  dangerouslySetInnerHTML={{
-                                    __html: item.answer,
-                                  }}
-                                />
-                              </p>
-                            </dd>
-                          </div>
+    return (
+        <main className="min-h-screen">
+            <div className="bg-gradient-to-r from-gray-200/10 to-gray-200/10 text-stone-900 w-full">
+                <Container>
+                    <div className="py-12">
+                        <h1 className="text-4xl font-bold text-stone-900 mb-3">Forms Management</h1>
+                        <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-400/80 text-emerald-50 text-sm font-medium">
+                            <div className="w-2 h-2 bg-emerald-600 rounded-full mr-2"></div>
+                            Active Survey Period: Oct 1 - Dec 1, {currentYear}
                         </div>
-                      ))}
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              })}
-            </Accordion>
-          </dl>
-        </div >
-      </Container >
-    </main >
-  );
-};
+                    </div>
+                </Container>
+            </div>
 
-export default FormsPage;
+            <Container className="py-12">
+                <div className="space-y-12">
+                    <section className="bg-white rounded-xl shadow-lg border border-orange-200 p-8 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/10 to-red-400/10 rounded-full -mr-16 -mt-16"></div>
+                        <div className="mb-8 relative">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                                <h2 className="text-2xl font-bold text-gray-900">Complete These First</h2>
+                                <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-semibold rounded-full">
+                                    Priority
+                                </span>
+                            </div>
+                            <p className="text-gray-600">Priority forms that need immediate attention</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
+                                <Link
+                                    href={`/admin/forms/${libid}/ebookedit`}
+                                    className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    📚 E-Book Database by Subscription for McGill Library in {currentYear}
+                                </Link>
+                            </div>
+                            <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
+                                <Link
+                                    href={`/admin/forms/${libid}/ejournaledit`}
+                                    className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    📰 E-Journal Database by Subscription for McGill Library in {currentYear}
+                                </Link>
+                            </div>
+                            <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
+                                <Link
+                                    href={`/admin/forms/${libid}/avdbedit`}
+                                    className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    🎵 Audio/Visual Database by Subscription for McGill Library in {currentYear}
+                                </Link>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="bg-white rounded-xl shadow-lg border border-purple-200 p-8">
+                        <div className="mb-8">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <ClipboardType className="text-white text-sm font-bold" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">My Forms</h2>
+                                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">
+                                    {forms.length} Available
+                                </span>
+                            </div>
+                            <p className="text-gray-600">All available forms for your library</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {forms.map((form, index) => (
+                                <div
+                                    key={index}
+                                    className="p-5 border border-purple-200 rounded-lg hover:border-purple-400 hover:shadow-lg transition-all group bg-gradient-to-br from-white to-purple-50/30"
+                                >
+                                    <Link
+                                        href={`/admin/forms/${libid}/${form.href}`}
+                                        className="block text-gray-900 hover:text-purple-600 font-semibold transition-colors group-hover:translate-x-1 transform duration-200 no-underline"
+                                    >
+                                        {form.title}
+                                    </Link>
+                                    <div className="mt-2 flex items-center text-sm text-purple-600">
+                                        <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                        Ready to complete
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="bg-white rounded-xl shadow-lg border border-emerald-200 p-8">
+                        <div className="mb-8">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                                    <OctagonAlert className="text-white text-sm font-bold" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Instructions</h2>
+                            </div>
+                            <p className="text-gray-600">Important information about the survey process</p>
+                        </div>
+
+                        <div className="prose prose-gray max-w-none">
+                            <p className="text-gray-700 leading-relaxed mb-6">
+                                The{" "}
+                                <span className="font-semibold text-emerald-700">
+                                    {previousYear}-{currentYear} CEAL Statistics Online Survey
+                                </span>{" "}
+                                input/edit period is from{" "}
+                                <span className="font-semibold text-orange-600">October 1 to December 1, {currentYear}</span>, with the
+                                results published in the February {nextYear} issue of the Journal of East Asian Libraries. The survey
+                                covers the fiscal year from July 1, {previousYear}, to June 30, {currentYear}, with all figures rounded
+                                to whole numbers and currency converted to US dollars.
+                            </p>
+
+                            <p className="text-gray-700 leading-relaxed mb-6">
+                                <span className="font-semibold text-purple-700">Non-CJK items</span> refer to non-CJK language materials
+                                related to East Asia. Each institution, except law libraries, should submit a combined report, and
+                                significant data changes must be footnoted. Participants must log in to the CEAL Statistics Database
+                                using the registered contact's email and follow the password setup process if necessary.
+                            </p>
+
+                            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 rounded-lg p-6">
+                                <p className="text-emerald-900 font-semibold">
+                                    📖 For detailed instructions, visit:{" "}
+                                    <a
+                                        href="https://guides.lib.ku.edu/CEAL_Stats"
+                                        className="text-emerald-600 hover:text-emerald-800 underline decoration-2 underline-offset-2 transition-colors"
+                                    >
+                                        https://guides.lib.ku.edu/CEAL_Stats
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                        <div className="mb-8">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <BadgeQuestionMark className="text-white text-sm font-bold" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h2>
+                            </div>
+                            <p className="text-gray-600">Common questions and answers about the forms</p>
+                        </div>
+
+                        <Accordion type="multiple" className="space-y-4">
+                            {Object.keys(instructionGroup).map((key, index) => (
+                                <AccordionItem
+                                    key={index}
+                                    value={key}
+                                    className="border border-gray-200 rounded-lg px-6 py-2 hover:border-blue-300 transition-colors"
+                                >
+                                    <AccordionTrigger className="text-left hover:no-underline">
+                                        <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">{key}</h3>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-4">
+                                        <div className="space-y-6">
+                                            {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map(
+                                                (item, itemIndex) => (
+                                                    <div
+                                                        key={itemIndex}
+                                                        className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg"
+                                                    >
+                                                        <dt className="font-semibold text-blue-700">{item.question}</dt>
+                                                        <dd className="lg:col-span-2 text-gray-700 leading-relaxed">
+                                                            <span
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: item.answer,
+                                                                }}
+                                                            />
+                                                        </dd>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </section>
+                </div>
+            </Container>
+        </main>
+    )
+}
+
+export default FormsPage

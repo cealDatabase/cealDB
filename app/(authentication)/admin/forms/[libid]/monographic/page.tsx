@@ -13,14 +13,14 @@ const MonographicPage = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900">
+      <h1 className="text-3xl font-bold text-gray-900 mt-6">
         Monographic Acquisitions
       </h1>
       <Container>
         <div className="flex items-center justify-between mb-6">
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2 text-md bg-black text-white font-bold" 
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 text-md bg-black text-white font-bold"
             size="lg"
             onClick={() => setShowInstructions(!showInstructions)}
           >
@@ -42,14 +42,6 @@ const MonographicPage = () => {
           {/* Instructions Column - 1/3 width */}
           {showInstructions && (
             <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Monographic Acquisitions Form (Required)
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Guidelines and requirements for completing the monographic acquisitions form.
-                </p>
-              </div>
               <MonographicInstructions />
             </div>
           )}

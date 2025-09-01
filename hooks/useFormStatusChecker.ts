@@ -7,6 +7,8 @@ interface LibraryYearStatus {
   is_open_for_editing: boolean
   is_active: boolean
   message: string
+  year?: number
+  library_id?: number
 }
 
 export function useFormStatusChecker(apiEndpoint: string) {
