@@ -14,6 +14,12 @@ const TABLES = [
   "Monographic_Acquisitions",
   "Volume_Holdings",
   "Serials",
+  "Unprocessed_Backlog_Materials",
+  "Fiscal_Support",
+  "Personnel_Support",
+  "Public_Services",
+  "Electronic",
+  "Electronic_Books",
 ];
 
 async function resetSequenceFor(table) {

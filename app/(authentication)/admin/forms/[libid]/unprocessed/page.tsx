@@ -1,97 +1,100 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+
 import { UnprocessedInstructions } from "@/components/instructions/unprocessed"
 import { Button } from "@/components/ui/button"
-import { BookOpen, X, Save, Send } from "lucide-react"
+import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
-import { StatusMessage } from "@/components/forms/StatusMessage"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
+import { ReusableFormField, ReusableNumberFormField } from "@/components/forms/ReusableFormField"
+import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import {
+  FormWrapper,
+  FormSection,
+  LanguageFieldGroup,
+  SubtotalDisplay,
+  FormSubmitSection
+} from "@/components/forms/shared"
 
-interface UnprocessedFormData {
-  ubchinese?: number;
-  ubjapanese?: number;
-  ubkorean?: number;
-  ubnoncjk?: number;
-  ubtotal?: number;
-  ubnotes?: string;
-}
+const formSchema = z.object({
+  // Entry ID (optional)
+  entryid: z.string().optional(),
 
-interface UnprocessedFormProps {
-  libid: string;
-}
+  // Unprocessed materials by language
+  ubchinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ubjapanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ubkorean: z.number().min(0, { message: "Must be a non-negative number" }),
+  ubnoncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
-const UnprocessedForm = ({ libid }: UnprocessedFormProps) => {
-  const [formData, setFormData] = useState<UnprocessedFormData>({
-    ubchinese: undefined,
-    ubjapanese: undefined,
-    ubkorean: undefined,
-    ubnoncjk: undefined,
-    ubtotal: undefined,
-    ubnotes: ""
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [isFormEnabled, setIsFormEnabled] = useState(false);
+  // Notes
+  ubnotes: z.string().optional(),
+})
 
-  // Auto-calculate total when individual values change
+type FormData = z.infer<typeof formSchema>
+
+const UnprocessedForm = () => {
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const params = useParams()
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      ubchinese: 0,
+      ubjapanese: 0,
+      ubkorean: 0,
+      ubnoncjk: 0,
+      ubnotes: "",
+    },
+  })
+
+  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/unprocessed/status')
+
+  // Load existing data
   useEffect(() => {
-    const chinese = formData.ubchinese || 0;
-    const japanese = formData.ubjapanese || 0;
-    const korean = formData.ubkorean || 0;
-    const noncjk = formData.ubnoncjk || 0;
-    const total = chinese + japanese + korean + noncjk;
-    
-    setFormData(prev => ({ ...prev, ubtotal: total }));
-  }, [formData.ubchinese, formData.ubjapanese, formData.ubkorean, formData.ubnoncjk]);
-
-  // Load existing data and check form status
-  useEffect(() => {
-    const loadData = async () => {
+    const loadExistingData = async () => {
       try {
-        const response = await fetch(`/api/unprocessed/status/${libid}`);
-        const result = await response.json();
-        
-        if (result.exists && result.is_open_for_editing) {
-          setIsFormEnabled(true);
-          if (result.data) {
-            setFormData({
-              ubchinese: result.data.ubchinese || undefined,
-              ubjapanese: result.data.ubjapanese || undefined,
-              ubkorean: result.data.ubkorean || undefined,
-              ubnoncjk: result.data.ubnoncjk || undefined,
-              ubtotal: result.data.ubtotal || undefined,
-              ubnotes: result.data.ubnotes || ""
-            });
+        const response = await fetch(`/api/unprocessed/status/${params.libid}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.existingData) {
+            Object.keys(data.existingData).forEach(key => {
+              if (key !== 'entryid' && key !== 'libid' && key !== 'year') {
+                form.setValue(key as keyof FormData, data.existingData[key])
+              }
+            })
           }
-        } else {
-          setIsFormEnabled(false);
-          setInfoMessage(result.message || 'Form is not available for editing');
         }
       } catch (error) {
-        console.error('Error loading form data:', error);
-        setStatusMessage({
-          type: 'error',
-          message: 'Failed to load form data'
-        });
+        console.log('No existing data found:', error)
       }
-    };
-
-    if (libid) {
-      loadData();
     }
-  }, [libid]);
 
-  const handleInputChange = (field: keyof UnprocessedFormData, value: string) => {
-    const numValue = value === '' ? undefined : Number(value);
-    setFormData(prev => ({ ...prev, [field]: numValue }));
-  };
+    if (params.libid) {
+      loadExistingData()
+    }
+  }, [params.libid, form])
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
-    setStatusMessage(null);
+  // Watch form values for calculations
+  const watchedValues = form.watch()
+
+  // Calculate total
+  const unprocessedTotal = (watchedValues.ubchinese || 0) + 
+                          (watchedValues.ubjapanese || 0) + 
+                          (watchedValues.ubkorean || 0) + 
+                          (watchedValues.ubnoncjk || 0)
+
+  async function onSubmit(values: FormData) {
+    setIsSubmitting(true)
+    setSuccessMessage(null)
+    setErrorMessage(null)
 
     try {
       const response = await fetch('/api/unprocessed/create', {
@@ -100,173 +103,92 @@ const UnprocessedForm = ({ libid }: UnprocessedFormProps) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          libid,
-          ...formData
+          ...values,
+          libid: Number(params.libid),
         }),
-      });
+      })
 
-      const result = await response.json();
-
-      if (result.success) {
-        setStatusMessage({
-          type: 'success',
-          message: result.message || 'Form submitted successfully'
-        });
-      } else {
-        setStatusMessage({
-          type: 'error',
-          message: result.error || 'Failed to submit form'
-        });
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to submit form')
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setStatusMessage({
-        type: 'error',
-        message: 'Failed to submit form. Please try again.'
-      });
+
+      const result = await response.json()
+      setSuccessMessage('Unprocessed backlog materials form submitted successfully!')
+      toast.success('Form submitted successfully!')
+      
+    } catch (error: any) {
+      console.error('Form submission error:', error)
+      setSuccessMessage(null);
+      setErrorMessage(error.message || 'An error occurred while submitting the form');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
-  };
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Unprocessed/Backlog Materials Form</h2>
-      
-      {infoMessage && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">{infoMessage}</p>
-        </div>
-      )}
-      
-      {statusMessage && (
-        <StatusMessage 
-          type={statusMessage.type} 
-          message={statusMessage.message} 
-          show={true}
+    <FormWrapper
+      form={form}
+      onSubmit={onSubmit}
+      isLoading={isLoading}
+      libraryYearStatus={libraryYearStatus}
+    >
+      {/* Unprocessed Backlog Materials */}
+      <FormSection
+        title="Unprocessed Backlog Materials"
+        description="Enter the number of unprocessed materials by language."
+      >
+        <LanguageFieldGroup
+          control={form.control}
+          fields={{
+            chinese: { name: "ubchinese", label: "01. Unprocessed Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
+            japanese: { name: "ubjapanese", label: "02. Unprocessed Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
+            korean: { name: "ubkorean", label: "03. Unprocessed Korean", disabled: !libraryYearStatus?.is_open_for_editing },
+            noncjk: { name: "ubnoncjk", label: "04. Unprocessed Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+          }}
+          useFloatNumbers={false}
         />
-      )}
-      
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              01. Unprocessed Chinese
-            </label>
-            <input
-              type="number"
-              min="0"
-              disabled={!isFormEnabled || isLoading}
-              value={formData.ubchinese || ''}
-              onChange={(e) => handleInputChange('ubchinese', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="e.g., 70"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              02. Unprocessed Japanese
-            </label>
-            <input
-              type="number"
-              min="0"
-              disabled={!isFormEnabled || isLoading}
-              value={formData.ubjapanese || ''}
-              onChange={(e) => handleInputChange('ubjapanese', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="e.g., 70"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              03. Unprocessed Korean
-            </label>
-            <input
-              type="number"
-              min="0"
-              disabled={!isFormEnabled || isLoading}
-              value={formData.ubkorean || ''}
-              onChange={(e) => handleInputChange('ubkorean', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="e.g., 70"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              04. Unprocessed Non-CJK
-            </label>
-            <input
-              type="number"
-              min="0"
-              disabled={!isFormEnabled || isLoading}
-              value={formData.ubnoncjk || ''}
-              onChange={(e) => handleInputChange('ubnoncjk', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="e.g., 70"
-            />
-          </div>
-        </div>
-        
-        <div className="border-t pt-4">
-          <div className="bg-gray-50 p-4 rounded-md">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              05. Unprocessed Total (auto-calculated: 01 + 02 + 03 + 04)
-            </label>
-            <input
-              type="number"
-              value={formData.ubtotal || 0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-          </div>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            06. Memo/Footnote for this form
-          </label>
-          <textarea
-            disabled={!isFormEnabled || isLoading}
-            value={formData.ubnotes || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, ubnotes: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            rows={4}
-            placeholder="Enter any notes or footnotes..."
-          />
-        </div>
-        
-        {isFormEnabled && (
-          <div className="flex justify-end space-x-4">
-            <Button 
-              variant="outline" 
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isLoading ? 'Saving...' : 'Save & Submit'}
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+        <SubtotalDisplay
+          label="05. Unprocessed Total"
+          value={unprocessedTotal}
+          formula="01 + 02 + 03 + 04"
+        />
+      </FormSection>
+
+      {/* Notes */}
+      <FormSection
+        title="Notes"
+        description="Additional information or comments about unprocessed materials."
+      >
+        <ReusableFormField
+          control={form.control}
+          name="ubnotes"
+          label="06. Memo/Footnote for this form"
+          placeholder="Enter any notes or footnotes..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
+        />
+      </FormSection>
+
+      <FormSubmitSection
+        isSubmitting={isSubmitting}
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        submitButtonText="Submit Unprocessed Materials Data"
+      />
+    </FormWrapper>
   )
 }
 
 const UnprocessedPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
-  const params = useParams()
-  const libid = params?.libid as string
 
   return (
     <>
       <Container>
         <AdminBreadcrumb libraryName="Library" />
         <h1 className="text-3xl font-bold text-gray-900 mt-6">
-          Unprocessed Backlog Materials (volumes or pieces)
+          Unprocessed Backlog Materials
         </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
@@ -299,7 +221,7 @@ const UnprocessedPage = () => {
 
           {/* Form Column - 2/3 width when instructions shown, full width when hidden */}
           <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-            <UnprocessedForm libid={libid} />
+            <UnprocessedForm />
           </div>
         </div>
       </Container>

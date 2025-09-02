@@ -109,9 +109,9 @@ export function SerialsInstructions() {
                     </div>
                     <div className="mt-4 p-3 bg-blue-100/50 rounded-lg border border-blue-200">
                         <p className="text-sm text-blue-800 font-medium">If you cannot separate purchased from non-purchased counts:</p>
-                        <ul className="text-sm text-blue-700 mt-2 space-y-1">
-                            <li>• Report only the total number of current subscribed serial titles on line 15</li>
-                            <li>• Enter "0" in all other fields</li>
+                        <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc">
+                            <li>Report only the total number of current subscribed serial titles on line 15</li>
+                            <li>Enter "0" in all other fields</li>
                         </ul>
                     </div>
                 </CardContent>
@@ -146,7 +146,7 @@ export function SerialsInstructions() {
                                 <span>Purchased Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">04</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Purchased Electronic Total</span>
                                 <Badge className="bg-green-100/90 text-green-600 text-xs">Auto Calculated: 01+02+03+04</Badge>
                             </div>
@@ -181,7 +181,7 @@ export function SerialsInstructions() {
                                 <span>Purchased Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">09</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Purchased Print Total</span>
                                 <Badge className="bg-green-100/90 text-green-600 text-xs">Auto Calculated: 06+07+08+09</Badge>
                             </div>
@@ -216,7 +216,7 @@ export function SerialsInstructions() {
                                 <span>Non-Purchased Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">14</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Non-Purchased Electronic Total</span>
                                 <Badge className="bg-purple-100/90 text-purple-600 text-xs">Auto Calculated: 11+12+13+14</Badge>
                             </div>
@@ -251,7 +251,7 @@ export function SerialsInstructions() {
                                 <span>Non-Purchased Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">19</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Non-Purchased Print Total</span>
                                 <Badge className="bg-purple-100/90 text-purple-600 text-xs">Auto Calculated: 16+17+18+19</Badge>
                             </div>
@@ -340,23 +340,23 @@ export function SerialsInstructions() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
-                            <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                            <div className="flex flex-col justify-start items-start gap-2 p-3 bg-background rounded-lg border">
                                 <span className="font-medium text-sm">Total Chinese (All Formats)</span>
                                 <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto: 21+26</Badge>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                            <div className="flex flex-col justify-start items-start gap-2 p-3 bg-background rounded-lg border">
                                 <span className="font-medium text-sm">Total Japanese (All Formats)</span>
                                 <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto: 22+27</Badge>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                            <div className="flex flex-col justify-start items-start gap-2 p-3 bg-background rounded-lg border">
                                 <span className="font-medium text-sm">Total Korean (All Formats)</span>
                                 <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto: 23+28</Badge>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                            <div className="flex flex-col justify-start items-start gap-2 p-3 bg-background rounded-lg border">
                                 <span className="font-medium text-sm">Total Non-CJK (All Formats)</span>
                                 <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto: 24+29</Badge>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border-2 border-primary/20">
+                            <div className="flex flex-col justify-start items-start gap-2 p-3 bg-primary/5 rounded-lg border-2 border-primary/20">
                                 <span className="font-bold text-sm text-primary">GRAND TOTAL (All Serials)</span>
                                 <Badge className="bg-primary/10 text-primary text-xs font-medium">Auto: 25+30</Badge>
                             </div>

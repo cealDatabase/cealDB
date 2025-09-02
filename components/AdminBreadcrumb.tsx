@@ -3,19 +3,19 @@
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
 import { ChevronDownIcon, SlashIcon } from "lucide-react"
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { forms } from "@/constant/form"
 
@@ -31,7 +31,7 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
   // Form mapping for better display names
   const formMap: Record<string, string> = {
     monographic: "Monographic Acquisitions",
-    volumeHoldings: "Physical Volume Holdings", 
+    volumeHoldings: "Physical Volume Holdings",
     serials: "Serial Titles",
     otherHoldings: "Holdings of Other Materials",
     unprocessed: "Unprocessed Backlog Materials",
@@ -60,7 +60,7 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
           {/* Home */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/" className="no-underline">Home</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator>
@@ -70,7 +70,7 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
           {/* Admin */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/admin">Admin</Link>
+              <Link href="/admin" className="no-underline">Admin</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator>
@@ -80,7 +80,7 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
           {/* Forms Management */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/admin/forms">Forms Management</Link>
+              <Link href="/admin/forms" className="no-underline">Forms Management</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
 
@@ -92,7 +92,7 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
               </BreadcrumbSeparator>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href={`/admin/forms?libraryName=${encodeURIComponent(libraryName || 'Library')}`}>
+                  <Link href={`/admin/forms?libraryName=${encodeURIComponent(libraryName || 'Library')}`} className="no-underline">
                     {libraryName || `Library ${libid}`}
                   </Link>
                 </BreadcrumbLink>
@@ -113,9 +113,9 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
                     <ChevronDownIcon />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-64">
-                    {otherForms.map((form) => (
+                    {otherForms.map((form, index) => (
                       <DropdownMenuItem key={form.href} asChild>
-                        <Link href={`/admin/forms/${libid}/${form.href}`}>
+                        <Link href={`/admin/forms/${libid}/${form.href}`} className="no-underline">
                           {form.title}
                         </Link>
                       </DropdownMenuItem>
@@ -123,21 +123,21 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
                     {/* Special edit forms */}
                     {currentForm !== 'ebookedit' && (
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/ebookedit`}>
+                        <Link href={`/admin/forms/${libid}/ebookedit`} className="no-underline">
                           E-Book Database by Subscription
                         </Link>
                       </DropdownMenuItem>
                     )}
                     {currentForm !== 'ejournaledit' && (
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/ejournaledit`}>
+                        <Link href={`/admin/forms/${libid}/ejournaledit`} className="no-underline">
                           E-Journal Database by Subscription
                         </Link>
                       </DropdownMenuItem>
                     )}
                     {currentForm !== 'avdbedit' && (
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/avdbedit`}>
+                        <Link href={`/admin/forms/${libid}/avdbedit`} className="no-underline">
                           Audio/Visual Database by Subscription
                         </Link>
                       </DropdownMenuItem>
