@@ -54,6 +54,7 @@ model Library_Year {
   Monographic_Acquisitions      Monographic_Acquisitions?
   Other_Holdings                Other_Holdings?
   Personnel_Support             Personnel_Support?
+  Public_Services               Public_Services?
   Serials                       Serials?
   Unprocessed_Backlog_Materials Unprocessed_Backlog_Materials?
   Volume_Holdings               Volume_Holdings?

@@ -356,7 +356,7 @@ export default function OtherHoldingsForm() {
         isSubmitting={isSubmitting}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Other Holdings"
+        submitButtonText="Submit Other Holdings Data"
       />
     </FormWrapper>
   )

@@ -105,7 +105,7 @@ export function VolumeHoldingsInstructions() {
                                 <span>Previous Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">04</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 py-1 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Subtotal</span>
                                 <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto Calculated: 01+02+03+04</Badge>
                             </div>
@@ -140,7 +140,7 @@ export function VolumeHoldingsInstructions() {
                                 <span>Added Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">09</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start py-1 gap-2 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Added Subtotal</span>
                                 <Badge className="bg-green-100/90 text-green-600 text-xs">Auto Calculated: 06+07+08+09</Badge>
                             </div>
@@ -174,7 +174,7 @@ export function VolumeHoldingsInstructions() {
                                 <span>Withdrawn Non-CJK</span>
                                 <Badge variant="outline" className="text-xs">14</Badge>
                             </div>
-                            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2">
+                            <div className="flex flex-col justify-start items-start gap-2 py-1 border-t border-border mt-2 pt-2">
                                 <span className="font-medium text-xs">Withdrawn Subtotal</span>
                                 <Badge className="bg-red-100/90 text-red-600 text-xs">Auto Calculated: 11+12+13+14</Badge>
                             </div>
@@ -192,8 +192,8 @@ export function VolumeHoldingsInstructions() {
                         <CardDescription className="text-sm">Automatically calculated by the system</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
-                            <span className="font-medium text-sm">Grand Total (Physical Vols)</span>
+                        <div className="flex flex-col justify-start items-start p-3 gap-2 bg-background rounded-lg border">
+                            <p className="font-medium text-sm">Grand Total (Physical Vols)</p>
                             <Badge className="bg-blue-100/90 text-blue-500 text-xs">Auto Calculated: 05 + 10 − 15</Badge>
                         </div>
                     </CardContent>

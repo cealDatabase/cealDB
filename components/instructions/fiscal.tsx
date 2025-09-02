@@ -227,7 +227,7 @@ export const FiscalInstructions = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border">
+                        <div className="flex flex-col justify-start items-start gap-2 p-3 bg-blue-50 rounded-lg border">
                             <span className="font-medium text-sm">Total Appropriations</span>
                             <Badge className="bg-blue-100/90 text-blue-600 text-xs">21: Auto Calculated (05+10+15+20)</Badge>
                         </div>
@@ -291,18 +291,23 @@ export const FiscalInstructions = () => {
                 </Card>
 
                 {/* Final Total */}
-                <Card className="border-4 border-green-200 bg-green-50/50">
+                <Card className="border-4 border-amber-200 bg-amber-50/50">
                     <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-base text-green-700">
-                            <Calculator className="h-4 w-4" />
+                        <CardTitle className="flex items-center gap-2 text-base text-amber-700">
+                            <AlertTriangle className="h-4 w-4" />
                             Total Acquisitions Budget
                         </CardTitle>
-                        <CardDescription className="text-sm text-green-600">Must be filled manually</CardDescription>
+                        <CardDescription className="text-sm text-amber-600">⚠️ Critical: Must be filled manually</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center p-3 bg-green-100 rounded-lg border border-green-200">
-                            <span className="font-bold text-sm">Total Acquisitions Budget</span>
-                            <Badge className="bg-green-200 text-green-700 text-xs font-semibold">37: Manual Entry Required</Badge>
+                        <div className="flex flex-col justify-start items-start p-3 gap-2 bg-amber-100 rounded-lg border border-amber-200">
+                            <span className="font-bold text-sm text-amber-800">Total Acquisitions Budget</span>
+                            <Badge className="bg-amber-200 text-amber-700 text-xs font-semibold">⚠️ 37: Manual Entry Required</Badge>
+                        </div>
+                        <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p className="text-xs text-amber-700 font-medium">
+                                ⚠️ <strong>Important:</strong> This field cannot be auto-calculated. You must manually enter the total acquisitions budget for your library.
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

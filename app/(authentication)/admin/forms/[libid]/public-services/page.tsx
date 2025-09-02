@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { FiscalInstructions } from "@/components/instructions/fiscal"
-import FiscalForm from "@/components/forms/fiscal-form"
+import { PublicServicesInstructions } from "@/components/instructions/publicServices"
+import PublicServicesForm from "@/components/forms/public-services-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
-const FiscalPage = () => {
+const PublicServicesPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   return (
@@ -16,7 +16,7 @@ const FiscalPage = () => {
       <Container>
         <AdminBreadcrumb libraryName="Library" />
         <h1 className="text-3xl font-bold text-gray-900 mt-6">
-          Fiscal Support
+          Public Services
         </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
@@ -43,13 +43,13 @@ const FiscalPage = () => {
           {/* Instructions Column - 1/3 width */}
           {showInstructions && (
             <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-              <FiscalInstructions />
+              <PublicServicesInstructions />
             </div>
           )}
 
           {/* Form Column - 2/3 width when instructions shown, full width when hidden */}
           <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-            <FiscalForm />
+            <PublicServicesForm />
           </div>
         </div>
       </Container>
@@ -57,4 +57,4 @@ const FiscalPage = () => {
   )
 }
 
-export default FiscalPage
+export default PublicServicesPage

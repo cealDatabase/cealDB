@@ -329,7 +329,7 @@ export function OtherHoldingsInstructions() {
                         <CardDescription className="text-sm">Additional material types specific to your library</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center p-3 bg-orange-100/50 rounded-lg border border-orange-200">
+                        <div className="flex flex-col justify-start items-start gap-2 p-3 bg-orange-100/50 rounded-lg border border-orange-200">
                             <span className="font-medium text-sm">Custom Materials (All Languages)</span>
                             <Badge className="bg-orange-100/90 text-orange-600 text-xs">Auto: 46-50</Badge>
                         </div>
@@ -346,7 +346,7 @@ export function OtherHoldingsInstructions() {
                         <CardDescription className="text-sm">Final total of all other materials</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border-2 border-primary/20">
+                        <div className="flex flex-col justify-start items-start gap-2 p-3 bg-primary/5 rounded-lg border-2 border-primary/20">
                             <span className="font-bold text-sm text-primary">GRAND TOTAL (Other Materials)</span>
                             <Badge className="bg-primary/10 text-primary text-xs font-medium">Auto: 05+10+15+20+25</Badge>
                         </div>
