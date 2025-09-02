@@ -4,18 +4,20 @@ import Link from "next/link"
 import { forms, instructionGroup } from "@/constant/form"
 import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
 import { getLibraryById } from "@/data/fetchPrisma"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-const FormsPage = async ({ searchParams }: { searchParams: { libraryName?: string } }) => {
+const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName?: string }> }) => {
     const cookieStore = await cookies()
     const library = cookieStore.get("library")
     const libid = library?.value
 
     // Get library name with fallback logic
-    let libraryName = searchParams.libraryName;
+    const resolvedSearchParams = await searchParams;
+    let libraryName = resolvedSearchParams.libraryName;
 
     if (!libraryName && libid) {
         try {
@@ -37,6 +39,7 @@ const FormsPage = async ({ searchParams }: { searchParams: { libraryName?: strin
         <main className="min-h-screen">
             <div className="bg-gradient-to-r from-gray-200/10 to-gray-200/10 text-stone-900 w-full">
                 <Container>
+                    <AdminBreadcrumb libraryName={libraryName} />
                     <div className="py-12">
                         <h1 className="text-4xl font-bold text-stone-900 mb-3">Forms Management</h1>
                         <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-400/80 text-emerald-50 text-sm font-medium">

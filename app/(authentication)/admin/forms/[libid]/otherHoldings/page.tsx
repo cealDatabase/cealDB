@@ -6,16 +6,18 @@ import OtherHoldingsForm from "@/components/forms/otherHoldings-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 const OtherHoldingsPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900 mt-6">
-        Holdings of Other Materials
-      </h1>
       <Container>
+        <AdminBreadcrumb libraryName="Library" />
+        <h1 className="text-3xl font-bold text-gray-900 mt-6">
+          Holdings of Other Materials
+        </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="outline"

@@ -7,16 +7,18 @@ import VolumeHoldingsForm from "@/components/forms/volume-holdings-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 const VolumeHoldingsPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900 mt-6">
-        Physical Volume Holdings
-      </h1>
       <Container>
+        <AdminBreadcrumb libraryName="Library" />
+        <h1 className="text-3xl font-bold text-gray-900 mt-6">
+          Physical Volume Holdings
+        </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="outline"

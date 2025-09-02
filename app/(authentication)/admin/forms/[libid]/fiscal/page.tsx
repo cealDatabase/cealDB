@@ -5,6 +5,7 @@ import { FiscalInstructions } from "@/components/instructions/fiscal"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 // Fiscal Support form component based on the schema
 const FiscalForm = () => {
@@ -499,10 +500,11 @@ const FiscalPage = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900 mt-6">
-        Fiscal Support
-      </h1>
       <Container>
+        <AdminBreadcrumb libraryName="Library" />
+        <h1 className="text-3xl font-bold text-gray-900 mt-6">
+          Fiscal Support
+        </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="outline"

@@ -46,7 +46,7 @@ export const UnprocessedInstructions = () => {
             </Card>
 
             {/* Schema Notice */}
-            <Card className="border-amber-200 bg-amber-50/50">
+            {/* <Card className="border-amber-200 bg-amber-50/50">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base text-amber-700">
                         <AlertTriangle className="h-4 w-4" />
@@ -59,7 +59,7 @@ export const UnprocessedInstructions = () => {
                         Form fields are placeholder implementations until the schema is finalized.
                     </p>
                 </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Field Categories */}
             <div className="space-y-4">
@@ -99,7 +99,7 @@ export const UnprocessedInstructions = () => {
                 </Card>
 
                 {/* Notes Section */}
-                <Card>
+                {/* <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
                             <Info className="h-4 w-4 text-gray-600" />
@@ -114,7 +114,7 @@ export const UnprocessedInstructions = () => {
                             </div>
                         </div>
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
         </div>
     )

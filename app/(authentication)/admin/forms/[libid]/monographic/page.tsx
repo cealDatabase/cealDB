@@ -6,6 +6,7 @@ import MonographicForm from "@/components/forms/monographic-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 
 const MonographicPage = () => {
@@ -13,10 +14,11 @@ const MonographicPage = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900 mt-6">
-        Monographic Acquisitions
-      </h1>
       <Container>
+        <AdminBreadcrumb libraryName="Library" />
+        <h1 className="text-3xl font-bold text-gray-900 mt-6">
+          Monographic Acquisitions
+        </h1>
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="outline"

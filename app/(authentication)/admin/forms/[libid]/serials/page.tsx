@@ -6,16 +6,18 @@ import SerialsForm from "@/components/forms/serials-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
 import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 const SerialsPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-900 mt-6">
-        Serial Titles: Purchased and Non-Purchased
-      </h1>
       <Container>
+        <AdminBreadcrumb libraryName="Library" />
+        <h1 className="text-3xl font-bold text-gray-900 mt-6">
+          Serial Titles: Purchased and Non-Purchased
+        </h1>
         <div className="flex items-center justify-between mb-6">
           <Button 
             variant="outline" 
