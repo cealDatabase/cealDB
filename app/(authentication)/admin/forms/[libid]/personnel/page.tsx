@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useState } from 'react'
-import { Container } from "@/components/Container"
-import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
+import { useState } from "react"
+import { PersonnelInstructions } from "@/components/instructions/personnel"
+import PersonnelForm from "@/components/forms/personnel-form"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
+import { Container } from "@/components/Container"
+import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
 const PersonnelPage = () => {
     const [showInstructions, setShowInstructions] = useState(false)
@@ -38,19 +40,16 @@ const PersonnelPage = () => {
                 </div>
 
                 <div className="flex gap-6 max-w-full">
+                    {/* Instructions Column - 1/3 width */}
                     {showInstructions && (
                         <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-                            <div className="text-gray-600">
-                                <p>Personnel Support instructions will be added here.</p>
-                            </div>
+                            <PersonnelInstructions />
                         </div>
                     )}
 
+                    {/* Form Column - 2/3 width when instructions shown, full width when hidden */}
                     <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-                        <div className="bg-white rounded-lg shadow-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Personnel Support Form</h2>
-                            <p className="text-gray-600">Personnel Support form will be implemented here.</p>
-                        </div>
+                        <PersonnelForm />
                     </div>
                 </div>
             </Container>

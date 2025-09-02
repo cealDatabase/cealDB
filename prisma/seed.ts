@@ -20,8 +20,10 @@ import {
   List_EJournal_Language,
   Monographic_Acquisitions,
   Personnel_Support,
+  Public_Services,
   Other_Holdings,
   Serials,
+  Unprocessed_Backlog_Materials,
   User,
   User_Library,
   Users_Roles,
@@ -110,6 +112,36 @@ async function main() {
   );
   const personnelSupport = await Promise.all<Personnel_Support[]>([
     await db.$queryRaw`SELECT * FROM ceal.personnel_support_fte`,
+  ]);
+  const publicServicesRaw = await db.$queryRaw`SELECT * FROM ceal.public_services` as any[];
+  const publicServices = [publicServicesRaw.map((record: any) => {
+    const { 
+      pslibrary_presentations, 
+      psparticipants, 
+      psreference_transactions, 
+      psnumber_of_total_circulation,
+      pslending_requests_filled,
+      pslending_requests_unfilled,
+      psborrowing_requests_filled,
+      psborrowing_requests_unfilled,
+      ...rest 
+    } = record;
+    return {
+      ...rest,
+      // Map the old field names to the new schema field names
+      pspresentations_subtotal: pslibrary_presentations,
+      pspresentation_participants_subtotal: psparticipants,
+      psreference_transactions_subtotal: psreference_transactions,
+      pstotal_circulations_subtotal: psnumber_of_total_circulation,
+      pslending_requests_filled_subtotal: pslending_requests_filled,
+      pslending_requests_unfilled_subtotal: pslending_requests_unfilled,
+      psborrowing_requests_filled_subtotal: psborrowing_requests_filled,
+      psborrowing_requests_unfilled_subtotal: psborrowing_requests_unfilled,
+    };
+  })];
+
+  const unprocessedBacklogMaterials = await Promise.all<Unprocessed_Backlog_Materials[]>([
+    await db.$queryRaw`SELECT * FROM ceal.unprocessed_backlog_materials`,
   ]);
 
   const otherHoldings = await Promise.all<Other_Holdings[]>([
@@ -257,6 +289,12 @@ async function main() {
     }),
     await db.volume_Holdings.createMany({
       data: volumeHoldings[0],
+    }),
+    await db.public_Services.createMany({
+      data: publicServices[0],
+    }),
+    await db.unprocessed_Backlog_Materials.createMany({
+      data: unprocessedBacklogMaterials[0],
     }),
   ]);
 }
