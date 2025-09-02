@@ -2,9 +2,10 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
-export async function GET(req: Request, { params }: { params: { libid: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ libid: string }> }) {
   try {
-    const libid = Number(params.libid);
+    const { libid: libidStr } = await params;
+    const libid = Number(libidStr);
     const currentYear = new Date().getFullYear();
 
     if (isNaN(libid)) {
@@ -24,9 +25,10 @@ export async function GET(req: Request, { params }: { params: { libid: string } 
 
     if (!libraryYear) {
       return NextResponse.json({
-        success: false,
-        message: "No library year record found",
+        exists: false,
         is_open_for_editing: false,
+        is_active: false,
+        message: "No library year record found",
       });
     }
 
@@ -38,8 +40,10 @@ export async function GET(req: Request, { params }: { params: { libid: string } 
     });
 
     return NextResponse.json({
-      success: true,
+      exists: true,
       is_open_for_editing: libraryYear.is_open_for_editing,
+      is_active: true,
+      message: libraryYear.is_open_for_editing ? "Form is available for editing" : "Form is read-only",
       existingData: existingData,
       libraryYear: libraryYear,
     });
