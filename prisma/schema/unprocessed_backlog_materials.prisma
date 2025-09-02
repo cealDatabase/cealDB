@@ -1,0 +1,16 @@
+model Unprocessed_Backlog_Materials {
+  id               Int           @id @default(autoincrement())
+  entryid          String?       @db.VarChar(15)
+  ubchinese        Float?
+  ubjapanese       Float?
+  ubkorean         Float?
+  ubnoncjk         Float?
+  ubtotal          Float?
+  ubcatalog_title  Float?
+  ubcatalog_volume Float?
+  ub_title         Float?
+  ub_volume        Float?
+  ubnotes          String?
+  libraryyear      Int?          @unique
+  Library_Year     Library_Year? @relation(fields: [libraryyear], references: [id])
+}

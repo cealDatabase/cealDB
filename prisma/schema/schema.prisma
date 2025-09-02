@@ -33,29 +33,30 @@ model Language {
 }
 
 model Library_Year {
-  id                       Int                        @id @default(autoincrement())
-  library                  Int?
-  is_open_for_editing      Boolean?                   @default(false)
-  admin_notes              String?
-  year                     Int
-  updated_at               DateTime
-  is_active                Boolean?                   @default(true)
-  Electronic               Electronic?
-  Electronic_Books         Electronic_Books?
-  Entry_Status             Entry_Status?
-  Fiscal_Support           Fiscal_Support?
-  LibraryYear_ListAV       LibraryYear_ListAV[]
-  LibraryYear_ListEBook    LibraryYear_ListEBook[]
-  LibraryYear_ListEJournal LibraryYear_ListEJournal[]
-  Library                  Library?                   @relation(fields: [library], references: [id])
-  List_AV                  List_AV[]
-  List_EBook               List_EBook[]
-  List_EJournal            List_EJournal[]
-  Monographic_Acquisitions Monographic_Acquisitions?
-  Other_Holdings           Other_Holdings?
-  Personnel_Support        Personnel_Support?
-  Serials                  Serials?
-  Volume_Holdings          Volume_Holdings?
+  id                            Int                            @id @default(autoincrement())
+  library                       Int?
+  is_open_for_editing           Boolean?                       @default(false)
+  admin_notes                   String?
+  year                          Int
+  updated_at                    DateTime
+  is_active                     Boolean?                       @default(true)
+  Electronic                    Electronic?
+  Electronic_Books              Electronic_Books?
+  Entry_Status                  Entry_Status?
+  Fiscal_Support                Fiscal_Support?
+  LibraryYear_ListAV            LibraryYear_ListAV[]
+  LibraryYear_ListEBook         LibraryYear_ListEBook[]
+  LibraryYear_ListEJournal      LibraryYear_ListEJournal[]
+  Library                       Library?                       @relation(fields: [library], references: [id])
+  List_AV                       List_AV[]
+  List_EBook                    List_EBook[]
+  List_EJournal                 List_EJournal[]
+  Monographic_Acquisitions      Monographic_Acquisitions?
+  Other_Holdings                Other_Holdings?
+  Personnel_Support             Personnel_Support?
+  Serials                       Serials?
+  Unprocessed_Backlog_Materials Unprocessed_Backlog_Materials?
+  Volume_Holdings               Volume_Holdings?
 }
 
 model User {
