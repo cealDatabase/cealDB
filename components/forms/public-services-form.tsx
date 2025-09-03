@@ -126,7 +126,7 @@ export default function PublicServicesForm() {
           const data = await response.json()
           if (data.existingData) {
             Object.keys(data.existingData).forEach(key => {
-              if (key !== 'entryid' && key !== 'libid' && key !== 'year') {
+              if (key !== 'id' && key !== 'entryid' && key !== 'libid' && key !== 'year' && key !== 'libraryyear') {
                 form.setValue(key as keyof FormData, data.existingData[key])
               }
             })

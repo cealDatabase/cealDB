@@ -6,6 +6,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const {
+      id, // Extract id but don't use it
       entryid,
       libid,
       pspresentations_chinese,

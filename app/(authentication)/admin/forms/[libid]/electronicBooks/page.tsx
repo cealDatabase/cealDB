@@ -5,6 +5,8 @@ import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { Button } from "@/components/ui/button"
 import { BookOpen, X } from "lucide-react"
+import ElectronicBooksForm from "@/components/forms/electronic-books-form"
+import { ElectronicBooksInstructions } from "@/components/instructions/electronicBooks"
 
 const ElectronicBooksPage = () => {
     const [showInstructions, setShowInstructions] = useState(false)
@@ -40,17 +42,12 @@ const ElectronicBooksPage = () => {
                 <div className="flex gap-6 max-w-full">
                     {showInstructions && (
                         <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-                            <div className="text-gray-600">
-                                <p>Electronic Books instructions will be added here.</p>
-                            </div>
+                            <ElectronicBooksInstructions />
                         </div>
                     )}
 
                     <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-                        <div className="bg-white rounded-lg shadow-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Electronic Books Form</h2>
-                            <p className="text-gray-600">Electronic Books form will be implemented here.</p>
-                        </div>
+                        <ElectronicBooksForm />
                     </div>
                 </div>
             </Container>
