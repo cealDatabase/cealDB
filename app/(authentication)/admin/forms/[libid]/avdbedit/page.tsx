@@ -1,61 +1,100 @@
-"use client"
+// app/(authentication)/admin/forms/[libid]/avdbedit/page.tsx
+import { cookies } from "next/headers";
+import db from "@/lib/db";
+import { notFound } from "next/navigation";
+import AvdbEditClient from "./AvdbEditClient";
 
-import React, { useState } from 'react'
-import { Container } from "@/components/Container"
-import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
-import { Button } from "@/components/ui/button"
-import { BookOpen, X } from "lucide-react"
+type PageProps = {
+  // 👇 in Next 15 these are async
+  params: Promise<{ libid: string }>;
+  searchParams: Promise<{ ids?: string; year?: string }>;
+};
 
-const AVDBEditPage = () => {
-    const [showInstructions, setShowInstructions] = useState(false)
+export default async function Page({ params, searchParams }: PageProps) {
+  // ✅ await both before accessing properties
+  const { libid: libidStr } = await params;
+  const sp = await searchParams;
 
-    return (
-        <>
-            <Container>
-                <AdminBreadcrumb libraryName="Library" />
-                <h1 className="text-3xl font-bold text-gray-900 mt-6">
-                    Audio/Visual Database by Subscription
-                </h1>
-                <div className="flex items-center justify-between mb-6">
-                    <Button
-                        variant="outline"
-                        className="flex items-center gap-2 text-md bg-black text-white font-bold"
-                        size="lg"
-                        onClick={() => setShowInstructions(!showInstructions)}
-                    >
-                        {showInstructions ? (
-                            <>
-                                <X className="h-4 w-4" />
-                                Hide Instructions
-                            </>
-                        ) : (
-                            <>
-                                <BookOpen className="h-4 w-4" />
-                                View Instructions
-                            </>
-                        )}
-                    </Button>
-                </div>
+  const cookieStore = await cookies();
+  
+  // Parse libid from URL params, but also check cookies for member users
+  let libid: number;
+  
+  // If libidStr is "member" or not a valid number, get libid from cookies
+  if (libidStr === "member" || isNaN(Number(libidStr))) {
+    const libidFromCookie = cookieStore.get("libid")?.value;
+    if (libidFromCookie) {
+      libid = Number(libidFromCookie);
+    } else {
+      libid = NaN; // Will trigger notFound
+    }
+  } else {
+    libid = Number(libidStr);
+  }
 
-                <div className="flex gap-6 max-w-full">
-                    {showInstructions && (
-                        <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-                            <div className="text-gray-600">
-                                <p>Audio/Visual Database by Subscription instructions will be added here.</p>
-                            </div>
-                        </div>
-                    )}
+  const year = Number(sp.year ?? NaN);
+  const ids = (sp.ids ?? "")
+    .split(",")
+    .map((s) => Number(s))
+    .filter((n) => Number.isFinite(n));
 
-                    <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-                        <div className="bg-white rounded-lg shadow-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Audio/Visual Database by Subscription Form</h2>
-                            <p className="text-gray-600">Audio/Visual Database by Subscription form will be implemented here.</p>
-                        </div>
-                    </div>
-                </div>
-            </Container>
-        </>
-    )
+  // Debug logging to see what we're getting
+  console.log("Debug avdbedit page:", {
+    libidStr,
+    libid,
+    year,
+    ids,
+    searchParams: sp
+  });
+
+  if (!libid || !Number.isFinite(year) || ids.length === 0) {
+    console.log("Returning notFound due to:", {
+      libidValid: !!libid,
+      yearValid: Number.isFinite(year),
+      idsLength: ids.length
+    });
+    return notFound();
+  }
+
+  const rows = await db.list_AV.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      title: true,
+      subtitle: true,
+      cjk_title: true,
+      romanized_title: true,
+      description: true,
+      notes: true,
+      publisher: true,
+      data_source: true,
+      type: true,
+      is_global: true,
+      updated_at: true,
+      List_AV_Counts: { where: { year }, select: { titles: true }, take: 1 },
+      List_AV_Language: { select: { Language: { select: { short: true } } } },
+    },
+  });
+
+  const data = rows.map((r) => ({
+    id: r.id,
+    title: r.title ?? "",
+    subtitle: r.subtitle ?? "",
+    cjk_title: r.cjk_title ?? "",
+    romanized_title: r.romanized_title ?? "",
+    description: r.description ?? "",
+    notes: r.notes ?? "",
+    publisher: r.publisher ?? "",
+    data_source: r.data_source ?? "",
+    type: r.type ?? "",
+    counts: r.List_AV_Counts[0]?.titles ?? 0,
+    language: r.List_AV_Language.map((x) => x.Language?.short).filter(
+      Boolean
+    ) as string[],
+    is_global: !!r.is_global,
+    subscribers: [], // satisfy listAV shape used by columns
+    updated_at: r.updated_at.toISOString(),
+  }));
+
+  return <AvdbEditClient libid={libid} year={year} rows={data} />;
 }
-
-export default AVDBEditPage
