@@ -1,6 +1,7 @@
 import * as jose from "jose";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { execSync } from "child_process";
 
 export async function POST(request: Request) {
   // Read data off req body
@@ -17,23 +18,79 @@ export async function POST(request: Request) {
     );
   }
 
-  // Lookup the user
-
-  const user = await db.user.findFirst({
-    where: { username: username.toLowerCase() },
+  // Lookup the user (try both original case and lowercase for compatibility)
+  let user = await db.user.findFirst({
+    where: { username: username },
   });
+  
+  // If not found, try lowercase version for backward compatibility
+  if (!user) {
+    user = await db.user.findFirst({
+      where: { username: username.toLowerCase() },
+    });
+  }
 
   if (!user) {
     return Response.json({ error: "User not found" }, { status: 400 });
   }
-  // Compare password
+  // Compare password using both bcrypt and MD5-crypt formats
+  let isCorrectPassword = false;
 
-  const isCorrectPassword = bcrypt.compareSync(password, user.password);
-
-  if (isCorrectPassword) { // TODO: verify password
+  try {
+    if (user.password.startsWith('$2y$') || user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
+      // bcrypt hash
+      isCorrectPassword = await bcrypt.compare(password, user.password);
+    } else if (user.password.startsWith('$1$')) {
+      // MD5-crypt hash - use OpenSSL for verification
+      try {
+        // Extract salt from stored hash (between first and second $)
+        const parts = user.password.split('$');
+        const salt = parts[2];
+        
+        // Use OpenSSL to generate hash with same salt
+        const command = `openssl passwd -1 -salt ${salt} "${password}"`;
+        const computedHash = execSync(command, { encoding: 'utf8' }).trim();
+        
+        isCorrectPassword = computedHash === user.password;
+      } catch (error) {
+        console.error('MD5-crypt verification error:', error);
+        return Response.json(
+          {
+            error: "Password verification failed",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
+    } else {
+      // Unknown hash format
+      console.error(`Unknown password hash format for user ${username}: ${user.password.substring(0, 10)}...`);
+      return Response.json(
+        {
+          error: "Invalid password format in database",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+  } catch (error) {
+    console.error(`Password comparison error for user ${username}:`, error);
     return Response.json(
       {
-        error: "Incorrect password",
+        error: "Password verification failed",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  if (!isCorrectPassword) {
+    return Response.json(
+      {
+        error: "Incorrect password. You can click 'forgot password' to reset your password.",
       },
       {
         status: 400,

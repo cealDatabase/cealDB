@@ -287,7 +287,7 @@ export default function MonographicForm() {
         isSubmitting={isSubmitting}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Monographic Data"
+        submitButtonText="Save Monographic Data"
       />
     </FormWrapper>
   )

@@ -80,6 +80,15 @@ export default function SignInPage() {
               <h3 className="text-sm font-medium text-red-700">
                 Error! {error}
               </h3>
+              {error.includes("Incorrect password") && (
+                <p className="mt-2 text-sm text-red-600">
+                  💡 <strong>Tip:</strong> If you forgot your password, click{" "}
+                  <Link href="/forgot" className="underline text-red-700 hover:text-red-800">
+                    "forgot password"
+                  </Link>{" "}
+                  above to reset it.
+                </p>
+              )}
             </div>
           </div>
         </div>

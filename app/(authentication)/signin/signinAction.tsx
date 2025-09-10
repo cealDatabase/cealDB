@@ -29,6 +29,11 @@ export default async function signinAction(
   });
   const json = await res.json();
 
+  // If signin failed, return error message without setting cookies
+  if (!res.ok || json.error) {
+    return json.error;
+  }
+
   (await cookies()).set("session", json.token, {
     secure: true,
     httpOnly: true,

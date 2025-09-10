@@ -204,15 +204,15 @@ export default function VolumeHoldingsForm() {
       {/* Physical Volume Numbers from Last Year */}
       <FormSection
         title="Physical Volume Numbers from Last Year"
-        description="The value for 01-05 are obtained from CEAL database, if available. New libraries please fill out 01-05."
+        description="The value for 01-05 are obtained from CEAL database, if available. New joined libraries please contact CEAL admin at https://ceal-db.vercel.app/help"
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "vhprevious_year_chinese", label: "01. Previous Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "vhprevious_year_japanese", label: "02. Previous Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "vhprevious_year_korean", label: "03. Previous Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            noncjk: { name: "vhprevious_year_noncjk", label: "04. Previous Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "vhprevious_year_chinese", label: "01. Previous Chinese", disabled: true },
+            japanese: { name: "vhprevious_year_japanese", label: "02. Previous Japanese", disabled: true },
+            korean: { name: "vhprevious_year_korean", label: "03. Previous Korean", disabled: true },
+            noncjk: { name: "vhprevious_year_noncjk", label: "04. Previous Non-CJK", disabled: true }
           }}
           useFloatNumbers={true}
         />
