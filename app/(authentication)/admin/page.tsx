@@ -143,6 +143,24 @@ async function getUserDetailByEmail({
   }
 
   const libraryData = await findLibrary();
+
+  async function findLastLogin() {
+    try {
+      const lastLogin = singleUser?.lastlogin_at;
+      if (lastLogin) {
+        const nycTime = new Date(lastLogin).toLocaleString('en-US', {
+          timeZone: 'America/New_York'
+        });
+        return nycTime;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      return null;
+    }
+  }
+
+  const lastLogin = await findLastLogin();
   
   return (
     <UserSingle
@@ -150,6 +168,7 @@ async function getUserDetailByEmail({
       role={findRole()}
       library={libraryData?.component}
       libraryName={libraryData?.libraryName}
+      lastLogin={lastLogin? lastLogin : undefined}
     />
   );
 }
@@ -159,11 +178,13 @@ function UserSingle({
   role,
   library,
   libraryName,
+  lastLogin,
 }: {
   user: SingleUserType;
   role: any;
   library: any;
   libraryName?: string;
+  lastLogin?: string;
 }) {
   if (!user) {
     return null; // or handle the case when user is null
@@ -177,9 +198,14 @@ function UserSingle({
           <dl className="divide-y divide-gray-400">
             {user.id && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-                <dt className="text-gray-500 font-medium">User Id</dt>
+                <dt className="text-gray-500 font-medium">User Id & Last Login</dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                   {user.id}
+                  {lastLogin && (
+                    <span className="ml-2 text-gray-500">
+                      Last Login: {lastLogin}
+                    </span>
+                  )}
                 </dd>
               </div>
             )}

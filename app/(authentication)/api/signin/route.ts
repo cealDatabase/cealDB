@@ -2,6 +2,8 @@ import * as jose from "jose";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { execSync } from "child_process";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 export async function POST(request: Request) {
   // Read data off req body
@@ -31,6 +33,14 @@ export async function POST(request: Request) {
   }
 
   if (!user) {
+    // Log failed signin attempt
+    await logAuditEvent({
+      username: username,
+      action: 'SIGNIN_FAILED',
+      success: false,
+      errorMessage: 'User not found',
+    }, request);
+    
     return Response.json({ error: "User not found" }, { status: 400 });
   }
   // Compare password using both bcrypt and MD5-crypt formats
@@ -88,6 +98,15 @@ export async function POST(request: Request) {
   }
 
   if (!isCorrectPassword) {
+    // Log failed signin attempt due to wrong password
+    await logAuditEvent({
+      userId: user.id,
+      username: user.username,
+      action: 'SIGNIN_FAILED',
+      success: false,
+      errorMessage: 'Incorrect password',
+    }, request);
+    
     return Response.json(
       {
         error: "Incorrect password. You can click 'forgot password' to reset your password.",
@@ -98,8 +117,31 @@ export async function POST(request: Request) {
     );
   }
 
-  // Create jwt token
+  // Update lastlogin timestamp in New York timezone
+  try {
+    const nyTimeZone = 'America/New_York';
+    const now = new Date();
+    const nyTime = toZonedTime(now, nyTimeZone);
+    const utcTime = fromZonedTime(nyTime, nyTimeZone);
 
+    await db.user.update({
+      where: { id: user.id },
+      data: { lastlogin_at: utcTime }
+    });
+  } catch (error) {
+    console.error('Failed to update lastlogin timestamp:', error);
+    // Don't fail the login if timestamp update fails
+  }
+
+  // Log successful signin
+  await logAuditEvent({
+    userId: user.id,
+    username: user.username,
+    action: 'SIGNIN',
+    success: true,
+  }, request);
+
+  // Create jwt token
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const alg = process.env.ALG || "";
 

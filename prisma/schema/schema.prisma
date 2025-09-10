@@ -70,6 +70,31 @@ model User {
   lastname     String?
   User_Library User_Library[]
   User_Roles   Users_Roles[]
+  AuditLog     AuditLog[]
+}
+
+model AuditLog {
+  id             Int      @id @default(autoincrement())
+  user_id        Int?     // Nullable for system operations or failed logins
+  username       String?  // Store username for reference even if user_id is null
+  action         String   // CREATE, UPDATE, DELETE, SIGNIN, SIGNOUT, etc.
+  table_name     String?  // Which table was affected (null for auth operations)
+  record_id      String?  // ID of the affected record (stored as string for flexibility)
+  old_values     Json?    // Previous values before change
+  new_values     Json?    // New values after change
+  ip_address     String?  // Client IP address
+  user_agent     String?  // Browser/client info
+  timestamp      DateTime @default(now())
+  success        Boolean  @default(true)
+  error_message  String?  // Store error details if operation failed
+  
+  // Relation to User table
+  User User? @relation(fields: [user_id], references: [id])
+  
+  @@index([user_id])
+  @@index([action])
+  @@index([table_name])
+  @@index([timestamp])
 }
 
 model User_Library {

@@ -6,8 +6,7 @@ import getCookiesByEmail from "./fetchCookies";
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
-    // : "https://ceal-db.vercel.app/";
-    :"https://cealstats.org";
+    : "https://cealstats.org";
 
 export default async function signinAction(
   currentState: any,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { ResourceType, CopyRecord, RESOURCE_TYPES } from "@/lib/copyRecords";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 // POST /api/copy-records
 // Expects JSON body: { resource: "av"|"ebook"|"ejournal", targetYear: number, records: Array<{id:number, counts:number}> }
@@ -150,9 +151,32 @@ export async function POST(request: Request) {
     }
     
     console.log(`/api/copy-records: Successfully processed ${processedRecords.length} records`);
+    
+    // Log successful copy operation
+    await logAuditEvent({
+      action: 'CREATE',
+      tableName: `list_${resource.toUpperCase()}_Counts`,
+      newValues: { 
+        resource, 
+        targetYear, 
+        processedCount: processedRecords.length,
+        records: records.map((r: any) => ({ id: r.id, counts: r.counts }))
+      },
+      success: true,
+    }, request);
+    
     return NextResponse.json({ processed: processedRecords.length }, { status: 200 });
   } catch (error) {
     console.error("Error copying records:", error);
+    
+    // Log failed copy operation
+    await logAuditEvent({
+      action: 'CREATE',
+      tableName: 'copy_records_operation',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    }, request);
+    
     return NextResponse.json(
       { error: "Error copying records" },
       { status: 500 }
