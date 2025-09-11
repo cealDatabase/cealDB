@@ -104,7 +104,18 @@ export async function POST(request: Request) {
           const computedHash = crypt(password, salt);
           console.log(`[SIGNIN DEBUG] Computed hash: ${computedHash}`);
           console.log(`[SIGNIN DEBUG] Stored hash:   ${user.password}`);
-          isCorrectPassword = computedHash === user.password;
+          console.log(`[SIGNIN DEBUG] Computed hash length: ${computedHash.length}`);
+          console.log(`[SIGNIN DEBUG] Stored hash length: ${user.password.length}`);
+          console.log(`[SIGNIN DEBUG] Computed hash bytes: ${JSON.stringify([...computedHash].map(c => c.charCodeAt(0)))}`);
+          console.log(`[SIGNIN DEBUG] Stored hash bytes: ${JSON.stringify([...user.password].map(c => c.charCodeAt(0)))}`);
+          
+          // Trim whitespace and normalize comparison
+          const normalizedComputed = computedHash.trim();
+          const normalizedStored = user.password.trim();
+          isCorrectPassword = normalizedComputed === normalizedStored;
+          
+          console.log(`[SIGNIN DEBUG] Normalized computed: "${normalizedComputed}"`);
+          console.log(`[SIGNIN DEBUG] Normalized stored: "${normalizedStored}"`);
           console.log(`[SIGNIN DEBUG] MD5-crypt comparison result: ${isCorrectPassword}`);
         } else {
           console.error(`Invalid MD5-crypt hash format for user ${username}: expected $1$salt$hash format`);
