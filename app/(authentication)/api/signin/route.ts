@@ -1,7 +1,6 @@
 import * as jose from "jose";
 import db from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { execSync } from "child_process";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { logAuditEvent } from "@/lib/auditLogger";
 
@@ -51,17 +50,28 @@ export async function POST(request: Request) {
       // bcrypt hash
       isCorrectPassword = await bcrypt.compare(password, user.password);
     } else if (user.password.startsWith('$1$')) {
-      // MD5-crypt hash - use OpenSSL for verification
+      // MD5-crypt hash - use unix-crypt-td-js for safe verification
       try {
-        // Extract salt from stored hash (between first and second $)
+        // Dynamic import to handle Next.js environment
+        const { crypt } = await import('unix-crypt-td-js');
+        
+        // Extract salt from stored hash
         const parts = user.password.split('$');
-        const salt = parts[2];
-        
-        // Use OpenSSL to generate hash with same salt
-        const command = `openssl passwd -1 -salt ${salt} "${password}"`;
-        const computedHash = execSync(command, { encoding: 'utf8' }).trim();
-        
-        isCorrectPassword = computedHash === user.password;
+        if (parts.length >= 3) {
+          const salt = '$1$' + parts[2];
+          const computedHash = crypt(password, salt);
+          isCorrectPassword = computedHash === user.password;
+        } else {
+          console.error(`Invalid MD5-crypt hash format for user ${username}`);
+          return Response.json(
+            {
+              error: "Invalid password format in database",
+            },
+            {
+              status: 500,
+            }
+          );
+        }
       } catch (error) {
         console.error('MD5-crypt verification error:', error);
         return Response.json(
