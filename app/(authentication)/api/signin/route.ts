@@ -3,7 +3,6 @@ import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { logAuditEvent } from "@/lib/auditLogger";
-import md5 from "apache-md5";
 
 export async function POST(request: Request) {
   // Read data off req body
@@ -43,24 +42,34 @@ export async function POST(request: Request) {
     
     return Response.json({ error: "User not found" }, { status: 400 });
   }
-  // Compare password using both bcrypt and MD5-crypt formats
+  // Compare password using multiple supported formats
   let isCorrectPassword = false;
 
   try {
-    if (user.password.startsWith('$2y$') || user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
-      // bcrypt hash
+    if (user.password.startsWith('$2y$') || user.password.startsWith('$2b$') || user.password.startsWith('$2a$') || user.password.startsWith('$2$')) {
+      // bcrypt hash - all variants
       isCorrectPassword = await bcrypt.compare(password, user.password);
     } else if (user.password.startsWith('$1$')) {
-      // MD5-crypt hash - use apache-md5 for safe verification
+      // MD5-crypt hash - use unix-crypt-td-js for safe verification
       try {
-        // Extract salt from stored hash (between first and second $)
+        // Import unix-crypt-td-js dynamically with proper CommonJS handling
+        let crypt;
+        try {
+          const unixCryptModule = await import('unix-crypt-td-js');
+          crypt = unixCryptModule.crypt || unixCryptModule.default?.crypt || unixCryptModule.default;
+        } catch (importError) {
+          console.error('Failed to import unix-crypt-td-js:', importError);
+          throw importError;
+        }
+        
+        // Extract salt from stored hash - format: $1$salt$hash
         const parts = user.password.split('$');
-        if (parts.length >= 3) {
-          const salt = parts[2];
-          const computedHash = md5(password, salt);
+        if (parts.length >= 4 && parts[1] === '1') {
+          const salt = '$1$' + parts[2];  // Salt format: $1$salt (no trailing $)
+          const computedHash = crypt(password, salt);
           isCorrectPassword = computedHash === user.password;
         } else {
-          console.error(`Invalid MD5-crypt hash format for user ${username}`);
+          console.error(`Invalid MD5-crypt hash format for user ${username}: expected $1$salt$hash format`);
           return Response.json(
             {
               error: "Invalid password format in database",
@@ -81,12 +90,49 @@ export async function POST(request: Request) {
           }
         );
       }
+    } else if (user.password.startsWith('$5$') || user.password.startsWith('$6$')) {
+      // SHA-256 ($5$) or SHA-512 ($6$) crypt formats
+      try {
+        const unixCryptModule = await import('unix-crypt-td-js');
+        const crypt = unixCryptModule.crypt;
+        
+        // Use the full hash as salt for crypt function
+        const computedHash = crypt(password, user.password);
+        isCorrectPassword = computedHash === user.password;
+      } catch (error) {
+        console.error('SHA crypt verification error:', error);
+        return Response.json(
+          {
+            error: "Password verification failed",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
+    } else if (user.password.length === 32 && /^[a-f0-9]+$/i.test(user.password)) {
+      // Plain MD5 hash (32 hex characters)
+      try {
+        const crypto = await import('crypto');
+        const md5Hash = crypto.createHash('md5').update(password).digest('hex');
+        isCorrectPassword = md5Hash.toLowerCase() === user.password.toLowerCase();
+      } catch (error) {
+        console.error('MD5 hash verification error:', error);
+        return Response.json(
+          {
+            error: "Password verification failed",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
     } else {
-      // Unknown hash format
-      console.error(`Unknown password hash format for user ${username}: ${user.password.substring(0, 10)}...`);
+      // Unknown hash format - log for debugging
+      console.error(`Unknown password hash format for user ${username}: ${user.password.substring(0, 20)}... (length: ${user.password.length})`);
       return Response.json(
         {
-          error: "Invalid password format in database",
+          error: "Unsupported password format in database",
         },
         {
           status: 500,
