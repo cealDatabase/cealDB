@@ -3,6 +3,7 @@ import db from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { logAuditEvent } from "@/lib/auditLogger";
+import md5 from "apache-md5";
 
 export async function POST(request: Request) {
   // Read data off req body
@@ -50,16 +51,13 @@ export async function POST(request: Request) {
       // bcrypt hash
       isCorrectPassword = await bcrypt.compare(password, user.password);
     } else if (user.password.startsWith('$1$')) {
-      // MD5-crypt hash - use unix-crypt-td-js for safe verification
+      // MD5-crypt hash - use apache-md5 for safe verification
       try {
-        // Dynamic import to handle Next.js environment
-        const { crypt } = await import('unix-crypt-td-js');
-        
-        // Extract salt from stored hash
+        // Extract salt from stored hash (between first and second $)
         const parts = user.password.split('$');
         if (parts.length >= 3) {
-          const salt = '$1$' + parts[2];
-          const computedHash = crypt(password, salt);
+          const salt = parts[2];
+          const computedHash = md5(password, salt);
           isCorrectPassword = computedHash === user.password;
         } else {
           console.error(`Invalid MD5-crypt hash format for user ${username}`);
