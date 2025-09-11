@@ -59,7 +59,7 @@ export default async function SingleLibraryInfoHomePage(
           <div>{userItem.username}</div>
           <div>{userItem.firstname}</div>
           <div>{userItem.lastname}</div>
-          <div>{userItem.password}</div>
+          <div>{userItem.password}</div> {/* TODO: decrypt */}
         </div>
       )}
       {!userItem && (
