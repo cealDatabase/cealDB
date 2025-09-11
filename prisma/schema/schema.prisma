@@ -61,16 +61,68 @@ model Library_Year {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  username     String         @unique
-  password     String
-  isactive     Boolean        @default(true)
-  lastlogin_at DateTime?
-  firstname    String?
-  lastname     String?
-  User_Library User_Library[]
-  User_Roles   Users_Roles[]
-  AuditLog     AuditLog[]
+  id                        Int            @id @default(autoincrement())
+  email                     String         @unique  // Primary identifier - replaces username
+  password_hash             String?        // New Argon2id hash, null means needs reset
+  name                      String?        // Combined name field
+  firstname                 String?        // Keep for legacy compatibility
+  lastname                  String?        // Keep for legacy compatibility
+  isactive                  Boolean        @default(true)
+  lastlogin_at              DateTime?
+  requires_password_reset   Boolean        @default(true)  // Force password reset on first login
+  password_reset_token      String?        // Token for password reset emails
+  password_reset_expires    DateTime?      // Expiration for reset token
+  email_verified            Boolean        @default(false) // Email confirmation status
+  email_verification_token  String?        // Token for email verification
+  created_at                DateTime       @default(now())
+  updated_at                DateTime       @default(now()) @updatedAt
+  
+  // Auth.js required fields
+  emailVerified             DateTime?      // Auth.js email verification
+  image                     String?        // Auth.js profile image
+  
+  // Relations
+  User_Library              User_Library[]
+  User_Roles                Users_Roles[]
+  AuditLog                  AuditLog[]
+  accounts                  Account[]
+  sessions                  Session[]
+}
+
+// Auth.js required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model AuditLog {

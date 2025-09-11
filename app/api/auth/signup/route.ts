@@ -1,128 +1,151 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { hashPasswordMD5Crypt, detectPasswordFormat } from '@/lib/passwordUtils';
+import { hashPassword, validatePassword, generateResetToken } from '@/lib/password';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, password, firstname, lastname } = body;
+    const { email, password, firstname, lastname, name } = body;
 
-    // Validate input
-    if (!username || !password) {
+    console.log(`\n🚀 SIGNUP ATTEMPT for email: "${email}"`);
+    console.log(`📊 Request timestamp: ${new Date().toISOString()}`);
+
+    // Validate required fields
+    if (!email || !firstname || !lastname) {
+      console.log(`❌ MISSING REQUIRED FIELDS`);
       return NextResponse.json(
         { 
           success: false, 
-          message: 'Username and password are required' 
+          message: 'Email, first name, and last name are required',
+          error: 'MISSING_REQUIRED_FIELDS' 
         },
         { status: 400 }
       );
     }
 
-    // Validate password strength
-    if (password.length < 8) {
+    // Normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log(`📧 Normalized email: "${normalizedEmail}"`);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      console.log(`❌ INVALID EMAIL FORMAT: "${normalizedEmail}"`);
       return NextResponse.json(
         { 
           success: false, 
-          message: 'Password must be at least 8 characters long' 
+          message: 'Invalid email format',
+          error: 'INVALID_EMAIL_FORMAT' 
         },
         { status: 400 }
       );
     }
-
-    console.log(`Signup attempt for username: ${username}`);
 
     // Check if user already exists
-    const existingUser = await db.user.findFirst({
-      where: { 
-        username: {
-          equals: username,
-          mode: 'insensitive'
-        }
-      }
+    const existingUser = await db.user.findUnique({
+      where: { email: normalizedEmail }
     });
 
     if (existingUser) {
-      console.log(`User already exists: ${username}`);
+      console.log(`❌ USER ALREADY EXISTS: email="${existingUser.email}"`);
       return NextResponse.json(
         { 
           success: false, 
-          message: 'Username already exists. Please choose a different username.' 
+          message: 'An account with this email address already exists',
+          error: 'USER_ALREADY_EXISTS' 
         },
-        { status: 409 }
+        { status: 400 }
       );
     }
 
-    // Hash password using MD5-crypt (preferred method)
-    console.log('Hashing password with MD5-crypt...');
-    const hashedPassword = hashPasswordMD5Crypt(password);
+    let passwordHash = null;
+    let requiresPasswordReset = true;
+    let resetToken = null;
+    let resetExpires = null;
 
-    if (!hashedPassword) {
-      console.error('Failed to hash password');
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Error processing password. Please try again.' 
-        },
-        { status: 500 }
-      );
+    // If password is provided, validate and hash it
+    if (password) {
+      console.log(`🔒 Password provided, validating...`);
+      
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        console.log(`❌ PASSWORD VALIDATION FAILED: ${passwordValidation.errors.join(', ')}`);
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: 'Password does not meet requirements',
+            errors: passwordValidation.errors,
+            error: 'INVALID_PASSWORD' 
+          },
+          { status: 400 }
+        );
+      }
+
+      passwordHash = await hashPassword(password);
+      requiresPasswordReset = false; // Password was set during signup
+      console.log(`✅ Password validated and hashed`);
+    } else {
+      console.log(`🔄 No password provided, will require password reset`);
+      // Generate reset token for password setup
+      resetToken = generateResetToken();
+      resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
     }
 
-    console.log(`Password hashed successfully: ${detectPasswordFormat(hashedPassword)}`);
-
-    // Create new user
+    // Create the user
     const newUser = await db.user.create({
       data: {
-        username: username,
-        password: hashedPassword,
-        firstname: firstname || null,
-        lastname: lastname || null,
+        email: normalizedEmail,
+        password_hash: passwordHash,
+        firstname: firstname.trim(),
+        lastname: lastname.trim(),
+        name: name?.trim() || `${firstname.trim()} ${lastname.trim()}`,
         isactive: true,
-        lastlogin_at: null
+        created_at: new Date(),
+        requires_password_reset: requiresPasswordReset,
+        password_reset_token: resetToken,
+        password_reset_expires: resetExpires,
+        email_verified: false, // Will be verified through email workflow
       }
     });
 
-    console.log(`User created successfully: ID ${newUser.id}, Username: ${newUser.username}`);
+    console.log(`✅ USER CREATED: ID=${newUser.id}, email="${newUser.email}"`);
 
-    // Return success response (don't include sensitive data)
-    return NextResponse.json(
-      { 
-        success: true, 
-        message: 'User created successfully',
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          firstname: newUser.firstname,
-          lastname: newUser.lastname,
-          isactive: newUser.isactive
-        }
-      },
-      { status: 201 }
+    // Send welcome email
+    const emailSent = await sendWelcomeEmail(
+      normalizedEmail, 
+      firstname, 
+      resetToken || undefined // Send reset token only if no password was set
     );
+    console.log(`📧 Welcome email sent: ${emailSent}`);
 
-  } catch (error: any) {
-    console.error('Signup error details:', {
-      message: error?.message || 'Unknown error',
-      stack: error?.stack || 'No stack trace',
-      name: error?.name || 'Unknown error type'
-    });
-    
-    // More specific error messages for debugging
-    let errorMessage = 'An error occurred during signup. Please try again.';
-    const errorMsg = error?.message || '';
-    
-    if (errorMsg.includes('Unique constraint')) {
-      errorMessage = 'Username already exists. Please choose a different username.';
-    } else if (errorMsg.includes('password')) {
-      errorMessage = 'Error processing password. Please try again.';
-    } else if (errorMsg.includes('database') || errorMsg.includes('connect')) {
-      errorMessage = 'Database connection error. Please try again.';
-    }
-    
+    // Return success response
+    const response = {
+      success: true,
+      message: password 
+        ? 'Account created successfully! You can now sign in with your email address.'
+        : 'Account created successfully! Please check your email to set up your password.',
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        firstname: newUser.firstname,
+        lastname: newUser.lastname,
+        name: newUser.name,
+        requiresPasswordReset: requiresPasswordReset
+      },
+      ...(resetToken && { resetToken }) // Include reset token if generated
+    };
+
+    console.log(`🎉 SIGNUP SUCCESSFUL for email: "${normalizedEmail}"`);
+    return NextResponse.json(response, { status: 201 });
+
+  } catch (error) {
+    console.error('Signup error:', error);
     return NextResponse.json(
       { 
         success: false, 
-        message: errorMessage,
-        debug: process.env.NODE_ENV === 'development' ? errorMsg : undefined
+        message: 'An error occurred during signup. Please try again.',
+        error: 'SERVER_ERROR' 
       },
       { status: 500 }
     );

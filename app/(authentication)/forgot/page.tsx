@@ -18,8 +18,8 @@ export default function ForgotPage() {
       subtitle={
         <>
           <div className="text-xs">
-            Leave your username (same as email) and click the button. Then check
-            your email inbox or spam box.
+            Enter your email address and click the button. Then check
+            your email inbox or spam box for the reset link.
             <br />
             CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
             <Link href="/libraries">contact persons</Link> to gain access to the
@@ -31,8 +31,8 @@ export default function ForgotPage() {
       <form action={formAction}>
         <div className="space-y-6">
           <TextField
-            label="Username (same as email)"
-            name="username"
+            label="Email Address"
+            name="email"
             type="email"
             autoComplete="email"
             required

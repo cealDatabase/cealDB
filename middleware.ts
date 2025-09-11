@@ -1,34 +1,38 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import * as jose from "jose";
+import { auth } from "@/auth";
 
-// This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
-  // check for cookie
-  // console.log("cookies: " + JSON.stringify(cookies().getAll()));
+export default auth((req) => {
+  // req.auth contains the authenticated user information
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
 
-  const cookie = (await cookies()).get("session");
+  // Define protected routes
+  const isProtectedRoute = nextUrl.pathname.startsWith('/admin') || 
+                          nextUrl.pathname.startsWith('/create');
 
-  if (!cookie) {
-    return NextResponse.redirect(new URL("/", request.url));
+  // Define auth routes (login, signup, etc.)
+  const isAuthRoute = nextUrl.pathname.startsWith('/signin') || 
+                     nextUrl.pathname.startsWith('/signup') || 
+                     nextUrl.pathname.startsWith('/forgot');
+
+  // Redirect authenticated users away from auth pages
+  if (isLoggedIn && isAuthRoute) {
+    return Response.redirect(new URL('/admin', nextUrl));
   }
-  // validate it
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const jwt = cookie.value;
 
-  try {
-    const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret, {});
-    // console.log("payload: " + JSON.stringify(payload));
-  } catch (err) {
-    // if not success, redirect them
-    return NextResponse.redirect(new URL("/", request.url));
+  // Redirect unauthenticated users from protected routes
+  if (!isLoggedIn && isProtectedRoute) {
+    return Response.redirect(new URL('/signin', nextUrl));
   }
-}
 
-// See "Matching Paths" below to learn more
+  // Allow access to all other routes
+  return;
+});
+
 export const config = {
-  // matcher: ["/admin/:path*", "/signup/:path*", "/confirmed/:path*"],
-  // matcher: ["/admin/:path*", "/confirmed/:path*"],
-  matcher: ["/admin/:path*", "/create"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };

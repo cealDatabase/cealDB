@@ -13,7 +13,7 @@ export default function SignInPage() {
 
   return (
     <AuthLayout
-      title="Sign in by Your Username"
+      title="Sign in with Your Email"
       subtitle={
         <>
           <div className="text-sm">
@@ -27,13 +27,12 @@ export default function SignInPage() {
           <div className="text-xs text-left mt-6">
             You can sign in to the CEAL Statistics Database to change
             information about your institution. Every library contact person
-            needs to use your email as your User ID, and the Password that you
-            used since your last sign-in. If you forget your password, you can
+            needs to use their email address to sign in, along with the password
+            from your last sign-in. If you forget your password, you can
             request a new password by clicking the &ldquo;Forgot Password&ldquo;
-            button. A system assigned password will be sent to
-            individual&lsquo;s mail box. CEAL Stats coordinators need to work
-            with their libraries&lsquo; contact persons to gain access to the
-            database online forms.
+            button. A password reset link will be sent to your email address. 
+            CEAL Stats coordinators need to work with their libraries&lsquo; 
+            contact persons to gain access to the database online forms.
           </div>
         </>
       }
@@ -41,8 +40,8 @@ export default function SignInPage() {
       <form action={formAction}>
         <div className="space-y-6">
           <TextField
-            label="Username same as email"
-            name="username"
+            label="Email Address"
+            name="email"
             type="email"
             autoComplete="email"
             required

@@ -17,15 +17,15 @@ export default async function forgotAction(
 ): Promise<string | undefined> {
   try {
     // Get data off form
-    const username = formData.get("username");
+    const email = formData.get("email");
 
-    // Send to our api route
-    const res = await fetch(ROOT_URL + "/api/send", {
+    // Send to our api route (updated to use forgot-password endpoint)
+    const res = await fetch(ROOT_URL + "/api/auth/forgot-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ email }),
     });
     const json: ApiResponse = await res.json();
 

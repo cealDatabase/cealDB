@@ -14,8 +14,8 @@ export default async function signinAction(
 ): Promise<any> {
   const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
   // Get data off form
-  const userNameRaw = formData.get("username")?.toString();
-  const username = userNameRaw && userNameRaw.toLowerCase();
+  const emailRaw = formData.get("email")?.toString();
+  const email = emailRaw && emailRaw.toLowerCase();
   const password = formData.get("password");
   // Send to our api route
 
@@ -24,7 +24,7 @@ export default async function signinAction(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email, password }),
   });
   const json = await res.json();
 
@@ -41,7 +41,7 @@ export default async function signinAction(
     sameSite: "strict",
   });
 
-  const fetchResult = async function (username: string | null): Promise<
+  const fetchResult = async function (email: string | null): Promise<
     | {
         role: string | null | undefined;
         library: number | null | undefined;
@@ -49,20 +49,20 @@ export default async function signinAction(
     | null
     | undefined
   > {
-    if (typeof username === "string" && username.length > 5) {
+    if (typeof email === "string" && email.length > 5) {
       // Valid email address
-      (await cookies()).set("uinf", username.toLowerCase(), {
+      (await cookies()).set("uinf", email.toLowerCase(), {
         secure: true,
         httpOnly: true,
         expires: expireTime,
       });
-      return await getCookiesByEmail({ cookieStore: username.toLowerCase() });
+      return await getCookiesByEmail({ cookieStore: email.toLowerCase() });
     }
   };
 
   (await cookies()).set(
     "library",
-    (await fetchResult(username as string))?.library as unknown as string,
+    (await fetchResult(email as string))?.library as unknown as string,
     {
       secure: true,
       httpOnly: true,
@@ -72,7 +72,7 @@ export default async function signinAction(
 
   (await cookies()).set(
     "role",
-    (await fetchResult(username as string))?.role as unknown as string,
+    (await fetchResult(email as string))?.role as unknown as string,
     {
       secure: true,
       httpOnly: true,
