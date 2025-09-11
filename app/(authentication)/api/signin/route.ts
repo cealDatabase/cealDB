@@ -21,25 +21,25 @@ async function compareMD5Crypt(plainPassword: string, hash: string): Promise<boo
     
     const salt = parts[2];
     
-    // Use system openssl command for MD5-crypt verification
-    const { execSync } = require('child_process');
-    
+    // Use unix-crypt-td-js for MD5-crypt verification (Vercel-compatible)
     try {
-      const computedHash = execSync(
-        `openssl passwd -1 -salt "${salt}" "${plainPassword}"`,
-        { encoding: 'utf8', timeout: 5000 }
-      ).trim();
+      const cryptModule = await import('unix-crypt-td-js');
+      const crypt = (cryptModule as any).default || (cryptModule as any);
+      const computedHash = crypt(plainPassword, hash);
       
       // console.log(`MD5-crypt verification: computed=${computedHash}, expected=${hash}`);
       return computedHash === hash;
-    } catch (execError) {
-      console.error('OpenSSL execution error:', execError);
+    } catch (cryptError) {
+      console.error('MD5-crypt verification error:', cryptError);
       
-      // Fallback: try unix-crypt-td-js as backup
+      // Alternative fallback: try a different approach with the crypt function
       try {
         const cryptModule = await import('unix-crypt-td-js');
         const crypt = (cryptModule as any).default || (cryptModule as any);
-        const computedHash = crypt(plainPassword, hash);
+        
+        // Try with just salt to generate new hash and compare
+        const saltedHash = `$1$${salt}$`;
+        const computedHash = crypt(plainPassword, saltedHash);
         return computedHash === hash;
       } catch (fallbackError) {
         console.error('Fallback MD5-crypt error:', fallbackError);
