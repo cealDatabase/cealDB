@@ -1,6 +1,7 @@
 // /app/api/av/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -108,6 +109,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // ✅ Log successful creation
+    await logAuditEvent({
+      action: 'CREATE',
+      tableName: 'List_AV',
+      recordId: newAV.id.toString(),
+      newValues: {
+        title: newAV.title,
+        type: newAV.type,
+        year: Number(year),
+        counts: Number(counts),
+        languages: language.length,
+      },
+      success: true,
+    }, req);
+
     // ✅ Return response
     return NextResponse.json({ 
       success: true, 
@@ -124,6 +140,14 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("API error (create AV):", error);
+
+    // Log failed creation
+    await logAuditEvent({
+      action: 'CREATE',
+      tableName: 'List_AV',
+      success: false,
+      errorMessage: error?.message || 'Unknown error',
+    }, req);
 
     return NextResponse.json(
       { error: "Failed to create AV record", detail: error?.message },
