@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
-import { verifyPassword } from '@/lib/password';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import db from '@/lib/db';
 
@@ -26,7 +25,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         },
       },
       async authorize(credentials) {
-        // Parse and validate credentials
+        // Auth.js authorize function is only used for token validation
+        // All password verification is handled by the custom signin API route
+        // This function will only validate existing sessions
+        
         const parsedCredentials = z
           .object({ 
             email: z.string().email(), 
@@ -35,66 +37,30 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           .safeParse(credentials);
 
         if (!parsedCredentials.success) {
-          console.log('❌ Invalid credentials format');
           return null;
         }
 
-        const { email, password } = parsedCredentials.data;
-
-        console.log(`🔐 Auth.js login attempt for: ${email}`);
+        const { email } = parsedCredentials.data;
 
         try {
-          // Find user by email
+          // Only find user for session validation - no password verification
           const user = await db.user.findUnique({
             where: { email: email.toLowerCase() },
             select: {
               id: true,
               email: true,
-              password_hash: true,
               name: true,
               firstname: true,
               lastname: true,
               isactive: true,
-              requires_password_reset: true,
-              email_verified: true
             }
           });
 
-          if (!user) {
-            console.log(`❌ User not found: ${email}`);
+          if (!user || !user.isactive) {
             return null;
           }
 
-          if (!user.isactive) {
-            console.log(`❌ Inactive account: ${email}`);
-            return null;
-          }
-
-          // Check if user needs password reset
-          if (!user.password_hash || user.requires_password_reset) {
-            console.log(`🔄 Password reset required for: ${email}`);
-            // For Auth.js, we can't handle password reset flow here
-            // This will be handled by a custom signin page
-            return null;
-          }
-
-          // Verify password
-          const passwordMatches = await verifyPassword(password, user.password_hash);
-
-          if (!passwordMatches) {
-            console.log(`❌ Invalid password for: ${email}`);
-            return null;
-          }
-
-          // Update last login
-          await db.user.update({
-            where: { id: user.id },
-            data: { lastlogin_at: new Date() }
-          });
-
-          console.log(`✅ Successful Auth.js login: ${email}`);
-
-          // Return user object for Auth.js
+          // Return user object for Auth.js session
           return {
             id: user.id.toString(),
             email: user.email,

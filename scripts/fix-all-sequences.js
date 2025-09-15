@@ -31,11 +31,16 @@ async function resetSequenceFor(table) {
 
   // 2) set sequence to max(id), mark as "already called"
   //    => nextval() will return max(id) + 1
+  //    If table is empty (max_id = 0), set sequence to 1 with is_called=false
+  const sequenceValue = Number(max_id);
+  const isCalled = sequenceValue > 0;
+  const setValue = sequenceValue > 0 ? sequenceValue : 1;
+
   await prisma.$executeRawUnsafe(
     `SELECT setval(
        pg_get_serial_sequence('"${table}"','id'),
-       ${Number(max_id)},
-       TRUE
+       ${setValue},
+       ${isCalled}
      );`
   );
 

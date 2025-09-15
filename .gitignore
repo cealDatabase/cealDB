@@ -1,34 +1,33 @@
-# # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# # testing
-# /coverage
+# testing
+/coverage
 
-# # production
-# /build
+# production
+/build
 
 
 
-# # debug
-# npm-debug.log*
-# yarn-debug.log*
-# yarn-error.log*
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# # local env files
-# .env
-# .env*.local
-# _.env
+# local env files
+.env
+.env*.local
+_.env
 
-# # vercel
-# .vercel
+# vercel
+.vercel
 
-# # Turborepo
-# .turbo
+# Turborepo
+.turbo
 
-# # typescript
-# *.tsbuildinfo
-# prisma/schema/electronic_books.txt
+# typescript
+*.tsbuildinfo
 
-#zipfiles
+# zipfiles
 *.zip
 ceal_code_files_db/*
 *.sql
