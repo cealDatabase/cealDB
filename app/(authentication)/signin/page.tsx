@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { XCircleIcon, CheckCircleIcon, ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { XCircleIcon, CheckCircleIcon, ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -24,6 +24,7 @@ export default function SignInPage() {
   const [checkingUser, setCheckingUser] = React.useState(false);
   const [emailCheckError, setEmailCheckError] = React.useState<any>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -216,14 +217,33 @@ export default function SignInPage() {
           <form onSubmit={handlePasswordSubmit}>
             <input type="hidden" name="email" value={userInfo.email} />
             <div className="space-y-6">
-              <TextField
-                label="Password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                placeholder="Enter your password"
-              />
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    placeholder="Enter your password"
+                    className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 pr-10 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
             <Button
               variant="outline"

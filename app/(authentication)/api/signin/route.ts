@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { logDebug } from '@/app/api/debug-logs/route';
 
 export async function POST(request: NextRequest) {
   try {
@@ -219,6 +220,9 @@ export async function POST(request: NextRequest) {
       const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
       const isProduction = process.env.NODE_ENV === 'production';
 
+      console.log(`🍪 SETTING COOKIES - Production: ${isProduction}`);
+      console.log(`🍪 Session User:`, sessionUser);
+
       // Set session token cookie
       response.cookies.set('session', token, {
         secure: isProduction,
@@ -227,6 +231,7 @@ export async function POST(request: NextRequest) {
         path: '/',
         sameSite: 'lax',
       });
+      console.log(`🍪 Set session cookie`);
 
       // Set user info cookie for quick access
       response.cookies.set('uinf', sessionUser.username.toLowerCase(), {
@@ -236,6 +241,7 @@ export async function POST(request: NextRequest) {
         path: '/',
         sameSite: 'lax',
       });
+      console.log(`🍪 Set uinf cookie: ${sessionUser.username.toLowerCase()}`);
 
       // Set role cookie if available
       if (sessionUser.role) {
@@ -246,6 +252,9 @@ export async function POST(request: NextRequest) {
           path: '/',
           sameSite: 'lax',
         });
+        console.log(`🍪 Set role cookie: ${sessionUser.role}`);
+      } else {
+        console.log(`🍪 No role to set for user`);
       }
 
       // Set library cookie if available
