@@ -111,10 +111,10 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Redirect unauthenticated users from protected routes
-  if (!isLoggedIn && isProtectedRoute) {
-    logMiddlewareDebug('REDIRECT_UNAUTH_TO_SIGNIN', { from: nextUrl.pathname, to: '/signin' });
-    return NextResponse.redirect(new URL('/signin', nextUrl));
-  }
+  // if (!isLoggedIn && isProtectedRoute) {
+  //   logMiddlewareDebug('REDIRECT_UNAUTH_TO_SIGNIN', { from: nextUrl.pathname, to: '/signin' });
+  //   return NextResponse.redirect(new URL('/signin', nextUrl));
+  // }
 
   // Log when allowing access
   logMiddlewareDebug('ALLOW_ACCESS', { 
