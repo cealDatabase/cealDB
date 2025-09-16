@@ -4,8 +4,8 @@ import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import db from './db';
 
-// JWT secret - should be in environment variables in production
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+// Authentication secret - should be in environment variables in production
+const AUTH_SECRET = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
 
 export interface SessionUser {
   id: number;
@@ -50,7 +50,7 @@ export async function verifyPassword(hashedPassword: string, plainPassword: stri
 
 // Generate JWT token
 export function generateJWTToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, AUTH_SECRET, {
     expiresIn: '3d', // 3 days
     algorithm: 'HS256'
   });
@@ -59,7 +59,7 @@ export function generateJWTToken(payload: JWTPayload): string {
 // Verify JWT token
 export function verifyJWTToken(token: string): JWTPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    return jwt.verify(token, AUTH_SECRET) as JWTPayload;
   } catch (error) {
     console.error('JWT verification error:', error);
     return null;
@@ -71,60 +71,19 @@ export function generateResetToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
-// Session token management
+// Session token management (using jsonwebtoken library for consistency)
 export function generateSessionToken(username: string): string {
-  const payload = {
-    username: username.toLowerCase(),
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60) // 3 days
+  const payload: JWTPayload = {
+    userId: 0, // Will be set by caller if needed
+    username: username.toLowerCase()
   };
   
-  const secret = process.env.AUTH_SECRET || 'default-secret-key';
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  
-  const signature = crypto
-    .createHmac('sha256', secret)
-    .update(`${header}.${payloadB64}`)
-    .digest('base64url');
-    
-  return `${header}.${payloadB64}.${signature}`;
+  return generateJWTToken(payload);
 }
 
 export async function verifySessionToken(token: string): Promise<{ username: string } | null> {
-  try {
-    const [header, payload, signature] = token.split('.');
-    
-    if (!header || !payload || !signature) {
-      return null;
-    }
-    
-    // Verify signature
-    const secret = process.env.AUTH_SECRET || 'default-secret-key';
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(`${header}.${payload}`)
-      .digest('base64url');
-      
-    if (signature !== expectedSignature) {
-      return null;
-    }
-    
-    // Decode payload
-    const decodedPayload = JSON.parse(Buffer.from(payload, 'base64url').toString());
-    
-    // Check expiration
-    if (decodedPayload.exp < Math.floor(Date.now() / 1000)) {
-      return null;
-    }
-    
-    return {
-      username: decodedPayload.username
-    };
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return null;
-  }
+  const payload = verifyJWTToken(token);
+  return payload ? { username: payload.username } : null;
 }
 
 // Get current user session
