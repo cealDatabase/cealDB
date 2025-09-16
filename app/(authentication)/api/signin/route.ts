@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { signIn } from '@/auth';
 import db from '@/lib/db';
-import { generateResetToken } from '@/lib/password';
+import { verifyPassword, generateJWTToken, generateResetToken, setSessionCookies } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -27,43 +26,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`\n🚀 AUTH.JS SIGNIN ATTEMPT for email: "${email}"`);
+    console.log(`\n🚀 ARGON2ID SIGNIN ATTEMPT for email: "${email}"`);
     console.log(`📊 Request timestamp: ${new Date().toISOString()}`);
 
-    // Check if user exists and needs password reset before attempting Auth.js signin
-    const user = await db.user.findUnique({
-      where: { email: email.toLowerCase() },
+    // Find user by email (treating username as email)
+    const user = await db.user.findFirst({
+      where: {
+        OR: [
+          { username: email.toLowerCase() },
+          { username: email.toLowerCase().trim() }
+        ]
+      },
       select: {
         id: true,
-        email: true,
-        password_hash: true,
-        name: true,
+        username: true,
         firstname: true,
         lastname: true,
         isactive: true,
-        requires_password_reset: true,
+        password: true,
+        requires_password_reset: true
       }
     });
 
     if (!user) {
       console.log(`❌ USER NOT FOUND: "${email}"`);
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           errorType: 'USER_NOT_FOUND',
-          message: 'Email address not found in the system.',
-          hint: 'Please double-check your email address or contact the CEAL admin for assistance.',
+          message: 'Email not found.',
+          hint: 'Double-check your email address or contact the CEAL administrator.',
           suggestions: [
-            'Verify your email address spelling',
-            'Contact CEAL admin if you believe this is an error',
-            'Check if you have an active account'
+            'Double-check the email address spelling',
+            'Contact your CEAL administrator for account setup',
+            'Ensure you are using the correct email address'
           ]
         },
-        { status: 401 }
+        { status: 404 }
       );
     }
 
-    console.log(`✅ USER FOUND: "${user.email}" (ID: ${user.id})`);
+    console.log(`✅ USER FOUND: "${user.username}" (ID: ${user.id})`);
     
     // Check if user account is active
     if (!user.isactive) {
@@ -83,10 +86,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user needs password reset (password_hash is null or requires_password_reset is true)
-    if (!user.password_hash || user.requires_password_reset) {
+    // Check if user needs password reset (password is null or requires_password_reset is true)
+    if (!user.password || user.requires_password_reset) {
       console.log(`🔄 PASSWORD RESET REQUIRED for user: "${email}"`);
-      console.log(`Password hash exists: ${!!user.password_hash}, Requires reset: ${user.requires_password_reset}`);
+      console.log(`Password hash exists: ${!!user.password}, Requires reset: ${user.requires_password_reset}`);
       
       // Generate password reset token
       const resetToken = generateResetToken();
@@ -102,65 +105,103 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // Send password reset email
-      const emailSent = await sendPasswordResetEmail(user.email, user.name || user.email, resetToken);
-      console.log(`📧 Password reset email sent: ${emailSent}`);
+      // Determine if this is initial password setup (NULL password) or reset
+      const isInitialSetup = !user.password;
+      
+      // Send appropriate email
+      const emailSent = await sendPasswordResetEmail(
+        user.username, 
+        user.firstname || user.lastname || user.username, 
+        resetToken,
+        isInitialSetup
+      );
+
+      console.log(`📧 ${isInitialSetup ? 'Initial password setup' : 'Password reset'} email sent to ${user.username}: ${emailSent}`);
 
       return NextResponse.json(
-        { 
-          success: false, 
-          errorType: 'PASSWORD_RESET_REQUIRED',
-          message: 'Password reset required.',
-          hint: 'As part of our security enhancement, you must set a new password. Check your email for reset instructions.',
+        {
+          success: false,
+          errorType: isInitialSetup ? 'PASSWORD_SETUP_REQUIRED' : 'PASSWORD_RESET_REQUIRED',
+          message: isInitialSetup ? 'Password setup required for your account.' : 'Password reset required.',
+          hint: isInitialSetup ? 
+            'A password setup link has been sent to your email address.' :
+            'As part of our security enhancement, you must set a new password. Check your email for reset instructions.',
           suggestions: [
             'Check your email for password reset instructions',
-            'Use the password reset link sent to your email',
-            'Contact CEAL admin if you don\'t receive the email within 10 minutes'
+            'Link expires in 24 hours',
+            'Contact CEAL admin if you don\'t receive the email',
+            'Check your spam/junk folder'
           ],
-          resetToken: resetToken, // Include for immediate password reset if needed
-          hasEmail: true
+          hasEmail: true,
+          resetToken: resetToken
         },
-        { status: 403 }
+        { status: 200 }
       );
     }
 
-    // Attempt Auth.js signin
+    // Verify password using Argon2id
     try {
-      const result = await signIn('credentials', {
-        email: email.toLowerCase(),
-        password: password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        console.log(`❌ AUTH.JS AUTHENTICATION FAILED for user: "${email}"`);
+      const isValidPassword = await verifyPassword(user.password!, password);
+      
+      if (!isValidPassword) {
+        console.log(`❌ CREDENTIALS NOT MATCH for user: "${email}"`);
         return NextResponse.json(
           { 
             success: false, 
             errorType: 'INVALID_PASSWORD',
-            message: 'Incorrect password.',
-            hint: 'Please check your password and try again. If you\'ve forgotten your password, use the "Forgot Password" option below.',
+            message: 'Credentials not match.',
+            hint: 'Either click on "Forgot Password" to reset your password or contact the CEAL administrator.',
             suggestions: [
+              'Click "Forgot Password" to reset your password',
               'Double-check your password (case-sensitive)',
-              'Use "Forgot Password" to reset your password',
-              'Contact CEAL admin if you continue having issues'
+              'Contact CEAL administrator if you continue having issues'
             ]
           },
           { status: 401 }
         );
       }
 
-      console.log(`🎉 SUCCESSFUL AUTH.JS SIGNIN for user: "${email}"`);
+      console.log(`🎉 SUCCESSFUL ARGON2ID SIGNIN for user: "${email}"`);
+
+      // Get user role and library information
+      const userLibrary = await db.user_Library.findFirst({
+        where: { user_id: user.id },
+        select: { library_id: true }
+      });
+
+      const userRole = await db.users_Roles.findFirst({
+        where: { user_id: user.id },
+        include: { Role: true }
+      });
+
+      // Create session user object
+      const sessionUser = {
+        id: user.id,
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        role: userRole?.Role?.role || null,
+        library: userLibrary?.library_id || null,
+      };
+
+      // Generate JWT token
+      const token = generateJWTToken({
+        userId: user.id,
+        username: user.username,
+      });
+
+      // Set session cookies (this function handles all cookie setting)
+      await setSessionCookies(sessionUser, token);
 
       // Successful authentication
       return NextResponse.json(
         { 
           success: true, 
           message: 'Login successful',
+          token: token, // Return token for compatibility
           user: {
             id: user.id,
-            email: user.email,
-            name: user.name,
+            username: user.username,
             firstname: user.firstname,
             lastname: user.lastname,
           },
@@ -170,7 +211,7 @@ export async function POST(request: NextRequest) {
       );
 
     } catch (authError) {
-      console.error('Auth.js signin error:', authError);
+      console.error('Argon2id signin error:', authError);
       return NextResponse.json(
         { 
           success: false, 

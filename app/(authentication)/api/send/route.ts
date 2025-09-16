@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "CEAL Admin <admin@vivoequeen.com>",
+      from: "CEAL Admin <admin@cealstats.org>",
       to: username,
       subject: "From CEAL - Your password reset request.",
       // @ts-ignore

@@ -19,25 +19,27 @@ export default async function forgotAction(
     // Get data off form
     const email = formData.get("email");
 
-    // Send to our api route (updated to use forgot-password endpoint)
-    const res = await fetch(ROOT_URL + "/api/auth/forgot-password", {
+    if (!email) {
+      return "Please enter your email address.";
+    }
+
+    // Send to our password reset API route
+    const res = await fetch(ROOT_URL + "/api/password-reset", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
     });
-    const json: ApiResponse = await res.json();
+    
+    const json = await res.json();
 
-    // Redirect to log in if success
     if (res.ok) {
-      return json.message;
-      // redirect("/signin");
+      return json.message || "Password reset email sent successfully! Check your email inbox.";
     } else {
-      // Return just the error message string, not the whole object
-      return json.message;
+      return json.message || "Unable to process password reset request.";
     }
   } catch (error) {
-    return `Error. An unexpected error occurred. Detail: ${error}`;
+    return "Unable to send password reset email. Please try again later.";
   }
 }

@@ -5,13 +5,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && node scripts/fix-all-sequences.js && next build",
-    "prisma": "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && node scripts/fix-all-sequences.js",
-    "prisma:seed": "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
-    "start": "next start",
-    "lint": "next lint",
-    "next": "next build"
+    "start":        "next start",
+    "dev":          "next dev",
+    "build":        "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js && next build",
+    "prisma":       "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
+    "lint":         "next lint"
   },
   "prisma": {
     "schema": "./prisma/schema",
@@ -19,7 +17,6 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.1.0",
-    "@auth/prisma-adapter": "^2.10.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@faker-js/faker": "^10.0.0",
@@ -48,6 +45,7 @@
     "@react-email/components": "^0.5.3",
     "@tailwindcss/forms": "^0.5.10",
     "@tanstack/react-table": "^8.21.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/ms": "^2.1.0",
     "@types/nodemailer": "^7.0.1",
     "@types/react": "19.1.13",
@@ -55,6 +53,7 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "antd": "^5.27.3",
+    "argon2": "^0.44.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -62,6 +61,7 @@
     "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.18",
     "jose": "^6.1.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.544.0",
     "luxon": "^3.7.2",
     "moment": "^2.30.1",
