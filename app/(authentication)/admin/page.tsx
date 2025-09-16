@@ -248,16 +248,14 @@ function UserSingle({
 
 async function UserLoggedInPage() {
   const cookieValue = await cookies();
-  const cookieStore = cookieValue.get("uinf")?.value?.toLowerCase();
+  const rawCookieValue = cookieValue.get("uinf")?.value;
+  const cookieStore = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
   const roleId = cookieValue.get("role")?.value;
   
-  // Debug: Log all available cookies
-  console.log("🍪 ADMIN PAGE COOKIE DEBUG:");
-  console.log("🍪 All cookies:", cookieValue.getAll().map(c => ({ name: c.name, value: c.value.substring(0, 20) + '...' })));
-  console.log("🍪 uinf cookie:", cookieValue.get("uinf"));
-  console.log("🍪 role cookie:", cookieValue.get("role"));
-  console.log("🍪 session cookie exists:", !!cookieValue.get("session"));
-  console.log("🍪 library cookie exists:", !!cookieValue.get("library"));
+  // Simple cookie check
+  if (!cookieStore) {
+    console.log("⚠️  No user cookie found in admin page");
+  }
 
   return (
     <main>

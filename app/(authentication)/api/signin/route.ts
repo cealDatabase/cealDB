@@ -221,45 +221,30 @@ export async function POST(request: NextRequest) {
       const isProduction = process.env.NODE_ENV === 'production';
       const domain = isProduction ? 'cealstats.org' : undefined; // Set domain for production
 
-      console.log(`🍪 SETTING COOKIES - Production: ${isProduction}, Domain: ${domain || 'localhost'}`);
-      console.log(`🍪 Session User:`, sessionUser);
-
-      // Enhanced cookie configuration with domain and priority settings
+      // Cookie configuration for production
       const cookieConfig = {
-        secure: isProduction, // HTTPS only in production
-        httpOnly: true, // Prevent XSS attacks
+        secure: isProduction,
+        httpOnly: true,
         expires: expireTime,
-        path: '/', // Available across entire site
-        sameSite: 'lax' as const, // CSRF protection while allowing navigation
-        ...(domain && { domain }), // Set domain only in production
-        priority: 'high' as const, // High priority for auth cookies
+        path: '/',
+        sameSite: 'lax' as const,
+        ...(domain && { domain }),
+        priority: 'high' as const,
       };
 
-      // Set session token cookie
+      // Set authentication cookies
       response.cookies.set('session', token, cookieConfig);
-      console.log(`🍪 Set session cookie with config:`, cookieConfig);
-
-      // Set user info cookie for quick access
       response.cookies.set('uinf', sessionUser.username.toLowerCase(), cookieConfig);
-      console.log(`🍪 Set uinf cookie: ${sessionUser.username.toLowerCase()}`);
-
-      // Set role cookie if available
+      
       if (sessionUser.role) {
         response.cookies.set('role', sessionUser.role, cookieConfig);
-        console.log(`🍪 Set role cookie: ${sessionUser.role}`);
-      } else {
-        console.log(`🍪 No role to set for user`);
       }
-
-      // Set library cookie if available
+      
       if (sessionUser.library) {
         response.cookies.set('library', sessionUser.library.toString(), cookieConfig);
-        console.log(`🍪 Set library cookie: ${sessionUser.library}`);
       }
 
-      console.log(`🍪 COOKIES SET VIA NEXTRESPONSE for user: "${email}"`);
-      console.log(`🔗 Cookies: session, uinf${sessionUser.role ? ', role' : ''}${sessionUser.library ? ', library' : ''}`);
-
+      console.log(`✅ Login successful: ${email}`);
       return response;
 
     } catch (authError) {

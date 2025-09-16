@@ -92,21 +92,14 @@ export default function SignInPage() {
       const result = await signinAction(undefined, formData);
       
       if (result.success) {
-        // Successful signin - perform client-side redirect with enhanced debugging
-        console.log("🎯 SIGNIN SUCCESS - Starting redirect process");
-        console.log("📊 Result:", result);
-        console.log("🍪 Document cookies:", document.cookie);
-        console.log("🚀 About to call router.push('/admin')");
+        console.log("✅ Login successful, preparing redirect...");
         
-        // Use Next.js router.push for proper client-side navigation
-        router.push("/admin");
-        console.log("✅ router.push() called");
-        
-        // Fallback after 2 seconds if redirect doesn't work
+        // Give cookies time to be set before redirect
         setTimeout(() => {
-          console.log("⏰ Fallback redirect triggering");
-          window.location.href = "/admin";
-        }, 2000);
+          console.log("🔄 Redirecting to admin...");
+          router.push("/admin");
+        }, 100); // Small delay to ensure cookies are set
+        
       } else {
         // Handle authentication errors
         setError(result);

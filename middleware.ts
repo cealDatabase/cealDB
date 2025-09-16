@@ -1,41 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Edge Runtime compatible session verification using jose library
 import { jwtVerify } from 'jose';
-
-// Console logger for middleware debugging (Edge Runtime compatible)
-function logMiddlewareDebug(step: string, data: any) {
-  const timestamp = new Date().toISOString();
-  console.log(`🔧 MIDDLEWARE_DEBUG [${timestamp}] ${step}:`, JSON.stringify(data));
-}
 
 async function verifySessionTokenEdge(token: string): Promise<{ username: string } | null> {
   try {
     const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
-    console.log(`🔑 Using AUTH_SECRET: ${secret ? '[SET]' : '[NOT SET]'}`);
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
     
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(secret)
-    );
-    
-    console.log(`🎯 JWT payload:`, payload);
-    
-    // The jose library payload structure - check for username in payload
-    // Note: jsonwebtoken library adds fields directly to payload, jose wraps them
     const username = payload.username as string;
-    
     if (username && typeof username === 'string') {
-      console.log(`✅ Valid JWT payload found username: ${username}`);
-      return {
-        username: username
-      };
+      return { username };
     }
-    
-    console.log(`❌ Invalid payload structure - username not found in:`, Object.keys(payload));
     return null;
   } catch (error) {
-    console.error('🚨 Token verification error:', error);
+    console.error('JWT verification failed:', error);
     return null;
   }
 }
@@ -43,107 +20,62 @@ async function verifySessionTokenEdge(token: string): Promise<{ username: string
 export default async function middleware(req: NextRequest) {
   const { nextUrl } = req;
   
-  // Enhanced cookie debugging for production environments
-  const allCookies = req.cookies.getAll();
-  const sessionCookie = req.cookies.get('session');
-  const userCookie = req.cookies.get('uinf');
-  
-  const requestInfo = {
-    path: nextUrl.pathname,
-    hasSessionCookie: !!sessionCookie,
-    hasUserCookie: !!userCookie,
-    sessionValue: sessionCookie ? sessionCookie.value.substring(0, 20) + '...' : null,
-    userValue: userCookie ? userCookie.value : null,
-    totalCookies: allCookies.length,
-    cookieNames: allCookies.map(c => c.name)
-  };
-  
-  logMiddlewareDebug('REQUEST_START', requestInfo);
-  
-  console.log(`🔍 MIDDLEWARE: ${nextUrl.pathname}`);
-  console.log(`🍪 Total cookies received: ${allCookies.length}`);
-  console.log(`🍪 Cookie names: ${allCookies.map(c => c.name).join(', ')}`);
-  console.log(`🍪 Session cookie exists: ${!!sessionCookie}`);
-  console.log(`🍪 User cookie exists: ${!!userCookie}`);
-  
-  let isLoggedIn = false;
-  
-  if (sessionCookie && userCookie) {
-    try {
-      console.log(`🔍 Starting token verification...`);
-      console.log(`🍪 Session cookie length: ${sessionCookie.value.length}`);
-      console.log(`🍪 User cookie value: ${userCookie.value}`);
-      
-      // Verify the session token using Edge Runtime compatible function
-      const tokenData = await verifySessionTokenEdge(sessionCookie.value);
-      
-      if (tokenData) {
-        console.log(`🎯 Token data extracted:`, tokenData);
-        console.log(`🔤 Token username: "${tokenData.username}"`);
-        console.log(`🔤 Cookie username: "${userCookie.value}"`);
-        console.log(`🔤 Lowercase comparison: "${tokenData.username.toLowerCase()}" === "${userCookie.value}"`);
-      }
-      
-      isLoggedIn = !!tokenData && tokenData.username.toLowerCase() === userCookie.value;
-      
-      const authResult = {
-        hasTokenData: !!tokenData,
-        tokenUsername: tokenData?.username,
-        cookieUsername: userCookie.value,
-        usernamesMatch: tokenData?.username?.toLowerCase() === userCookie.value,
-        finalIsLoggedIn: isLoggedIn
-      };
-      
-      logMiddlewareDebug('AUTH_CHECK', authResult);
-      
-      console.log(`🔐 Token verification result: ${!!tokenData}`);
-      console.log(`👤 Username match: ${tokenData?.username?.toLowerCase()} === ${userCookie.value} = ${tokenData?.username?.toLowerCase() === userCookie.value}`);
-      console.log(`✅ Final auth result: ${isLoggedIn}`);
-    } catch (error) {
-      // Invalid token, consider not logged in
-      logMiddlewareDebug('AUTH_ERROR', { error: error instanceof Error ? error.message : String(error) });
-      console.log(`❌ Token verification error:`, error);
-      isLoggedIn = false;
-    }
-  } else {
-    logMiddlewareDebug('NO_COOKIES', { sessionExists: !!sessionCookie, userExists: !!userCookie });
-  }
-
-  // Define protected routes
+  // Define route types first
   const isProtectedRoute = nextUrl.pathname.startsWith('/admin') || 
                           nextUrl.pathname.startsWith('/create');
-
-  // Define auth routes (login, signup, etc.)
   const isAuthRoute = nextUrl.pathname.startsWith('/signin') || 
                      nextUrl.pathname.startsWith('/signup') || 
                      nextUrl.pathname.startsWith('/forgot') ||
                      nextUrl.pathname.startsWith('/confirmed');
-
-  // Define API routes that should be protected
   const isProtectedApiRoute = nextUrl.pathname.startsWith('/api/admin') ||
                              nextUrl.pathname.startsWith('/api/create') ||
                              nextUrl.pathname.startsWith('/api/update') ||
                              nextUrl.pathname.startsWith('/api/delete');
 
-  // Redirect authenticated users away from auth pages
-  if (isLoggedIn && isAuthRoute) {
-    logMiddlewareDebug('REDIRECT_AUTH_TO_ADMIN', { from: nextUrl.pathname, to: '/admin' });
-    return NextResponse.redirect(new URL('/admin', nextUrl));
+  // Get cookies
+  const sessionCookie = req.cookies.get('session');
+  const userCookie = req.cookies.get('uinf');
+  
+  // Only perform authentication check if we have both cookies
+  let isLoggedIn = false;
+  if (sessionCookie && userCookie) {
+    try {
+      // Wait for proper JWT verification
+      const tokenData = await verifySessionTokenEdge(sessionCookie.value);
+      
+      // Thorough verification - both token must be valid AND usernames must match
+      if (tokenData && tokenData.username && userCookie.value) {
+        // Decode URL-encoded cookie value to handle @ symbols
+        const decodedCookieValue = decodeURIComponent(userCookie.value).toLowerCase();
+        isLoggedIn = tokenData.username.toLowerCase() === decodedCookieValue;
+        
+        if (isLoggedIn) {
+          console.log(`✅ Verified user: ${userCookie.value}`);
+        }
+      }
+    } catch (error) {
+      // JWT verification failed
+      isLoggedIn = false;
+    }
   }
 
-  // Redirect unauthenticated users from protected routes
-  if (!isLoggedIn && isProtectedRoute) {
-    logMiddlewareDebug('REDIRECT_UNAUTH_TO_SIGNIN', { from: nextUrl.pathname, to: '/signin' });
+  // Handle protected routes - only redirect if clearly unauthenticated
+  if (isProtectedRoute && !isLoggedIn) {
+    // Only redirect if we're sure there's no valid authentication
+    if (!sessionCookie || !userCookie) {
+      console.log(`🚫 No auth cookies, redirecting to signin`);
+      return NextResponse.redirect(new URL('/signin', nextUrl));
+    }
+    // If cookies exist but verification failed, still redirect but let them try again
+    console.log(`🚫 Auth verification failed, redirecting to signin`);
     return NextResponse.redirect(new URL('/signin', nextUrl));
   }
 
-  // Log when allowing access
-  logMiddlewareDebug('ALLOW_ACCESS', { 
-    path: nextUrl.pathname, 
-    isLoggedIn, 
-    isProtectedRoute, 
-    isAuthRoute 
-  });
+  // Handle auth routes - only redirect away if definitively logged in
+  if (isAuthRoute && isLoggedIn && sessionCookie && userCookie) {
+    console.log(`🔄 Already authenticated, redirecting to admin`);
+    return NextResponse.redirect(new URL('/admin', nextUrl));
+  }
 
   // Handle protected API routes
   if (!isLoggedIn && isProtectedApiRoute) {
