@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +14,33 @@ export async function GET(request: NextRequest) {
     const serverCookies = cookieStore.getAll();
     const requestCookiesAll = requestCookies.getAll();
     
+    // Test JWT verification if session cookie exists
+    let jwtDebug = null;
+    const sessionCookie = cookieStore.get('session');
+    if (sessionCookie) {
+      try {
+        const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
+        const { payload } = await jwtVerify(
+          sessionCookie.value,
+          new TextEncoder().encode(secret)
+        );
+        jwtDebug = {
+          success: true,
+          payload: payload,
+          username: payload.username,
+          payloadKeys: Object.keys(payload)
+        };
+      } catch (jwtError) {
+        jwtDebug = {
+          success: false,
+          error: jwtError instanceof Error ? jwtError.message : String(jwtError)
+        };
+      }
+    }
+    
     const debugInfo = {
       timestamp: new Date().toISOString(),
+      jwtVerification: jwtDebug,
       serverCookies: {
         count: serverCookies.length,
         cookies: serverCookies.map(c => ({

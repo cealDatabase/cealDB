@@ -21,14 +21,18 @@ async function verifySessionTokenEdge(token: string): Promise<{ username: string
     
     console.log(`🎯 JWT payload:`, payload);
     
-    // Check if payload has required fields
-    if (payload.username && typeof payload.username === 'string') {
+    // The jose library payload structure - check for username in payload
+    // Note: jsonwebtoken library adds fields directly to payload, jose wraps them
+    const username = payload.username as string;
+    
+    if (username && typeof username === 'string') {
+      console.log(`✅ Valid JWT payload found username: ${username}`);
       return {
-        username: payload.username as string
+        username: username
       };
     }
     
-    console.log(`❌ Invalid payload structure`);
+    console.log(`❌ Invalid payload structure - username not found in:`, Object.keys(payload));
     return null;
   } catch (error) {
     console.error('🚨 Token verification error:', error);
@@ -66,8 +70,20 @@ export default async function middleware(req: NextRequest) {
   
   if (sessionCookie && userCookie) {
     try {
+      console.log(`🔍 Starting token verification...`);
+      console.log(`🍪 Session cookie length: ${sessionCookie.value.length}`);
+      console.log(`🍪 User cookie value: ${userCookie.value}`);
+      
       // Verify the session token using Edge Runtime compatible function
       const tokenData = await verifySessionTokenEdge(sessionCookie.value);
+      
+      if (tokenData) {
+        console.log(`🎯 Token data extracted:`, tokenData);
+        console.log(`🔤 Token username: "${tokenData.username}"`);
+        console.log(`🔤 Cookie username: "${userCookie.value}"`);
+        console.log(`🔤 Lowercase comparison: "${tokenData.username.toLowerCase()}" === "${userCookie.value}"`);
+      }
+      
       isLoggedIn = !!tokenData && tokenData.username.toLowerCase() === userCookie.value;
       
       const authResult = {
@@ -81,8 +97,8 @@ export default async function middleware(req: NextRequest) {
       logMiddlewareDebug('AUTH_CHECK', authResult);
       
       console.log(`🔐 Token verification result: ${!!tokenData}`);
-      console.log(`👤 Username match: ${tokenData?.username} === ${userCookie.value} = ${tokenData?.username?.toLowerCase() === userCookie.value}`);
-      console.log(`✅ Is logged in: ${isLoggedIn}`);
+      console.log(`👤 Username match: ${tokenData?.username?.toLowerCase()} === ${userCookie.value} = ${tokenData?.username?.toLowerCase() === userCookie.value}`);
+      console.log(`✅ Final auth result: ${isLoggedIn}`);
     } catch (error) {
       // Invalid token, consider not logged in
       logMiddlewareDebug('AUTH_ERROR', { error: error instanceof Error ? error.message : String(error) });
