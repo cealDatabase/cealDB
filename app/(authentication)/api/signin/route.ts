@@ -193,6 +193,14 @@ export async function POST(request: NextRequest) {
       // Set session cookies (this function handles all cookie setting)
       await setSessionCookies(sessionUser, token);
 
+      console.log(`🍪 COOKIES SET for user: "${email}"`);
+      console.log(`📋 Session User:`, {
+        id: sessionUser.id,
+        username: sessionUser.username,
+        role: sessionUser.role,
+        library: sessionUser.library
+      });
+
       // Successful authentication
       return NextResponse.json(
         { 

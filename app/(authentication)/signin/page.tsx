@@ -93,7 +93,12 @@ export default function SignInPage() {
       if (result.success) {
         // Successful signin - perform client-side redirect
         console.log("✅ Client-side redirect to /admin");
-        router.push("/admin");
+        console.log("Result:", result);
+        
+        // Use window.location.href for more reliable redirect after cookie setting
+        setTimeout(() => {
+          window.location.href = "/admin";
+        }, 100);
       } else {
         // Handle authentication errors
         setError(result);

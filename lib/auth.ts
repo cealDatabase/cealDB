@@ -153,7 +153,7 @@ export async function setSessionCookies(user: SessionUser, token: string) {
     httpOnly: true,
     expires: new Date(expireTime),
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'lax',
   });
 
   // Set user info for quick access
@@ -162,6 +162,7 @@ export async function setSessionCookies(user: SessionUser, token: string) {
     httpOnly: true,
     expires: new Date(expireTime),
     path: '/',
+    sameSite: 'lax',
   });
 
   // Set role cookie if available
@@ -171,6 +172,7 @@ export async function setSessionCookies(user: SessionUser, token: string) {
       httpOnly: true,
       expires: new Date(expireTime),
       path: '/',
+      sameSite: 'lax',
     });
   }
 
@@ -181,6 +183,7 @@ export async function setSessionCookies(user: SessionUser, token: string) {
       httpOnly: true,
       expires: new Date(expireTime),
       path: '/',
+      sameSite: 'lax',
     });
   }
 }
