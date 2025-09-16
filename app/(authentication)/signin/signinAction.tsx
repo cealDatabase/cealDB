@@ -1,9 +1,9 @@
 "use server";
 
-const ROOT_URL =
-  process.env.NODE_ENV !== "production"
-    ? "http://localhost:3000"
-    : "https://cealstats.org";
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import db from '@/lib/db';
+import { verifyPassword, generateJWTToken } from '@/lib/auth';
 
 export default async function signinAction(
   currentState: any,
@@ -25,63 +25,110 @@ export default async function signinAction(
   }
 
   try {
-    // Send to our new Argon2id signin API route
-    const res = await fetch(ROOT_URL + "/api/signin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: username, password }),
+    // Find user in database
+    const user = await db.user.findFirst({
+      where: { username: username },
+      select: {
+        id: true,
+        username: true,
+        password: true,
+        firstname: true,
+        lastname: true,
+      }
     });
-    
-    const json = await res.json();
 
-    // Handle different response scenarios
-    if (res.ok && json.success) {
-      // Successful signin - cookies are already set by the API route
-      console.log("✅ Signin successful, returning success for client-side redirect");
-      return {
-        success: true,
-        message: json.message,
-        redirectUrl: "/admin"
-      };
-    } else if (json.errorType === 'PASSWORD_RESET_REQUIRED') {
-      // Password reset required - return specific response for frontend handling
+    if (!user) {
       return {
         success: false,
-        errorType: 'PASSWORD_RESET_REQUIRED',
-        message: json.message,
-        hint: json.hint,
-        suggestions: json.suggestions,
-        resetToken: json.resetToken,
-        hasEmail: json.hasEmail
-      };
-    } else {
-      // Other authentication failures
-      return {
-        success: false,
-        errorType: json.errorType || 'AUTHENTICATION_FAILED',
-        message: json.message || 'Authentication failed.',
-        hint: json.hint || 'Please check your credentials and try again.',
-        suggestions: json.suggestions || [
-          'Verify your username and password',
-          'Use "Forgot Password" if needed',
-          'Contact CEAL admin if you continue having issues'
-        ]
+        errorType: 'USER_NOT_FOUND',
+        message: 'No account found with this email address.',
+        hint: 'Please check your email address or contact your administrator.',
       };
     }
+
+    // Verify password - handle null password
+    if (!user.password) {
+      return {
+        success: false,
+        errorType: 'INVALID_CREDENTIALS',
+        message: 'Account has no password set.',
+        hint: 'Please contact your administrator.',
+      };
+    }
+
+    const isValidPassword = await verifyPassword(password, user.password);
+    
+    if (!isValidPassword) {
+      // Check if this is due to old password format
+      if (!user.password.startsWith('$argon2id$')) {
+        return {
+          success: false,
+          errorType: 'PASSWORD_MIGRATION_REQUIRED',
+          message: 'Password format migration required.',
+          hint: 'Your account uses an outdated password format. Please reset your password to continue.',
+          suggestions: [
+            'Click "Forgot Password" to reset your password',
+            'Your new password will use modern Argon2id encryption',
+            'Contact admin if you need assistance'
+          ]
+        };
+      }
+
+      return {
+        success: false,
+        errorType: 'INVALID_CREDENTIALS',
+        message: 'Invalid email or password.',
+        hint: 'Please check your credentials and try again.',
+      };
+    }
+
+    // Generate JWT token
+    const token = generateJWTToken({
+      userId: user.id,
+      username: user.username,
+    });
+
+    // Set cookies using Server Action cookies API
+    const cookieStore = await cookies();
+    const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
+    
+    const cookieOptions = {
+      secure: false, // For development
+      httpOnly: true,
+      expires: expireTime,
+      path: '/',
+      sameSite: 'lax' as const,
+    };
+
+    // Set essential authentication cookies
+    cookieStore.set('session', token, cookieOptions);
+    cookieStore.set('uinf', user.username.toLowerCase(), cookieOptions);
+    
+    // Set basic role (we'll add proper role/library lookup later)
+    cookieStore.set('role', 'ROLE_ADMIN', cookieOptions);
+    cookieStore.set('library', '56', cookieOptions);
+
+    console.log(`✅ Server Action: Login successful for ${username}`);
+    console.log(`🍪 Server Action: Cookies set directly via cookies() API`);
+
+    return {
+      success: true,
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      }
+    };
+
   } catch (error) {
-    console.error('Signin action error:', error);
+    console.error('Server Action signin error:', error);
     return {
       success: false,
-      errorType: 'NETWORK_ERROR',
-      message: 'Unable to connect to authentication service.',
-      hint: 'Please check your internet connection and try again.',
-      suggestions: [
-        'Check your internet connection',
-        'Wait a moment and try again',
-        'Contact CEAL admin if the problem persists'
-      ]
+      errorType: 'SERVER_ERROR',
+      message: 'An error occurred during authentication.',
+      hint: 'Please try again or contact support if the problem persists.',
     };
   }
 }

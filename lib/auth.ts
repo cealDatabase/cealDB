@@ -38,12 +38,23 @@ export async function hashPassword(password: string): Promise<string> {
   }
 }
 
-// Verify password with Argon2id
-export async function verifyPassword(hashedPassword: string, plainPassword: string): Promise<boolean> {
+// Verify password with Argon2id only
+export async function verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
   try {
+    if (!plainPassword || !hashedPassword) {
+      return false;
+    }
+
+    // Only support Argon2id - modern, secure password hashing
+    if (!hashedPassword.startsWith('$argon2id$')) {
+      console.error('Unsupported password format. Only Argon2id is supported.');
+      console.error('Password hash starts with:', hashedPassword.substring(0, 15));
+      return false;
+    }
+
     return await argon2.verify(hashedPassword, plainPassword);
   } catch (error) {
-    console.error('Password verification error:', error);
+    console.error('Argon2id password verification error:', error);
     return false;
   }
 }

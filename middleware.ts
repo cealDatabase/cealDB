@@ -38,6 +38,9 @@ export default async function middleware(request: NextRequest) {
   
   console.log(`🔍 MIDDLEWARE: ${request.nextUrl.pathname}`);
   console.log(`🍪 Session: ${!!sessionCookie}, User: ${!!userCookie}`);
+  console.log(`🍪 All cookies:`, request.cookies.getAll().map(c => c.name));
+  if (sessionCookie) console.log(`🔑 Session cookie: ${sessionCookie.value.substring(0, 20)}...`);
+  if (userCookie) console.log(`👤 User cookie: ${userCookie.value}`);
   
   // Check authentication
   let isAuthenticated = false;

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import db from '@/lib/db';
 import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
@@ -141,21 +140,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify password using Argon2id
+    // Verify password using Argon2id only
     try {
-      const isValidPassword = await verifyPassword(user.password!, password);
+      const isValidPassword = await verifyPassword(password, user.password!);
       
       if (!isValidPassword) {
-        console.log(`❌ CREDENTIALS NOT MATCH for user: "${email}"`);
+        // Check if this is due to old password format  
+        if (!user.password!.startsWith('$argon2id$')) {
+          console.log(`🔄 PASSWORD MIGRATION REQUIRED for user: "${email}"`);
+          return NextResponse.json(
+            { 
+              success: false, 
+              errorType: 'PASSWORD_MIGRATION_REQUIRED',
+              message: 'Password format migration required.',
+              hint: 'Your account uses an outdated password format. Please reset your password to continue.',
+              suggestions: [
+                'Click "Forgot Password" to reset your password',
+                'Your new password will use modern Argon2id encryption',
+                'Contact admin if you need assistance'
+              ]
+            },
+            { status: 401 }
+          );
+        }
+
+        console.log(`❌ INVALID CREDENTIALS for user: "${email}"`);
         return NextResponse.json(
           { 
             success: false, 
-            errorType: 'INVALID_PASSWORD',
-            message: 'Credentials not match.',
-            hint: 'Either click on "Forgot Password" to reset your password or contact the CEAL administrator.',
+            errorType: 'INVALID_CREDENTIALS',
+            message: 'Invalid email or password.',
+            hint: 'Please check your credentials and try again.',
             suggestions: [
-              'Click "Forgot Password" to reset your password',
               'Double-check your password (case-sensitive)',
+              'Click "Forgot Password" if you\'ve forgotten your password',
               'Contact CEAL administrator if you continue having issues'
             ]
           },
@@ -217,34 +235,35 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
 
-      // Set cookies using official Next.js cookies API
-      const cookieStore = await cookies();
+      // Set cookies on NextResponse object (Route Handler pattern)
       const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
       const isProduction = process.env.NODE_ENV === 'production';
       
-      // Official Next.js cookie options
+      // Cookie options for route handler - secure: false for development
       const cookieOptions = {
-        secure: isProduction,
+        secure: false, // Always false for localhost development
         httpOnly: true,
         expires: expireTime,
         path: '/',
         sameSite: 'lax' as const,
-        priority: 'high' as const,
       };
 
-      // Set authentication cookies using Next.js cookies API
-      cookieStore.set('session', token, cookieOptions);
-      cookieStore.set('uinf', sessionUser.username.toLowerCase(), cookieOptions);
+      // Set cookies on the response object (Route Handler method)
+      response.cookies.set('session', token, cookieOptions);
+      response.cookies.set('uinf', sessionUser.username.toLowerCase(), cookieOptions);
       
       if (sessionUser.role) {
-        cookieStore.set('role', sessionUser.role, cookieOptions);
+        response.cookies.set('role', sessionUser.role, cookieOptions);
       }
       
       if (sessionUser.library) {
-        cookieStore.set('library', sessionUser.library.toString(), cookieOptions);
+        response.cookies.set('library', sessionUser.library.toString(), cookieOptions);
       }
 
       console.log(`✅ Login successful: ${email}`);
+      console.log(`🍪 Cookies set: session, uinf, role, library`);
+      console.log(`🔧 Cookie options:`, cookieOptions);
+      console.log(`📋 Response headers:`, response.headers.get('set-cookie'));
       return response;
 
     } catch (authError) {

@@ -92,17 +92,24 @@ export default function SignInPage() {
       const result = await signinAction(undefined, formData);
       
       if (result.success) {
-        console.log("✅ Login successful, preparing redirect...");
+        console.log("✅ Login successful, server action completed");
         
-        // Give cookies time to be set before redirect (longer delay for production)
-        setTimeout(() => {
-          console.log("🔄 Redirecting to admin...");
-          router.push("/admin");
-        }, 500); // Longer delay to ensure cookies are properly set in production
+        // Server Action sets cookies directly, so redirect immediately
+        console.log("🔄 Redirecting to admin...");
+        router.push("/admin");
         
       } else {
         // Handle authentication errors
-        setError(result);
+        if (result.errorType === 'PASSWORD_MIGRATION_REQUIRED') {
+          // Show special message for password migration
+          setError({
+            ...result,
+            message: 'Password Update Required',
+            hint: 'Your account uses an outdated password format. Please reset your password to continue with modern Argon2id encryption.'
+          });
+        } else {
+          setError(result);
+        }
       }
     } catch (error) {
       console.error('Form submission error:', error);
