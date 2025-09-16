@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { verifyPassword, generateJWTToken, generateResetToken, setSessionCookies } from '@/lib/auth';
+import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
