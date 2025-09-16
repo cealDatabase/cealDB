@@ -190,10 +190,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
       });
 
-      // Set session cookies (this function handles all cookie setting)
-      await setSessionCookies(sessionUser, token);
-
-      console.log(`🍪 COOKIES SET for user: "${email}"`);
+      console.log(`🎉 SUCCESSFUL ARGON2ID SIGNIN for user: "${email}"`);
       console.log(`📋 Session User:`, {
         id: sessionUser.id,
         username: sessionUser.username,
@@ -201,8 +198,8 @@ export async function POST(request: NextRequest) {
         library: sessionUser.library
       });
 
-      // Successful authentication
-      return NextResponse.json(
+      // Create response with cookies set in headers (Vercel compatible)
+      const response = NextResponse.json(
         { 
           success: true, 
           message: 'Login successful',
@@ -217,6 +214,55 @@ export async function POST(request: NextRequest) {
         },
         { status: 200 }
       );
+
+      // Set cookies using NextResponse headers for Vercel compatibility
+      const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      // Set session token cookie
+      response.cookies.set('session', token, {
+        secure: isProduction,
+        httpOnly: true,
+        expires: expireTime,
+        path: '/',
+        sameSite: 'lax',
+      });
+
+      // Set user info cookie for quick access
+      response.cookies.set('uinf', sessionUser.username.toLowerCase(), {
+        secure: isProduction,
+        httpOnly: true,
+        expires: expireTime,
+        path: '/',
+        sameSite: 'lax',
+      });
+
+      // Set role cookie if available
+      if (sessionUser.role) {
+        response.cookies.set('role', sessionUser.role, {
+          secure: isProduction,
+          httpOnly: true,
+          expires: expireTime,
+          path: '/',
+          sameSite: 'lax',
+        });
+      }
+
+      // Set library cookie if available
+      if (sessionUser.library) {
+        response.cookies.set('library', sessionUser.library.toString(), {
+          secure: isProduction,
+          httpOnly: true,
+          expires: expireTime,
+          path: '/',
+          sameSite: 'lax',
+        });
+      }
+
+      console.log(`🍪 COOKIES SET VIA NEXTRESPONSE for user: "${email}"`);
+      console.log(`🔗 Cookies: session, uinf${sessionUser.role ? ', role' : ''}${sessionUser.library ? ', library' : ''}`);
+
+      return response;
 
     } catch (authError) {
       console.error('Argon2id signin error:', authError);

@@ -95,10 +95,9 @@ export default function SignInPage() {
         console.log("✅ Client-side redirect to /admin");
         console.log("Result:", result);
         
-        // Use window.location.href for more reliable redirect after cookie setting
-        setTimeout(() => {
-          window.location.href = "/admin";
-        }, 100);
+        // Use window.location.replace for immediate redirect without browser history
+        // This is more reliable on Vercel and ensures proper cookie handling
+        window.location.replace("/admin");
       } else {
         // Handle authentication errors
         setError(result);
