@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start":        "next start",
-    "dev":          "next dev",
+    "dev":          "next dev --turbo",
     "build":        "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js && next build",
     "prisma":       "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
     "lint":         "next lint"
