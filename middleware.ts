@@ -1,60 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Edge Runtime compatible session verification
+// Edge Runtime compatible session verification using jose library
+import { jwtVerify } from 'jose';
+
 async function verifySessionTokenEdge(token: string): Promise<{ username: string } | null> {
   try {
-    const [header, payload, signature] = token.split('.');
+    const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
+    console.log(`🔑 Using AUTH_SECRET: ${secret ? '[SET]' : '[NOT SET]'}`);
     
-    if (!header || !payload || !signature) {
-      return null;
-    }
-    
-    // Use Web Crypto API (Edge Runtime compatible)
-    const secret = process.env.AUTH_SECRET || 'default-secret-key';
-    const encoder = new TextEncoder();
-    const data = encoder.encode(`${header}.${payload}`);
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(secret)
     );
     
-    // Decode the signature from base64url
-    const expectedSignature = new Uint8Array(
-      atob(signature.replace(/-/g, '+').replace(/_/g, '/'))
-        .split('')
-        .map(char => char.charCodeAt(0))
-    );
+    console.log(`🎯 JWT payload:`, payload);
     
-    const isValid = await crypto.subtle.verify('HMAC', key, expectedSignature, data);
-    
-    if (!isValid) {
-      return null;
+    // Check if payload has required fields
+    if (payload.username && typeof payload.username === 'string') {
+      return {
+        username: payload.username as string
+      };
     }
     
-    // Decode payload
-    const decodedPayload = JSON.parse(
-      new TextDecoder().decode(
-        new Uint8Array(
-          atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
-            .split('')
-            .map(char => char.charCodeAt(0))
-        )
-      )
-    );
-    
-    // Check expiration
-    if (decodedPayload.exp < Math.floor(Date.now() / 1000)) {
-      return null;
-    }
-    
-    return {
-      username: decodedPayload.username
-    };
+    console.log(`❌ Invalid payload structure`);
+    return null;
   } catch (error) {
-    console.error('Token verification error:', error);
+    console.error('🚨 Token verification error:', error);
     return null;
   }
 }
@@ -66,6 +37,10 @@ export default async function middleware(req: NextRequest) {
   const sessionCookie = req.cookies.get('session');
   const userCookie = req.cookies.get('uinf');
   
+  console.log(`🔍 MIDDLEWARE: ${nextUrl.pathname}`);
+  console.log(`🍪 Session cookie exists: ${!!sessionCookie}`);
+  console.log(`🍪 User cookie exists: ${!!userCookie}`);
+  
   let isLoggedIn = false;
   
   if (sessionCookie && userCookie) {
@@ -73,8 +48,12 @@ export default async function middleware(req: NextRequest) {
       // Verify the session token using Edge Runtime compatible function
       const tokenData = await verifySessionTokenEdge(sessionCookie.value);
       isLoggedIn = !!tokenData && tokenData.username === userCookie.value;
+      console.log(`🔐 Token verification result: ${!!tokenData}`);
+      console.log(`👤 Username match: ${tokenData?.username} === ${userCookie.value} = ${tokenData?.username === userCookie.value}`);
+      console.log(`✅ Is logged in: ${isLoggedIn}`);
     } catch (error) {
       // Invalid token, consider not logged in
+      console.log(`❌ Token verification error:`, error);
       isLoggedIn = false;
     }
   }
