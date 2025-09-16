@@ -130,5 +130,5 @@ export const config = {
     '/(api|trpc)(.*)',
   // matcher: ["/admin/:path*", "/signup/:path*", "/confirmed/:path*"],
   // matcher: ["/admin/:path*", "/confirmed/:path*"],
-  "/create",
+  ]
 };
