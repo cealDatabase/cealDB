@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { XCircleIcon, CheckCircleIcon, ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
@@ -16,11 +17,13 @@ interface UserInfo {
 }
 
 export default function SignInPage() {
-  const [error, formAction] = React.useActionState(signinAction, undefined);
+  const router = useRouter();
+  const [error, setError] = React.useState<any>(undefined);
   const [step, setStep] = React.useState<SigninStep>('EMAIL');
   const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
   const [checkingUser, setCheckingUser] = React.useState(false);
   const [emailCheckError, setEmailCheckError] = React.useState<any>(null);
+  const [isSigningIn, setIsSigningIn] = React.useState(false);
 
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,6 +77,38 @@ export default function SignInPage() {
     setStep('EMAIL');
     setUserInfo(null);
     setEmailCheckError(null);
+    setError(undefined);
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSigningIn(true);
+    setError(undefined);
+
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const result = await signinAction(undefined, formData);
+      
+      if (result.success) {
+        // Successful signin - perform client-side redirect
+        console.log("✅ Client-side redirect to /admin");
+        router.push("/admin");
+      } else {
+        // Handle authentication errors
+        setError(result);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setError({
+        success: false,
+        errorType: 'NETWORK_ERROR',
+        message: 'Unable to connect to authentication service.',
+        hint: 'Please check your internet connection and try again.'
+      });
+    } finally {
+      setIsSigningIn(false);
+    }
   };
 
   const getTitle = () => {
@@ -166,7 +201,7 @@ export default function SignInPage() {
             </div>
           </div>
           
-          <form action={formAction}>
+          <form onSubmit={handlePasswordSubmit}>
             <input type="hidden" name="email" value={userInfo.email} />
             <div className="space-y-6">
               <TextField
@@ -186,8 +221,9 @@ export default function SignInPage() {
               }}
               type="submit"
               className="mt-8 w-full"
+              disabled={isSigningIn}
             >
-              Sign In
+              {isSigningIn ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 

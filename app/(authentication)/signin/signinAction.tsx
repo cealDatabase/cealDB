@@ -1,5 +1,4 @@
 "use server";
-import { redirect } from "next/navigation";
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -40,8 +39,12 @@ export default async function signinAction(
     // Handle different response scenarios
     if (res.ok && json.success) {
       // Successful signin - cookies are already set by the API route
-      console.log("✅ Signin successful, redirecting to /admin");
-      redirect("/admin");
+      console.log("✅ Signin successful, returning success for client-side redirect");
+      return {
+        success: true,
+        message: json.message,
+        redirectUrl: "/admin"
+      };
     } else if (json.errorType === 'PASSWORD_RESET_REQUIRED') {
       // Password reset required - return specific response for frontend handling
       return {
