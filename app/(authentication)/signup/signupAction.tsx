@@ -10,25 +10,36 @@ export default async function signupAction(
   currentState: any,
   formData: FormData
 ): Promise<string> {
-  // Get data off form
-  const username = formData.get("username");
-  const password = Math.floor(100000 + Math.random() * 900000);
-  const institution = formData.get("nameinstitution");
-  const userrole = formData.get("namerole");
-  // Send to our api route
+  try {
+    // Get data off form
+    const username = formData.get("username");
+    const institution = formData.get("nameinstitution");
+    const userrole = formData.get("namerole");
 
-  const res = await fetch(ROOT_URL + "/api/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password, institution, userrole }),
-  });
-  const json = await res.json();
-  // Redirect to log in if success
-  if (res.ok) {
-    redirect("/confirmed");
-  } else {
-    return json.error;
+    // Validate required fields
+    if (!username || !institution || !userrole) {
+      return "Please fill in all required fields.";
+    }
+
+    // Send to our api route (no password needed - user will set via email)
+    const res = await fetch(ROOT_URL + "/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, institution, userrole }),
+    });
+    
+    const json = await res.json();
+    
+    // Redirect to confirmation if success
+    if (res.ok && json.success) {
+      redirect("/confirmed");
+    } else {
+      // Return error message with better formatting
+      return json.message || json.error || "Account creation failed. Please try again.";
+    }
+  } catch (error) {
+    return "Unable to create account. Please check your connection and try again.";
   }
 }

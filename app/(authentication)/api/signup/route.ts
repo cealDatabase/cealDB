@@ -1,108 +1,140 @@
-// import validateEmail from "@/lib/validateEM";
-// import validatePassword from "@/lib/validatePW";
-import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
-import { WelcomeEmailTemplate } from "@/components/WelcomeEmailTmpt";
+import { generateResetToken } from "@/lib/auth";
+import { sendWelcomeEmail } from "@/lib/email";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
-  // read data off request body
-  const body = await request.json();
-  const { username, password, institution, userrole } = body;
-  const institutionId = parseInt(institution);
-  const userroleId = parseInt(userrole);
+  try {
+    // read data off request body
+    const body = await request.json();
+    const { username, institution, userrole } = body;
+    const institutionId = parseInt(institution);
+    const userroleId = parseInt(userrole);
 
-  const searchUser = await getUserByUserName(username);
-  if (searchUser?.username.toLowerCase() === username.toLowerCase()) {
-    return Response.json(
-      { error: "Email already registered!" },
-      { status: 400 }
-    );
-  }
+    // Validate required fields
+    if (!username || !institution || !userrole) {
+      return Response.json(
+        { 
+          success: false,
+          errorType: 'MISSING_FIELDS',
+          message: "Missing required fields.",
+          hint: "Please fill in all required fields."
+        },
+        { status: 400 }
+      );
+    }
 
-  // validate data -> TODO: Validation has problem
-  if (!username || !password) {
-    return Response.json(
-      { error: "Invalid email or password" },
-      { status: 400 }
-    );
-  }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(username)) {
+      return Response.json(
+        { 
+          success: false,
+          errorType: 'INVALID_EMAIL',
+          message: "Invalid email format.",
+          hint: "Please enter a valid email address."
+        },
+        { status: 400 }
+      );
+    }
 
-  // hash the password
-  const hash = bcrypt.hashSync(password.toString(), 8);
+    // Check if user already exists
+    const searchUser = await getUserByUserName(username);
+    if (searchUser?.username.toLowerCase() === username.toLowerCase()) {
+      return Response.json(
+        { 
+          success: false,
+          errorType: 'USER_EXISTS',
+          message: "Email already registered!",
+          hint: "This email is already in use. Try signing in or use password reset if you forgot your password."
+        },
+        { status: 409 }
+      );
+    }
 
-  // ----------------- Create user in db -----------------
-  // create a user in db. Will move to /data/fetchPrisma.ts in the future
-  await db.user.create({
-    data: {
-      username: username,
-      password: hash,
-      isactive: true,
-    },
-  });
+    // Generate password reset token for initial setup
+    const resetToken = generateResetToken();
+    const resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-  const newUserId = await db.user.findUnique({
-    where: {
-      username: username,
-    },
-  });
+    // ----------------- Create user in db -----------------
+    // Create user with no password (they'll set it via email link)
+    const newUser = await db.user.create({
+      data: {
+        username: username.toLowerCase(),
+        password: null, // No password initially - user will set via email
+        isactive: true,
+        requires_password_reset: true,
+        password_reset_token: resetToken,
+        password_reset_expires: resetExpires,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+    });
 
-  if (newUserId?.id) {
-    await db.user_Library.upsert({
-      where: {
-        user_id_library_id: {
-          user_id: newUserId.id,
+    // Create user-library relationship
+    if (institutionId) {
+      await db.user_Library.create({
+        data: {
+          user_id: newUser.id,
           library_id: institutionId,
         },
-      },
-      update: {},
-      create: {
-        user_id: newUserId.id,
-        library_id: institutionId,
-      },
-    });
-    await db.users_Roles.upsert({
-      where: {
-        user_id_role_id: {
-          user_id: newUserId.id,
+      });
+    }
+
+    // Create user-role relationship
+    if (userroleId) {
+      await db.users_Roles.create({
+        data: {
+          user_id: newUser.id,
           role_id: userroleId,
         },
-      },
-      update: {},
-      create: {
-        user_id: newUserId.id,
-        role_id: userroleId,
-      },
-    });
-
-    // ----------------- Send email to user -----------------
-    try {
-      const { data, error } = await resend.emails.send({
-        from: "CEAL Admin <admin@cealstats.org>",
-        to: username,
-        subject: "Welcome to CEAL Stats",
-        react: WelcomeEmailTemplate({
-          username: username,
-          password: password,
-        }),
-        text: "", // Keep this! To avoid error
       });
-
-      if (error) {
-        return Response.json({ error }, { status: 500 });
-      }
-
-      return Response.json({
-        message: data?.id,
-      });
-    } catch (error) {
-      return Response.json({ error }, { status: 500 });
     }
-  }
 
-  // return something
-  return Response.json({});
+    console.log(`✅ NEW USER CREATED: ${username} (ID: ${newUser.id})`);
+
+    // ----------------- Send welcome email with password setup -----------------
+    try {
+      const emailSent = await sendWelcomeEmail(username, username, resetToken);
+      
+      if (emailSent) {
+        console.log(`📧 Welcome email sent to: ${username}`);
+        return Response.json({
+          success: true,
+          message: "Account created successfully! Check your email to set up your password.",
+          hint: "We've sent password setup instructions to your email address."
+        });
+      } else {
+        // If email fails, we should still return success since user was created
+        console.log(`⚠️ User created but email failed for: ${username}`);
+        return Response.json({
+          success: true,
+          message: "Account created successfully! Please contact your administrator for password setup.",
+          hint: "There was an issue sending the setup email. Please contact your CEAL administrator."
+        });
+      }
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      return Response.json({
+        success: true,
+        message: "Account created successfully! Please contact your administrator for password setup.",
+        hint: "There was an issue sending the setup email. Please contact your CEAL administrator."
+      });
+    }
+
+  } catch (error) {
+    console.error('Signup error:', error);
+    return Response.json(
+      { 
+        success: false,
+        errorType: 'SERVER_ERROR',
+        message: "A technical error occurred during account creation.",
+        hint: "Please try again or contact the CEAL administrator."
+      },
+      { status: 500 }
+    );
+  }
 }
