@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     // ----------------- Send email to user -----------------
     try {
       const { data, error } = await resend.emails.send({
-        from: "CEAL Admin <admin@vivoequeen.com>",
+        from: "CEAL Admin <admin@cealstats.org>",
         to: username,
         subject: "Welcome to CEAL Stats",
         react: WelcomeEmailTemplate({

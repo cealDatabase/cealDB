@@ -1,7 +1,5 @@
 "use server";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import getCookiesByEmail from "./fetchCookies";
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -12,78 +10,75 @@ export default async function signinAction(
   currentState: any,
   formData: FormData
 ): Promise<any> {
-  const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
-  // Get data off form
-  const userNameRaw = formData.get("username")?.toString();
-  const username = userNameRaw && userNameRaw.toLowerCase();
-  const password = formData.get("password");
-  // Send to our api route
-
-  const res = await fetch(ROOT_URL + "/api/signin", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password }),
-  });
-  const json = await res.json();
-
-  // If signin failed, return error message without setting cookies
-  if (!res.ok || json.error) {
-    return json.error;
+  // Get data off form - using username field but treating it as email
+  const usernameRaw = formData.get("email")?.toString() || formData.get("username")?.toString();
+  const username = usernameRaw && usernameRaw.toLowerCase();
+  const password = formData.get("password")?.toString();
+  
+  // Validate input
+  if (!username || !password) {
+    return {
+      success: false,
+      errorType: 'MISSING_CREDENTIALS',
+      message: 'Both username and password are required.',
+      hint: 'Please enter both your username and password to sign in.',
+    };
   }
 
-  (await cookies()).set("session", json.token, {
-    secure: true,
-    httpOnly: true,
-    expires: expireTime,
-    path: "/",
-    sameSite: "strict",
-  });
+  try {
+    // Send to our new Argon2id signin API route
+    const res = await fetch(ROOT_URL + "/api/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: username, password }),
+    });
+    
+    const json = await res.json();
 
-  const fetchResult = async function (username: string | null): Promise<
-    | {
-        role: string | null | undefined;
-        library: number | null | undefined;
-      }
-    | null
-    | undefined
-  > {
-    if (typeof username === "string" && username.length > 5) {
-      // Valid email address
-      (await cookies()).set("uinf", username.toLowerCase(), {
-        secure: true,
-        httpOnly: true,
-        expires: expireTime,
-      });
-      return await getCookiesByEmail({ cookieStore: username.toLowerCase() });
+    // Handle different response scenarios
+    if (res.ok && json.success) {
+      // Successful signin - cookies are already set by the API route
+      console.log("✅ Signin successful, redirecting to /admin");
+      redirect("/admin");
+    } else if (json.errorType === 'PASSWORD_RESET_REQUIRED') {
+      // Password reset required - return specific response for frontend handling
+      return {
+        success: false,
+        errorType: 'PASSWORD_RESET_REQUIRED',
+        message: json.message,
+        hint: json.hint,
+        suggestions: json.suggestions,
+        resetToken: json.resetToken,
+        hasEmail: json.hasEmail
+      };
+    } else {
+      // Other authentication failures
+      return {
+        success: false,
+        errorType: json.errorType || 'AUTHENTICATION_FAILED',
+        message: json.message || 'Authentication failed.',
+        hint: json.hint || 'Please check your credentials and try again.',
+        suggestions: json.suggestions || [
+          'Verify your username and password',
+          'Use "Forgot Password" if needed',
+          'Contact CEAL admin if you continue having issues'
+        ]
+      };
     }
-  };
-
-  (await cookies()).set(
-    "library",
-    (await fetchResult(username as string))?.library as unknown as string,
-    {
-      secure: true,
-      httpOnly: true,
-      expires: expireTime,
-    }
-  );
-
-  (await cookies()).set(
-    "role",
-    (await fetchResult(username as string))?.role as unknown as string,
-    {
-      secure: true,
-      httpOnly: true,
-      expires: expireTime,
-    }
-  );
-
-  // Redirect to log in if success
-  if ((await cookies()).has("role") || (await cookies()).has("library")) {
-    redirect("/admin");
-  } else {
-    return json.error;
+  } catch (error) {
+    console.error('Signin action error:', error);
+    return {
+      success: false,
+      errorType: 'NETWORK_ERROR',
+      message: 'Unable to connect to authentication service.',
+      hint: 'Please check your internet connection and try again.',
+      suggestions: [
+        'Check your internet connection',
+        'Wait a moment and try again',
+        'Contact CEAL admin if the problem persists'
+      ]
+    };
   }
 }

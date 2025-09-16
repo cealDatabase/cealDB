@@ -61,16 +61,41 @@ model Library_Year {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  username     String         @unique
-  password     String
-  isactive     Boolean        @default(true)
-  lastlogin_at DateTime?
-  firstname    String?
-  lastname     String?
-  User_Library User_Library[]
-  User_Roles   Users_Roles[]
-  AuditLog     AuditLog[]
+  id                        Int            @id @default(autoincrement())
+  username                  String         @unique  // Primary identifier
+  password                  String?        // New Argon2id hash, null means needs reset
+  firstname                 String?        // Keep for legacy compatibility
+  lastname                  String?        // Keep for legacy compatibility
+  isactive                  Boolean        @default(true)
+  lastlogin_at              DateTime?
+  requires_password_reset   Boolean?        @default(true)  // Force password reset on first login
+  password_reset_token      String?        // Token for password reset emails
+  password_reset_expires    DateTime?      // Expiration for reset token
+  email_verified            Boolean?        @default(false) // Email confirmation status
+  created_at                DateTime?       @default(now())
+  updated_at                DateTime?       @default(now()) @updatedAt
+  
+  // Relations
+  User_Library              User_Library[]
+  User_Roles                Users_Roles[]
+  AuditLog                  AuditLog[]
+  sessions                  Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model AuditLog {

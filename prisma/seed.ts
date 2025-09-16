@@ -32,6 +32,9 @@ import {
 import db from "../lib/db";
 
 async function main() {
+
+  await db.$executeRawUnsafe('DISCARD ALL'); 
+
   const electronic = await Promise.all<Electronic[]>([
     await db.$queryRaw`SELECT * FROM ceal.electronic`,
   ]);
@@ -113,33 +116,89 @@ async function main() {
   const personnelSupport = await Promise.all<Personnel_Support[]>([
     await db.$queryRaw`SELECT * FROM ceal.personnel_support_fte`,
   ]);
-  const publicServicesRaw = await db.$queryRaw`SELECT * FROM ceal.public_services` as any[];
-  const publicServices = [publicServicesRaw.map((record: any) => {
-    const { 
-      pslibrary_presentations, 
-      psparticipants, 
-      psreference_transactions, 
-      psnumber_of_total_circulation,
-      pslending_requests_filled,
-      pslending_requests_unfilled,
-      psborrowing_requests_filled,
-      psborrowing_requests_unfilled,
-      ...rest 
-    } = record;
-    return {
-      ...rest,
-      // Map the old field names to the new schema field names
-      pspresentations_subtotal: pslibrary_presentations,
-      pspresentation_participants_subtotal: psparticipants,
-      psreference_transactions_subtotal: psreference_transactions,
-      pstotal_circulations_subtotal: psnumber_of_total_circulation,
-      pslending_requests_filled_subtotal: pslending_requests_filled,
-      pslending_requests_unfilled_subtotal: pslending_requests_unfilled,
-      psborrowing_requests_filled_subtotal: psborrowing_requests_filled,
-      psborrowing_requests_unfilled_subtotal: psborrowing_requests_unfilled,
-    };
-  })];
+  // Public Services with field mapping from old schema to new granular schema
+  interface OldPublicServicesRecord {
+    id: number;
+    entryid: string | null;
+    libraryyear: number | null;
+    pslibrary_presentations: number | null;
+    psparticipants: number | null;
+    psreference_transactions: number | null;
+    psnumber_of_total_circulation: number | null;
+    pslending_requests_filled: number | null;
+    pslending_requests_unfilled: number | null;
+    psborrowing_requests_filled: number | null;
+    psborrowing_requests_unfilled: number | null;
+    psnotes: string | null;
+  }
 
+  const publicServicesRaw = await db.$queryRaw<OldPublicServicesRecord[]>`SELECT * FROM ceal.public_services`;
+  
+  // Map old consolidated fields to new granular schema
+  const publicServices = publicServicesRaw.map((oldRecord: OldPublicServicesRecord) => ({
+    id: oldRecord.id,
+    entryid: oldRecord.entryid,
+    libraryyear: oldRecord.libraryyear,
+    
+    // Map old pslibrary_presentations to new presentation fields (put in subtotal)
+    pspresentations_chinese: null,
+    pspresentations_japanese: null,
+    pspresentations_korean: null,
+    pspresentations_eastasian: null,
+    pspresentations_subtotal: oldRecord.pslibrary_presentations,
+    
+    // Map old psparticipants to new presentation participants fields (put in subtotal)
+    pspresentation_participants_chinese: null,
+    pspresentation_participants_japanese: null,
+    pspresentation_participants_korean: null,
+    pspresentation_participants_eastasian: null,
+    pspresentation_participants_subtotal: oldRecord.psparticipants,
+    
+    // Map old psreference_transactions to new reference transaction fields (put in subtotal)
+    psreference_transactions_chinese: null,
+    psreference_transactions_japanese: null,
+    psreference_transactions_korean: null,
+    psreference_transactions_eastasian: null,
+    psreference_transactions_subtotal: oldRecord.psreference_transactions,
+    
+    // Map old psnumber_of_total_circulation to new total circulation fields (put in subtotal)
+    pstotal_circulations_chinese: null,
+    pstotal_circulations_japanese: null,
+    pstotal_circulations_korean: null,
+    pstotal_circulations_eastasian: null,
+    pstotal_circulations_subtotal: oldRecord.psnumber_of_total_circulation,
+    
+    // Map old pslending_requests_filled to new lending filled fields (put in subtotal)
+    pslending_requests_filled_chinese: null,
+    pslending_requests_filled_japanese: null,
+    pslending_requests_filled_korean: null,
+    pslending_requests_filled_eastasian: null,
+    pslending_requests_filled_subtotal: oldRecord.pslending_requests_filled,
+    
+    // Map old pslending_requests_unfilled to new lending unfilled fields (put in subtotal)
+    pslending_requests_unfilled_chinese: null,
+    pslending_requests_unfilled_japanese: null,
+    pslending_requests_unfilled_korean: null,
+    pslending_requests_unfilled_eastasian: null,
+    pslending_requests_unfilled_subtotal: oldRecord.pslending_requests_unfilled,
+    
+    // Map old psborrowing_requests_filled to new borrowing filled fields (put in subtotal)
+    psborrowing_requests_filled_chinese: null,
+    psborrowing_requests_filled_japanese: null,
+    psborrowing_requests_filled_korean: null,
+    psborrowing_requests_filled_eastasian: null,
+    psborrowing_requests_filled_subtotal: oldRecord.psborrowing_requests_filled,
+    
+    // Map old psborrowing_requests_unfilled to new borrowing unfilled fields (put in subtotal)
+    psborrowing_requests_unfilled_chinese: null,
+    psborrowing_requests_unfilled_japanese: null,
+    psborrowing_requests_unfilled_korean: null,
+    psborrowing_requests_unfilled_eastasian: null,
+    psborrowing_requests_unfilled_subtotal: oldRecord.psborrowing_requests_unfilled,
+    
+    // Map notes field directly
+    psnotes: oldRecord.psnotes
+  }));
   const unprocessedBacklogMaterials = await Promise.all<Unprocessed_Backlog_Materials[]>([
     await db.$queryRaw`SELECT * FROM ceal.unprocessed_backlog_materials`,
   ]);
@@ -291,7 +350,7 @@ async function main() {
       data: volumeHoldings[0],
     }),
     await db.public_Services.createMany({
-      data: publicServices[0],
+      data: publicServices,
     }),
     await db.unprocessed_Backlog_Materials.createMany({
       data: unprocessedBacklogMaterials[0],
