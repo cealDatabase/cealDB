@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthLayout } from "@/components/AuthLayout";
@@ -8,7 +8,7 @@ import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
 import { CheckCircleIcon, XCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
@@ -278,5 +278,22 @@ export default function ResetPasswordPage() {
         </Link>
       </div>
     </AuthLayout>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <AuthLayout
+        title="Loading..."
+        subtitle="Please wait while we prepare your password reset page."
+      >
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </AuthLayout>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
