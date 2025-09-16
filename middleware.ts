@@ -47,7 +47,7 @@ export default async function middleware(req: NextRequest) {
     try {
       // Verify the session token using Edge Runtime compatible function
       const tokenData = await verifySessionTokenEdge(sessionCookie.value);
-      isLoggedIn = !!tokenData && tokenData.username === userCookie.value;
+      isLoggedIn = !!tokenData && tokenData.username.toLowerCase() === userCookie.value;
       console.log(`🔐 Token verification result: ${!!tokenData}`);
       console.log(`👤 Username match: ${tokenData?.username} === ${userCookie.value} = ${tokenData?.username === userCookie.value}`);
       console.log(`✅ Is logged in: ${isLoggedIn}`);
