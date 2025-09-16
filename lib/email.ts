@@ -4,6 +4,11 @@ import { Resend } from 'resend';
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const ROOT_URL =
+  process.env.NODE_ENV !== "production"
+    ? "http://localhost:3000"
+    : "https://cealstats.org";
+
 export interface EmailOptions {
   to: string;
   subject: string;
@@ -45,7 +50,7 @@ export async function sendPasswordResetEmail(
   resetToken: string,
   isInitialSetup = false
 ): Promise<boolean> {
-  const resetUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+  const resetUrl = `${ROOT_URL}/reset-password?token=${resetToken}`;
   
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -145,7 +150,7 @@ export async function sendWelcomeEmail(
   username: string, 
   resetToken?: string
 ): Promise<boolean> {
-  const resetUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+  const resetUrl = `${ROOT_URL}/reset-password?token=${resetToken}`;
   
   try {
     if (!process.env.RESEND_API_KEY) {
