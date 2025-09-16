@@ -94,11 +94,11 @@ export default function SignInPage() {
       if (result.success) {
         console.log("✅ Login successful, preparing redirect...");
         
-        // Give cookies time to be set before redirect
+        // Give cookies time to be set before redirect (longer delay for production)
         setTimeout(() => {
           console.log("🔄 Redirecting to admin...");
           router.push("/admin");
-        }, 100); // Small delay to ensure cookies are set
+        }, 500); // Longer delay to ensure cookies are properly set in production
         
       } else {
         // Handle authentication errors

@@ -147,49 +147,37 @@ export async function setSessionCookies(user: SessionUser, token: string) {
   const cookieStore = await cookies();
   const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
   const isProduction = process.env.NODE_ENV === 'production';
-  const domain = isProduction ? 'cealstats.org' : undefined;
 
-  const cookieConfig = {
+  // Official Next.js cookie options
+  const cookieOptions = {
     secure: isProduction,
     httpOnly: true,
     expires: new Date(expireTime),
     path: '/',
     sameSite: 'lax' as const,
-    ...(domain && { domain }),
     priority: 'high' as const,
   };
 
-  // Set authentication cookies
-  cookieStore.set('session', token, cookieConfig);
-  // Set user info (uinf = username/email) for quick access  
-  cookieStore.set('uinf', user.username.toLowerCase(), cookieConfig);
+  // Set authentication cookies using Next.js cookies API
+  cookieStore.set('session', token, cookieOptions);
+  cookieStore.set('uinf', user.username.toLowerCase(), cookieOptions);
   
   if (user.role) {
-    cookieStore.set('role', user.role, cookieConfig);
+    cookieStore.set('role', user.role, cookieOptions);
   }
   
   if (user.library) {
-    cookieStore.set('library', user.library.toString(), cookieConfig);
+    cookieStore.set('library', user.library.toString(), cookieOptions);
   }
 }
 
-// Clear session cookies with production domain handling
+// Clear session cookies
 export async function clearSessionCookies() {
   const cookieStore = await cookies();
-  const isProduction = process.env.NODE_ENV === 'production';
-  const domain = isProduction ? 'cealstats.org' : undefined;
   
   const cookieNames = ['session', 'uinf', 'role', 'library'];
   cookieNames.forEach(name => {
-    if (domain) {
-      cookieStore.set(name, '', {
-        domain,
-        expires: new Date(0),
-        path: '/',
-      });
-    } else {
-      cookieStore.delete(name);
-    }
+    cookieStore.delete(name);
   });
 }
 

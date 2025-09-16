@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import db from '@/lib/db';
 import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
@@ -216,32 +217,31 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
 
-      // Enhanced cookie configuration for production/Vercel compatibility
+      // Set cookies using official Next.js cookies API
+      const cookieStore = await cookies();
       const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
       const isProduction = process.env.NODE_ENV === 'production';
-      const domain = isProduction ? 'cealstats.org' : undefined; // Set domain for production
-
-      // Cookie configuration for production
-      const cookieConfig = {
+      
+      // Official Next.js cookie options
+      const cookieOptions = {
         secure: isProduction,
         httpOnly: true,
         expires: expireTime,
         path: '/',
         sameSite: 'lax' as const,
-        ...(domain && { domain }),
         priority: 'high' as const,
       };
 
-      // Set authentication cookies
-      response.cookies.set('session', token, cookieConfig);
-      response.cookies.set('uinf', sessionUser.username.toLowerCase(), cookieConfig);
+      // Set authentication cookies using Next.js cookies API
+      cookieStore.set('session', token, cookieOptions);
+      cookieStore.set('uinf', sessionUser.username.toLowerCase(), cookieOptions);
       
       if (sessionUser.role) {
-        response.cookies.set('role', sessionUser.role, cookieConfig);
+        cookieStore.set('role', sessionUser.role, cookieOptions);
       }
       
       if (sessionUser.library) {
-        response.cookies.set('library', sessionUser.library.toString(), cookieConfig);
+        cookieStore.set('library', sessionUser.library.toString(), cookieOptions);
       }
 
       console.log(`✅ Login successful: ${email}`);

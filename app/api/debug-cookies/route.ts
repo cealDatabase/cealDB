@@ -5,12 +5,13 @@ import { jwtVerify } from 'jose';
 export async function GET(request: NextRequest) {
   try {
     console.log("🍪 COOKIE DEBUG API CALLED");
+    console.log("🌐 URL:", request.url);
     
-    // Get cookies using both methods
+    // Get cookies using official Next.js cookies API
     const cookieStore = await cookies();
     const requestCookies = request.cookies;
     
-    // Get all cookies from both sources
+    // Get all cookies using official methods
     const serverCookies = cookieStore.getAll();
     const requestCookiesAll = requestCookies.getAll();
     

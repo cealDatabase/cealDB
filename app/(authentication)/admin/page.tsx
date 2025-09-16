@@ -247,19 +247,20 @@ function UserSingle({
 }
 
 async function UserLoggedInPage() {
-  const cookieValue = await cookies();
-  const rawCookieValue = cookieValue.get("uinf")?.value;
-  const cookieStore = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
-  const roleId = cookieValue.get("role")?.value;
+  // Use official Next.js cookies API
+  const cookieStore = await cookies();
+  const rawCookieValue = cookieStore.get("uinf")?.value;
+  const userCookie = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
+  const roleId = cookieStore.get("role")?.value;
   
   // Simple cookie check
-  if (!cookieStore) {
+  if (!userCookie) {
     console.log("⚠️  No user cookie found in admin page");
   }
 
   return (
     <main>
-      {getUserDetailByEmail({ cookieStore })}
+      {getUserDetailByEmail({ cookieStore: userCookie })}
       {/* TODO: change back to 1 as Super Admin */}
       {roleId?.includes("2") &&
         <div className="container mt-12">

@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-async function verifySessionTokenEdge(token: string): Promise<{ username: string } | null> {
+async function verifyJWTToken(token: string): Promise<{ username: string } | null> {
   try {
     const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
@@ -12,95 +13,96 @@ async function verifySessionTokenEdge(token: string): Promise<{ username: string
     }
     return null;
   } catch (error) {
-    console.error('JWT verification failed:', error);
     return null;
   }
 }
 
-export default async function middleware(req: NextRequest) {
-  const { nextUrl } = req;
+export default async function middleware(request: NextRequest) {
+  // Define protected routes
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/admin') || 
+                          request.nextUrl.pathname.startsWith('/create');
   
-  // Define route types first
-  const isProtectedRoute = nextUrl.pathname.startsWith('/admin') || 
-                          nextUrl.pathname.startsWith('/create');
-  const isAuthRoute = nextUrl.pathname.startsWith('/signin') || 
-                     nextUrl.pathname.startsWith('/signup') || 
-                     nextUrl.pathname.startsWith('/forgot') ||
-                     nextUrl.pathname.startsWith('/confirmed');
-  const isProtectedApiRoute = nextUrl.pathname.startsWith('/api/admin') ||
-                             nextUrl.pathname.startsWith('/api/create') ||
-                             nextUrl.pathname.startsWith('/api/update') ||
-                             nextUrl.pathname.startsWith('/api/delete');
+  const isAuthRoute = request.nextUrl.pathname.startsWith('/signin') || 
+                     request.nextUrl.pathname.startsWith('/signup') || 
+                     request.nextUrl.pathname.startsWith('/forgot') ||
+                     request.nextUrl.pathname.startsWith('/confirmed');
 
-  // Get cookies
-  const sessionCookie = req.cookies.get('session');
-  const userCookie = req.cookies.get('uinf');
+  const isProtectedApiRoute = request.nextUrl.pathname.startsWith('/api/admin') ||
+                             request.nextUrl.pathname.startsWith('/api/create') ||
+                             request.nextUrl.pathname.startsWith('/api/update') ||
+                             request.nextUrl.pathname.startsWith('/api/delete');
+
+  // Get cookies using official Next.js middleware API
+  const sessionCookie = request.cookies.get('session');
+  const userCookie = request.cookies.get('uinf');
   
-  // Only perform authentication check if we have both cookies
-  let isLoggedIn = false;
+  console.log(`🔍 MIDDLEWARE: ${request.nextUrl.pathname}`);
+  console.log(`🍪 Session: ${!!sessionCookie}, User: ${!!userCookie}`);
+  
+  // Check authentication
+  let isAuthenticated = false;
+  
   if (sessionCookie && userCookie) {
     try {
-      // Wait for proper JWT verification
-      const tokenData = await verifySessionTokenEdge(sessionCookie.value);
+      const tokenData = await verifyJWTToken(sessionCookie.value);
       
-      // Thorough verification - both token must be valid AND usernames must match
-      if (tokenData && tokenData.username && userCookie.value) {
-        // Decode URL-encoded cookie value to handle @ symbols
-        const decodedCookieValue = decodeURIComponent(userCookie.value).toLowerCase();
-        isLoggedIn = tokenData.username.toLowerCase() === decodedCookieValue;
+      if (tokenData && tokenData.username) {
+        // Handle URL-encoded cookie values
+        const decodedUserCookie = decodeURIComponent(userCookie.value).toLowerCase();
+        const tokenUsername = tokenData.username.toLowerCase();
         
-        if (isLoggedIn) {
-          console.log(`✅ Verified user: ${userCookie.value}`);
+        isAuthenticated = tokenUsername === decodedUserCookie;
+        
+        if (isAuthenticated) {
+          console.log(`✅ Authenticated: ${decodedUserCookie}`);
         }
       }
     } catch (error) {
-      // JWT verification failed
-      isLoggedIn = false;
+      isAuthenticated = false;
     }
   }
 
-  // Handle protected routes - only redirect if clearly unauthenticated
-  if (isProtectedRoute && !isLoggedIn) {
-    // Only redirect if we're sure there's no valid authentication
-    if (!sessionCookie || !userCookie) {
-      console.log(`🚫 No auth cookies, redirecting to signin`);
-      return NextResponse.redirect(new URL('/signin', nextUrl));
-    }
-    // If cookies exist but verification failed, still redirect but let them try again
-    console.log(`🚫 Auth verification failed, redirecting to signin`);
-    return NextResponse.redirect(new URL('/signin', nextUrl));
+  // Redirect logic using official Next.js patterns
+  if (isProtectedRoute && !isAuthenticated) {
+    console.log(`🚫 Redirecting unauthenticated user to signin`);
+    return NextResponse.redirect(new URL('/signin', request.url));
   }
 
-  // Handle auth routes - only redirect away if definitively logged in
-  if (isAuthRoute && isLoggedIn && sessionCookie && userCookie) {
-    console.log(`🔄 Already authenticated, redirecting to admin`);
-    return NextResponse.redirect(new URL('/admin', nextUrl));
+  if (isAuthRoute && isAuthenticated) {
+    console.log(`🔄 Redirecting authenticated user to admin`);
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   // Handle protected API routes
-  if (!isLoggedIn && isProtectedApiRoute) {
+  if (isProtectedApiRoute && !isAuthenticated) {
     return NextResponse.json(
       { 
         success: false, 
-        errorType: 'UNAUTHORIZED',
-        message: 'Authentication required.',
-        hint: 'Please sign in to access this resource.'
+        error: 'Unauthorized',
+        message: 'Authentication required'
       }, 
       { status: 401 }
     );
   }
 
-  // Allow access to all other routes
+  // Continue with the request
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  // matcher: ["/admin/:path*", "/signup/:path*", "/confirmed/:path*"],
-  // matcher: ["/admin/:path*", "/confirmed/:path*"],
+    // Protected routes
+    '/admin/:path*',
+    '/create/:path*',
+    // Auth routes  
+    '/signin',
+    '/signup',
+    '/forgot',
+    '/confirmed',
+    // Protected API routes
+    '/api/admin/:path*',
+    '/api/create/:path*',
+    '/api/update/:path*',
+    '/api/delete/:path*',
   ]
 };
