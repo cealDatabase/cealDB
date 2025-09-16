@@ -91,13 +91,13 @@ export default function SignInPage() {
       const result = await signinAction(undefined, formData);
       
       if (result.success) {
-        // Successful signin - perform client-side redirect
+        // Successful signin - perform client-side redirect using Next.js best practices
         console.log("✅ Client-side redirect to /admin");
         console.log("Result:", result);
         
-        // Use window.location.replace for immediate redirect without browser history
-        // This is more reliable on Vercel and ensures proper cookie handling
-        window.location.replace("/admin");
+        // Use Next.js router.push for proper client-side navigation
+        // This is the recommended Next.js way for client-side redirects
+        router.push("/admin");
       } else {
         // Handle authentication errors
         setError(result);
