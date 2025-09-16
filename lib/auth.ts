@@ -142,59 +142,71 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   }
 }
 
-// Set session cookies
+// Set session cookies with consistent configuration
 export async function setSessionCookies(user: SessionUser, token: string) {
   const cookieStore = await cookies();
   const expireTime = Date.now() + 24 * 60 * 60 * 1000 * 3; // 3 days
+  const isProduction = process.env.NODE_ENV === 'production';
+  const domain = isProduction ? 'cealstats.org' : undefined;
+
+  console.log(`🍪 AUTH.TS - SETTING COOKIES - Production: ${isProduction}, Domain: ${domain || 'localhost'}`);
+  console.log(`🍪 AUTH.TS - User info: ${user.username} (${user.role})`);
+
+  // Enhanced cookie configuration matching signin route
+  const cookieConfig = {
+    secure: isProduction, // HTTPS only in production
+    httpOnly: true, // Prevent XSS attacks
+    expires: new Date(expireTime),
+    path: '/', // Available across entire site
+    sameSite: 'lax' as const, // CSRF protection while allowing navigation
+    ...(domain && { domain }), // Set domain only in production
+    priority: 'high' as const, // High priority for auth cookies
+  };
 
   // Set session token
-  cookieStore.set('session', token, {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    expires: new Date(expireTime),
-    path: '/',
-    sameSite: 'lax',
-  });
+  cookieStore.set('session', token, cookieConfig);
+  console.log(`🍪 AUTH.TS - Set session cookie`);
 
-  // Set user info for quick access
-  cookieStore.set('uinf', user.username.toLowerCase(), {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    expires: new Date(expireTime),
-    path: '/',
-    sameSite: 'lax',
-  });
+  // Set user info (uinf = username/email) for quick access
+  cookieStore.set('uinf', user.username.toLowerCase(), cookieConfig);
+  console.log(`🍪 AUTH.TS - Set uinf cookie: ${user.username.toLowerCase()}`);
 
   // Set role cookie if available
   if (user.role) {
-    cookieStore.set('role', user.role, {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      expires: new Date(expireTime),
-      path: '/',
-      sameSite: 'lax',
-    });
+    cookieStore.set('role', user.role, cookieConfig);
+    console.log(`🍪 AUTH.TS - Set role cookie: ${user.role}`);
   }
 
   // Set library cookie if available
   if (user.library) {
-    cookieStore.set('library', user.library.toString(), {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      expires: new Date(expireTime),
-      path: '/',
-      sameSite: 'lax',
-    });
+    cookieStore.set('library', user.library.toString(), cookieConfig);
+    console.log(`🍪 AUTH.TS - Set library cookie: ${user.library}`);
   }
+
+  console.log(`🍪 AUTH.TS - All cookies set for user: ${user.username}`);
 }
 
-// Clear session cookies
+// Clear session cookies with production domain handling
 export async function clearSessionCookies() {
   const cookieStore = await cookies();
+  const isProduction = process.env.NODE_ENV === 'production';
+  const domain = isProduction ? 'cealstats.org' : undefined;
+  
+  console.log(`🍪 AUTH.TS - CLEARING COOKIES - Production: ${isProduction}, Domain: ${domain || 'localhost'}`);
   
   const cookieNames = ['session', 'uinf', 'role', 'library'];
   cookieNames.forEach(name => {
-    cookieStore.delete(name);
+    // Clear with domain if in production
+    if (domain) {
+      cookieStore.set(name, '', {
+        domain,
+        expires: new Date(0), // Expired date
+        path: '/',
+      });
+    } else {
+      cookieStore.delete(name);
+    }
+    console.log(`🍪 AUTH.TS - Cleared ${name} cookie`);
   });
 }
 

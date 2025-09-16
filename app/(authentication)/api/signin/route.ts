@@ -216,42 +216,36 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
 
-      // Set cookies using NextResponse headers for Vercel compatibility
+      // Enhanced cookie configuration for production/Vercel compatibility
       const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
       const isProduction = process.env.NODE_ENV === 'production';
+      const domain = isProduction ? 'cealstats.org' : undefined; // Set domain for production
 
-      console.log(`🍪 SETTING COOKIES - Production: ${isProduction}`);
+      console.log(`🍪 SETTING COOKIES - Production: ${isProduction}, Domain: ${domain || 'localhost'}`);
       console.log(`🍪 Session User:`, sessionUser);
 
-      // Set session token cookie
-      response.cookies.set('session', token, {
-        secure: isProduction,
-        httpOnly: true,
+      // Enhanced cookie configuration with domain and priority settings
+      const cookieConfig = {
+        secure: isProduction, // HTTPS only in production
+        httpOnly: true, // Prevent XSS attacks
         expires: expireTime,
-        path: '/',
-        sameSite: 'lax',
-      });
-      console.log(`🍪 Set session cookie`);
+        path: '/', // Available across entire site
+        sameSite: 'lax' as const, // CSRF protection while allowing navigation
+        ...(domain && { domain }), // Set domain only in production
+        priority: 'high' as const, // High priority for auth cookies
+      };
+
+      // Set session token cookie
+      response.cookies.set('session', token, cookieConfig);
+      console.log(`🍪 Set session cookie with config:`, cookieConfig);
 
       // Set user info cookie for quick access
-      response.cookies.set('uinf', sessionUser.username.toLowerCase(), {
-        secure: isProduction,
-        httpOnly: true,
-        expires: expireTime,
-        path: '/',
-        sameSite: 'lax',
-      });
+      response.cookies.set('uinf', sessionUser.username.toLowerCase(), cookieConfig);
       console.log(`🍪 Set uinf cookie: ${sessionUser.username.toLowerCase()}`);
 
       // Set role cookie if available
       if (sessionUser.role) {
-        response.cookies.set('role', sessionUser.role, {
-          secure: isProduction,
-          httpOnly: true,
-          expires: expireTime,
-          path: '/',
-          sameSite: 'lax',
-        });
+        response.cookies.set('role', sessionUser.role, cookieConfig);
         console.log(`🍪 Set role cookie: ${sessionUser.role}`);
       } else {
         console.log(`🍪 No role to set for user`);
@@ -259,13 +253,8 @@ export async function POST(request: NextRequest) {
 
       // Set library cookie if available
       if (sessionUser.library) {
-        response.cookies.set('library', sessionUser.library.toString(), {
-          secure: isProduction,
-          httpOnly: true,
-          expires: expireTime,
-          path: '/',
-          sameSite: 'lax',
-        });
+        response.cookies.set('library', sessionUser.library.toString(), cookieConfig);
+        console.log(`🍪 Set library cookie: ${sessionUser.library}`);
       }
 
       console.log(`🍪 COOKIES SET VIA NEXTRESPONSE for user: "${email}"`);

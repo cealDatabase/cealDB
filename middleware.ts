@@ -39,7 +39,8 @@ async function verifySessionTokenEdge(token: string): Promise<{ username: string
 export default async function middleware(req: NextRequest) {
   const { nextUrl } = req;
   
-  // Check for authentication via session cookie
+  // Enhanced cookie debugging for production environments
+  const allCookies = req.cookies.getAll();
   const sessionCookie = req.cookies.get('session');
   const userCookie = req.cookies.get('uinf');
   
@@ -48,12 +49,16 @@ export default async function middleware(req: NextRequest) {
     hasSessionCookie: !!sessionCookie,
     hasUserCookie: !!userCookie,
     sessionValue: sessionCookie ? sessionCookie.value.substring(0, 20) + '...' : null,
-    userValue: userCookie ? userCookie.value : null
+    userValue: userCookie ? userCookie.value : null,
+    totalCookies: allCookies.length,
+    cookieNames: allCookies.map(c => c.name)
   };
   
   logMiddlewareDebug('REQUEST_START', requestInfo);
   
   console.log(`🔍 MIDDLEWARE: ${nextUrl.pathname}`);
+  console.log(`🍪 Total cookies received: ${allCookies.length}`);
+  console.log(`🍪 Cookie names: ${allCookies.map(c => c.name).join(', ')}`);
   console.log(`🍪 Session cookie exists: ${!!sessionCookie}`);
   console.log(`🍪 User cookie exists: ${!!userCookie}`);
   
@@ -111,10 +116,10 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Redirect unauthenticated users from protected routes
-  // if (!isLoggedIn && isProtectedRoute) {
-  //   logMiddlewareDebug('REDIRECT_UNAUTH_TO_SIGNIN', { from: nextUrl.pathname, to: '/signin' });
-  //   return NextResponse.redirect(new URL('/signin', nextUrl));
-  // }
+  if (!isLoggedIn && isProtectedRoute) {
+    logMiddlewareDebug('REDIRECT_UNAUTH_TO_SIGNIN', { from: nextUrl.pathname, to: '/signin' });
+    return NextResponse.redirect(new URL('/signin', nextUrl));
+  }
 
   // Log when allowing access
   logMiddlewareDebug('ALLOW_ACCESS', { 
