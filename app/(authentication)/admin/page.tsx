@@ -151,7 +151,8 @@ async function getUserDetailByEmail({
         const nycTime = new Date(lastLogin).toLocaleString('en-US', {
           timeZone: 'America/New_York'
         });
-        return nycTime;
+        // return nycTime;
+        return lastLogin.toISOString() // Return UTC time as ISO string for client-side conversion
       } else {
         return null;
       }
@@ -196,16 +197,11 @@ function UserSingle({
       <Container className="bg-gray-100 rounded-lg lg:min-w-[720px]">
         <div className="mt-2">
           <dl className="divide-y divide-gray-400">
-            {user.id && (
+            {lastLogin && (
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-                <dt className="text-gray-500 font-medium">User Id & Last Login</dt>
+                <dt className="text-gray-500 font-medium">Last Login</dt>
                 <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {user.id}
-                  {lastLogin && (
-                    <span className="ml-2 text-gray-500">
-                      Last Login: {lastLogin}
-                    </span>
-                  )}
+                  <span>{new Date(lastLogin).toLocaleString()}</span>
                 </dd>
               </div>
             )}

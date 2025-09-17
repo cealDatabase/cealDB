@@ -23,13 +23,13 @@ export function AuthLayout({
           <h1 className="text-center text-2xl font-medium tracking-tight text-gray-900">
             {title}
           </h1>
+          {subtitle && (
+          <div className="text-center text-lg text-gray-600">{subtitle}</div>
+        )}
         </div>
         <div className="-mx-4 mt-10 flex-auto bg-white px-4 py-10 shadow-2xl shadow-gray-900/10 sm:mx-0 sm:flex-none sm:rounded-5xl sm:p-24">
           {children}
         </div>
-        {subtitle && (
-          <div className="mt-3 text-center text-lg text-gray-600">{subtitle}</div>
-        )}
       </div>
     </main>
   )

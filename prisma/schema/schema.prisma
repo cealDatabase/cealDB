@@ -79,7 +79,7 @@ model User {
   User_Library              User_Library[]
   User_Roles                Users_Roles[]
   AuditLog                  AuditLog[]
-  sessions                  Session[]
+  Session                   Session[]
 }
 
 model Session {

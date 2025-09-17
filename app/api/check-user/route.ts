@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           errorType: 'USER_NOT_FOUND',
-          message: 'No account found with this email address.',
+          message: 'No user found with this email address.',
           hint: 'Please check your email address or contact your CEAL administrator.',
           suggestions: [
             'Double-check the email address spelling',
@@ -115,16 +115,16 @@ export async function POST(request: NextRequest) {
           userStatus: 'NEEDS_PASSWORD_SETUP',
           needsPasswordSetup,
           needsPasswordReset,
-          message: needsPasswordSetup ? 
-            'Welcome! Your account needs a password to be set up.' :
-            'Your account requires a password reset.',
-          hint: 'A password setup link has been sent to your email address.',
-          suggestions: [
-            'Check your email for the password setup link',
-            'The link will expire in 24 hours',
-            'Check your spam/junk folder if you don\'t see the email',
-            'Contact CEAL admin if you need assistance'
-          ],
+          // message: needsPasswordSetup ? 
+          //   'Welcome! Your account needs a password to be set up.' :
+          //   'Your account requires a password reset.',
+          // hint: 'A password setup link has been sent to your email address.',
+          // suggestions: [
+          //   'Check your email for the password setup link',
+          //   'The link will expire in 24 hours',
+          //   'Check your spam/junk folder if you don\'t see the email',
+          //   'Contact CEAL admin if you need assistance'
+          // ],
           user: {
             email: user.username,
             name: user.firstname && user.lastname ? 

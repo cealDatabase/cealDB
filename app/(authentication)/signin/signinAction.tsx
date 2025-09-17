@@ -59,6 +59,20 @@ export default async function signinAction(
     });
 
     if (!user) {
+      // Create audit log entry for failed signin attempt
+      await db.auditLog.create({
+        data: {
+          user_id: null,
+          username: username,
+          action: 'SIGNIN',
+          success: false,
+          error_message: 'User not found',
+          timestamp: new Date(),
+          ip_address: null,
+          user_agent: null
+        }
+      });
+      
       return {
         success: false,
         errorType: 'USER_NOT_FOUND',
@@ -80,6 +94,20 @@ export default async function signinAction(
     const isValidPassword = await verifyPassword(password, user.password);
     
     if (!isValidPassword) {
+      // Create audit log entry for failed password attempt
+      await db.auditLog.create({
+        data: {
+          user_id: user.id,
+          username: user.username,
+          action: 'SIGNIN',
+          success: false,
+          error_message: 'Invalid password',
+          timestamp: new Date(),
+          ip_address: null,
+          user_agent: null
+        }
+      });
+
       // Check if this is due to old password format
       if (!user.password.startsWith('$argon2id$')) {
         return {
@@ -136,9 +164,38 @@ export default async function signinAction(
     cookieStore.set('role', JSON.stringify(userRoleIds), cookieOptions);
     cookieStore.set('library', userLibraryId, cookieOptions);
 
+    // Update user's last login time
+    await db.user.update({
+      where: { id: user.id },
+      data: { lastlogin_at: new Date() }
+    });
+
+    // Create a session record
+    const sessionRecord = await db.session.create({
+      data: {
+        sessionToken: token,
+        userId: user.id,
+        expires: expireTime
+      }
+    });
+
+    // Create audit log entry for successful signin
+    await db.auditLog.create({
+      data: {
+        user_id: user.id,
+        username: user.username,
+        action: 'SIGNIN',
+        success: true,
+        timestamp: new Date(),
+        ip_address: null, // We don't have access to IP in server actions
+        user_agent: null  // We don't have access to user agent in server actions
+      }
+    });
+
     console.log(`✅ Server Action: Login successful for ${username}`);
     console.log(`🍪 Server Action: Cookies set directly via cookies() API`);
     console.log(`👤 User Role IDs: [${userRoleIds.join(', ')}], Library ID: ${userLibraryId}`);
+    console.log(`📊 Session created: ${sessionRecord.id}, Last login updated`);
 
     return {
       success: true,
@@ -153,6 +210,25 @@ export default async function signinAction(
 
   } catch (error) {
     console.error('Server Action signin error:', error);
+    
+    // Try to create audit log entry for the error (but don't fail if this fails)
+    try {
+      await db.auditLog.create({
+        data: {
+          user_id: null,
+          username: username || 'unknown',
+          action: 'SIGNIN',
+          success: false,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date(),
+          ip_address: null,
+          user_agent: null
+        }
+      });
+    } catch (auditError) {
+      console.error('Failed to create audit log for signin error:', auditError);
+    }
+    
     return {
       success: false,
       errorType: 'SERVER_ERROR',

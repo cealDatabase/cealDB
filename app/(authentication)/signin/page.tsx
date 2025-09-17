@@ -87,17 +87,17 @@ export default function SignInPage() {
     setError(undefined);
 
     const formData = new FormData(e.currentTarget);
-    
+
     try {
       const result = await signinAction(undefined, formData);
-      
+
       if (result.success) {
         console.log("✅ Login successful, server action completed");
-        
+
         // Server Action sets cookies directly, so redirect immediately
         console.log("🔄 Redirecting to admin...");
         router.push("/admin");
-        
+
       } else {
         // Handle authentication errors
         if (result.errorType === 'PASSWORD_MIGRATION_REQUIRED') {
@@ -143,7 +143,7 @@ export default function SignInPage() {
         return (
           <>
             <div className="text-sm">
-              Enter your email address to continue. Need help?{" "}
+              Enter your email address to continue. Forgot your password?{" "}
               <Link href="/forgot">Request password reset.</Link>
             </div>
           </>
@@ -209,11 +209,11 @@ export default function SignInPage() {
             <div className="flex items-center">
               <CheckCircleIcon className="h-5 w-5 text-green-400 mr-2" />
               <p className="text-sm text-green-800">
-                Account found: <strong>{userInfo.email}</strong>
+                User found: <strong>{userInfo.email}</strong>
               </p>
             </div>
           </div>
-          
+
           <form onSubmit={handlePasswordSubmit}>
             <input type="hidden" name="email" value={userInfo.email} />
             <div className="space-y-6">
@@ -245,6 +245,7 @@ export default function SignInPage() {
                 </div>
               </div>
             </div>
+            <Link className="flex justify-end mt-2 text-xs hover:text-gray-800" href="/forgot">Forgot Password?</Link>
             <Button
               variant="outline"
               style={{
@@ -282,9 +283,11 @@ export default function SignInPage() {
               <p className="text-sm font-medium text-blue-800">
                 {userInfo.email}
               </p>
-              <p className="text-xs text-blue-600">Password setup link sent</p>
+              <p className="text-xs text-blue-600 mt-1">Password setup link sent</p>
+              {/* Footer Note */}
             </div>
           </div>
+          <p className="text-start text-xs text-gray-500 mt-1">The password setup link will expire in 24 hours</p>
 
           {/* Simple Instructions */}
           <div className="space-y-3">
@@ -320,9 +323,9 @@ export default function SignInPage() {
             <Button variant="outline" className="w-full bg-transparent">
               Resend Email
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full bg-transparent border-gray-300 text-gray-600 hover:text-gray-800" 
+            <Button
+              variant="outline"
+              className="w-full bg-transparent border-gray-300 text-gray-600 hover:text-gray-800"
               onClick={handleBackToEmail}
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -330,8 +333,7 @@ export default function SignInPage() {
             </Button>
           </div>
 
-          {/* Footer Note */}
-          <p className="text-center text-xs text-gray-500">The password setup link will expire in 24 hours</p>
+
         </div>
       )}
 
