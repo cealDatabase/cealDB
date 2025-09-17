@@ -103,7 +103,7 @@ export default function About() {
                   Total Holdings
                 </dt>
                 <dd className="mt-2 text-3xl font-bold leading-10 tracking-tight text-gray-900">
-                  36,690,040
+                  36M
                 </dd>
               </div>
             </dl>

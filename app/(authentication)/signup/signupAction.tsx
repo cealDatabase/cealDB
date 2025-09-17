@@ -6,10 +6,16 @@ const ROOT_URL =
     ? "http://localhost:3000"
     : "https://cealstats.org";
 
+interface SignupResult {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
 export default async function signupAction(
   currentState: any,
   formData: FormData
-): Promise<string | null> {
+): Promise<SignupResult> {
   try {
     // Get data off form
     const username = formData.get("username");
@@ -18,7 +24,11 @@ export default async function signupAction(
 
     // Validate required fields
     if (!username || !institution || !userrole) {
-      return "Please fill in all required fields.";
+      return {
+        success: false,
+        message: "Please fill in all required fields.",
+        error: "Please fill in all required fields."
+      };
     }
 
     console.log(`🔄 Creating account for: ${username}`);
@@ -35,22 +45,28 @@ export default async function signupAction(
     const json = await res.json();
     console.log(`📋 Signup API response:`, json);
     
-    // Redirect to confirmation if success
+    // Return success or error response
     if (res.ok && json.success) {
-      console.log(`✅ Account created successfully, redirecting to confirmation`);
-      redirect("/confirmed");
+      console.log(`✅ Account created successfully for: ${username}`);
+      return {
+        success: true,
+        message: `Account created successfully for ${username}! Password setup email has been sent.`
+      };
     } else {
       // Return specific error message from API
       console.log(`❌ Account creation failed:`, json);
-      return json.message || json.hint || "Account creation failed. Please try again.";
+      return {
+        success: false,
+        message: json.message || json.hint || "Account creation failed. Please try again.",
+        error: json.message || json.hint || "Account creation failed. Please try again."
+      };
     }
   } catch (error) {
     console.error('Signup action error:', error);
-    // Check if this is a redirect error (which is expected)
-    if (error && typeof error === 'object' && 'digest' in error) {
-      // This is likely a Next.js redirect, let it propagate
-      throw error;
-    }
-    return "Unable to create account. Please check your connection and try again.";
+    return {
+      success: false,
+      message: "Unable to create account. Please check your connection and try again.",
+      error: "Unable to create account. Please check your connection and try again."
+    };
   }
 }

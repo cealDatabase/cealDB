@@ -20,8 +20,8 @@ import {
 
 const actions = [
   {
-    title: 'Admin Help',
-    href: '/admin/help',
+    title: 'Super Admin Guide',
+    href: '/admin/superguide',
     icon: ClockIcon,
     iconForeground: 'text-teal-700',
     iconBackground: 'bg-teal-50',

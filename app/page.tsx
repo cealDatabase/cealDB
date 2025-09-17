@@ -1,96 +1,155 @@
 
-import { Button } from "@/components/Button";
-import { Container } from "@/components/Container";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ArrowRight, BookOpen, BarChart3, ExternalLink, HelpCircle } from "lucide-react";
 import Link from "next/link";
-import CEALMainWebButton from "@/components/CEALMainWebButton";
+
 export default function Index() {
   return (
-    <main>
-      <Container>
-        <div className="overflow-hidden">
-          <div className="gap-x-14 my-16 lg:flex lg:items-center">
-            <div className="relative w-full ">
-              <h1 className="text-4xl text-left font-bold tracking-tight sm:text-6xl">
-                Welcome to CEAL Statistics Database
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Fluid Background Animation */}
+      <div className="fluid-bg" />
+      <div className="fluid-bg" style={{ animationDelay: "-10s", opacity: 0.4 }} />
+      {/* Main Content */}
+      <main className="relative z-10">
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-20 text-center">
+          <div className="max-w-7xl mx-auto">
+            <div className="float-animation">
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">
+                Council on East Asian Libraries
+                <span className="text-primary block">Statistics</span>
               </h1>
-              <div className="mt-6 text-lg leading-6 text-gray-600 sm:max-w-md lg:max-w-none">
-                <p className="">
-                  For new users of this database, please click{" "}
-                  <Link href="/help">here</Link> for more information.
-                </p>
-                <p className="">
-                  Certain data, such as tables with derived statistical data,
-                  can only be accessed by members. Please{" "}
-                  <Link href="help">contact us</Link> for information about
-                  membership.
-                </p>
-              </div>
-              <div className="mt-10 flex flex-col gap-6">
-                <div className="flex gap-6">
-                  <Button href="/started" className="bg-red-400 hover:bg-red-600">Get started</Button>
-                  <Link
-                    href="/libraries"
-                    className="text-sm font-semibold leading-6 text-gray-900"
-                  >
-                    Libraries <span aria-hidden="true">→</span>
-                  </Link>
-                </div>
-                <div>
-                  <CEALMainWebButton />
-                </div>
-              </div>
             </div>
-            <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">
-              <div className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1614849963640-9cc74b2a826f?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt=""
-                    className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
-                  />
-                  <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
-                </div>
-              </div>
-              <div className="mr-auto w-44 flex-none space-y-8 sm:mr-0 sm:pt-52 lg:pt-36">
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=2515&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt=""
-                    className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
-                  />
-                  <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
-                </div>
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1506555191898-a76bacf004ca?q=80&w=2339&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt=""
-                    className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
-                  />
-                  <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
-                </div>
-              </div>
-              <div className="w-44 flex-none space-y-8 pt-32 sm:pt-0">
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1707762890671-52ef6d6f51e7?q=80&w=2050&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt=""
-                    className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
-                  />
-                  <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
-                </div>
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1622493812833-dc6e69371f82?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt=""
-                    className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
-                  />
-                  <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
-                </div>
-              </div>
+
+            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty">
+              The primary and consistently maintained statistical resource on East Asian collections across North
+              America
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+              <Button asChild size="lg" className="group">
+                <Link href="/started">
+                  Get Started
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/libraries">
+                  <BookOpen className="mr-2 w-4 h-4" />
+                  Libraries
+                </Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg">
+                <Link href="https://www.eastasianlib.org/" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 w-4 h-4" />
+                  CEAL Main Website
+                </Link>
+              </Button>
+            </div>
+
+            {/* Info Text */}
+            <div className="text-sm text-muted-foreground mb-8">
+              <p className="mb-2">
+                For new users of this database, please click the{" "}
+                <Link href="/help" className="text-primary hover:underline">Help</Link> button for more information.
+              </p>
+              <p>
+                Certain data, such as tables with derived statistical data,
+                can only be accessed by members. Please{" "}
+                <Link href="/help" className="text-primary hover:underline">contact us</Link> for information about
+                membership.
+              </p>
             </div>
           </div>
+        </section>
+
+        {/* Decorative Line */}
+        <div className="container mx-auto px-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-20" />
         </div>
-      </Container>
-    </main>
+
+        {/* Statistics Section */}
+        <section className="container mx-auto px-4 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Key Statistics</h2>
+            <p className="text-lg text-muted-foreground">Comprehensive data on East Asian library collections</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">1999</div>
+              <div className="text-sm text-muted-foreground uppercase tracking-wider">Founded</div>
+            </Card>
+
+            <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">39</div>
+              <div className="text-sm text-muted-foreground uppercase tracking-wider">Institutions</div>
+            </Card>
+
+            <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">36M</div>
+              <div className="text-sm text-muted-foreground uppercase tracking-wider">Total Holdings</div>
+            </Card>
+          </div>
+        </section>
+
+        {/* Content Sections */}
+        <section className="container mx-auto px-4 py-20">
+          <div className="max-w-4xl mx-auto space-y-16">
+            {/* Overview */}
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-6">Overview</h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                The CEAL Statistics Database stands as the primary and consistently maintained statistical resource on
+                East Asian collections across North America. It provides annual data from dedicated East Asian libraries
+                and collections, as well as East Asian resources holding in other institutions.
+              </p>
+            </div>
+
+            {/* Decorative Line */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-border" />
+              <BarChart3 className="w-6 h-6 text-accent" />
+              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-border" />
+            </div>
+
+            {/* History */}
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-6">History</h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                CEAL began publishing statistical data in 1957, with annual reports appearing in the Journal of East
+                Asian Libraries (JEAL) since the late 1980s. The online database was launched in 1999, with earlier data
+                (pre-1999) added in 2007. It includes statistics dating back as far as 1869 and continues to be
+                published annually in parallel with the February issue of JEAL.
+              </p>
+            </div>
+
+            {/* Decorative Line */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-border" />
+              <div className="w-2 h-2 bg-primary rounded-full" />
+              <div className="w-2 h-2 bg-secondary rounded-full" />
+              <div className="w-2 h-2 bg-accent rounded-full" />
+              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-border" />
+            </div>
+
+            {/* Scope and Significance */}
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-6">Scope and Significance</h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                The CEAL Statistics Database aligns with the scope of the Association of Research Libraries (ARL)
+                statistics, and focuses specifically on East Asian libraries and collections. It features data related
+                to Chinese, Japanese, and Korean studies, categorized according to library type (public or private),
+                geographic region, and other relevant criteria. The database captures trends in the development of East
+                Asian studies libraries and collections across North America and provides valuable insights for
+                benchmarking, strategic planning, and advocacy in East Asian librarianship.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

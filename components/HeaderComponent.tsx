@@ -5,7 +5,6 @@ import { Fragment, useState } from "react";
 import { Button } from "@/components/Button";
 import { MainMenu } from "@/constant/nav";
 import { StatisticsMenu } from "@/constant/nav";
-import CEALMainWebButton from "@/components/CEALMainWebButton";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 import {

@@ -1,52 +1,48 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
-@custom-variant dark (&:is(.dark *));
-@plugin 'tailwind-scrollbar';
+/* https://coolors.co/palette/355070-6d597a-b56576-e56b6f-eaac8b */
 
 @layer base {
-  * {
-    border: border-border;
-  }
+  * { @apply border-border;}
+  
   :root {
-    --foreground-rgb: #f6e9e0;
-    /* --foreground-rgb: 20 14.3% 4.1%; */
-    --background-start-rgb: 214, 219, 220;
+    --foreground-rgb: 53, 80, 112; /* #355070 - contrast color */
+    --background-start-rgb: 234, 172, 139; /* #EAAC8B - light peach */
     --background-end-rgb: 255, 255, 255;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 214 27% 32%; /* #355070 in HSL */
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --popover-foreground: 214 27% 32%; /* #355070 in HSL */
+    --primary: 357 67% 67%; /* #E56B6F - primary color in HSL */
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --secondary: 351 28% 58%; /* #B56576 - secondary color in HSL */
+    --secondary-foreground: 214 27% 32%; /* #355070 for contrast */
+    --muted: 37 38% 73%; /* #EAAC8B - light peach in HSL */
+    --muted-foreground: 214 27% 32%; /* #355070 for contrast */
+    --accent: 270 15% 41%; /* #6D597A - purple in HSL */
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --border: 37 38% 73%; /* #EAAC8B - light peach for borders */
+    --input: 37 38% 73%; /* #EAAC8B - light peach for inputs */
+    --ring: 357 67% 67%; /* #E56B6F - primary color for focus rings */
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 357 67% 67%; /* #E56B6F - primary */
+    --chart-2: 351 28% 58%; /* #B56576 - secondary */
+    --chart-3: 214 27% 32%; /* #355070 - contrast */
+    --chart-4: 37 38% 73%; /* #EAAC8B - light peach */
+    --chart-5: 270 15% 41%; /* #6D597A - purple */
   }
 
   body {
-    color: rgb(var(--foreground-rgb));
-    background: rgb(var(--foreground-rgb));
-
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb));
+    @apply bg-background text-foreground;
+    /* If you still want a gradient, do one based on your OKLCH tokens: */
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--background) 0%, transparent 100%),
+      var(--background)
+    );
   }
 
   main {
@@ -61,13 +57,13 @@
 
   a {
     text-decoration: underline;
-    color: #dd6a6a;
+    color: #E56B6F; /* Updated to primary color */
   }
 
   h1 {
     padding-top: 1rem; /* 16px */
     padding-bottom: 2rem;
-    color: #075a69;
+    color: #355070; /* Updated to contrast color */
     /* bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500  */
     text-align: center;
     font-size: 2.25rem; /* 36px */
@@ -87,11 +83,11 @@
     font-size: 1.25rem; /* 20px */
     line-height: 1.75rem; /* 28px */
     font-weight: 600;
-    color: #a855f7;
+    color: #E56B6F; /* Updated to primary color */
   }
 
   h3 {
-    color: #6366f1;
+    color: #B56576; /* Updated to secondary color */
   }
 
   ul > li {
@@ -260,11 +256,43 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+
+/* Added fluid animation keyframes */
+@keyframes fluid-wave {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
   }
-  body {
-    @apply bg-background text-foreground;
+  33% {
+    transform: translateX(-50%) translateY(-50%) rotate(120deg) scale(1.1);
   }
+  66% {
+    transform: translateX(-50%) translateY(-50%) rotate(240deg) scale(0.9);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.fluid-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, oklch(0.95 0.03 200) 0%, oklch(0.98 0.02 200) 30%, oklch(1 0 0) 70%);
+  animation: fluid-wave 20s ease-in-out infinite;
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
 }

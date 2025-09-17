@@ -15,6 +15,13 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
 
 import signupAction from "./signupAction";
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
+
+interface SignupResult {
+  success: boolean;
+  message: string;
+  error?: string;
+}
 
 export default function SignUpForm({
   libraries,
@@ -23,7 +30,7 @@ export default function SignUpForm({
   libraries: any;
   roles: any;
 }) {
-  const [error, formAction] = React.useActionState(signupAction, undefined);
+  const [result, formAction] = React.useActionState(signupAction, undefined);
   const [institution, setInstitution] = useState("");
   const [userRole, setUserRole] = useState("");
 
@@ -115,7 +122,24 @@ export default function SignUpForm({
             Sign Up
           </Button>
         </form>
-        {error && (
+        {result && result.success && (
+          <div className="rounded-md bg-green-50 p-4 mt-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <CheckCircleIcon
+                  className="h-5 w-5 text-green-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-green-700">
+                  Success! {result.message}
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
+        {result && !result.success && (
           <div className="rounded-md bg-red-50 p-4 mt-8">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -126,7 +150,7 @@ export default function SignUpForm({
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-700">
-                  Error! {error}
+                  Error! {result.error}
                 </h3>
               </div>
             </div>

@@ -7,13 +7,9 @@ import {
 
 export const MainMenu = [
   {
-    label: "About",
-    href: "/about",
-  },
-  {
     label: "Libraries",
     href: "/libraries",
-  },
+  }
 ];
 
 export const StatisticsMenu = [

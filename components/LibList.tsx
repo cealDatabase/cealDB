@@ -24,7 +24,7 @@ export default function LibList({
   return (
     <div className="mt-8">
       <Stack direction="row" spacing={2} alignItems="center">
-        <Box sx={{ minWidth: 240 }}>
+        <Box sx={{ minWidth: 360 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
               Select an Institution

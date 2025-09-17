@@ -3,6 +3,7 @@
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
 import React from 'react'
+import Link from 'next/link'
 
 const openNewYearForm = async () => {
     // Show loading message
@@ -112,6 +113,8 @@ const adminHelp = () => {
             <h1>Admin Help</h1>
             <Container>
                 <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
+                <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
+                <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>
