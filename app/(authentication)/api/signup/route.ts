@@ -67,6 +67,7 @@ export async function POST(request: Request) {
         password: null, // No password initially - user will set via email
         isactive: true,
         requires_password_reset: true,
+        email_verified: false, // Email not verified until they click the setup link
         password_reset_token: resetToken,
         password_reset_expires: resetExpires,
         created_at: new Date(),
@@ -95,6 +96,19 @@ export async function POST(request: Request) {
     }
 
     console.log(`✅ NEW USER CREATED: ${username} (ID: ${newUser.id})`);
+
+    // Create audit log entry for successful account creation
+    await db.auditLog.create({
+      data: {
+        user_id: newUser.id,
+        username: username.toLowerCase(),
+        action: 'ACCOUNT_CREATED',
+        success: true,
+        timestamp: new Date(),
+        ip_address: null,
+        user_agent: null
+      }
+    });
 
     // ----------------- Send welcome email with password setup -----------------
     try {

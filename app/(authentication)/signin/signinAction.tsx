@@ -76,7 +76,7 @@ export default async function signinAction(
       return {
         success: false,
         errorType: 'USER_NOT_FOUND',
-        message: 'No account found with this email address.',
+        message: 'No user found with this email address.',
         hint: 'Please check your email address or contact your administrator.',
       };
     }

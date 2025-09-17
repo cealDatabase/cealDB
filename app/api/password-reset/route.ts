@@ -204,6 +204,7 @@ async function handlePasswordReset(token: string, newPassword: string) {
         password_reset_token: null,
         password_reset_expires: null,
         requires_password_reset: false,
+        email_verified: true, // Mark email as verified when password is set
         updated_at: new Date()
       }
     });

@@ -9,7 +9,7 @@ const ROOT_URL =
 export default async function signupAction(
   currentState: any,
   formData: FormData
-): Promise<string> {
+): Promise<string | null> {
   try {
     // Get data off form
     const username = formData.get("username");
@@ -21,6 +21,8 @@ export default async function signupAction(
       return "Please fill in all required fields.";
     }
 
+    console.log(`🔄 Creating account for: ${username}`);
+
     // Send to our api route (no password needed - user will set via email)
     const res = await fetch(ROOT_URL + "/api/signup", {
       method: "POST",
@@ -31,15 +33,24 @@ export default async function signupAction(
     });
     
     const json = await res.json();
+    console.log(`📋 Signup API response:`, json);
     
     // Redirect to confirmation if success
     if (res.ok && json.success) {
+      console.log(`✅ Account created successfully, redirecting to confirmation`);
       redirect("/confirmed");
     } else {
-      // Return error message with better formatting
-      return json.message || json.error || "Account creation failed. Please try again.";
+      // Return specific error message from API
+      console.log(`❌ Account creation failed:`, json);
+      return json.message || json.hint || "Account creation failed. Please try again.";
     }
   } catch (error) {
+    console.error('Signup action error:', error);
+    // Check if this is a redirect error (which is expected)
+    if (error && typeof error === 'object' && 'digest' in error) {
+      // This is likely a Next.js redirect, let it propagate
+      throw error;
+    }
     return "Unable to create account. Please check your connection and try again.";
   }
 }
