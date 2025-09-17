@@ -148,9 +148,6 @@ export function HeaderComponent({
 
             <Button href="/help">Help</Button>
           </div>
-          <div>
-            <CEALMainWebButton />
-          </div>
         </div>
       </nav>
 
@@ -241,9 +238,6 @@ export function HeaderComponent({
                   </div>
                 )}
                 <Link href="/help">Help</Link>
-                <div className="my-4">
-                <CEALMainWebButton />
-                </div>
               </div>
             </div>
           </div>

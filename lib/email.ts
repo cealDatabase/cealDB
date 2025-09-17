@@ -109,7 +109,7 @@ export async function sendPasswordResetEmail(
               </ol>
               
               <div style="text-align: center;">
-                <a href="${resetUrl}" class="button">${isInitialSetup ? 'Create Password' : 'Set New Password'}</a>
+                <a href="${resetUrl}" class="button text-white">${isInitialSetup ? 'Create Password' : 'Set New Password'}</a>
               </div>
               
               <p>Or copy and paste this link into your browser:</p>
@@ -197,7 +197,7 @@ export async function sendWelcomeEmail(
               <p>Your CEAL Database account has been created successfully! To complete your account setup, you need to create a secure password.</p>
               
               <div style="text-align: center;">
-                <a href="${resetUrl}" class="button">Create Your Password</a>
+                <a href="${resetUrl}" class="button text-white">Create Your Password</a>
               </div>
               
               <p>Or copy and paste this link into your browser:</p>

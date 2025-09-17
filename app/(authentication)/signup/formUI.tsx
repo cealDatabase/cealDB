@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import React from "react";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -43,9 +42,7 @@ export default function SignUpForm({
         subtitle={
           <>
             <div className="text-sm">
-              CEAL Stats coordinators need to work with their libraries&lsquo;{" "}
-              <Link href="/libraries">contact persons</Link> to gain access to
-              the database online forms.
+            This sign up form is for Super Admin only.
             </div>
           </>
         }
@@ -53,17 +50,17 @@ export default function SignUpForm({
         <form action={formAction}>
           <div className="space-y-6">
             <TextField
-              label="Username Same as Email"
+              label="*Email"
               name="username"
               type="email"
               autoComplete="email"
               required
             />
 
-            <Box sx={{ minWidth: 240 }}>
+            <Box sx={{ minWidth: 360 }}>
               <FormControl fullWidth>
                 <InputLabel id="institution-label">
-                  Select Institution
+                  *Select Institution
                 </InputLabel>
                 <Select
                   labelId="institution-label"
@@ -86,9 +83,9 @@ export default function SignUpForm({
               </FormControl>
             </Box>
 
-            <Box sx={{ minWidth: 240 }}>
+            <Box sx={{ minWidth: 360 }}>
               <FormControl fullWidth>
-                <InputLabel id="userrole-label">Select Role</InputLabel>
+                <InputLabel id="userrole-label">*Select Role</InputLabel>
                 <Select
                   labelId="userrole-label"
                   name="namerole"

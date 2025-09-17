@@ -232,7 +232,7 @@ async function main() {
       data: [
         { role: "ROLE_ADMIN", name: "Super Admin" },
         { role: "ROLE_MEMBER", name: "Member Institution" },
-        { role: "ROLE_EBOOK_EDITOR", name: "E-Book/E-Journal Editor" },
+        { role: "ROLE_ERESOURCE_EDITOR", name: "E-Resource Editor" },
         { role: "ROLE_ADMIN_ASSISTANT", name: "Assistant Admin" },
       ],
     }),

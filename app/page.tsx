@@ -1,10 +1,9 @@
-"use client";
-import { useState } from "react";
+
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import Link from "next/link";
+import CEALMainWebButton from "@/components/CEALMainWebButton";
 export default function Index() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <main>
       <Container>
@@ -26,14 +25,19 @@ export default function Index() {
                   membership.
                 </p>
               </div>
-              <div className="mt-10 flex items-center gap-x-6">
-                <Button href="/started" className="bg-red-400 hover:bg-red-600">Get started</Button>
-                <Link
-                  href="/libraries"
-                  className="text-sm font-semibold leading-6 text-gray-900"
-                >
-                  Libraries <span aria-hidden="true">→</span>
-                </Link>
+              <div className="mt-10 flex flex-col gap-6">
+                <div className="flex gap-6">
+                  <Button href="/started" className="bg-red-400 hover:bg-red-600">Get started</Button>
+                  <Link
+                    href="/libraries"
+                    className="text-sm font-semibold leading-6 text-gray-900"
+                  >
+                    Libraries <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+                <div>
+                  <CEALMainWebButton />
+                </div>
               </div>
             </div>
             <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">

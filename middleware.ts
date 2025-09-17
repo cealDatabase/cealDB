@@ -18,12 +18,13 @@ async function verifyJWTToken(token: string): Promise<{ username: string } | nul
 }
 
 export default async function middleware(request: NextRequest) {
-  // Define protected routes
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/admin') || 
-                          request.nextUrl.pathname.startsWith('/create');
+  // Define different types of protected routes
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const isSuperAdminRoute = request.nextUrl.pathname.startsWith('/signup') ||
+                           request.nextUrl.pathname.startsWith('/create');
+  const isProtectedRoute = isAdminRoute || isSuperAdminRoute;
   
   const isAuthRoute = request.nextUrl.pathname.startsWith('/signin') || 
-                     request.nextUrl.pathname.startsWith('/signup') || 
                      request.nextUrl.pathname.startsWith('/forgot') ||
                      request.nextUrl.pathname.startsWith('/confirmed');
 
@@ -35,6 +36,7 @@ export default async function middleware(request: NextRequest) {
   // Get cookies using official Next.js middleware API
   const sessionCookie = request.cookies.get('session');
   const userCookie = request.cookies.get('uinf');
+  const roleCookie = request.cookies.get('role');
   
   console.log(`🔍 MIDDLEWARE: ${request.nextUrl.pathname}`);
   console.log(`🍪 Session: ${!!sessionCookie}, User: ${!!userCookie}`);
@@ -63,6 +65,29 @@ export default async function middleware(request: NextRequest) {
     } catch (error) {
       isAuthenticated = false;
     }
+  }
+
+  // Check role-based authorization for super admin routes
+  if (isSuperAdminRoute && isAuthenticated) {
+    let userRoleIds: string[] = [];
+    if (roleCookie) {
+      try {
+        userRoleIds = JSON.parse(roleCookie.value);
+      } catch (error) {
+        console.error('Failed to parse role cookie:', error);
+        userRoleIds = [];
+      }
+    }
+    
+    // Check if user has super admin (1) or admin assistant (4) role
+    const hasAuthorization = userRoleIds.includes("1") || userRoleIds.includes("4");
+    
+    if (!hasAuthorization) {
+      console.log(`🚫 User lacks authorization for super admin route. Roles: [${userRoleIds.join(', ')}]`);
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+    
+    console.log(`✅ User authorized for super admin route. Roles: [${userRoleIds.join(', ')}]`);
   }
 
   // Redirect logic using official Next.js patterns
@@ -97,11 +122,12 @@ export const config = {
     // Protected routes
     '/admin/:path*',
     '/create/:path*',
+    '/signup/:path*',
     // Auth routes  
     '/signin',
-    '/signup',
     '/forgot',
     '/confirmed',
+    '/unauthorized',
     // Protected API routes
     '/api/admin/:path*',
     '/api/create/:path*',

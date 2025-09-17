@@ -332,8 +332,6 @@ export default function SignInPage() {
               Use a different email
             </Button>
           </div>
-
-
         </div>
       )}
 
