@@ -161,14 +161,14 @@ async function getUserDetailByEmail({
   }
 
   const lastLogin = await findLastLogin();
-  
+
   return (
     <UserSingle
       user={singleUser as unknown as SingleUserType}
       role={findRole()}
       library={libraryData?.component}
       libraryName={libraryData?.libraryName}
-      lastLogin={lastLogin? lastLogin : undefined}
+      lastLogin={lastLogin ? lastLogin : undefined}
     />
   );
 }
@@ -251,8 +251,17 @@ async function UserLoggedInPage() {
   const cookieStore = await cookies();
   const rawCookieValue = cookieStore.get("uinf")?.value;
   const userCookie = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
-  const roleId = cookieStore.get("role")?.value;
-  
+  const roleIds = cookieStore.get("role")?.value;
+
+  // Parse role IDs from JSON array
+  let userRoleIds: string[] = [];
+  try {
+    userRoleIds = roleIds ? JSON.parse(roleIds) : [];
+  } catch (error) {
+    console.error('Failed to parse role IDs from cookie:', error);
+    userRoleIds = [];
+  }
+
   // Simple cookie check
   if (!userCookie) {
     console.log("⚠️  No user cookie found in admin page");
@@ -261,8 +270,10 @@ async function UserLoggedInPage() {
   return (
     <main>
       {getUserDetailByEmail({ cookieStore: userCookie })}
-      {/* TODO: change back to 1 as Super Admin */}
-      {roleId?.includes("2") &&
+      {/* Show Super Admin Tools when user has roles other than just role ID 2 */}
+      {Array.isArray(userRoleIds) && userRoleIds.length > 0 && (
+        userRoleIds.length > 1 || !userRoleIds.includes("2") || userRoleIds.includes("1")
+      ) &&
         <div className="container mt-12">
           <h1>Super Admin Toolkit</h1>
           <div className="grid grid-cols-1 gap-y-12">

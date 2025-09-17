@@ -25,7 +25,7 @@ export default async function signinAction(
   }
 
   try {
-    // Find user in database
+    // Find user in database with role and library information
     const user = await db.user.findFirst({
       where: { username: username },
       select: {
@@ -34,6 +34,27 @@ export default async function signinAction(
         password: true,
         firstname: true,
         lastname: true,
+        User_Roles: {
+          select: {
+            Role: {
+              select: {
+                id: true,
+                role: true,
+                name: true,
+              }
+            }
+          }
+        },
+        User_Library: {
+          select: {
+            Library: {
+              select: {
+                id: true,
+                library_name: true,
+              }
+            }
+          }
+        }
       }
     });
 
@@ -104,12 +125,20 @@ export default async function signinAction(
     cookieStore.set('session', token, cookieOptions);
     cookieStore.set('uinf', user.username.toLowerCase(), cookieOptions);
     
-    // Set basic role (we'll add proper role/library lookup later)
-    cookieStore.set('role', 'ROLE_ADMIN', cookieOptions);
-    cookieStore.set('library', '56', cookieOptions);
+    // Set user's actual role and library from database
+    console.log(`🔍 Raw User_Roles data:`, JSON.stringify(user.User_Roles, null, 2));
+    const userRoleIds = user.User_Roles?.map(userRole => userRole.Role.id.toString()) || ['2'];
+    const userLibraryId = user.User_Library?.[0]?.Library?.id?.toString() || '';
+    
+    console.log(`🎭 Processed Role IDs: [${userRoleIds.join(', ')}]`);
+    
+    // Store role IDs array as JSON string in cookie
+    cookieStore.set('role', JSON.stringify(userRoleIds), cookieOptions);
+    cookieStore.set('library', userLibraryId, cookieOptions);
 
     console.log(`✅ Server Action: Login successful for ${username}`);
     console.log(`🍪 Server Action: Cookies set directly via cookies() API`);
+    console.log(`👤 User Role IDs: [${userRoleIds.join(', ')}], Library ID: ${userLibraryId}`);
 
     return {
       success: true,
