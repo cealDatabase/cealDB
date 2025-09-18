@@ -99,7 +99,9 @@ async function main() {
   // Clear tables that will be synced (preserve auth tables if configured)
   console.log('🧹 Clearing tables for fresh sync...');
   
-  // Always clear non-auth data tables
+  // Clear tables in proper dependency order to avoid foreign key constraints
+  
+  // Step 1: Clear main data tables (no dependencies on them)
   await Promise.all([
     db.public_Services.deleteMany({}),
     db.unprocessed_Backlog_Materials.deleteMany({}),
@@ -113,22 +115,40 @@ async function main() {
     db.electronic.deleteMany({}),
     db.exclude_Year.deleteMany({}),
     db.entry_Status.deleteMany({}),
-    // List and survey tables
+  ]);
+
+  // Step 2: Delete junction tables first  
+  await Promise.all([
     db.libraryYear_ListEJournal.deleteMany({}),
     db.libraryYear_ListEBook.deleteMany({}),
     db.libraryYear_ListAV.deleteMany({}),
+  ]);
+
+  // Step 3: Delete library_Year (references libraries and list tables)
+  await db.library_Year.deleteMany({});
+
+  // Step 4: Delete libraries (references region and type tables)
+  await db.library.deleteMany({});
+
+  // Step 5: Delete list supporting tables
+  await Promise.all([
     db.list_EJournal_Language.deleteMany({}),
     db.list_EBook_Language.deleteMany({}),
     db.list_AV_Language.deleteMany({}),
     db.list_EJournal_Counts.deleteMany({}),
-    db.list_EJournal.deleteMany({}),
     db.list_EBook_Counts.deleteMany({}),
-    db.list_EBook.deleteMany({}),
     db.list_AV_Counts.deleteMany({}),
+  ]);
+
+  // Step 6: Delete main list tables
+  await Promise.all([
+    db.list_EJournal.deleteMany({}),
+    db.list_EBook.deleteMany({}),
     db.list_AV.deleteMany({}),
-    db.library_Year.deleteMany({}),
-    db.library.deleteMany({}),
-    // Reference tables (safe to recreate)
+  ]);
+
+  // Step 7: Delete reference tables (now safe)
+  await Promise.all([
     db.language.deleteMany({}),
     db.reflibraryregion.deleteMany({}),
     db.reflibrarytype.deleteMany({}),
@@ -194,27 +214,27 @@ async function main() {
     await db.$queryRaw`SELECT * FROM ceal.list_ebook`,
   ]);
 
-  const listEBookCounts = await Promise.all<List_EBook_Counts>([
+  const listEBookCounts = await Promise.all<List_EBook_Counts[]>([
     await db.$queryRaw`SELECT * FROM ceal.list_ebook_counts`,
   ]);
 
-  const listEJournal = await Promise.all<List_EJournal>([
+  const listEJournal = await Promise.all<List_EJournal[]>([
     await db.$queryRaw`SELECT * FROM ceal.list_ejournal`,
   ]);
 
-  const listEJournalCounts = await Promise.all<List_EJournal_Counts>([
+  const listEJournalCounts = await Promise.all<List_EJournal_Counts[]>([
     await db.$queryRaw`SELECT * FROM ceal.list_ejournal_counts`,
   ]);
 
-  const listAVLanguage = await Promise.all<List_AV_Language>([
+  const listAVLanguage = await Promise.all<List_AV_Language[]>([
     await db.$queryRaw`SELECT * FROM ceal.listav_language`,
   ]);
 
-  const ListEBookLanguage = await Promise.all<List_EBook_Language>([
+  const ListEBookLanguage = await Promise.all<List_EBook_Language[]>([
     await db.$queryRaw`SELECT * FROM ceal.listebook_language`,
   ]);
 
-  const ListEJournalLanguage = await Promise.all<List_EJournal_Language>([
+  const ListEJournalLanguage = await Promise.all<List_EJournal_Language[]>([
     await db.$queryRaw`SELECT * FROM ceal.listejournal_language`,
   ]);
   
@@ -343,127 +363,140 @@ async function main() {
 
   console.log('📥 Inserting fresh data from ceal schema...');
   
-  const response = await Promise.all([
-    await db.role.createMany({
+  // Fetch reference data from ceal schema (with original IDs) - using correct MySQL table/column names
+  console.log('🔍 Fetching refLibraryRegion data...');
+  const refRegions = await db.$queryRaw<{id: number, libraryregion: string}[]>`SELECT id, LibraryRegion as libraryregion FROM ceal.refLibraryRegion`;
+  
+  console.log('🔍 Fetching refLibraryType data...');  
+  const refTypes = await db.$queryRaw<{id: number, librarytype: string}[]>`SELECT id, LibraryType as librarytype FROM ceal.refLibraryType`;
+  
+  console.log('🔍 Using language data from MySQL dump (PostgreSQL ceal.language table not accessible)...');
+  const languages = [
+    { id: 1, short: "CHN", full: "Chinese" },
+    { id: 2, short: "JPN", full: "Japanese" },
+    { id: 3, short: "KOR", full: "Korean" },
+    { id: 4, short: "NON", full: "Non-CJK" },
+  ];
+  
+  // Step 1: Create reference tables first (no dependencies) - using original IDs
+  await Promise.all([
+    db.role.createMany({
       data: [
         { role: "ROLE_ADMIN", name: "Super Admin" },
         { role: "ROLE_MEMBER", name: "Member Institution" },
-        { role: "ROLE_ERESOURCE_EDITOR", name: "E-Resource Editor" },
+        { role: "ROLE_ERESOURCE_EDITOR", name: "E-Resource Editor" },  
         { role: "ROLE_ADMIN_ASSISTANT", name: "Assistant Admin" },
       ],
       skipDuplicates: true,
     }),
-    await db.reflibrarytype.createMany({
-      data: [
-        { librarytype: "Canadian University" },
-        { librarytype: "U.S. Non-University" },
-        { librarytype: "Private U.S. University" },
-        { librarytype: "Public U.S. University" },
-        { librarytype: "Canadian Non-University" },
-      ],
+    db.reflibrarytype.createMany({
+      data: refTypes,
       skipDuplicates: true,
     }),
-    await db.reflibraryregion.createMany({
-      data: [
-        { libraryregion: "New England" },
-        { libraryregion: "Middle Atlantic" },
-        { libraryregion: "East North Central" },
-        { libraryregion: "West North Central" },
-        { libraryregion: "South Atlantic" },
-        { libraryregion: "East South Central" },
-        { libraryregion: "West South Central" },
-        { libraryregion: "Mountain" },
-        { libraryregion: "Pacific" },
-        { libraryregion: "Canada" },
-        { libraryregion: "Mexico" },
-      ],
+    db.reflibraryregion.createMany({
+      data: refRegions,
       skipDuplicates: true,
     }),
-    await db.language.createMany({
-      data: [
-        { short: "CHN", full: "Chinese" },
-        { short: "JPN", full: "Japanese" },
-        { short: "KOR", full: "Korean" },
-        { short: "NON", full: "Non-CJK" },
-      ],
+    db.language.createMany({
+      data: languages,
       skipDuplicates: true,
     }),
-    await db.library.createMany({
-      data: libraries[0],
-    }),
-    await db.library_Year.createMany({
-      data: libraryYear[0],
-    }),
-    await db.list_AV.createMany({
+  ]);
+
+  // Step 2: Create dependent tables (libraries and their dependencies)
+  await db.library.createMany({
+    data: libraries[0],
+  });
+
+  // Step 3: Create library_Year first
+  await db.library_Year.createMany({
+    data: libraryYear[0],
+  });
+
+  // Step 4: Create list tables that depend on library_Year
+  await Promise.all([
+    db.list_AV.createMany({
       data: listAV[0],
     }),
-    await db.list_AV_Counts.createMany({
-      data: listAVCounts[0],
-    }),
-    await db.list_EBook.createMany({
+    db.list_EBook.createMany({
       data: listEBook[0],
     }),
-    await db.list_EBook_Counts.createMany({
-      data: listEBookCounts[0],
-    }),
-    await db.list_EJournal.createMany({
+    db.list_EJournal.createMany({
       data: listEJournal[0],
     }),
-    await db.list_EJournal_Counts.createMany({
+  ]);
+
+  // Step 5: Create list supporting tables that depend on list tables
+  await Promise.all([
+    db.list_AV_Counts.createMany({
+      data: listAVCounts[0],
+    }),
+    db.list_EBook_Counts.createMany({
+      data: listEBookCounts[0],
+    }),
+    db.list_EJournal_Counts.createMany({
       data: listEJournalCounts[0],
     }),
-    await db.list_AV_Language.createMany({
+    db.list_AV_Language.createMany({
       data: listAVLanguage[0],
     }),
-    await db.list_EBook_Language.createMany({
+    db.list_EBook_Language.createMany({
       data: ListEBookLanguage[0],
     }),
-    await db.list_EJournal_Language.createMany({
+    db.list_EJournal_Language.createMany({
       data: ListEJournalLanguage[0],
     }),
-    await db.libraryYear_ListAV.createMany({
+  ]);
+
+  // Step 6: Create junction tables (depend on library_Year and list tables)
+  await Promise.all([
+    db.libraryYear_ListAV.createMany({
       data: libraryYearListAV[0],
     }),
-    await db.libraryYear_ListEBook.createMany({
+    db.libraryYear_ListEBook.createMany({
       data: libraryYearListEBook[0],
     }),
-    await db.libraryYear_ListEJournal.createMany({
+    db.libraryYear_ListEJournal.createMany({
       data: libraryYearListEJournal[0],
     }),
-    await db.monographic_Acquisitions.createMany({
+  ]);
+
+  // Step 7: Create remaining data tables
+  const response = await Promise.all([
+    db.monographic_Acquisitions.createMany({
       data: monographicAcquisitions[0],
     }),
-    await db.personnel_Support.createMany({
+    db.personnel_Support.createMany({
       data: personnelSupport[0],
     }),
-    await db.other_Holdings.createMany({
+    db.other_Holdings.createMany({
       data: otherHoldings[0],
     }),
-    await db.electronic.createMany({
+    db.electronic.createMany({
       data: electronic[0],
     }),
-    await db.electronic_Books.createMany({
+    db.electronic_Books.createMany({
       data: electronicBooks[0],
     }),
-    await db.entry_Status.createMany({
+    db.entry_Status.createMany({
       data: entryStatus[0],
     }),
-    await db.exclude_Year.createMany({
+    db.exclude_Year.createMany({
       data: excludeYear[0],
     }),
-    await db.fiscal_Support.createMany({
+    db.fiscal_Support.createMany({
       data: fiscalSupport[0],
     }),
-    await db.serials.createMany({
+    db.serials.createMany({
       data: serials[0],
     }),
-    await db.volume_Holdings.createMany({
+    db.volume_Holdings.createMany({
       data: volumeHoldings[0],
     }),
-    await db.public_Services.createMany({
+    db.public_Services.createMany({
       data: publicServices,
     }),
-    await db.unprocessed_Backlog_Materials.createMany({
+    db.unprocessed_Backlog_Materials.createMany({
       data: unprocessedBacklogMaterials[0],
     }),
   ]);
