@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useId } from 'react'
+import { useEffect, useState } from 'react'
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ const years = Array.from({ length: yearLength }, (_, i) => beginYear + i);
 export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
   const router = useRouter();
   const [selectedYear, setSelectedYear] = useState(years[0]);
-  const id = useId();
 
   useEffect(() => {
     setSelectedYear(Number(yearCurrent));
@@ -36,7 +35,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     <div className='flex items-center justify-end my-4 gap-4'>
       <div className='flex flex-row self-end'>
         <Listbox value={selectedYear} onChange={handleChange}>
-          <Label id={`year-selector-label-${id}`} className='text-sky-600 mr-2 text-sm/6 md:text-normal'>
+          <Label id="year-selector-label" className='text-sky-600 mr-2 text-sm/6 md:text-normal'>
             Select Year:
           </Label>
           <div className='relative'>
