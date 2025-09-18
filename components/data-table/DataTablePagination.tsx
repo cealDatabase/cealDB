@@ -125,7 +125,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
               <span
                 className={`text-sm ${copyStatus === "success" ? "text-green-600" : "text-red-600"}`}
               >
-                {copyStatus === "success" ? copyMessage : `Copy Failed: ${copyMessage}`}
+                {copyStatus === "success" ? copyMessage : `Copy Failed`}
               </span>
             )}
             {/* Detailed record list */}
