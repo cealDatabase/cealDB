@@ -1,5 +1,6 @@
 import db from './db';
 import { headers } from 'next/headers';
+import { getCurrentUser } from './auth';
 
 export interface AuditLogData {
   userId?: number;
@@ -15,6 +16,23 @@ export interface AuditLogData {
 
 export async function logAuditEvent(data: AuditLogData, request?: Request) {
   try {
+    // Get current user if not provided
+    let userId = data.userId;
+    let username = data.username;
+    
+    if (!userId || !username) {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          userId = currentUser.id;
+          username = currentUser.username;
+        }
+      } catch (error) {
+        // Ignore errors getting current user - might not be authenticated
+        console.log('Could not get current user for audit log:', error);
+      }
+    }
+    
     // Extract client info from headers
     const headersList = await headers();
     const userAgent = headersList.get('user-agent');
@@ -33,8 +51,8 @@ export async function logAuditEvent(data: AuditLogData, request?: Request) {
 
     await db.auditLog.create({
       data: {
-        user_id: data.userId || null,
-        username: data.username || null,
+        user_id: userId || null,
+        username: username || null,
         action: data.action,
         table_name: data.tableName || null,
         record_id: data.recordId?.toString() || null,
@@ -50,6 +68,28 @@ export async function logAuditEvent(data: AuditLogData, request?: Request) {
     // Log to console if audit logging fails (don't throw to avoid breaking main operation)
     console.error('Audit logging failed:', error);
   }
+}
+
+// Simplified audit logging that automatically gets current user
+export async function logUserAction(
+  action: AuditLogData['action'],
+  tableName?: string,
+  recordId?: string | number,
+  oldValues?: any,
+  newValues?: any,
+  success: boolean = true,
+  errorMessage?: string,
+  request?: Request
+) {
+  await logAuditEvent({
+    action,
+    tableName,
+    recordId,
+    oldValues,
+    newValues,
+    success,
+    errorMessage,
+  }, request);
 }
 
 // Helper function to get record before deletion/update

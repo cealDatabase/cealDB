@@ -1,7 +1,7 @@
 // /app/api/av/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { logAuditEvent } from "@/lib/auditLogger";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -110,19 +110,22 @@ export async function POST(req: Request) {
     }
 
     // ✅ Log successful creation
-    await logAuditEvent({
-      action: 'CREATE',
-      tableName: 'List_AV',
-      recordId: newAV.id.toString(),
-      newValues: {
+    await logUserAction(
+      'CREATE',
+      'List_AV',
+      newAV.id.toString(),
+      undefined, // oldValues
+      {
         title: newAV.title,
         type: newAV.type,
         year: Number(year),
         counts: Number(counts),
         languages: language.length,
       },
-      success: true,
-    }, req);
+      true, // success
+      undefined, // errorMessage
+      req
+    );
 
     // ✅ Return response
     return NextResponse.json({ 
@@ -142,12 +145,16 @@ export async function POST(req: Request) {
     console.error("API error (create AV):", error);
 
     // Log failed creation
-    await logAuditEvent({
-      action: 'CREATE',
-      tableName: 'List_AV',
-      success: false,
-      errorMessage: error?.message || 'Unknown error',
-    }, req);
+    await logUserAction(
+      'CREATE',
+      'List_AV',
+      undefined, // recordId
+      undefined, // oldValues
+      undefined, // newValues
+      false, // success
+      error?.message || 'Unknown error',
+      req
+    );
 
     // Handle Prisma P2002 unique constraint violations
     if (error.code === 'P2002') {
