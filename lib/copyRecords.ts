@@ -6,6 +6,17 @@ export interface CopyRecord {
   counts: number;
 }
 
+export interface CopyRecordsResult {
+  processed: number;
+}
+
+export interface CopyRecordsError {
+  error: string;
+  detail: string;
+  duplicateRecords?: number[];
+  totalDuplicates?: number;
+}
+
 /**
  * Copies count records from an existing year to a target year
  * Used by the admin UI to easily copy library stats between years
@@ -13,6 +24,7 @@ export interface CopyRecord {
  * @param targetYear Target year to copy counts to
  * @param records Array of {id, counts} to copy
  * @returns Object with count of processed records
+ * @throws Error with detailed information if duplicates are found or other errors occur
  */
 export async function copyRecords(
   resource: ResourceType,
@@ -42,8 +54,25 @@ export async function copyRecords(
     });
     
     if (!resp.ok) {
-      const errorText = await resp.text();
-      throw new Error(`API error: ${resp.status} - ${errorText}`);
+      try {
+        const errorData: CopyRecordsError = await resp.json();
+        
+        // Handle duplicate records error with detailed information
+        if (resp.status === 409 && errorData.duplicateRecords) {
+          const duplicateList = errorData.duplicateRecords.join(', ');
+          throw new Error(
+            `Cannot copy records: ${errorData.totalDuplicates} duplicate record(s) already exist for ${resource} in year ${targetYear}. ` +
+            `Duplicate record IDs: ${duplicateList}. Please choose a different target year or remove existing records first.`
+          );
+        }
+        
+        // Handle other API errors
+        throw new Error(errorData.detail || errorData.error || `API error: ${resp.status}`);
+      } catch (parseError) {
+        // Fallback if JSON parsing fails
+        const errorText = await resp.text();
+        throw new Error(`API error: ${resp.status} - ${errorText}`);
+      }
     }
     
     const result = await resp.json();

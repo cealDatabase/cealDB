@@ -73,9 +73,37 @@ export async function POST(request: Request) {
       listRefField
     });
 
+    // First, check for existing records to prevent duplicates
+    console.log(`/api/copy-records: Checking for existing records in target year ${targetYear}`);
+    const recordIds = records.map((r: CopyRecord) => Number(r.id));
+    
+    const existingRecords = await countsModel.findMany({
+      where: {
+        [listRefField]: { in: recordIds },
+        year: targetYear
+      },
+      select: {
+        [listRefField]: true,
+        year: true,
+        id: true
+      }
+    });
+    
+    if (existingRecords.length > 0) {
+      const duplicateIds = existingRecords.map((r: any) => r[listRefField]);
+      console.log(`/api/copy-records: Found ${existingRecords.length} existing records`, { duplicateIds });
+      
+      return NextResponse.json({
+        error: "Duplicate records found",
+        detail: `Records already exist for ${resource} in year ${targetYear}. Cannot copy existing records.`,
+        duplicateRecords: duplicateIds,
+        totalDuplicates: existingRecords.length
+      }, { status: 409 }); // Conflict status
+    }
+    
     // Process each record with detailed logging
     const processedRecords = [];
-    console.log(`/api/copy-records: Starting to process ${records.length} records`);
+    console.log(`/api/copy-records: No duplicates found. Starting to process ${records.length} records`);
     
     // Get the max ID once before processing any records
     let nextId: number;
@@ -99,53 +127,31 @@ export async function POST(request: Request) {
       console.log(`/api/copy-records: Processing record`, { id: idNum, counts: val, year: yearNum });
       
       try {
-        // First try to update existing row
-        console.log(`/api/copy-records: Attempting update for record ${idNum}`);
-        const updateRes = await countsModel.updateMany({
-          where: { [listRefField]: idNum, year: yearNum },
-          data: { [countsField]: val, updatedat: new Date(), ishidden: false },
+        // Since we've already checked for duplicates, we can directly create new records
+        const recordId = nextId++; // increment after use
+        console.log(`/api/copy-records: Using ID ${recordId} for new record`);
+        
+        // Create with explicit ID
+        const newRecord = await countsModel.create({
+          data: {
+            id: recordId,
+            [listRefField]: idNum,
+            [countsField]: val,
+            year: yearNum,
+            updatedat: new Date(),
+            ishidden: false,
+          },
         });
         
-        console.log(`/api/copy-records: Update result for ${idNum}`, { updated: updateRes.count });
+        console.log(`/api/copy-records: Successfully created record`, { 
+          id: newRecord.id,
+          [listRefField]: newRecord[listRefField],
+          year: newRecord.year
+        });
         
-        // If no row existed, create one
-        if (updateRes.count === 0) {
-          console.log(`/api/copy-records: No existing record found for ${idNum}, creating new`);
-          
-          try {
-            // Use the pre-calculated nextId 
-            const recordId = nextId++; // increment after use
-            console.log(`/api/copy-records: Using ID ${recordId} for new record`);
-            
-            // Create with explicit ID
-            const newRecord = await countsModel.create({
-              data: {
-                id: recordId,
-                [listRefField]: idNum,
-                [countsField]: val,
-                year: yearNum,
-                updatedat: new Date(),
-                ishidden: false,
-              },
-            });
-            
-            console.log(`/api/copy-records: Successfully created record`, { 
-              id: newRecord.id,
-              [listRefField]: newRecord[listRefField],
-              year: newRecord.year
-            });
-            
-            processedRecords.push(newRecord);
-          } catch (e: any) {
-            console.error(`/api/copy-records: Error creating record for ${idNum}`, e);
-            throw e;
-          }
-        } else {
-          console.log(`/api/copy-records: Updated existing record for ${idNum}`);
-          processedRecords.push({ id: idNum, updated: true });
-        }
+        processedRecords.push(newRecord);
       } catch (e: any) {
-        console.error(`/api/copy-records: Error processing record ${idNum}`, e);
+        console.error(`/api/copy-records: Error creating record for ${idNum}`, e);
         throw e;
       }
     }

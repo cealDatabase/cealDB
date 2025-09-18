@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     const ch = chapters == null || chapters === "" ? null : Number(chapters);
 
     const newBook = await db.$transaction(async (tx) => {
-      // 1) Parent row
+      // 1) Parent row - handle potential duplicates gracefully
       const book = await tx.list_EBook.create({
         data: {
           title: title?.trim() ?? null,
@@ -61,12 +61,13 @@ export async function POST(req: Request) {
         },
       });
 
-      // 2) Link to Library_Year (m–m)
-      await tx.libraryYear_ListEBook.create({
-        data: { libraryyear_id: year, listebook_id: book.id },
+      // 2) Link to Library_Year (m–m) - use createMany with skipDuplicates
+      await tx.libraryYear_ListEBook.createMany({
+        data: [{ libraryyear_id: year, listebook_id: book.id }],
+        skipDuplicates: true,
       });
 
-      // 3) Per-year counts row (includes volumes/chapters)
+      // 3) Per-year counts row - simple create (no unique constraints other than ID)
       await tx.list_EBook_Counts.create({
         data: {
           listebook: book.id,
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
         },
       });
 
-      // 4) Languages
+      // 4) Languages - already using skipDuplicates
       if (Array.isArray(language) && language.length) {
         const rows = language
           .map((v: any) => Number(v))
@@ -100,8 +101,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, newBook });
   } catch (err: any) {
     console.error("EBook create failed:", err);
+    
+    // Handle Prisma P2002 unique constraint violations
+    if (err.code === 'P2002') {
+      return NextResponse.json(
+        { 
+          error: "Duplicate entry detected", 
+          detail: "A record with these values already exists. Please check your data and try again.",
+          field: err.meta?.target || 'unknown'
+        },
+        { status: 409 } // Conflict status
+      );
+    }
+    
+    // Handle other Prisma errors
+    if (err.code?.startsWith('P')) {
+      return NextResponse.json(
+        { error: "Database error", detail: "Please try again or contact support." },
+        { status: 500 }
+      );
+    }
+    
+    // Handle general errors
     return NextResponse.json(
-      { error: "Failed to create E-Book", detail: err?.message },
+      { error: "Failed to create E-Book", detail: "An unexpected error occurred." },
       { status: 500 }
     );
   }

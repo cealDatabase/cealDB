@@ -149,8 +149,29 @@ export async function POST(req: Request) {
       errorMessage: error?.message || 'Unknown error',
     }, req);
 
+    // Handle Prisma P2002 unique constraint violations
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { 
+          error: "Duplicate entry detected", 
+          detail: "A record with these values already exists. Please check your data and try again.",
+          field: error.meta?.target || 'unknown'
+        },
+        { status: 409 } // Conflict status
+      );
+    }
+    
+    // Handle other Prisma errors
+    if (error.code?.startsWith('P')) {
+      return NextResponse.json(
+        { error: "Database error", detail: "Please try again or contact support." },
+        { status: 500 }
+      );
+    }
+
+    // Handle general errors
     return NextResponse.json(
-      { error: "Failed to create AV record", detail: error?.message },
+      { error: "Failed to create AV record", detail: "An unexpected error occurred." },
       { status: 500 }
     );
   }

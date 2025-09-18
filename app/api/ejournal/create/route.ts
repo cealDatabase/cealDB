@@ -64,9 +64,10 @@ export async function POST(req: Request) {
         },
       });
 
-      // 2) m-m link
-      await tx.libraryYear_ListEJournal.create({
-        data: { libraryyear_id: year, listejournal_id: journal.id },
+      // 2) m-m link - handle duplicates
+      await tx.libraryYear_ListEJournal.createMany({
+        data: [{ libraryyear_id: year, listejournal_id: journal.id }],
+        skipDuplicates: true,
       });
 
       // 3) per-year counts
@@ -105,8 +106,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, newJournal });
   } catch (err: any) {
     console.error("E-Journal create failed:", err);
+    
+    // Handle Prisma P2002 unique constraint violations
+    if (err.code === 'P2002') {
+      return NextResponse.json(
+        { 
+          error: "Duplicate entry detected", 
+          detail: "A record with these values already exists. Please check your data and try again.",
+          field: err.meta?.target || 'unknown'
+        },
+        { status: 409 } // Conflict status
+      );
+    }
+    
+    // Handle other Prisma errors
+    if (err.code?.startsWith('P')) {
+      return NextResponse.json(
+        { error: "Database error", detail: "Please try again or contact support." },
+        { status: 500 }
+      );
+    }
+    
+    // Handle general errors
     return NextResponse.json(
-      { error: "Failed to create E-Journal", detail: err?.message },
+      { error: "Failed to create E-Journal", detail: "An unexpected error occurred." },
       { status: 500 }
     );
   }
