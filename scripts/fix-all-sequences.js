@@ -20,7 +20,7 @@ const TABLES = [
   "Public_Services",
   "Electronic",
   "Electronic_Books",
-  "User",
+  // "User",
 ];
 
 async function resetSequenceFor(table) {

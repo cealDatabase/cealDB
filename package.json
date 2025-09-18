@@ -7,8 +7,12 @@
   "scripts": {
     "start": "next start",
     "dev": "next dev --turbo",
-    "build": "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js && next build",
-    "prisma": "prisma generate --schema=./prisma/schema && prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
+    "build": "prisma generate --schema=./prisma/schema && next build",
+    "db:push": "prisma db push --schema=./prisma/schema",
+    "db:reset": "prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
+    "db:seed": "prisma db seed && node scripts/fix-all-sequences.js",
+    "db:migrate": "prisma migrate dev --schema=./prisma/schema",
+    "prisma:studio": "prisma studio --schema=./prisma/schema",
     "lint": "next lint"
   },
   "prisma": {

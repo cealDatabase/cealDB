@@ -8,15 +8,24 @@ import { Button } from "@/components/ui/button";
 
 // Generate list of years option from 2017 to current year
 const beginYear = 2017;
-const yearLength = Number(new Date().getFullYear()) - beginYear + 1;
-const years = Array.from({ length: yearLength }, (_, i) => beginYear + i);
 
 export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     const router = useRouter();
-    const [selectedYear, setSelectedYear] = useState(years[0]);
+    const [selectedYear, setSelectedYear] = useState<number>(beginYear);
+    const [years, setYears] = useState<number[]>([]);
+    const [isClient, setIsClient] = useState(false);
 
+    // Initialize client-side state and years array
     useEffect(() => {
-        setSelectedYear(Number(yearCurrent));
+        setIsClient(true);
+        const currentYear = new Date().getFullYear();
+        const yearLength = currentYear - beginYear + 1;
+        const yearsArray = Array.from({ length: yearLength }, (_, i) => beginYear + i);
+        setYears(yearsArray);
+        
+        if (yearCurrent) {
+            setSelectedYear(Number(yearCurrent));
+        }
     }, [yearCurrent]);
 
     const handleChange = (year: number) => {
@@ -25,11 +34,33 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     };
 
     const handleCreateClick = () => {
+        if (!isClient) return; // Prevent SSR issues
         const currentPath = window.location.pathname; // e.g., /admin/survey/avdb/2024
         const segments = currentPath.split("/");
         const type = segments[segments.indexOf("survey") + 1]; // avdb, ebook, ejournal
         router.push(`/admin/survey/${type}/create?year=${selectedYear}`);
     };
+
+    // Show loading state during hydration
+    if (!isClient || years.length === 0) {
+        return (
+            <div className='flex items-center justify-end my-4 gap-4'>
+                <div className='flex flex-row self-end'>
+                    <div className="text-sky-600 mr-2 text-sm/6 md:text-normal">
+                        Select Year:
+                    </div>
+                    <div className="grid cursor-default grid-cols-1 rounded-md bg-white px-3 pb-0.5 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        <span className="col-start-1 row-start-1 truncate pr-6 text-sky-600 text-sm/6 md:text-normal">
+                            {selectedYear}
+                        </span>
+                    </div>
+                </div>
+                <Button disabled className='ml-4 text-sm px-4 py-0 md:text-normal'>
+                    Create New Entry
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className='flex items-center justify-end my-4 gap-4'>
