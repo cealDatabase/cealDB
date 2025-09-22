@@ -93,12 +93,31 @@ export async function POST(request: Request) {
       const duplicateIds = existingRecords.map((r: any) => r[listRefField]);
       console.log(`/api/copy-records: Found ${existingRecords.length} existing records`, { duplicateIds });
       
-      return NextResponse.json({
-        error: "Duplicate records found",
-        detail: `Records already exist for ${resource} in year ${targetYear}. Cannot copy existing records.`,
-        duplicateRecords: duplicateIds,
-        totalDuplicates: existingRecords.length
-      }, { status: 409 }); // Conflict status
+      // Check if ALL requested records already exist
+      const allRecordsExist = recordIds.every((id: number) => duplicateIds.includes(id));
+      
+      if (allRecordsExist) {
+        // All records already exist - this is success, not an error
+        return NextResponse.json({
+          success: true,
+          alreadyExists: true,
+          processed: 0,
+          existingCount: existingRecords.length,
+          message: `All ${existingRecords.length} record(s) already exist for ${resource} in year ${targetYear}. No copying needed.`,
+          duplicateRecords: duplicateIds
+        }, { status: 200 });
+      } else {
+        // Some records exist, some don't - this is a partial conflict
+        const newRecordIds = recordIds.filter((id: number) => !duplicateIds.includes(id));
+        return NextResponse.json({
+          error: "Partial duplicate records found",
+          detail: `${duplicateIds.length} of ${recordIds.length} records already exist for ${resource} in year ${targetYear}. Cannot copy due to partial duplicates.`,
+          duplicateRecords: duplicateIds,
+          newRecords: newRecordIds,
+          totalDuplicates: existingRecords.length,
+          totalRequested: recordIds.length
+        }, { status: 409 }); // Conflict status for partial duplicates
+      }
     }
     
     // Process each record with detailed logging

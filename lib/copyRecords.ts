@@ -8,6 +8,9 @@ export interface CopyRecord {
 
 export interface CopyRecordsResult {
   processed: number;
+  alreadyExists?: boolean;
+  existingCount?: number;
+  message?: string;
 }
 
 export interface CopyRecordsError {
@@ -15,6 +18,7 @@ export interface CopyRecordsError {
   detail: string;
   duplicateRecords?: number[];
   totalDuplicates?: number;
+  totalRequested?: number;
 }
 
 /**
@@ -30,7 +34,7 @@ export async function copyRecords(
   resource: ResourceType,
   targetYear: number,
   records: CopyRecord[],
-): Promise<{ processed: number }> {
+): Promise<CopyRecordsResult> {
   // Validate input
   if (!Array.isArray(records) || records.length === 0) return { processed: 0 };
   if (!targetYear) throw new Error("Target year required");
@@ -57,21 +61,26 @@ export async function copyRecords(
       try {
         const errorData: CopyRecordsError = await resp.json();
         
-        // Handle duplicate records error with detailed information
+        // Handle partial duplicate records error with detailed information
         if (resp.status === 409 && errorData.duplicateRecords) {
           const duplicateList = errorData.duplicateRecords.join(', ');
           throw new Error(
-            `Cannot copy records: ${errorData.totalDuplicates} duplicate record(s) already exist for ${resource} in year ${targetYear}. ` +
-            `Duplicate record IDs: ${duplicateList}. Please choose a different target year or remove existing records first.`
+            `Cannot copy records: ${errorData.totalDuplicates} of ${errorData.totalRequested} record(s) already exist for ${resource} in year ${targetYear}. ` +
+            `Existing record IDs: ${duplicateList}. Please choose a different target year or remove existing records first.`
           );
         }
         
         // Handle other API errors
         throw new Error(errorData.detail || errorData.error || `API error: ${resp.status}`);
       } catch (parseError) {
-        // Fallback if JSON parsing fails
-        const errorText = await resp.text();
-        throw new Error(`API error: ${resp.status} - ${errorText}`);
+        // Fallback if JSON parsing fails - clone response to avoid "Body already read" error
+        const respClone = resp.clone();
+        try {
+          const errorText = await respClone.text();
+          throw new Error(`API error: ${resp.status} - ${errorText}`);
+        } catch (textError) {
+          throw new Error(`API error: ${resp.status} - Unable to read response body`);
+        }
       }
     }
     
