@@ -69,11 +69,19 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
 
       // Call server action
       console.log("[handleCopy] calling copyCounts server action...");
-      await copyCounts(apiResource as ResourceType, targetYear, records);
-      console.log("[handleCopy] server action resolved");
+      const result = await copyCounts(apiResource as ResourceType, targetYear, records);
+      console.log("[handleCopy] server action resolved", result);
 
       setCopyStatus("success");
-      setCopyMessage("Copy Success");
+      
+      // Handle different success scenarios
+      if (result.alreadyExists) {
+        setCopyMessage(`Already copied: All ${result.existingCount} record(s) already exist in year ${targetYear}`);
+      } else if (result.processed > 0) {
+        setCopyMessage(`Copy Success: ${result.processed} record(s) copied to year ${targetYear}`);
+      } else {
+        setCopyMessage("Copy Success");
+      }
 
       // // Navigate to the target year page so the user can immediately see the copied data
       // const newPath = pathname.replace(/\d{4}$/g, String(targetYear));
