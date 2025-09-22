@@ -15,8 +15,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -37,14 +37,14 @@ jobs:
         
       - name: Setup test database
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
         run: |
           npx prisma generate --schema=./prisma/schema
           npx prisma db push --schema=./prisma/schema
           
       - name: Run sequence health check
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
         run: npm run db:check
 
   deploy:
@@ -109,5 +109,5 @@ jobs:
         
       - name: Verify deployment
         env:
-          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
         run: npm run db:verify
