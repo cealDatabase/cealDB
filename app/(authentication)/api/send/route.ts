@@ -4,9 +4,18 @@ import db from "@/lib/db";
 import { ResetEmailTemplate } from "@/components/ResetEmailTmpt";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: Request) {
+  // Check if RESEND_API_KEY is available
+  if (!process.env.RESEND_API_KEY) {
+    return Response.json(
+      { message: "Error. Email service not configured" },
+      { status: 500 }
+    );
+  }
+
+  // Initialize Resend client at runtime
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   // Read data off req body
   const body = await request.json();
   const { username } = body;
