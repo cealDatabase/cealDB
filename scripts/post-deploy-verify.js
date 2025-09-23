@@ -47,7 +47,7 @@ async function testSequenceOperations() {
         const testEBook = await prisma.list_EBook.create({
           data: {
             title: "SEQUENCE_TEST_EBOOK",
-            type: "test",
+            description: "test verification record",
             is_global: false,
             updated_at: new Date(),
           }
@@ -65,6 +65,35 @@ async function testSequenceOperations() {
         
         await prisma.list_EBook_Counts.delete({ where: { id: testCount.id } });
         await prisma.list_EBook.delete({ where: { id: testEBook.id } });
+        
+        return { success: true, id: testCount.id };
+      }
+    },
+    {
+      name: "List_EJournal_Counts", 
+      test: async () => {
+        const testEJournal = await prisma.list_EJournal.create({
+          data: {
+            title: "SEQUENCE_TEST_EJOURNAL",
+            description: "test verification record",
+            is_global: false,
+            updated_at: new Date(),
+          }
+        });
+        
+        const testCount = await prisma.list_EJournal_Counts.create({
+          data: {
+            journals: 1,
+            dbs: 1,
+            year: 2025,
+            updatedat: new Date(),
+            ishidden: false,
+            listejournal: testEJournal.id,
+          }
+        });
+        
+        await prisma.list_EJournal_Counts.delete({ where: { id: testCount.id } });
+        await prisma.list_EJournal.delete({ where: { id: testEJournal.id } });
         
         return { success: true, id: testCount.id };
       }
