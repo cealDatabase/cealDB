@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+
     // Check if RESEND_API_KEY is available
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
