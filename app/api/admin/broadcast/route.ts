@@ -4,7 +4,6 @@ import { Resend } from 'resend';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +24,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+
+    // Check if RESEND_API_KEY is available
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: 'Email service not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Initialize Resend at runtime
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const openDate = new Date(openingDate);
     const closeDate = new Date(openDate);

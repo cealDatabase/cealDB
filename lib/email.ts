@@ -1,9 +1,6 @@
 // lib/email.ts (server-only)
 import { Resend } from 'resend';
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
@@ -22,6 +19,9 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       console.error('Email configuration missing: RESEND_API_KEY required');
       return false;
     }
+
+    // Initialize Resend at runtime
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
       from: "CEAL Statistics Database System <admin@cealstats.org>",
@@ -57,6 +57,9 @@ export async function sendPasswordResetEmail(
       console.error('Email configuration missing: RESEND_API_KEY required');
       return false;
     }
+
+    // Initialize Resend at runtime
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
       from: "CEAL Statistics Database System <admin@cealstats.org>",
@@ -157,6 +160,9 @@ export async function sendWelcomeEmail(
       console.error('Email configuration missing: RESEND_API_KEY required');
       return false;
     }
+
+    // Initialize Resend at runtime
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
       from: "CEAL Statistics Database System <admin@cealstats.org>",
