@@ -24,7 +24,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "CEAL Database System <admin@cealstats.org>",
+      from: "CEAL Statistics Database System <admin@cealstats.org>",
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -59,7 +59,7 @@ export async function sendPasswordResetEmail(
     }
 
     const { data, error } = await resend.emails.send({
-      from: "CEAL Database System <admin@cealstats.org>",
+      from: "CEAL Statistics Database System <admin@cealstats.org>",
       to: email,
       subject: isInitialSetup ? 'CEAL Database - Set Up Your Password' : 'CEAL Database - Password Reset Required',
       html: `
@@ -89,7 +89,7 @@ export async function sendPasswordResetEmail(
         <body>
           <div class="container">
             <div class="header">
-              <h1>CEAL Database System</h1>
+              <h1>CEAL Statistics Database System</h1>
               <h2>${isInitialSetup ? 'Set Up Your Password' : 'Password Reset Required'}</h2>
             </div>
             
@@ -123,7 +123,7 @@ export async function sendPasswordResetEmail(
             </div>
             
             <div class="footer">
-              <p>This is an automated message from the CEAL Database System. Please do not reply to this email.</p>
+              <p>This is an automated message from the CEAL Statistics Database System. Please do not reply to this email.</p>
               <p>If you did not expect this email, please contact your administrator immediately.</p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export async function sendWelcomeEmail(
     }
 
     const { data, error } = await resend.emails.send({
-      from: "CEAL Database System <admin@cealstats.org>",
+      from: "CEAL Statistics Database System <admin@cealstats.org>",
       to: email,
       subject: 'Welcome to CEAL Database - Set Your Password',
       html: `
@@ -216,7 +216,7 @@ export async function sendWelcomeEmail(
             </div>
             
             <div class="footer">
-              <p>This is an automated message from the CEAL Database System. Please do not reply to this email.</p>
+              <p>This is an automated message from the CEAL StatisticsDatabase System. Please do not reply to this email.</p>
             </div>
           </div>
         </body>

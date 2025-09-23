@@ -2,8 +2,9 @@
 
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import BroadcastFormModal from '@/components/BroadcastFormModal'
 
 const openNewYearForm = async () => {
     // Show loading message
@@ -108,13 +109,71 @@ const openNewYearForm = async () => {
 
 const adminHelp = () => {
     const currentYear = new Date().getFullYear();
+    const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+    const [userInfo, setUserInfo] = useState<{userId: number, userRoles: string[]} | null>(null);
+
+    // Get user info from cookies on component mount
+    useEffect(() => {
+        const getUserInfo = () => {
+            // Get user info from cookies (this should match your authentication system)
+            const userIdCookie = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('userId='))
+                ?.split('=')[1];
+            
+            const userRolesCookie = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('userRoles='))
+                ?.split('=')[1];
+
+            if (userIdCookie && userRolesCookie) {
+                try {
+                    const roles = JSON.parse(decodeURIComponent(userRolesCookie));
+                    setUserInfo({
+                        userId: parseInt(userIdCookie),
+                        userRoles: roles
+                    });
+                } catch (error) {
+                    console.error('Failed to parse user info from cookies:', error);
+                }
+            }
+        };
+
+        getUserInfo();
+    }, []);
+
     return (
         <>
             <h1>Admin Help</h1>
             <Container>
-                <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
-                <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
-                <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
+                <div className="mb-6 space-y-4">
+                    <div className="flex flex-wrap gap-4">
+                        <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
+                        <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
+                        <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
+                        
+                        {/* New Broadcast Button - Only show for super admins */}
+                        {userInfo && userInfo.userRoles.includes('1') && (
+                            <Button 
+                                className='w-[250px] bg-blue-600 hover:bg-blue-700' 
+                                onClick={() => setShowBroadcastModal(true)}
+                            >
+                                📧 Open Forms & Broadcast
+                            </Button>
+                        )}
+                    </div>
+                    
+                    {/* Info box for broadcast feature */}
+                    {userInfo && userInfo.userRoles.includes('1') && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h3 className="font-semibold text-blue-800 mb-2">📧 Form Broadcasting System</h3>
+                            <p className="text-sm text-blue-700">
+                                Use "Open Forms & Broadcast" to create a new form session, open all library forms for editing (62-day period), 
+                                and automatically send notification emails to all CEAL members.
+                            </p>
+                        </div>
+                    )}
+                </div>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>
@@ -318,6 +377,16 @@ const adminHelp = () => {
                     <li>Find the file in the list, to the right of the file name you will see its URL.&nbsp; Copy and paste this as the link to the file.</li>
                 </ol>
             </Container>
+            
+            {/* Broadcast Modal */}
+            {userInfo && (
+                <BroadcastFormModal
+                    isOpen={showBroadcastModal}
+                    onClose={() => setShowBroadcastModal(false)}
+                    userId={userInfo.userId}
+                    userRoles={userInfo.userRoles}
+                />
+            )}
         </>
     )
 }
