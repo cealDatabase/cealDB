@@ -12,7 +12,7 @@ export async function copyCounts(
   resource: ResourceType,
   targetYear: number,
   records: CopyRecord[],
-): Promise<{ processed: number }> {
+): Promise<{ processed: number; alreadyExists?: boolean; existingCount?: number; message?: string }> {
   // Basic argument validation
   if (!Array.isArray(records) || typeof targetYear !== "number") {
     throw new Error("Invalid payload for copyCounts");
