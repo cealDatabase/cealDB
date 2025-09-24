@@ -11,7 +11,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 import { copyCounts } from "@/actions/copyCounts";
-import type { ResourceType } from "@/lib/copyRecords";
+import type { ResourceType, CopyRecordsResult } from "@/lib/copyRecords";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +33,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
 
   const [targetYear, setTargetYear] = useState<number>(new Date().getFullYear());
   const [isCopying, setIsCopying] = useState(false);
-  const [copyStatus, setCopyStatus] = useState<"" | "success" | "error">("");
+  const [copyStatus, setCopyStatus] = useState<"" | "success" | "error" | "warning">("");
   const [copyMessage, setCopyMessage] = useState<string>("");
   const [copiedRecords, setCopiedRecords] = useState<{ id: number; counts: number }[]>([]);
 
@@ -72,14 +72,18 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
       const result = await copyCounts(apiResource as ResourceType, targetYear, records);
       console.log("[handleCopy] server action resolved", result);
 
-      setCopyStatus("success");
-      
-      // Handle different success scenarios
+      // Handle different result scenarios with appropriate status
       if (result.alreadyExists) {
+        setCopyStatus("warning");
         setCopyMessage(`Already copied: All ${result.existingCount} record(s) already exist in year ${targetYear}`);
+      } else if (result.isPartialCopy) {
+        setCopyStatus("success");
+        setCopyMessage(`Partial Copy Success: ${result.processed} new record(s) copied, ${result.skippedCount} already existed in year ${targetYear}. Database sequences synchronized.`);
       } else if (result.processed > 0) {
-        setCopyMessage(`Copy Success: ${result.processed} record(s) copied to year ${targetYear}`);
+        setCopyStatus("success");
+        setCopyMessage(`Copy Success: ${result.processed} record(s) copied to year ${targetYear}. Database sequences synchronized.`);
       } else {
+        setCopyStatus("success");
         setCopyMessage("Copy Success");
       }
 
@@ -131,9 +135,15 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
             {/* Feedback message */}
             {copyStatus && (
               <span
-                className={`text-sm ${copyStatus === "success" ? "text-green-600" : "text-red-600"}`}
+                className={`text-sm ${
+                  copyStatus === "success" 
+                    ? "text-green-600" 
+                    : copyStatus === "warning" 
+                    ? "text-orange-700" 
+                    : "text-red-600"
+                }`}
               >
-                {copyStatus === "success" ? copyMessage : `Copy Failed`}
+                {copyStatus === "error" ? "Copy Failed" : copyMessage}
               </span>
             )}
             {/* Detailed record list */}
@@ -155,11 +165,11 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => table.setPageSize(Number(value))}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-8 w-[80px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top" className="bg-white">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {[20, 50, 100, 200].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

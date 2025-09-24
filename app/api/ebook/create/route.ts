@@ -1,6 +1,7 @@
 // /app/api/ebook/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { handleP2002WithSequenceFix, SEQUENCE_TABLES } from "@/lib/sequenceFixer";
 
 export async function POST(req: Request) {
   try {
@@ -42,61 +43,67 @@ export async function POST(req: Request) {
     const vol = volumes == null || volumes === "" ? null : Number(volumes);
     const ch = chapters == null || chapters === "" ? null : Number(chapters);
 
-    const newBook = await db.$transaction(async (tx) => {
-      // 1) Parent row - handle potential duplicates gracefully
-      const book = await tx.list_EBook.create({
-        data: {
-          title: title?.trim() ?? null,
-          subtitle: subtitle?.trim() ?? null,
-          sub_series_number: sub_series_number?.trim() ?? null,
-          description: description?.trim() ?? null,
-          notes: notes?.trim() ?? null,
-          publisher: publisher?.trim() ?? null,
-          data_source: data_source?.trim() ?? null,
-          cjk_title: cjk_title?.trim() ?? null,
-          romanized_title: romanized_title?.trim() ?? null,
-          is_global: Boolean(is_global),
-          updated_at: new Date(),
-          libraryyear: year,
-        },
-      });
+    const newBook = await handleP2002WithSequenceFix(
+      () => db.$transaction(async (tx) => {
+        // 1) Parent row - handle potential duplicates gracefully
+        const book = await tx.list_EBook.create({
+          data: {
+            title: title?.trim() ?? null,
+            subtitle: subtitle?.trim() ?? null,
+            sub_series_number: sub_series_number?.trim() ?? null,
+            description: description?.trim() ?? null,
+            notes: notes?.trim() ?? null,
+            publisher: publisher?.trim() ?? null,
+            data_source: data_source?.trim() ?? null,
+            cjk_title: cjk_title?.trim() ?? null,
+            romanized_title: romanized_title?.trim() ?? null,
+            is_global: Boolean(is_global),
+            updated_at: new Date(),
+            libraryyear: year,
+          },
+        });
 
-      // 2) Link to Library_Year (m–m) - use createMany with skipDuplicates
-      await tx.libraryYear_ListEBook.createMany({
-        data: [{ libraryyear_id: year, listebook_id: book.id }],
-        skipDuplicates: true,
-      });
+        // 2) Link to Library_Year (m–m) - use createMany with skipDuplicates
+        await tx.libraryYear_ListEBook.createMany({
+          data: [{ libraryyear_id: year, listebook_id: book.id }],
+          skipDuplicates: true,
+        });
 
-      // 3) Per-year counts row - simple create (no unique constraints other than ID)
-      await tx.list_EBook_Counts.create({
-        data: {
-          listebook: book.id,
-          year,
-          titles,
-          volumes: vol,
-          chapters: ch,
-          updatedat: new Date(),
-          ishidden: false,
-        },
-      });
+        // 3) Per-year counts row - wrapped with sequence fix
+        await handleP2002WithSequenceFix(
+          () => tx.list_EBook_Counts.create({
+            data: {
+              listebook: book.id,
+              year,
+              titles,
+              volumes: vol,
+              chapters: ch,
+              updatedat: new Date(),
+              ishidden: false,
+            },
+          }),
+          SEQUENCE_TABLES.EBOOK_COUNTS
+        );
 
-      // 4) Languages - already using skipDuplicates
-      if (Array.isArray(language) && language.length) {
-        const rows = language
-          .map((v: any) => Number(v))
-          .filter((n) => Number.isFinite(n))
-          .map((langId) => ({ listebook_id: book.id, language_id: langId }));
+        // 4) Languages - already using skipDuplicates
+        if (Array.isArray(language) && language.length) {
+          const rows = language
+            .map((v: any) => Number(v))
+            .filter((n) => Number.isFinite(n))
+            .map((langId) => ({ listebook_id: book.id, language_id: langId }));
 
-        if (rows.length) {
-          await tx.list_EBook_Language.createMany({
-            data: rows,
-            skipDuplicates: true,
-          });
+          if (rows.length) {
+            await tx.list_EBook_Language.createMany({
+              data: rows,
+              skipDuplicates: true,
+            });
+          }
         }
-      }
 
-      return book;
-    });
+        return book;
+      }),
+      SEQUENCE_TABLES.EBOOK
+    );
 
     return NextResponse.json({ success: true, newBook });
   } catch (err: any) {

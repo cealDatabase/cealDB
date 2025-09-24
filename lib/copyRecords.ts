@@ -11,6 +11,9 @@ export interface CopyRecordsResult {
   alreadyExists?: boolean;
   existingCount?: number;
   message?: string;
+  isPartialCopy?: boolean;
+  skippedCount?: number;
+  totalRequested?: number;
 }
 
 export interface CopyRecordsError {

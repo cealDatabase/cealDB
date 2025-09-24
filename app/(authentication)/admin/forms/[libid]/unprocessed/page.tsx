@@ -193,7 +193,7 @@ const UnprocessedPage = () => {
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="outline"
-            className="flex items-center gap-2 text-md bg-black text-white font-bold"
+            className="flex items-center gap-2 text-md font-bold"
             size="lg"
             onClick={() => setShowInstructions(!showInstructions)}
           >

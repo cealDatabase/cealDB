@@ -1,6 +1,6 @@
 'use server';
 
-import { copyRecords, ResourceType, CopyRecord } from "@/lib/copyRecords";
+import { copyRecords, ResourceType, CopyRecord, CopyRecordsResult } from "@/lib/copyRecords";
 
 /**
  * Server Action: copyCounts
@@ -12,7 +12,7 @@ export async function copyCounts(
   resource: ResourceType,
   targetYear: number,
   records: CopyRecord[],
-): Promise<{ processed: number; alreadyExists?: boolean; existingCount?: number; message?: string }> {
+): Promise<CopyRecordsResult> {
   // Basic argument validation
   if (!Array.isArray(records) || typeof targetYear !== "number") {
     throw new Error("Invalid payload for copyCounts");

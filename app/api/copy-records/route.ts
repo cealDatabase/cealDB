@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { ResourceType, CopyRecord, RESOURCE_TYPES } from "@/lib/copyRecords";
 import { logUserAction } from "@/lib/auditLogger";
+import { fixSequenceForTable } from "@/lib/sequenceFixer";
 
 // POST /api/copy-records
 // Expects JSON body: { resource: "av"|"ebook"|"ejournal", targetYear: number, records: Array<{id:number, counts:number}> }
@@ -107,22 +108,49 @@ export async function POST(request: Request) {
           duplicateRecords: duplicateIds
         }, { status: 200 });
       } else {
-        // Some records exist, some don't - this is a partial conflict
+        // Some records exist, some don't - filter out existing records and copy only new ones
         const newRecordIds = recordIds.filter((id: number) => !duplicateIds.includes(id));
-        return NextResponse.json({
-          error: "Partial duplicate records found",
-          detail: `${duplicateIds.length} of ${recordIds.length} records already exist for ${resource} in year ${targetYear}. Cannot copy due to partial duplicates.`,
-          duplicateRecords: duplicateIds,
-          newRecords: newRecordIds,
-          totalDuplicates: existingRecords.length,
-          totalRequested: recordIds.length
-        }, { status: 409 }); // Conflict status for partial duplicates
+        const newRecords = records.filter((r: CopyRecord) => !duplicateIds.includes(Number(r.id)));
+        
+        console.log(`/api/copy-records: Partial duplicates found. Processing ${newRecords.length} new records, skipping ${duplicateIds.length} existing ones`);
+        
+        // Store info about partial operation for response
+        var isPartialCopy = true;
+        var skippedCount = duplicateIds.length;
+        var originalRequestCount = recordIds.length;
+        
+        // Continue processing with filtered records
+        return await processRecords(newRecords, resource, targetYear, countsModel, countsField, listRefField, request, isPartialCopy, skippedCount, originalRequestCount);
       }
     }
     
+    // Process all records (no duplicates found)
+    return await processRecords(records, resource, targetYear, countsModel, countsField, listRefField, request, false, 0, records.length);
+  } catch (error: any) {
+    console.error("Error in copy-records API:", error);
+    return NextResponse.json(
+      { error: "Error copying records", detail: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+async function processRecords(
+  records: CopyRecord[], 
+  resource: ResourceType, 
+  targetYear: number, 
+  countsModel: any, 
+  countsField: string, 
+  listRefField: string, 
+  request: Request,
+  isPartialCopy: boolean = false,
+  skippedCount: number = 0,
+  originalRequestCount: number = 0
+) {
+  try {
     // Process each record with detailed logging
     const processedRecords = [];
-    console.log(`/api/copy-records: No duplicates found. Starting to process ${records.length} records`);
+    console.log(`/api/copy-records: Starting to process ${records.length} records`);
     
     // Get the max ID once before processing any records
     let nextId: number;
@@ -177,10 +205,39 @@ export async function POST(request: Request) {
     
     console.log(`/api/copy-records: Successfully processed ${processedRecords.length} records`);
     
+    // Map resource to correct table name (case-sensitive)
+    let tableName: string;
+    switch (resource) {
+      case "av":
+        tableName = "List_AV_Counts";
+        break;
+      case "ebook":
+        tableName = "List_EBook_Counts";
+        break;
+      case "ejournal":
+        tableName = "List_EJournal_Counts";
+        break;
+      default:
+        tableName = `List_${resource}_Counts`;
+    }
+    
+    // 🔧 FIX SEQUENCES after manual ID insertion
+    if (processedRecords.length > 0) {
+      console.log(`/api/copy-records: Fixing sequence for ${tableName} after copy operation`);
+      
+      try {
+        await fixSequenceForTable(tableName);
+        console.log(`/api/copy-records: ✅ Sequence fixed for ${tableName}`);
+      } catch (seqError) {
+        console.error(`/api/copy-records: ❌ Failed to fix sequence for ${tableName}:`, seqError);
+        // Don't fail the whole operation for sequence fix errors
+      }
+    }
+    
     // Log successful copy operation
     await logUserAction(
       'CREATE',
-      `List_${resource.charAt(0).toUpperCase() + resource.slice(1)}_Counts`,
+      tableName, // Use the same corrected table name
       undefined, // recordId
       undefined, // oldValues
       { 
@@ -194,8 +251,19 @@ export async function POST(request: Request) {
       request
     );
     
-    return NextResponse.json({ processed: processedRecords.length }, { status: 200 });
-  } catch (error) {
+    // Return appropriate response based on whether this was a partial copy
+    if (isPartialCopy) {
+      return NextResponse.json({ 
+        processed: processedRecords.length,
+        isPartialCopy: true,
+        skippedCount: skippedCount,
+        totalRequested: originalRequestCount,
+        message: `Partial copy completed: ${processedRecords.length} new record(s) copied, ${skippedCount} already existed in year ${targetYear}.`
+      }, { status: 200 });
+    } else {
+      return NextResponse.json({ processed: processedRecords.length }, { status: 200 });
+    }
+  } catch (error: any) {
     console.error("Error copying records:", error);
     
     // Log failed copy operation

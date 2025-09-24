@@ -5,6 +5,7 @@ import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
+import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 
 async function EJournalSinglePage(yearPassIn: number, roleIdPassIn: string | undefined) {
     const tasks = (await GetEJournalList(yearPassIn)).sort((a, b) => a.id - b.id);
@@ -23,11 +24,13 @@ export default async function EJournalListPage(
 
     return (
         <main>
-            <Container className="bg-white p-12 max-w-full">
-
-                <div className="flex-1 flex-col p-8 md:flex">
+            <Container className="bg-white pb-12 max-w-full">
+                <SurveyBreadcrumb surveyType="ejournal" year={params.year} />
+                <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold tracking-tight">E-Journal Database by Subscription - {params.year}</h2>
+                        <h1 className="text-2xl font-bold tracking-tight text-start">
+                            E-Journal Database by Subscription - {params.year}
+                        </h1>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes next to each subscription your library has, for
                             each language Chinese, Japanese, Korean, and Non-CJK. Data in this

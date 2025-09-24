@@ -228,7 +228,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
                   disabled={loading}
                   className="bg-red-600 hover:bg-red-700"
                 >
-                  {loading ? 'Closing...' : 'Close All Forms'}
+                  {loading ? 'Closing...' : 'Close All Forms (warning!!! button works)'}
                 </Button>
               </div>
             )}
