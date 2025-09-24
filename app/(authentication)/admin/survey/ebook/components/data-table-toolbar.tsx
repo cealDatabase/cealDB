@@ -22,11 +22,9 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Search in title..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search in English or CJK title..."
+          value={(table.getState().globalFilter as string) ?? ""}
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {table.getColumn("language") && (
@@ -36,10 +34,13 @@ export function DataTableToolbar<TData>({
             options={languages.map((item) => ({ ...item, value: item.label }))}
           />
         )}
-        {isFiltered && (
+        {(isFiltered || table.getState().globalFilter) && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              table.setGlobalFilter("");
+              table.resetColumnFilters();
+            }}
             className="h-8 px-2 lg:px-3 border border-red-400"
           >
             Reset

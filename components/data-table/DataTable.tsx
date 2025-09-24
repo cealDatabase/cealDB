@@ -48,6 +48,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   const table = useReactTable({
     data,
@@ -57,12 +58,32 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       columnVisibility,
       rowSelection,
       columnFilters,
+      globalFilter,
     },
     enableRowSelection: true,
+    enableGlobalFilter: true,
+    globalFilterFn: (row, columnId, value) => {
+      // Search across title and cjk_title columns (and subtitle for more comprehensive search) 
+      const searchValue = String(value || "").toLowerCase();
+      
+      // Try to get values from common searchable columns
+      const searchableColumns = ["title", "cjk_title", "subtitle", "publisher"];
+      
+      return searchableColumns.some(column => {
+        try {
+          const columnValue = String(row.getValue(column) || "").toLowerCase();
+          return columnValue.includes(searchValue);
+        } catch {
+          // Column doesn't exist, skip it
+          return false;
+        }
+      });
+    },
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

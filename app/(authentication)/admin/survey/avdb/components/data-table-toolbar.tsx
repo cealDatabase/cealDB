@@ -62,14 +62,12 @@ export function DataTableToolbar<TData>({
   return (
     <div className='flex items-center justify-between gap-3'>
       <div className='flex flex-1 items-center space-x-2'>
-        {titleCol && (
-          <Input
-            placeholder='Search in title...'
-            value={(titleCol.getFilterValue() as string) ?? ""}
-            onChange={(e) => titleCol.setFilterValue(e.target.value)}
-            className='h-8 w-[150px] lg:w-[250px]'
-          />
-        )}
+        <Input
+          placeholder='Search in English or CJK title...'
+          value={(table.getState().globalFilter as string) ?? ""}
+          onChange={(e) => table.setGlobalFilter(e.target.value)}
+          className='h-8 w-[150px] lg:w-[250px]'
+        />
 
         {languageCol && (
           <DataTableFacetedFilter
@@ -79,11 +77,11 @@ export function DataTableToolbar<TData>({
           />
         )}
 
-        {isFiltered && (
+        {(isFiltered || table.getState().globalFilter) && (
           <Button
             variant='ghost'
             onClick={() => {
-              titleCol?.setFilterValue(undefined);
+              table.setGlobalFilter("");
               languageCol?.setFilterValue(undefined);
               table.resetColumnFilters();
             }}
