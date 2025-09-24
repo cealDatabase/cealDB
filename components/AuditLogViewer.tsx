@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
+import { LocalDateTime } from '@/components/LocalDateTime';
 
 interface AuditLog {
   id: number;
@@ -293,7 +294,7 @@ export default function AuditLogViewer({ logs, total, currentPage, filter }: Pro
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Timestamp</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {new Date(selectedLog.timestamp).toLocaleString()}
+                      <LocalDateTime dateString={selectedLog.timestamp.toString()} />
                     </p>
                   </div>
                   

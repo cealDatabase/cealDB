@@ -1,7 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { X, Loader2, Info, AlertCircle, MessageSquare, Users } from 'lucide-react';
+import { toast } from 'sonner';
+import { LocalDateTime } from '@/components/LocalDateTime';
 
 interface FormSession {
   year: number;
@@ -218,7 +224,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
                 <strong>Closed:</strong> {currentSession.closedLibraries} libraries
               </div>
               <div className="col-span-2">
-                <strong>Last Updated:</strong> {new Date(currentSession.lastUpdated).toLocaleString()}
+                <strong>Last Updated:</strong> <LocalDateTime dateString={currentSession.lastUpdated} />
               </div>
             </div>
             {hasActiveSession && (
