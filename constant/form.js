@@ -2,6 +2,16 @@ const currentYear = new Date().getFullYear();
 const previousYear = currentYear - 1;
 const nextYear = currentYear + 1;
 
+import {
+  Database,
+  Users,
+  BookOpen,
+  Settings,
+  Plus,
+  CheckCircle,
+  BarChart3,
+} from "lucide-react";
+
 export const forms = [
   {
     title: "Monographic Acquisitions",
@@ -138,3 +148,70 @@ export const instructionGroup = {
     },
   ],
 };
+
+export const actions = [
+    {
+      title: 'Super Admin Guide',
+      href: '/admin/superguide',
+      icon: BookOpen,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      description: 'Comprehensive documentation and best practices for system administration.',
+    },
+    {
+      title: 'Audio/Visual Databases',
+      href: `/admin/survey/avdb/${currentYear}`,
+      icon: Database,
+      iconColor: 'text-purple-600',
+      iconBg: 'bg-purple-100',
+      description: 'Manage multimedia resources and database configurations.',
+    },
+    {
+      title: 'Custom Fields for Other Holdings',
+      href: '/admin/custom-other',
+      icon: Settings,
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
+      description: 'Configure custom metadata fields for specialized collections.',
+    },
+    {
+      title: 'Ebook Databases',
+      href: `/admin/survey/ebook/${currentYear}`,
+      icon: BookOpen,
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
+      description: 'Manage electronic book collections and access settings.',
+    },
+    {
+      title: 'All New Users/Check All Users',
+      href: '/admin/all-users',
+      icon: Users,
+      iconColor: 'text-red-600',
+      iconBg: 'bg-red-100',
+      description: 'Review new user registrations and manage user accounts.',
+    },
+    {
+      title: 'E-Journal Databases',
+      href: `/admin/survey/ejournal/${currentYear}`,
+      icon: BarChart3,
+      iconColor: 'text-indigo-600',
+      iconBg: 'bg-indigo-100',
+      description: 'Monitor and manage electronic journal subscriptions.',
+    },
+    {
+      title: 'Add New Library/Check All Libraries',
+      href: '/admin/all-libraries',
+      icon: Plus,
+      iconColor: 'text-red-600',
+      iconBg: 'bg-red-100',
+      description: 'Add new institutions and manage library network.',
+    },
+    {
+      title: 'Additional Tools',
+      href: '/admin/help',
+      icon: CheckCircle,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      description: 'Additional administrative tools and system utilities.',
+    },
+  ]

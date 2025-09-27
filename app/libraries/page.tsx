@@ -21,8 +21,8 @@ function SkeletonCard() {
 export default function LibraiesHomePage() {
   return (
     <main>
-      <h1>Library Information</h1>
-      <p>This page contains library information of CEAL participants.</p>
+      <h1>Institution Information</h1>
+      <p>This page contains institution information of CEAL participants.</p>
       <Suspense fallback={<SkeletonCard />}>{allLibraries()}</Suspense>
     </main>
   );

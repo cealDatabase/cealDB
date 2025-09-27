@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
-import { Container } from "@/components/Container";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   getUserByUserName,
   getRoleById,
@@ -8,75 +10,16 @@ import {
 import { SingleUserType } from "@/types/types";
 import Link from "next/link";
 import { LocalDateTime } from "@/components/LocalDateTime";
-
-
 import {
-  AcademicCapIcon,
-  BanknotesIcon,
-  CheckBadgeIcon,
-  ClockIcon,
-  ReceiptRefundIcon,
-  UsersIcon,
-} from '@heroicons/react/24/outline'
+  User,
+  Calendar,
+  Mail,
+  Building,
+  FileText,
+  Settings,
+} from "lucide-react";
 
-const actions = [
-  {
-    title: 'Super Admin Guide',
-    href: '/admin/superguide',
-    icon: ClockIcon,
-    iconForeground: 'text-teal-700',
-    iconBackground: 'bg-teal-50',
-  },
-  {
-    title: 'Audio/Visual Databases',
-    href: `/admin/survey/avdb/${new Date().getFullYear()}`,
-    icon: CheckBadgeIcon,
-    iconForeground: 'text-purple-700',
-    iconBackground: 'bg-purple-50',
-  },
-  {
-    title: 'Custom Fields for Other Holdings',
-    href: '/admin/custom-other',
-    icon: UsersIcon,
-    iconForeground: 'text-sky-700',
-    iconBackground: 'bg-sky-50',
-  },
-  {
-    title: 'Ebook Databases',
-    href: `/admin/survey/ebook/${new Date().getFullYear()}`,
-    icon: BanknotesIcon,
-    iconForeground: 'text-yellow-700',
-    iconBackground: 'bg-yellow-50',
-  },
-  {
-    title: 'All New User/Check All Users',
-    href: '/admin/all-users',
-    icon: ReceiptRefundIcon,
-    iconForeground: 'text-rose-700',
-    iconBackground: 'bg-rose-50',
-  },
-  {
-    title: 'EJournal Databases',
-    href: `/admin/survey/ejournal/${new Date().getFullYear()}`,
-    icon: AcademicCapIcon,
-    iconForeground: 'text-indigo-700',
-    iconBackground: 'bg-indigo-50',
-  },
-  {
-    title: 'Add New Library/Check All Libraries',
-    href: '/admin/all-users',
-    icon: ReceiptRefundIcon,
-    iconForeground: 'text-rose-700',
-    iconBackground: 'bg-rose-50',
-  },
-  {
-    title: 'Something Else',
-    href: '/admin/help',
-    icon: ClockIcon,
-    iconForeground: 'text-teal-700',
-    iconBackground: 'bg-teal-50',
-  },
-]
+import { actions } from "@/constant/form";
 
 
 function classNames(...classes: string[]) {
@@ -90,73 +33,67 @@ async function getUserDetailByEmail({
   cookieStore: string | undefined;
 }) {
   if (!cookieStore) {
-    return null; // or handle the case when cookieStore is undefined
+    return null;
   }
   const singleUser = await getUserByUserName(cookieStore);
+
+  if (!singleUser) {
+    return null;
+  }
 
   async function findRole() {
     try {
       const roleInfo = singleUser?.User_Roles;
-      if (roleInfo?.length ?? 0 > 1) {
-        return (
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-            <dt className="text-gray-500 font-medium">Role</dt>
-            <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-              {roleInfo?.map(async (roles) => {
-                const roleObj = await getRoleById(roles.role_id);
-                return roleObj?.name + ", ";
-              })}
-            </dd>
-          </div>
+      if (roleInfo && roleInfo.length > 0) {
+        const roleNames = await Promise.all(
+          roleInfo.map(async (roles) => {
+            try {
+              const roleObj = await getRoleById(roles.role_id);
+              return roleObj?.name || null;
+            } catch (error) {
+              console.error('Error fetching role:', error);
+              return null;
+            }
+          })
         );
-      } else {
-        return null;
+        return roleNames.filter((role): role is string => Boolean(role));
       }
+      return [];
     } catch (error) {
-      return null;
+      console.error('Error in findRole:', error);
+      return [];
     }
   }
 
   async function findLibrary() {
     try {
-      const libraryid = singleUser?.User_Library[0].library_id;
+      const libraryid = singleUser?.User_Library?.[0]?.library_id;
       if (libraryid) {
         const output = await getLibraryById(libraryid);
-        return {
-          component: (
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Library</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                <Link href={`/libraries/${output?.id}`}>
-                  {output?.library_name}
-                </Link>
-              </dd>
-            </div>
-          ),
-          libraryName: output?.library_name
-        };
-      } else {
-        return null;
+        if (output && output.id && output.library_name) {
+          return {
+            id: Number(output.id),
+            name: String(output.library_name)
+          };
+        }
       }
+      return null;
     } catch (error) {
+      console.error('Error in findLibrary:', error);
       return null;
     }
   }
 
   const libraryData = await findLibrary();
+  const roleData = await findRole();
 
   async function findLastLogin() {
     try {
       const lastLogin = singleUser?.lastlogin_at;
       if (lastLogin) {
-        const nycTime = new Date(lastLogin).toLocaleString('en-US', {
-          timeZone: 'America/New_York'
-        });
-        // return nycTime;
-        return lastLogin.toISOString() // Return UTC time as ISO string for client-side conversion
-      } else {
-        return null;
+        return lastLogin.toISOString();
       }
+      return null;
     } catch (error) {
       return null;
     }
@@ -164,93 +101,107 @@ async function getUserDetailByEmail({
 
   const lastLogin = await findLastLogin();
 
-  return (
-    <UserSingle
-      user={singleUser as unknown as SingleUserType}
-      role={findRole()}
-      library={libraryData?.component}
-      libraryName={libraryData?.libraryName}
-      lastLogin={lastLogin ? lastLogin : undefined}
-    />
-  );
+  return {
+    user: singleUser as unknown as SingleUserType,
+    roles: Array.isArray(roleData) ? roleData : [],
+    library: libraryData,
+    lastLogin: lastLogin || undefined
+  };
 }
 
-function UserSingle({
+function UserProfile({
   user,
-  role,
+  roles,
   library,
-  libraryName,
   lastLogin,
 }: {
   user: SingleUserType;
-  role: any;
-  library: any;
-  libraryName?: string;
+  roles: string[];
+  library: { id: number; name: string } | null;
   lastLogin?: string;
 }) {
   if (!user) {
-    return null; // or handle the case when user is null
+    return null;
   }
+
   return (
-    <>
-      <h1>Hello {user.firstname}</h1>
-
-      <Container className="bg-gray-100 rounded-lg lg:min-w-[720px]">
-        <div className="mt-2">
-          <dl className="divide-y divide-gray-400">
-            {lastLogin && (
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-                <dt className="text-gray-500 font-medium">Last Login</dt>
-                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  <LocalDateTime dateString={lastLogin} />
-                </dd>
-              </div>
-            )}
-
-            {(user.firstname || user.lastname) && (
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-                <dt className="text-gray-500 font-medium">Name</dt>
-                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  {user.firstname} {user.lastname}
-                </dd>
-              </div>
-            )}
-
-            {user.username && (
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-                <dt className="text-gray-500 font-medium">Email</dt>
-                <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                  <Link href={`mailto:${user.username}`}>{user.username}</Link>
-                </dd>
-              </div>
-            )}
-
-            {role}
-
-            {library}
-
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-              <dt className="text-gray-500 font-medium">Forms</dt>
-              <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
-                <Link href={`/admin/forms?libraryName=${encodeURIComponent(libraryName || '')}`}>Forms Page</Link>
-              </dd>
-            </div>
-
-          </dl>
+    <Card>
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-3">
+          {/* <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <User className="w-6 h-6 text-primary" />
+          </div> */}
+          <div>
+            <CardTitle className="text-xl">Hello {user.firstname}</CardTitle>
+            <CardDescription>Welcome back to your dashboard</CardDescription>
+          </div>
         </div>
-      </Container>
-    </>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-3">
+          {lastLogin && (
+            <div className="flex items-center gap-3 text-sm">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Last Login:</span>
+              <span className="font-medium">
+                <LocalDateTime dateString={lastLogin} />
+              </span>
+            </div>
+          )}
+
+          {(user.firstname || user.lastname) && (
+            <div className="flex items-center gap-3 text-sm">
+              <User className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Name:</span>
+              <span className="font-medium">{user.firstname} {user.lastname}</span>
+            </div>
+          )}
+
+          {user.username && (
+            <div className="flex items-center gap-3 text-sm">
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Email:</span>
+              <Link href={`mailto:${user.username}`} className="font-medium">
+                {user.username}
+              </Link>
+            </div>
+          )}
+
+          {roles && roles.length > 0 && (
+            <div className="flex items-start gap-3 text-sm">
+              <Settings className="w-4 h-4 text-muted-foreground mt-0.5" />
+              <span className="text-muted-foreground">Role:</span>
+              <div className="flex flex-wrap gap-1">
+                {roles.map((role, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {role}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {library && (
+            <div className="flex items-center gap-3 text-sm">
+              <Building className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Institution:</span>
+              <Link href={`/libraries/${library.id}`} className="font-medium">
+                {library.name}
+              </Link>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 async function UserLoggedInPage() {
-  // Use official Next.js cookies API
   const cookieStore = await cookies();
   const rawCookieValue = cookieStore.get("uinf")?.value;
   const userCookie = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
   const roleIds = cookieStore.get("role")?.value;
 
-  // Parse role IDs from JSON array
   let userRoleIds: string[] = [];
   try {
     userRoleIds = roleIds ? JSON.parse(roleIds) : [];
@@ -259,73 +210,113 @@ async function UserLoggedInPage() {
     userRoleIds = [];
   }
 
-  // Simple cookie check
   if (!userCookie) {
     console.log("⚠️  No user cookie found in admin page");
   }
 
+  const userData = await getUserDetailByEmail({ cookieStore: userCookie });
+  const showSuperAdminTools = Array.isArray(userRoleIds) && userRoleIds.length > 0 && (
+    userRoleIds.length > 1 || !userRoleIds.includes("2") || userRoleIds.includes("1")
+  );
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-6">
+          <CardContent>
+            <p className="text-muted-foreground">Unable to load user data.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <main>
-      {getUserDetailByEmail({ cookieStore: userCookie })}
-      {/* Show Super Admin Tools when user has roles other than just role ID 2 */}
-      {Array.isArray(userRoleIds) && userRoleIds.length > 0 && (
-        userRoleIds.length > 1 || !userRoleIds.includes("2") || userRoleIds.includes("1")
-      ) &&
-        <div className="container mt-12">
-          <h1>Super Admin Toolkit</h1>
-          <div className="grid grid-cols-1 gap-y-12">
-            <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-gray-200 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
-              {actions.map((action, actionIdx) => (
-                <div
-                  key={action.title}
-                  className={classNames(
-                    actionIdx === 0 ? 'rounded-tl-lg rounded-tr-lg sm:rounded-tr-none' : '',
-                    actionIdx === 1 ? 'sm:rounded-tr-lg' : '',
-                    actionIdx === actions.length - 2 ? 'sm:rounded-bl-lg' : '',
-                    actionIdx === actions.length - 1 ? 'rounded-bl-lg rounded-br-lg sm:rounded-bl-none' : '',
-                    'group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500',
-                  )}
-                >
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* User Profile Section - Left Column */}
+          <div className="lg:col-span-1">
+            <UserProfile
+              user={userData.user}
+              roles={userData.roles || []}
+              library={userData.library}
+              lastLogin={userData.lastLogin || undefined}
+            />
+          </div>
+
+          {/* Main Content Area - Right Columns */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Forms Management Section */}
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
                   <div>
-                    <span
-                      className={classNames(
-                        action.iconBackground,
-                        action.iconForeground,
-                        'inline-flex rounded-lg p-3 ring-4 ring-white',
-                      )}
-                    >
-                      <action.icon aria-hidden="true" className="h-6 w-6" />
-                    </span>
+                    <CardTitle className="text-lg">Forms Management</CardTitle>
+                    <CardDescription>Manage and access all system forms</CardDescription>
                   </div>
-                  <div className="mt-8">
-                    <h3 className="text-base font-semibold text-gray-900">
-                      <a href={action.href} className="focus:outline-hidden">
-                        {/* Extend touch target to entire panel */}
-                        <span aria-hidden="true" className="absolute inset-0" />
-                        {action.title}
-                      </a>
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Doloribus dolores nostrum quia qui natus officia quod et dolorem. Sit repellendus qui ut at blanditiis et
-                      quo et molestiae.
-                    </p>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute right-6 top-6 text-gray-300 group-hover:text-gray-400"
-                  >
-                    <svg fill="currentColor" viewBox="0 0 24 24" className="h-6 w-6">
-                      <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
-                    </svg>
-                  </span>
                 </div>
-              ))}
-            </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-medium">Forms Page</p>
+                      <p className="text-sm text-muted-foreground">Access all available forms and submissions</p>
+                    </div>
+                  </div>
+                  <Button asChild className="">
+                    <Link href={`/admin/forms?libraryName=${encodeURIComponent(userData.library?.name || '')}`}>
+                      Access Forms
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Super Admin Toolkit */}
+            {showSuperAdminTools && (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Super Admin Toolkit</h2>
+                  <p className="text-muted-foreground">Comprehensive administrative tools and resources</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {actions.map((action, index) => {
+                    const IconComponent = action.icon;
+                    return (
+                      <Card key={index} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                              <IconComponent className={`w-5 h-5 ${action.iconColor}`} />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-primary mb-1">{action.title}</h3>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {action.description}
+                              </p>
+                              <Button variant="outline" size="sm" asChild>
+                                <Link href={action.href}>Access</Link>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-      }
-    </main>
+      </div>
+    </div>
   );
 }
 
