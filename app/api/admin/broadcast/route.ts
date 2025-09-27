@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { openingDate, year, userId, userRoles } = await request.json();
+    const { openingDate, closingDate, year, userId, userRoles } = await request.json();
 
     // Verify user is super admin (role contains 1)
     if (!userRoles || !userRoles.includes('1')) {
@@ -18,9 +18,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields
-    if (!openingDate || !year || !userId) {
+    if (!openingDate || !closingDate || !year || !userId) {
       return NextResponse.json(
-        { error: 'Missing required fields: openingDate, year, userId' },
+        { error: 'Missing required fields: openingDate, closingDate, year, userId' },
+        { status: 400 }
+      );
+    }
+
+    // Validate that closing date is after opening date
+    const openDate = new Date(openingDate);
+    const closeDate = new Date(closingDate);
+    
+    if (closeDate <= openDate) {
+      return NextResponse.json(
+        { error: 'Closing date must be after opening date' },
         { status: 400 }
       );
     }
@@ -37,9 +48,8 @@ export async function POST(request: NextRequest) {
     // Initialize Resend at runtime
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const openDate = new Date(openingDate);
-    const closeDate = new Date(openDate);
-    closeDate.setDate(closeDate.getDate() + 62); // Add 62 days
+    // Use the provided dates
+    const totalDays = Math.ceil((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // Check if forms are already open for this year
     const openLibraries = await prisma.library_Year.findMany({
@@ -89,7 +99,7 @@ export async function POST(request: NextRequest) {
               month: 'long', 
               day: 'numeric' 
             })}</li>
-            <li><strong>Time Period:</strong> 62 days</li>
+            <li><strong>Time Period:</strong> ${totalDays} days</li>
           </ul>
         </div>
         
@@ -196,17 +206,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const year = searchParams.get('year');
     const openingDate = searchParams.get('openingDate');
+    const closingDate = searchParams.get('closingDate');
 
-    if (!year || !openingDate) {
+    if (!year || !openingDate || !closingDate) {
       return NextResponse.json(
-        { error: 'Missing required parameters: year, openingDate' },
+        { error: 'Missing required parameters: year, openingDate, closingDate' },
         { status: 400 }
       );
     }
 
     const openDate = new Date(openingDate);
-    const closeDate = new Date(openDate);
-    closeDate.setDate(closeDate.getDate() + 62);
+    const closeDate = new Date(closingDate);
+    const totalDays = Math.ceil((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // Generate preview template
     const emailTemplate = `
@@ -232,7 +243,7 @@ export async function GET(request: NextRequest) {
               month: 'long', 
               day: 'numeric' 
             })}</li>
-            <li><strong>Time Period:</strong> 62 days</li>
+            <li><strong>Time Period:</strong> ${totalDays} days</li>
           </ul>
         </div>
         
@@ -263,7 +274,7 @@ export async function GET(request: NextRequest) {
         year: year,
         openingDate: openDate.toISOString(),
         closingDate: closeDate.toISOString(),
-        duration: '62 days'
+        duration: `${totalDays} days`
       }
     });
 

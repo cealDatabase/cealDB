@@ -14,17 +14,13 @@ import {
   User,
   Calendar,
   Mail,
+  BookOpen,
   Building,
   FileText,
   Settings,
 } from "lucide-react";
 
 import { actions } from "@/constant/form";
-
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
 
 
 async function getUserDetailByEmail({
@@ -128,9 +124,6 @@ function UserProfile({
     <Card>
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
-          {/* <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-            <User className="w-6 h-6 text-primary" />
-          </div> */}
           <div>
             <CardTitle className="text-xl">Hello {user.firstname}</CardTitle>
             <CardDescription>Welcome back to your dashboard</CardDescription>
@@ -171,7 +164,7 @@ function UserProfile({
             <div className="flex items-start gap-3 text-sm">
               <Settings className="w-4 h-4 text-muted-foreground mt-0.5" />
               <span className="text-muted-foreground">Role:</span>
-              <div className="flex flex-wrap gap-1">
+              <div className="grid grid-cols-2 gap-1">
                 {roles.map((role, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {role}
@@ -284,6 +277,27 @@ async function UserLoggedInPage() {
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Super Admin Toolkit</h2>
                   <p className="text-muted-foreground">Comprehensive administrative tools and resources</p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 mb-6">
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className={`w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center`}>
+                          <BookOpen className={`w-5 h-5 text-green-600`} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-primary mb-1">Admin Guide</h3>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Provides an overview of the Super Admin’s responsibilities, along with instructions for performing key operations such as creating, editing, and deleting library and user information.
+                          </p>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href="/admin/superguide">Access</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

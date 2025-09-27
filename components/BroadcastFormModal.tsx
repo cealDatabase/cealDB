@@ -40,6 +40,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
   // Form data
   const [year, setYear] = useState(new Date().getFullYear());
   const [openingDate, setOpeningDate] = useState('');
+  const [closingDate, setClosingDate] = useState('');
   const [emailTemplate, setEmailTemplate] = useState('');
   
   // Current session data
@@ -73,12 +74,22 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
       return;
     }
 
+    if (!closingDate) {
+      setError('Please select a closing date');
+      return;
+    }
+
+    if (new Date(closingDate) <= new Date(openingDate)) {
+      setError('Closing date must be after opening date');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `/api/admin/broadcast?year=${year}&openingDate=${openingDate}`,
+        `/api/admin/broadcast?year=${year}&openingDate=${openingDate}&closingDate=${closingDate}`,
         { method: 'GET' }
       );
 
@@ -109,6 +120,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
         body: JSON.stringify({
           year,
           openingDate,
+          closingDate,
           userId,
           userRoles
         })
@@ -192,7 +204,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
         
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Form Session Management</h2>
+          <h2 className="text-2xl font-bold">Open/Close Annual Surveys​</h2>
           <button 
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-2xl"
@@ -252,7 +264,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
           <div>
             <h3 className="text-lg font-semibold mb-4">Create New Form Session</h3>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium mb-2">Academic Year</label>
                 <input
@@ -274,6 +286,17 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Closing Date</label>
+                <input
+                  type="date"
+                  value={closingDate}
+                  onChange={(e) => setClosingDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min={openingDate || undefined}
+                />
+              </div>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
@@ -281,7 +304,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>• Forms will be opened for editing for all libraries</li>
                 <li>• An email notification will be sent to all CEAL members</li>
-                <li>• Forms will automatically close after 62 days</li>
+                <li>• Forms will automatically close on the specified closing date</li>
                 <li>• Members will only be able to edit their own library's forms</li>
               </ul>
             </div>
@@ -289,7 +312,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
             <div className="flex gap-4">
               <Button 
                 onClick={previewEmail}
-                disabled={loading || !openingDate}
+                disabled={loading || !openingDate || !closingDate}
                 className="flex-1"
               >
                 {loading ? 'Loading...' : 'Preview Email & Continue'}
@@ -347,7 +370,7 @@ export default function BroadcastFormModal({ isOpen, onClose, userId, userRoles 
                 <li>• Email will be sent immediately to all CEAL members</li>
                 <li>• All library forms will be opened for editing</li>
                 <li>• Forms will close automatically on {
-                  new Date(new Date(openingDate).getTime() + 62 * 24 * 60 * 60 * 1000)
+                  new Date(closingDate)
                     .toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
                 }</li>
               </ul>

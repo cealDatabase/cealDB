@@ -124,40 +124,29 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
 
     return (
         <>
-            <h1>Admin Help</h1>
+            <h1>Admin Guide</h1>
             <Container>
                 <div className="mb-6 space-y-4">
                     <div className="flex flex-wrap gap-4">
                         <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
                         <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
                         <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
-                        
+
                         {/* New Broadcast Button - Only show for super admins */}
                         {userInfo && userInfo.userRoles.includes('1') && (
-                            <Button 
-                                className='w-[250px] bg-blue-600 hover:bg-blue-700' 
+                            <Button
+                                className='w-[250px] bg-blue-600 hover:bg-blue-700'
                                 onClick={() => setShowBroadcastModal(true)}
                             >
                                 📧 Open Forms & Broadcast
                             </Button>
                         )}
                     </div>
-                    
+
                     {/* Debug info */}
                     <div className="bg-yellow-50 p-2 rounded text-xs">
                         <strong>🔍 Debug:</strong> UserInfo: {userInfo ? `Roles: [${userInfo.userRoles.join(', ')}], Super Admin: ${userInfo.userRoles.includes('1') ? 'YES' : 'NO'}` : 'NULL'}
                     </div>
-                    
-                    {/* Info box for broadcast feature */}
-                    {userInfo && userInfo.userRoles.includes('1') && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <h3 className="font-semibold text-blue-800 mb-2">📧 Form Broadcasting System</h3>
-                            <p className="text-sm text-blue-700">
-                                Use "Open Forms & Broadcast" to create a new form session, open all library forms for editing (62-day period), 
-                                and automatically send notification emails to all CEAL members.
-                            </p>
-                        </div>
-                    )}
                 </div>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
@@ -362,7 +351,7 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
                     <li>Find the file in the list, to the right of the file name you will see its URL.&nbsp; Copy and paste this as the link to the file.</li>
                 </ol>
             </Container>
-            
+
             {/* Broadcast Modal */}
             {userInfo && (
                 <BroadcastFormModal
