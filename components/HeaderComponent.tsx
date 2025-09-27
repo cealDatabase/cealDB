@@ -6,16 +6,17 @@ import { Button } from "@/components/Button";
 import { MainMenu } from "@/constant/nav";
 import { StatisticsMenu } from "@/constant/nav";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Dialog,
   DialogPanel,
   Disclosure,
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-  Transition,
 } from "@headlessui/react";
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -61,58 +62,41 @@ export function HeaderComponent({
         </div>
         {/* End of hamburger button */}
 
-        <PopoverGroup className="hidden lg:flex lg:gap-x-12">
+        <div className="hidden lg:flex lg:gap-x-12">
           <Link
             href="/"
             className="text-sm font-semibold leading-6 text-gray-900"
           >
             Home
           </Link>
-          <Popover>
-            <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 focus:outline-none">
               Statistics
               <ChevronDownIcon
                 className="h-5 w-5 flex-none text-gray-400"
                 aria-hidden="true"
               />
-            </PopoverButton>
-
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-200"
-              enterFrom="opacity-0 -translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition ease-in duration-150"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 -translate-y-1"
-            >
-              <PopoverPanel className="absolute inset-x-0 top-0 -z-10 bg-white pt-14 shadow-lg ring-1 ring-gray-900/5">
-                <div className="mx-auto grid max-w-7xl grid-cols-4 gap-x-4 px-6 py-10 lg:px-8 xl:gap-x-8">
-                  {StatisticsMenu.map((item) => (
-                    <div
-                      key={item.name}
-                      className="group relative rounded-lg p-6 text-sm leading-6 hover:bg-gray-50"
-                    >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mx-auto grid max-w-7xl bg-white shadow-lg ring-1 ring-gray-900/5 p-6" align="start">
+              <div className="grid grid-cols-4 gap-x-4 gap-y-6">
+                {StatisticsMenu.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild className="cursor-pointer p-0 h-auto">
+                    <Link href={item.href} className="group relative rounded-lg p-6 text-sm leading-6 hover:bg-gray-50 flex flex-col items-start no-underline">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white mb-4">
                         <item.icon
                           className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
                           aria-hidden="true"
                         />
                       </div>
-                      <Link
-                        href={item.href}
-                        className="mt-6 block font-semibold text-gray-900"
-                      >
-                        {item.name}
-                        <span className="absolute inset-0" />
-                      </Link>
+                      <div className="font-semibold text-gray-900">{item.name}</div>
                       <p className="mt-1 text-gray-600">{item.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </PopoverPanel>
-            </Transition>
-          </Popover>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {[...MainMenu].map((item) => (
             <Link
@@ -123,7 +107,7 @@ export function HeaderComponent({
               {item.label}
             </Link>
           ))}
-        </PopoverGroup>
+        </div>
 
         <div className="hidden lg:flex lg:justify-end gap-x-4">
           <div className="flex flex-row gap-4">
@@ -197,15 +181,13 @@ export function HeaderComponent({
                       </Disclosure.Button>
                       <Disclosure.Panel className="mt-2 space-y-2">
                         {[...StatisticsMenu].map((item) => (
-                          <Disclosure.Button
+                          <Link
                             key={item.name}
-                            as="a"
-                            className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 hover:bg-gray-50"
+                            href={item.href}
+                            className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50 no-underline"
                           >
-                            <Link href={item.href} className=" text-gray-900">
-                              {item.name}
-                            </Link>
-                          </Disclosure.Button>
+                            {item.name}
+                          </Link>
                         ))}
                       </Disclosure.Panel>
                     </>

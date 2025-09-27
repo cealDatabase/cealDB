@@ -6,8 +6,8 @@ import {
 } from "@/data/fetchPrisma";
 import Link from "next/link";
 import { Container } from "./Container";
-import { Button } from "./Button";
 import { SingleLibraryType } from "@/types/types";
+import LibraryViewWrapper from "./LibraryViewWrapper";
 
 // Force dynamic so cookies can be read each request
 export const dynamic = 'force-dynamic';
@@ -162,14 +162,10 @@ export default async function LibSingle({
   let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
 
   return (
-    <main>
-      <h1>{libraries.library_name}</h1>
-      {isMatchedUser || cookiesRoleId?.includes("1") ? (
-        <Button className="mb-4">Edit</Button>
-      ) : (
-        ""
-      )}
-
+    <LibraryViewWrapper 
+      library={libraries} 
+      canEdit={!!(isMatchedUser || cookiesRoleId?.includes("1"))}
+    >
       <Container className="bg-gray-100 rounded-lg">
         <div className="mt-2">
           <dl className="divide-y divide-gray-400">
@@ -341,6 +337,6 @@ export default async function LibSingle({
           </dl>
         </div>
       </Container>
-    </main>
+    </LibraryViewWrapper>
   );
 }
