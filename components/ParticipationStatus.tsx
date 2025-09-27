@@ -170,9 +170,9 @@ export default function ParticipationStatus() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-600 text-white">
-                    <th className="text-left p-3 font-semibold min-w-[250px] border-r border-gray-300">Institution</th>
+                    <th className="text-left p-3 font-semibold min-w-[180px] border-r border-gray-300">Institution</th>
                     {Object.values(formLabels).map((label) => (
-                      <th key={label} className="text-center p-2 font-semibold min-w-[90px] border-r border-gray-300 text-xs">
+                      <th key={label} className="text-center px-1 py-2 font-semibold min-w-[85px] border-r border-gray-300 text-xs">
                         {label}
                       </th>
                     ))}
