@@ -397,3 +397,117 @@ export const getSubscriberIdByListEJournalId = async (listEJournalId: number, ye
     return null;
   }
 }
+
+// Role management functions for super admin
+export const addUserRole = async (userId: number, roleId: number) => {
+  try {
+    const existingRole = await db.users_Roles.findUnique({
+      where: {
+        user_id_role_id: {
+          user_id: userId,
+          role_id: roleId,
+        },
+      },
+    });
+
+    if (existingRole) {
+      return { success: false, message: 'Role already assigned to user' };
+    }
+
+    const result = await db.users_Roles.create({
+      data: {
+        user_id: userId,
+        role_id: roleId,
+      },
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error adding user role:', error);
+    return { success: false, message: 'Failed to add role to user' };
+  }
+};
+
+export const removeUserRole = async (userId: number, roleId: number) => {
+  try {
+    const result = await db.users_Roles.delete({
+      where: {
+        user_id_role_id: {
+          user_id: userId,
+          role_id: roleId,
+        },
+      },
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error removing user role:', error);
+    return { success: false, message: 'Failed to remove role from user' };
+  }
+};
+
+export const updateUserRoles = async (userId: number, roleIds: number[]) => {
+  try {
+    // Start a transaction to ensure data consistency
+    const result = await db.$transaction(async (prisma) => {
+      // Remove all existing roles for the user
+      await prisma.users_Roles.deleteMany({
+        where: { user_id: userId },
+      });
+
+      // Add the new roles
+      if (roleIds.length > 0) {
+        await prisma.users_Roles.createMany({
+          data: roleIds.map((roleId) => ({
+            user_id: userId,
+            role_id: roleId,
+          })),
+        });
+      }
+
+      // Return updated user with roles
+      return await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          User_Roles: {
+            include: {
+              Role: true,
+            },
+          },
+        },
+      });
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error updating user roles:', error);
+    return { success: false, message: 'Failed to update user roles' };
+  }
+};
+
+export const getUsersWithRoles = async () => {
+  try {
+    const users = await db.user.findMany({
+      include: {
+        User_Roles: {
+          include: {
+            Role: true,
+          },
+        },
+        User_Library: {
+          include: {
+            Library: true,
+          },
+        },
+      },
+      orderBy: [
+        { firstname: 'asc' },
+        { lastname: 'asc' },
+      ],
+    });
+    return users;
+  } catch (error) {
+    console.error('Error fetching users with roles:', error);
+    return null;
+  }
+};

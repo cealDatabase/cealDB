@@ -5,7 +5,7 @@ import { getCurrentUser } from './auth';
 export interface AuditLogData {
   userId?: number;
   username?: string;
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN' | 'SIGNOUT' | 'SIGNIN_FAILED';
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN' | 'SIGNOUT' | 'SIGNIN_FAILED' | 'UPDATE_ROLES';
   tableName?: string;
   recordId?: string | number;
   oldValues?: any;
