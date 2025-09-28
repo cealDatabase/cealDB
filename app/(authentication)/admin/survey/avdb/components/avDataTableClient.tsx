@@ -9,7 +9,7 @@ export default function AVDataTableClient({
   data,
   year,
   roleIdPassIn,
-  libid, // 👈 add this
+  libid,
 }: {
   data: listAV[];
   year: number;
@@ -18,9 +18,9 @@ export default function AVDataTableClient({
 }) {
   const columns = getColumns(year, roleIdPassIn);
 
-  // Inject libid + year into the toolbar
+  // Inject libid + year + roleId into the toolbar
   const ToolbarWithLib = (props: any) => (
-    <DataTableToolbar {...props} year={year} libid={libid} />
+    <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
 
   return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} />;

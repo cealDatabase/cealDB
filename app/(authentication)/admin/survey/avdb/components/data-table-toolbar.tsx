@@ -13,12 +13,14 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   year: number;
   libid?: number; // ⬅ optional: disable action if missing
+  roleId?: string; // ⬅ to control visibility
 }
 
 export function DataTableToolbar<TData>({
   table,
   libid,
   year,
+  roleId,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -59,6 +61,8 @@ export function DataTableToolbar<TData>({
     router.push(`/admin/forms/${targetLibid}/avdbedit?${qs}`);
   };
 
+  const isMemberUser = roleId?.trim() === "2";
+
   return (
     <div className='flex items-center justify-between gap-3'>
       <div className='flex flex-1 items-center space-x-2'>
@@ -93,19 +97,21 @@ export function DataTableToolbar<TData>({
         )}
       </div>
 
-      {/* New action: open selection in the AV editor */}
-      <Button
-        onClick={goToEditor}
-        disabled={selectedIds.length === 0}
-        className='h-8'
-        title={
-          selectedIds.length === 0
-            ? "Select at least one row"
-            : "Add to My Subscription"
-        }
-      >
-        Add to My Subscription ({selectedIds.length})
-      </Button>
+      {/* Action visible only to Super Admin (not role 2) */}
+      {!isMemberUser && (
+        <Button
+          onClick={goToEditor}
+          disabled={selectedIds.length === 0}
+          className='h-8'
+          title={
+            selectedIds.length === 0
+              ? "Select at least one row"
+              : "Add to My Subscription"
+          }
+        >
+          Add to My Subscription ({selectedIds.length})
+        </Button>
+      )}
 
       <DataTableViewOptions table={table} />
     </div>
