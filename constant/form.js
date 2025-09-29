@@ -199,12 +199,4 @@ export const actions = [
       iconBg: 'bg-red-100',
       description: 'Add or modify institution information participating in surveys.',
     },
-    {
-      title: 'Manage User Roles',
-      href: '/admin/users',
-      icon: Shield,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-100',
-      description: 'Edit user roles and permissions across the system.',
-    },
   ]

@@ -164,7 +164,7 @@ function UserProfile({
             <div className="flex items-start gap-3 text-sm">
               <Settings className="w-4 h-4 text-muted-foreground mt-0.5" />
               <span className="text-muted-foreground">Role:</span>
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-1">
                 {roles.map((role, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {role}

@@ -161,7 +161,7 @@ export function UserRoleManager() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 space-x-4 space-y-4">
               {filteredUsers.map((user) => (
                 <div 
                   key={user.id} 
@@ -217,7 +217,8 @@ export function UserRoleManager() {
                       className="ml-4"
                     >
                       <Edit className="w-4 h-4 mr-2" />
-                      Edit Roles
+                      <span className="inline md:hidden">Edit</span>
+                      <span className="hidden md:inline">Edit Roles</span>
                     </Button>
                   </div>
                 </div>

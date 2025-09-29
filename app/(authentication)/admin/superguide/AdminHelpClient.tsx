@@ -130,6 +130,7 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
                     <div className="flex flex-wrap gap-4">
                         <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
                         <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
+                        <Button className='w-[200px]'><Link href="/admin/users" className='text-white'>Manage User Roles</Link></Button>
                         <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
 
                         {/* New Broadcast Button - Only show for super admins */}
