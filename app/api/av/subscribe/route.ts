@@ -55,26 +55,50 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find the Library_Year record for this library and year
-    const libraryYearRecord = await db.library_Year.findFirst({
+    // Find or create the Library_Year record for this library and year
+    console.log(`Looking for Library_Year record with library: ${libid}, year: ${year}`);
+    
+    let libraryYearRecord = await db.library_Year.findFirst({
       where: {
         library: Number(libid),
         year: Number(year),
       },
     });
 
+    console.log("Found Library_Year record:", libraryYearRecord);
+
     if (!libraryYearRecord) {
-      return NextResponse.json(
-        { 
-          error: "Library year record not found", 
-          detail: `No Library_Year record exists for library ${libid} and year ${year}. Please ensure the library is set up for this year.` 
-        },
-        { status: 404 }
-      );
+      // Try to create the Library_Year record if it doesn't exist
+      console.log(`Creating Library_Year record for library ${libid} and year ${year}`);
+      
+      try {
+        libraryYearRecord = await db.library_Year.create({
+          data: {
+            library: Number(libid),
+            year: Number(year),
+            updated_at: new Date(),
+            is_open_for_editing: true,
+            is_active: true,
+          },
+        });
+        
+        console.log("Created new Library_Year record:", libraryYearRecord);
+        
+      } catch (createError) {
+        console.error("Failed to create Library_Year record:", createError);
+        return NextResponse.json(
+          { 
+            error: "Library year record not found and could not be created", 
+            detail: `No Library_Year record exists for library ${libid} and year ${year}, and failed to create one: ${createError instanceof Error ? createError.message : "Unknown error"}` 
+          },
+          { status: 404 }
+        );
+      }
     }
 
     // Create subscription entries using LibraryYear_ListAV junction table
     const subscriptionResults = [];
+    const libraryYearId = libraryYearRecord.id;
 
     for (const recordId of validRecordIds) {
       try {
@@ -82,7 +106,7 @@ export async function POST(req: Request) {
         const existingSubscription = await db.libraryYear_ListAV.findUnique({
           where: {
             libraryyear_id_listav_id: {
-              libraryyear_id: libraryYearRecord.id,
+              libraryyear_id: libraryYearId,
               listav_id: Number(recordId),
             },
           },
@@ -98,7 +122,7 @@ export async function POST(req: Request) {
           // Create new subscription
           const subscription = await db.libraryYear_ListAV.create({
             data: {
-              libraryyear_id: libraryYearRecord.id,
+              libraryyear_id: libraryYearId,
               listav_id: Number(recordId),
             },
           });

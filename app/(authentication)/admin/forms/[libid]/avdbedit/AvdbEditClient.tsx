@@ -80,6 +80,8 @@ export default function AvdbEditClient({
     setIsSubscribing(true);
     
     try {
+      console.log("Attempting to subscribe with:", { libid, year, recordIds: selectedRowIds });
+      
       const response = await fetch("/api/av/subscribe", {
         method: "POST",
         headers: {
@@ -92,11 +94,16 @@ export default function AvdbEditClient({
         }),
       });
 
+      console.log("Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to subscribe to records");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("API Error Response:", errorData);
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to subscribe to records`);
       }
 
       const result = await response.json();
+      console.log("Subscription result:", result);
       
       // Update subscribed IDs
       setSubscribedIds(prev => new Set([...prev, ...selectedRowIds]));

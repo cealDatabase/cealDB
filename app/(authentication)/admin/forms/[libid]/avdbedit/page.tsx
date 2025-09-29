@@ -25,13 +25,42 @@ export default async function Page({ params, searchParams }: PageProps) {
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;
   
+  // Debug all cookies first
+  const allCookies = cookieStore.getAll();
+  console.log("All cookies:", allCookies);
+  
+  const libidFromCookie = cookieStore.get("libid")?.value;
+  const roleFromCookie = cookieStore.get("role")?.value;
+  
+  console.log("Cookie values:", {
+    libidFromCookie,
+    roleFromCookie,
+    libidStr
+  });
+  
   // If libidStr is "member" or not a valid number, get libid from cookies
   if (libidStr === "member" || isNaN(Number(libidStr))) {
-    const libidFromCookie = cookieStore.get("libid")?.value;
-    if (libidFromCookie) {
+    if (libidFromCookie && !isNaN(Number(libidFromCookie))) {
       libid = Number(libidFromCookie);
     } else {
-      libid = NaN; // Will trigger notFound
+      console.error("No valid libid found in cookies. Available cookies:", allCookies);
+      return (
+        <main>
+          <Container className='bg-white p-12 max-w-full'>
+            <div className='flex-1 flex-col p-8 md:flex'>
+              <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+                Access Error
+              </h2>
+              <p className='text-muted-foreground text-sm mt-2'>
+                No valid library ID found. Please ensure you are logged in and have the proper permissions.
+              </p>
+              <p className='text-xs text-gray-500 mt-2'>
+                Debug: libidStr={libidStr}, libidFromCookie={libidFromCookie}
+              </p>
+            </div>
+          </Container>
+        </main>
+      );
     }
   } else {
     libid = Number(libidStr);
@@ -51,6 +80,25 @@ export default async function Page({ params, searchParams }: PageProps) {
     ids,
     searchParams: sp
   });
+
+  // Final validation
+  if (!libid || isNaN(libid)) {
+    console.error("Invalid libid after processing:", libid);
+    return (
+      <main>
+        <Container className='bg-white p-12 max-w-full'>
+          <div className='flex-1 flex-col p-8 md:flex'>
+            <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+              Invalid Library ID
+            </h2>
+            <p className='text-muted-foreground text-sm mt-2'>
+              The library ID could not be determined. Please check your access permissions.
+            </p>
+          </div>
+        </Container>
+      </main>
+    );
+  }
 
   // If no ids are provided, render the list view similar to survey page, with role-based visibility
   if (ids.length === 0) {
