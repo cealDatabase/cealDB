@@ -36,9 +36,8 @@ export default async function Page({ params, searchParams }: PageProps) {
   
   // Debug all cookies first
   const allCookies = cookieStore.getAll();
-  console.log("All cookies:", allCookies);
   
-  const libidFromCookie = cookieStore.get("libid")?.value;
+  const libidFromCookie = cookieStore.get("library")?.value;
   const roleFromCookie = cookieStore.get("role")?.value;
   
   console.log("Cookie values:", {
@@ -93,11 +92,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     libid = Number(libidStr);
   }
   
-  // Enhanced debugging for URL parsing
-  console.log("🔍 DEBUG: Raw searchParams:", sp);
-  console.log("🔍 DEBUG: sp.ids value:", sp.ids);
-  console.log("🔍 DEBUG: sp.ids type:", typeof sp.ids);
-  
   // Fix: Handle empty string and undefined properly
   const idsParam = sp.ids;
   let ids: number[] = [];
@@ -108,25 +102,10 @@ export default async function Page({ params, searchParams }: PageProps) {
       .map((s) => Number(s.trim()))
       .filter((n) => Number.isFinite(n));
   }
-
-  // Debug logging to see what we're getting
-  console.log("🔍 DEBUG: Starting avdbedit page load");
-  console.log("Debug avdbedit page:", {
-    libidStr,
-    libid,
-    year,
-    idsParam,
-    ids,
-    searchParams: sp
-  });
-
-  console.log("🔍 DEBUG: ids.length =", ids.length, ", ids =", ids);
-  console.log("🔍 DEBUG: Will enter", ids.length === 0 ? "VIEW mode (show current subscriptions)" : "ADD mode (subscription editor)");
   
   // TEMPORARY: Force VIEW mode to troubleshoot the issue
   // Override ids to be empty to force subscription management view
   if (!sp.ids || sp.ids.trim() === "") {
-    console.log("🔍 DEBUG: No valid IDs detected, forcing VIEW mode");
     ids = []; // Ensure empty array for VIEW mode
   }
 
