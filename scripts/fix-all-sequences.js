@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const TABLES = [
+  "Library",
   "Library_Year",
   "List_AV",
   "List_AV_Counts",

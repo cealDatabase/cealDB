@@ -34,7 +34,6 @@
     "app/libraries/page.jsx",
     "app/libraries/[libraryid]/page.jsx",
     "components/LibSingle.jsx",
-    "components/DatePicker.jsx",
     "app/api/submit-form/route.js",
     "tailwind.config.mjs"
   ],
