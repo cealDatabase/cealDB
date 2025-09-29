@@ -108,11 +108,11 @@ export default function AvdbEditClient({
       // Update subscribed IDs
       setSubscribedIds(prev => new Set([...prev, ...selectedRowIds]));
       
-      toast.success(`Successfully subscribed to ${selectedRowIds.length} record${selectedRowIds.length === 1 ? "" : "s"}.`);
+      toast.success(`Successfully subscribed to ${selectedRowIds.length} record${selectedRowIds.length === 1 ? "" : "s"}! Redirecting to your subscription management page...`);
 
-      // Optionally redirect back to the survey page
+      // Redirect to subscription management page to see all subscriptions
       setTimeout(() => {
-        router.push(`/admin/survey/avdb/${year}?libid=${libid}`);
+        router.push(`/admin/forms/${libid}/avdbedit`);
       }, 2000);
 
     } catch (error) {

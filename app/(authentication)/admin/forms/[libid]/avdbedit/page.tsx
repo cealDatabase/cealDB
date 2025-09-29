@@ -8,6 +8,12 @@ import AVDataTableClient from "@/app/(authentication)/admin/survey/avdb/componen
 import { GetAVList } from "@/app/(authentication)/admin/survey/avdb/components/getAVList";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamic import for client component
+const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
+  loading: () => <SkeletonTableCard />,
+});
 
 type PageProps = {
   // 👇 in Next 15 these are async
@@ -21,6 +27,9 @@ export default async function Page({ params, searchParams }: PageProps) {
   const sp = await searchParams;
 
   const cookieStore = await cookies();
+  
+  // Parse year early so we can use it in error messages
+  const year = sp.year ? Number(sp.year) : 2025;
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;
@@ -49,14 +58,32 @@ export default async function Page({ params, searchParams }: PageProps) {
           <Container className='bg-white p-12 max-w-full'>
             <div className='flex-1 flex-col p-8 md:flex'>
               <h2 className='text-2xl font-bold tracking-tight text-red-600'>
-                Access Error
+                Library ID Missing
               </h2>
               <p className='text-muted-foreground text-sm mt-2'>
-                No valid library ID found. Please ensure you are logged in and have the proper permissions.
+                Your library ID cookie is missing or invalid. This is required to manage subscriptions.
               </p>
-              <p className='text-xs text-gray-500 mt-2'>
-                Debug: libidStr={libidStr}, libidFromCookie={libidFromCookie}
-              </p>
+              <div className="bg-gray-100 p-4 rounded mt-4">
+                <p className="text-sm font-medium mb-2">Debug Information:</p>
+                <p className="text-xs">URL libid: {libidStr}</p>
+                <p className="text-xs">Cookie libid: {libidFromCookie || "Not found"}</p>
+                <p className="text-xs">Available cookies: {allCookies.length > 0 ? allCookies.map(c => c.name).join(", ") : "None"}</p>
+              </div>
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">Quick Fixes:</p>
+                <a 
+                  href="/debug-cookies"
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm mr-2"
+                >
+                  Set Cookies
+                </a>
+                <a 
+                  href={`/admin/forms/56/avdbedit${sp.ids ? `?ids=${sp.ids}&year=${year}` : ''}`}
+                  className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                >
+                  Try with Library 56
+                </a>
+              </div>
             </div>
           </Container>
         </main>
@@ -65,21 +92,43 @@ export default async function Page({ params, searchParams }: PageProps) {
   } else {
     libid = Number(libidStr);
   }
-
-  const year = sp.year ? Number(sp.year) : 2025;
-  const ids = (sp.ids ?? "")
-    .split(",")
-    .map((s) => Number(s))
-    .filter((n) => Number.isFinite(n));
+  
+  // Enhanced debugging for URL parsing
+  console.log("🔍 DEBUG: Raw searchParams:", sp);
+  console.log("🔍 DEBUG: sp.ids value:", sp.ids);
+  console.log("🔍 DEBUG: sp.ids type:", typeof sp.ids);
+  
+  // Fix: Handle empty string and undefined properly
+  const idsParam = sp.ids;
+  let ids: number[] = [];
+  
+  if (idsParam && idsParam.trim() !== "") {
+    ids = idsParam
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isFinite(n));
+  }
 
   // Debug logging to see what we're getting
+  console.log("🔍 DEBUG: Starting avdbedit page load");
   console.log("Debug avdbedit page:", {
     libidStr,
     libid,
     year,
+    idsParam,
     ids,
     searchParams: sp
   });
+
+  console.log("🔍 DEBUG: ids.length =", ids.length, ", ids =", ids);
+  console.log("🔍 DEBUG: Will enter", ids.length === 0 ? "VIEW mode (show current subscriptions)" : "ADD mode (subscription editor)");
+  
+  // TEMPORARY: Force VIEW mode to troubleshoot the issue
+  // Override ids to be empty to force subscription management view
+  if (!sp.ids || sp.ids.trim() === "") {
+    console.log("🔍 DEBUG: No valid IDs detected, forcing VIEW mode");
+    ids = []; // Ensure empty array for VIEW mode
+  }
 
   // Final validation
   if (!libid || isNaN(libid)) {
@@ -100,110 +149,85 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
-  // If no ids are provided, render the list view similar to survey page, with role-based visibility
+  // If no ids are provided, show all current subscriptions for this library with delete functionality
   if (ids.length === 0) {
-    const roleId = cookieStore.get("role")?.value;
+    console.log("🔍 DEBUG: No IDs provided - showing all current subscriptions for library", libid);
+    
+    // Find or create Library_Year record
+    let libraryYearRecord = await db.library_Year.findFirst({
+      where: { library: libid, year: year }
+    });
+    
+    if (!libraryYearRecord) {
+      libraryYearRecord = await db.library_Year.create({
+        data: {
+          library: libid,
+          year: year,
+          updated_at: new Date(),
+          is_open_for_editing: true,
+          is_active: true,
+        },
+      });
+    }
 
-    // Super admin: show full list for the year
-    if (roleId && roleId.trim() !== "2") {
-      const tasks = (await GetAVList(year)).sort((a: any, b: any) => a.id - b.id);
+    // Get all current subscriptions for this library and year
+    // At this point libraryYearRecord is guaranteed to exist (either found or created)
+    const subscriptions = await db.libraryYear_ListAV.findMany({
+      where: { libraryyear_id: libraryYearRecord!.id },
+      include: { List_AV: true },
+    });
+
+    const subscribedAVs = subscriptions.map((s) => s.List_AV);
+    
+    if (subscribedAVs.length === 0) {
       return (
         <main>
           <Container className='bg-white p-12 max-w-full'>
             <div className='flex-1 flex-col p-8 md:flex'>
               <div className='space-y-2'>
                 <h2 className='text-2xl font-bold tracking-tight'>
-                  Audio/Visual Database by Subscription - {year}
+                  Library {libid} AV Subscription Management - {year}
                 </h2>
                 <p className='text-muted-foreground text-sm'>
-                  Please check the boxes next to each subscription your library has.
+                  No AV subscriptions found for this library and year. Go to the survey page to add subscriptions.
                 </p>
+                <div className="mt-4">
+                  <a 
+                    href={`/admin/survey/avdb/${year}`}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Go to Survey Page to Add Subscriptions
+                  </a>
+                </div>
               </div>
-
-              <Suspense fallback={<SkeletonTableCard />}> 
-                <AVDataTableClient data={tasks} year={year} roleIdPassIn={roleId} libid={libid} />
-              </Suspense>
             </div>
           </Container>
         </main>
       );
     }
 
-    // Member users: only show subscribed items for this library and year
-    const subscribed = await db.libraryYear_ListAV.findMany({
-      where: {
-        Library_Year: {
-          year: year,
-          library: libid,
-        },
-      },
-      include: { List_AV: true },
-    });
-
-    const subscribedIds = subscribed.map((s) => s.listav_id);
-
-    if (subscribedIds.length === 0) {
-      return (
-        <main>
-          <Container className='bg-white p-12 max-w-full'>
-            <div className='flex-1 flex-col p-8 md:flex'>
-              <h2 className='text-2xl font-bold tracking-tight'>My AV Subscriptions - {year}</h2>
-              <p className='text-muted-foreground text-sm'>No subscriptions found for your library.</p>
-            </div>
-          </Container>
-        </main>
-      );
-    }
-
-    const rows = await db.list_AV.findMany({
-      where: { id: { in: subscribedIds } },
-      select: {
-        id: true,
-        title: true,
-        subtitle: true,
-        cjk_title: true,
-        romanized_title: true,
-        description: true,
-        notes: true,
-        publisher: true,
-        data_source: true,
-        type: true,
-        is_global: true,
-        updated_at: true,
-        List_AV_Counts: { where: { year }, select: { titles: true }, take: 1 },
-        List_AV_Language: { select: { Language: { select: { short: true } } } },
-      },
-    });
-
-    const data = rows.map((r) => ({
-      id: r.id,
-      title: r.title ?? "",
-      subtitle: r.subtitle ?? "",
-      cjk_title: r.cjk_title ?? "",
-      romanized_title: r.romanized_title ?? "",
-      description: r.description ?? "",
-      notes: r.notes ?? "",
-      publisher: r.publisher ?? "",
-      data_source: r.data_source ?? "",
-      type: r.type ?? "",
-      counts: r.List_AV_Counts[0]?.titles ?? 0,
-      language: r.List_AV_Language.map((x) => x.Language?.short).filter(Boolean) as string[],
-      is_global: !!r.is_global,
-      subscribers: [],
-      updated_at: r.updated_at.toISOString(),
-    }));
-
+    
     return (
       <main>
         <Container className='bg-white p-12 max-w-full'>
           <div className='flex-1 flex-col p-8 md:flex'>
             <div className='space-y-2'>
-              <h2 className='text-2xl font-bold tracking-tight'>My AV Subscriptions - {year}</h2>
-              <p className='text-muted-foreground text-sm'>Your library's subscriptions for the selected year.</p>
+              <h2 className='text-2xl font-bold tracking-tight'>
+                Library {libid} AV Subscription Management - {year}
+              </h2>
+              <p className='text-muted-foreground text-sm'>
+                Currently subscribed to {subscribedAVs.length} AV record{subscribedAVs.length === 1 ? '' : 's'} for {year}. 
+                You can remove subscriptions below or go to the survey page to add more.
+              </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
-              <AVDataTableClient data={data} year={year} roleIdPassIn={"2"} libid={libid} />
+              <SubscriptionManagementClient 
+                subscriptions={subscriptions}
+                libid={libid}
+                year={year}
+                mode="view"
+              />
             </Suspense>
           </div>
         </Container>
@@ -211,6 +235,9 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
+  // When IDs are provided, show the subscription editor for adding new subscriptions
+  console.log("🔍 DEBUG: IDs provided - showing subscription editor for", ids.length, "records");
+  
   const rows = await db.list_AV.findMany({
     where: { id: { in: ids } },
     select: {
@@ -251,5 +278,21 @@ export default async function Page({ params, searchParams }: PageProps) {
     updated_at: r.updated_at.toISOString(),
   }));
 
-  return <AvdbEditClient libid={libid} year={year} rows={data} />;
+  return (
+    <main>
+      <Container className='bg-white p-12 max-w-full'>
+        <div className='flex-1 flex-col p-8 md:flex'>
+          <div className='space-y-2 mb-4'>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              Add AV Subscriptions - Library {libid}
+            </h2>
+            <p className='text-muted-foreground text-sm'>
+              Subscribe to selected AV records for {year}. This will add them to Library {libid}'s collection.
+            </p>
+          </div>
+          <AvdbEditClient rows={data} libid={libid} year={year} />
+        </div>
+      </Container>
+    </main>
+  );
 }
