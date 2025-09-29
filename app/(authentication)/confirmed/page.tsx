@@ -1,21 +1,21 @@
 import { Container } from "@/components/Container";
 import { Button } from "@/components/Button";
 import Link from "next/link";
-import { CheckCircleIcon, EnvelopeIcon } from "@heroicons/react/20/solid";
+import { CheckCircle, Mail } from "lucide-react";
 
 const AccountConfirmedPage = () => {
   return (
     <main>
       <Container className="text-center max-w-2xl">
         <div className="flex justify-center mb-6">
-          <CheckCircleIcon className="h-16 w-16 text-green-500" />
+          <CheckCircle className="h-16 w-16 text-green-500" />
         </div>
         
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Account Created Successfully!</h1>
         
         <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
           <div className="flex items-center justify-center mb-4">
-            <EnvelopeIcon className="h-8 w-8 text-green-600 mr-3" />
+            <Mail className="h-8 w-8 text-green-600 mr-3" />
             <h2 className="text-lg font-medium text-green-800">Check Your Email</h2>
           </div>
           

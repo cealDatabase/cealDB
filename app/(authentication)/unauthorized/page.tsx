@@ -1,14 +1,14 @@
 import { Container } from "@/components/Container";
 import { Button } from "@/components/Button";
 import Link from "next/link";
-import { ExclamationTriangleIcon, HomeIcon } from "@heroicons/react/20/solid";
+import { AlertTriangle, Home } from "lucide-react";
 
 export default function UnauthorizedPage() {
   return (
     <main>
       <Container className="text-center max-w-2xl">
         <div className="flex justify-center mb-6">
-          <ExclamationTriangleIcon className="h-16 w-16 text-red-500" />
+          <AlertTriangle className="h-16 w-16 text-red-500" />
         </div>
         
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
@@ -38,7 +38,7 @@ export default function UnauthorizedPage() {
         
         <div className="flex justify-center space-x-4">
           <Button href="/admin" className="flex items-center">
-            <HomeIcon className="h-4 w-4 mr-2" />
+            <Home className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
           <Button variant="outline" href="/">

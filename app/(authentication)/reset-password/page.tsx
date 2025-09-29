@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
-import { CheckCircleIcon, XCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
+import { CheckCircle, XCircle, Eye, EyeOff } from "lucide-react";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
@@ -158,7 +158,7 @@ function ResetPasswordContent() {
           <div className="rounded-md bg-red-50 p-4 mt-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-700">
@@ -203,9 +203,9 @@ function ResetPasswordContent() {
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? (
-              <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+              <EyeOff className="h-5 w-5 text-gray-400" />
             ) : (
-              <EyeIcon className="h-5 w-5 text-gray-400" />
+              <Eye className="h-5 w-5 text-gray-400" />
             )}
           </button>
         </div>
@@ -226,9 +226,9 @@ function ResetPasswordContent() {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? (
-              <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+              <EyeOff className="h-5 w-5 text-gray-400" />
             ) : (
-              <EyeIcon className="h-5 w-5 text-gray-400" />
+              <Eye className="h-5 w-5 text-gray-400" />
             )}
           </button>
         </div>
@@ -253,9 +253,9 @@ function ResetPasswordContent() {
           <div className="flex">
             <div className="flex-shrink-0">
               {message.type === 'success' ? (
-                <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
+                <CheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />
               ) : (
-                <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
               )}
             </div>
             <div className="ml-3">

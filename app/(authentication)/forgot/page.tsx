@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import React from 'react';
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import { XCircleIcon } from "@heroicons/react/20/solid";
+import { CheckCircle, XCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -54,7 +53,7 @@ export default function ForgotPage() {
         <div className="rounded-md bg-green-50 p-4 mt-8">
           <div className="flex">
             <div className="flex-shrink-0">
-              <CheckCircleIcon
+              <CheckCircle
                 className="h-5 w-5 text-green-400"
                 aria-hidden="true"
               />
@@ -73,7 +72,7 @@ export default function ForgotPage() {
         <div className="rounded-md bg-red-50 p-4 mt-8">
           <div className="flex">
             <div className="flex-shrink-0">
-              <XCircleIcon
+              <XCircle
                 className="h-5 w-5 text-red-400"
                 aria-hidden="true"
               />

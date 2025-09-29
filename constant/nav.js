@@ -1,9 +1,9 @@
 import {
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  TableCellsIcon,
-  DocumentTextIcon,
-} from "@heroicons/react/24/outline";
+  MousePointer,
+  Table,
+  FileText,
+  PieChart,
+} from "lucide-react";
 
 export const MainMenu = [
   {
@@ -17,24 +17,24 @@ export const StatisticsMenu = [
     name: "Quick View",
     description: "A quick view on the statistics of all institutions.",
     href: "/statistics/quickview",
-    icon: CursorArrowRaysIcon,
+    icon: MousePointer,
   },
   {
     name: "Table View",
     description: "Contains Basic view and Advanced view, to fetch all the data available in individual tables.",
     href: "/statistics/tableview",
-    icon: TableCellsIcon,
+    icon: Table,
   },
   {
     name: "Graph View",
     description: "Contains Basic view and Advanced view, to fetch all the data available in individual graphs.",
     href: "/statistics/graphview",
-    icon: ChartPieIcon,
+    icon: PieChart,
   },
   {
     name: "Published Statistics",
     description: "Published Statistics in PDFs",
     href: "/statistics/pdf",
-    icon: DocumentTextIcon,
+    icon: FileText,
   },
 ];

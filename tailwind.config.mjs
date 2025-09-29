@@ -1,6 +1,6 @@
 import formsPlugin from "@tailwindcss/forms";
-import headlessuiPlugin from "@headlessui/tailwindcss";
 import tailwindcssAnimate from 'tailwindcss-animate';
+import tailwindScrollbar from 'tailwind-scrollbar';
 
 const config = {
   darkMode: ["class"],
@@ -111,13 +111,11 @@ const config = {
   		}
   	}
   },
-  plugins: {
-    "@tailwindcss/postcss": {},
+  plugins: [
 	formsPlugin,
-	headlessuiPlugin,
 	tailwindcssAnimate,
 	tailwindScrollbar,
-  },
+  ],
   variants: {
 	scrollbar: ['rounded'],
   }

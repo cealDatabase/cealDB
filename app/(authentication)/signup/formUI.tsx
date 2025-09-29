@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import React from "react";
-import { XCircleIcon } from "@heroicons/react/20/solid";
+import { XCircle, CheckCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -15,7 +15,6 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
 
 import signupAction from "./signupAction";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
 
 interface SignupResult {
   success: boolean;
@@ -126,7 +125,7 @@ export default function SignUpForm({
           <div className="rounded-md bg-green-50 p-4 mt-8">
             <div className="flex">
               <div className="flex-shrink-0">
-                <CheckCircleIcon
+                <CheckCircle
                   className="h-5 w-5 text-green-400"
                   aria-hidden="true"
                 />
@@ -143,7 +142,7 @@ export default function SignUpForm({
           <div className="rounded-md bg-red-50 p-4 mt-8">
             <div className="flex">
               <div className="flex-shrink-0">
-                <XCircleIcon
+                <XCircle
                   className="h-5 w-5 text-red-400"
                   aria-hidden="true"
                 />

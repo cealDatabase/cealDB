@@ -1,32 +1,34 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Generate list of years option from 2017 to current year
 const beginYear = 2017;
 
 export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     const router = useRouter();
-    const [selectedYear, setSelectedYear] = useState<number>(beginYear);
+    const currentYear = new Date().getFullYear();
+    const [selectedYear, setSelectedYear] = useState<number>(currentYear);
     const [years, setYears] = useState<number[]>([]);
     const [isClient, setIsClient] = useState(false);
 
     // Initialize client-side state and years array
     useEffect(() => {
         setIsClient(true);
-        const currentYear = new Date().getFullYear();
         const yearLength = currentYear - beginYear + 1;
         const yearsArray = Array.from({ length: yearLength }, (_, i) => beginYear + i);
         setYears(yearsArray);
         
+        // Set selectedYear based on yearCurrent prop or default to current year
         if (yearCurrent) {
             setSelectedYear(Number(yearCurrent));
+        } else {
+            setSelectedYear(currentYear);
         }
-    }, [yearCurrent]);
+    }, [yearCurrent, currentYear]);
 
     const handleChange = (year: number) => {
         setSelectedYear(year);
@@ -61,40 +63,26 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     }
 
     return (
-        <div className='flex items-center justify-end my-4 gap-4'>
-            <div className='flex flex-row self-end'>
-                <Listbox value={selectedYear} onChange={handleChange}>
-                    <Label className="text-sm/6 font-medium text-sky-600">Select Year:</Label>
-                    <div className="relative">
-                        <ListboxButton className="grid cursor-default grid-cols-1 rounded-md bg-white px-3 pb-0.5 text-left 
-                        outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                            <span className="col-start-1 row-start-1 truncate pr-6 text-sky-600 text-sm/6 md:text-normal">{selectedYear}</span>
-                            <ChevronUpDownIcon
-                                aria-hidden="true"
-                                className="col-start-1 row-start-1 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                            />
-                        </ListboxButton>
-
-                        <ListboxOptions
-                            transition
-                            className="absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
-                        >
-                            {years.map((year) => (
-                                <ListboxOption
-                                    key={year}
-                                    value={year}
-                                    className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
-                                >
-                                    <span className="block truncate font-normal group-data-selected:font-semibold">{year}</span>
-
-                                </ListboxOption>
-                            ))}
-                        </ListboxOptions>
-                    </div>
-                </Listbox>
+        <div className='flex items-center justify-between my-4 gap-4'>
+            <div className="flex items-center gap-4">
+                <div className="min-w-[120px]">
+                    <label className="block text-sm font-medium text-gray-900 mb-2">Select Year</label>
+                <Select value={selectedYear?.toString()} onValueChange={(value) => handleChange(parseInt(value))}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {years.map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                                {year}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                </div>
             </div>
 
-            <Button onClick={handleCreateClick} className='ml-4 text-sm px-4 py-0 md:text-normal'>
+            <Button onClick={handleCreateClick} className='text-sm px-4 py-0 md:text-normal'>
                 Create New Entry
             </Button>
         </div>

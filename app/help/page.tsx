@@ -1,7 +1,7 @@
 "use client";
 
 import { Container } from "@/components/Container";
-import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { Copy } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -50,7 +50,7 @@ const HelpPage = () => {
                     navigator.clipboard.writeText("mailto:anlin.yang@wisc.edu")
                   }
                 >
-                  <DocumentDuplicateIcon className="w-4 h-4" />
+                  <Copy className="w-4 h-4" />
                   Copy
                 </Link>
               </TooltipTrigger>
@@ -120,7 +120,7 @@ const HelpPage = () => {
                     navigator.clipboard.writeText("mailto:dni@hawaii.edu")
                   }
                 >
-                  <DocumentDuplicateIcon className="w-4 h-4" />
+                  <Copy className="w-4 h-4" />
                   Copy
                 </Link>
               </TooltipTrigger>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { XCircleIcon, CheckCircleIcon, ArrowLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
+import { XCircle, CheckCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -207,7 +207,7 @@ export default function SignInPage() {
         <div>
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center">
-              <CheckCircleIcon className="h-5 w-5 text-green-400 mr-2" />
+              <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
               <p className="text-sm text-green-800">
                 User found: <strong>{userInfo.email}</strong>
               </p>
@@ -237,9 +237,9 @@ export default function SignInPage() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                     ) : (
-                      <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                     )}
                   </button>
                 </div>
@@ -266,7 +266,7 @@ export default function SignInPage() {
               onClick={handleBackToEmail}
               className="flex items-center text-sm text-gray-600 hover:text-gray-800"
             >
-              <ArrowLeftIcon className="h-4 w-4 mr-1" />
+              <ArrowLeft className="h-4 w-4 mr-1" />
               Use a different email
             </button>
           </div>
@@ -278,7 +278,7 @@ export default function SignInPage() {
         <div className="space-y-6">
           {/* Email Display */}
           <div className="flex items-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <CheckCircleIcon className="h-5 w-5 text-blue-400 mr-3" />
+            <CheckCircle className="h-5 w-5 text-blue-400 mr-3" />
             <div>
               <p className="text-sm font-medium text-blue-800">
                 {userInfo.email}
@@ -328,7 +328,7 @@ export default function SignInPage() {
               className="w-full bg-transparent border-gray-300 text-gray-600 hover:text-gray-800"
               onClick={handleBackToEmail}
             >
-              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Use a different email
             </Button>
           </div>
@@ -340,7 +340,7 @@ export default function SignInPage() {
         <div className="rounded-md bg-red-50 p-4 mt-8">
           <div className="flex">
             <div className="flex-shrink-0">
-              <XCircleIcon
+              <XCircle
                 className="h-5 w-5 text-red-400"
                 aria-hidden="true"
               />
@@ -374,7 +374,7 @@ export default function SignInPage() {
         <div className="rounded-md bg-red-50 p-4 mt-8">
           <div className="flex">
             <div className="flex-shrink-0">
-              <XCircleIcon
+              <XCircle
                 className="h-5 w-5 text-red-400"
                 aria-hidden="true"
               />
