@@ -53,7 +53,7 @@ export async function GET(
       data: existingData,
       message: libraryYear.is_open_for_editing 
         ? "Form is available for editing" 
-        : "Form is not open for editing. Please contact the administrator."
+        : "Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help."
     });
 
   } catch (error: any) {

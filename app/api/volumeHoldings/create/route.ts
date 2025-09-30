@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     if (!libraryYear.is_open_for_editing) {
       return NextResponse.json(
-        { error: "Form is not open for editing. Please contact the administrator." },
+        { error: "Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help." },
         { status: 403 }
       );
     }

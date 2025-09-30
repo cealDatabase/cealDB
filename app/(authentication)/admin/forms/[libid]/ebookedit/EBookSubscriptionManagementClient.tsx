@@ -26,18 +26,21 @@ interface EBookSubscriptionManagementClientProps {
       is_global: boolean | null;
       libraryyear: number | null;
       updated_at: Date;
+      List_EBook_Counts?: Array<{ titles: number | null; volumes: number | null; chapters: number | null }>;
     };
   }>;
   libid: number;
   year: number;
   mode: "view" | "add";
+  libraryName: string;
 }
 
 export default function EBookSubscriptionManagementClient({
   subscriptions,
   libid,
   year,
-  mode
+  mode,
+  libraryName
 }: EBookSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -59,6 +62,9 @@ export default function EBookSubscriptionManagementClient({
       data_source: sub.List_EBook.data_source ?? "",
       is_global: !!sub.List_EBook.is_global,
       updated_at: sub.List_EBook.updated_at.toISOString(),
+      titles: sub.List_EBook.List_EBook_Counts?.[0]?.titles ?? 0,
+      volumes: sub.List_EBook.List_EBook_Counts?.[0]?.volumes ?? 0,
+      chapters: sub.List_EBook.List_EBook_Counts?.[0]?.chapters ?? 0,
     }));
 
   // Define columns for the management view
@@ -87,6 +93,30 @@ export default function EBookSubscriptionManagementClient({
       accessorKey: "cjk_title",
       header: "CJK Title",
       cell: ({ row }: any) => <div className="max-w-[150px] truncate">{row.getValue("cjk_title")}</div>,
+    },
+    {
+      accessorKey: "titles",
+      header: "Titles",
+      cell: ({ row }: any) => {
+        const count = row.getValue("titles") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
+    },
+    {
+      accessorKey: "volumes",
+      header: "Volumes",
+      cell: ({ row }: any) => {
+        const count = row.getValue("volumes") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
+    },
+    {
+      accessorKey: "chapters",
+      header: "Chapters",
+      cell: ({ row }: any) => {
+        const count = row.getValue("chapters") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
     },
     {
       id: "actions",
@@ -157,16 +187,16 @@ export default function EBookSubscriptionManagementClient({
     return (
       <div className="space-y-4">
         {/* Header with Add More Subscriptions button */}
-        <div className="flex items-center justify-between bg-purple-50 p-4 rounded-lg border border-purple-200">
+        <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200 shadow-sm">
           <div>
-            <h3 className="text-lg font-medium text-purple-900">Manage Your E-Book Subscriptions</h3>
+            <h3 className="text-xl font-semibold text-purple-900">Current Subscriptions</h3>
             <p className="text-sm text-purple-700 mt-1">
-              Currently subscribed to {data.length} E-Book record{data.length === 1 ? '' : 's'} for {year}
+              {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
             </p>
           </div>
           <Button
             size="lg"
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-purple-600 hover:bg-purple-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/ebook/${year}`)}
           >
             ➕ Add More Subscriptions

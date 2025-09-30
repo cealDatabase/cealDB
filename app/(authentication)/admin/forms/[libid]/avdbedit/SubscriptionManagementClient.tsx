@@ -25,18 +25,21 @@ interface SubscriptionManagementClientProps {
       type: string | null;
       is_global: boolean | null;
       updated_at: Date;
+      List_AV_Counts?: Array<{ titles: number | null }>;
     };
   }>;
   libid: number;
   year: number;
   mode: "view" | "add";
+  libraryName: string;
 }
 
 export default function SubscriptionManagementClient({
   subscriptions,
   libid,
   year,
-  mode
+  mode,
+  libraryName
 }: SubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -56,7 +59,7 @@ export default function SubscriptionManagementClient({
       publisher: sub.List_AV.publisher ?? "",
       data_source: sub.List_AV.data_source ?? "",
       type: sub.List_AV.type ?? "",
-      counts: 0,
+      counts: sub.List_AV.List_AV_Counts?.[0]?.titles ?? 0,
       language: [],
       is_global: !!sub.List_AV.is_global,
       subscribers: [],
@@ -89,6 +92,14 @@ export default function SubscriptionManagementClient({
       accessorKey: "type",
       header: "Type",
       cell: ({ row }: any) => <Badge variant="outline">{row.getValue("type")}</Badge>,
+    },
+    {
+      accessorKey: "counts",
+      header: "Titles",
+      cell: ({ row }: any) => {
+        const count = row.getValue("counts") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
     },
     {
       id: "actions",
@@ -159,16 +170,16 @@ export default function SubscriptionManagementClient({
     return (
       <div className="space-y-4">
         {/* Header with Add More Subscriptions button */}
-        <div className="flex items-center justify-between bg-blue-50 p-4 rounded-lg border border-blue-200">
+        <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 shadow-sm">
           <div>
-            <h3 className="text-lg font-medium text-blue-900">Manage Your AV Subscriptions</h3>
+            <h3 className="text-xl font-semibold text-blue-900">Current Subscriptions</h3>
             <p className="text-sm text-blue-700 mt-1">
-              Currently subscribed to {data.length} AV record{data.length === 1 ? '' : 's'} for {year}
+              {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
             </p>
           </div>
           <Button
             size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/avdb/${year}`)}
           >
             ➕ Add More Subscriptions
@@ -248,18 +259,11 @@ export default function SubscriptionManagementClient({
 
   return (
     <div className='space-y-4'>
-      <div className="rounded-md border bg-card p-4">
-        <h2 className="text-lg font-medium mb-2">Current Subscriptions</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Manage your library's AV subscriptions for {year}. You can remove individual subscriptions or select multiple to remove at once.
-        </p>
-        
-        <DataTable 
-          data={data} 
-          columns={getColumns()} 
-          Toolbar={ManagementToolbar}
-        />
-      </div>
+      <DataTable 
+        data={data} 
+        columns={getColumns()} 
+        Toolbar={ManagementToolbar}
+      />
     </div>
   );
 }

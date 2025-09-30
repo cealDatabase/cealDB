@@ -28,18 +28,21 @@ interface EJournalSubscriptionManagementClientProps {
       data_source: string | null;
       is_global: boolean | null;
       libraryyear: number | null;
+      List_EJournal_Counts?: Array<{ journals: number | null; dbs: number | null }>;
     };
   }>;
   libid: number;
   year: number;
   mode: "view" | "add";
+  libraryName: string;
 }
 
 export default function EJournalSubscriptionManagementClient({
   subscriptions,
   libid,
   year,
-  mode
+  mode,
+  libraryName
 }: EJournalSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -56,14 +59,15 @@ export default function EJournalSubscriptionManagementClient({
       description: sub.List_EJournal.description ?? "",
       notes: sub.List_EJournal.notes ?? "",
       subtitle: sub.List_EJournal.subtitle ?? "",
-      series: sub.List_EJournal.series ?? "",
-      vendor: sub.List_EJournal.vendor ?? "",
       cjk_title: sub.List_EJournal.cjk_title ?? "",
       romanized_title: sub.List_EJournal.romanized_title ?? "",
       data_source: sub.List_EJournal.data_source ?? "",
+      series: sub.List_EJournal.series ?? "",
+      vendor: sub.List_EJournal.vendor ?? "",
       is_global: !!sub.List_EJournal.is_global,
-      libraryyear: sub.List_EJournal.libraryyear,
       updated_at: sub.List_EJournal.updated_at.toISOString(),
+      journals: sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0,
+      dbs: sub.List_EJournal.List_EJournal_Counts?.[0]?.dbs ?? 0,
     }));
 
   // Define columns for the management view
@@ -92,6 +96,22 @@ export default function EJournalSubscriptionManagementClient({
       accessorKey: "series",
       header: "Series",
       cell: ({ row }: any) => <div className="max-w-[120px] truncate">{row.getValue("series")}</div>,
+    },
+    {
+      accessorKey: "journals",
+      header: "Journals",
+      cell: ({ row }: any) => {
+        const count = row.getValue("journals") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
+    },
+    {
+      accessorKey: "dbs",
+      header: "DBs",
+      cell: ({ row }: any) => {
+        const count = row.getValue("dbs") as number;
+        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+      },
     },
     {
       id: "actions",
@@ -162,16 +182,16 @@ export default function EJournalSubscriptionManagementClient({
     return (
       <div className="space-y-4">
         {/* Header with Add More Subscriptions button */}
-        <div className="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200">
+        <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200 shadow-sm">
           <div>
-            <h3 className="text-lg font-medium text-green-900">Manage Your E-Journal Subscriptions</h3>
+            <h3 className="text-xl font-semibold text-green-900">Current Subscriptions</h3>
             <p className="text-sm text-green-700 mt-1">
-              Currently subscribed to {data.length} E-Journal record{data.length === 1 ? '' : 's'} for {year}
+              {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
             </p>
           </div>
           <Button
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/ejournal/${year}`)}
           >
             ➕ Add More Subscriptions

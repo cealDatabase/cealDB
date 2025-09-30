@@ -88,11 +88,11 @@ export async function POST(req: Request) {
 
     // Check if editing is allowed
     if (!libraryYear.is_open_for_editing) {
-      console.log("Form is not open for editing");
+      console.log("Form is not avilable at this time");
       return NextResponse.json(
         { 
           error: "Form submission not allowed", 
-          message: "This form is not open for editing. Please contact the administrator." 
+          message: "This Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help." 
         },
         { status: 403 }
       );

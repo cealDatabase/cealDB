@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
     if (!libraryYear.is_open_for_editing) {
       return NextResponse.json(
-        { error: "Form is not open for editing" },
+        { error: "Form is not avilable at this time" },
         { status: 403 }
       );
     }

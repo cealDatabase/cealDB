@@ -7,6 +7,8 @@ import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import EJournalEditClient from "./EJournalEditClient";
+import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
+import { getLibraryById } from "@/data/fetchPrisma";
 
 // Define the component props interface for typing (matching actual database schema)
 interface EJournalSubscriptionManagementClientProps {
@@ -29,11 +31,13 @@ interface EJournalSubscriptionManagementClientProps {
       data_source: string | null;
       is_global: boolean | null;
       libraryyear: number | null;
+      List_EJournal_Counts?: Array<{ journals: number | null; dbs: number | null }>;
     };
   }>;
   libid: number;
   year: number;
   mode: "view" | "add";
+  libraryName: string;
 }
 
 // Use dynamic import with proper typing for client component
@@ -179,6 +183,10 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
+  // Fetch library information for display
+  const library = await getLibraryById(libid);
+  const libraryName = library?.library_name || `Library ${libid}`;
+
   // If no ids are provided, show all current subscriptions for this library with delete functionality
   if (ids.length === 0) {
     console.log("🔍 DEBUG: No IDs provided - showing all current E-Journal subscriptions for library", libid);
@@ -200,11 +208,19 @@ export default async function Page({ params, searchParams }: PageProps) {
       });
     }
 
-    // Get all current E-Journal subscriptions for this library and year
-    // At this point libraryYearRecord is guaranteed to exist (either found or created)
+    // Get all current E-Journal subscriptions for this library and year with counts
     const subscriptions = await db.libraryYear_ListEJournal.findMany({
       where: { libraryyear_id: libraryYearRecord!.id },
-      include: { List_EJournal: true },
+      include: { 
+        List_EJournal: {
+          include: {
+            List_EJournal_Counts: {
+              where: { year },
+              select: { journals: true, dbs: true }
+            }
+          }
+        } 
+      },
     });
 
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
@@ -212,15 +228,30 @@ export default async function Page({ params, searchParams }: PageProps) {
     if (subscribedEJournals.length === 0) {
       return (
         <main>
-          <Container className='bg-white p-12 max-w-full'>
-            <div className='flex-1 flex-col p-8 md:flex'>
-              <div className='space-y-2'>
-                <h2 className='text-2xl font-bold tracking-tight'>
-                  Library {libid} E-Journal Subscription Management - {year}
-                </h2>
-                <p className='text-muted-foreground text-sm'>
-                  No E-Journal subscriptions found for this library and year. Go to the survey page to add subscriptions.
-                </p>
+          <Container className='bg-white pb-12 max-w-full'>
+            <div className='px-8 pt-4'>
+              <SubscriptionBreadcrumb 
+                surveyType="ejournal" 
+                year={year} 
+                libraryName={libraryName}
+                mode="view"
+              />
+            </div>
+            <div className='flex-1 flex-col px-8 pb-4 md:flex'>
+              <div className='space-y-4'>
+                <div className='space-y-2'>
+                  <h2 className='text-3xl font-bold tracking-tight'>
+                    {libraryName} - E-Journal Subscription Management
+                  </h2>
+                  <p className='text-lg text-gray-600'>
+                    Year: {year}
+                  </p>
+                </div>
+                <div className='bg-yellow-50 border-l-4 border-yellow-400 p-4'>
+                  <p className='text-sm font-medium text-yellow-800'>
+                    No E-Journal subscriptions found for this library and year. Go to the survey page to add subscriptions.
+                  </p>
+                </div>
                 <div className="mt-4">
                   <a 
                     href={`/admin/survey/ejournal/${year}`}
@@ -238,15 +269,22 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     return (
       <main>
-        <Container className='bg-white p-12 max-w-full'>
-          <div className='flex-1 flex-col p-8 md:flex'>
-            <div className='space-y-2'>
-              <h2 className='text-2xl font-bold tracking-tight'>
-                Library {libid} E-Journal Subscription Management - {year}
-              </h2>
-              <p className='text-muted-foreground text-sm'>
-                Currently subscribed to {subscribedEJournals.length} E-Journal record{subscribedEJournals.length === 1 ? '' : 's'} for {year}. 
-                You can remove subscriptions below or go to the survey page to add more.
+        <Container className='bg-white pb-12 max-w-full'>
+          <div className='px-8 pt-4'>
+            <SubscriptionBreadcrumb 
+              surveyType="ejournal" 
+              year={year} 
+              libraryName={libraryName}
+              mode="view"
+            />
+          </div>
+          <div className='flex-1 flex-col px-8 pb-4 md:flex'>
+            <div className='mb-6 space-y-2'>
+              <h1 className='text-3xl font-bold tracking-tight'>
+                {libraryName} - E-Journal Subscription Management
+              </h1>
+              <p className='text-lg text-gray-600'>
+                Year: {year} • {subscribedEJournals.length} subscription{subscribedEJournals.length === 1 ? '' : 's'}
               </p>
             </div>
 
@@ -256,6 +294,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 libid={libid}
                 year={year}
                 mode="view"
+                libraryName={libraryName}
               />
             </Suspense>
           </div>
@@ -290,13 +329,21 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <main>
-      <Container className='bg-white p-12 max-w-full'>
-        <div className='flex-1 flex-col p-8 md:flex'>
-          <div className='space-y-2 mb-4'>
-            <h2 className='text-2xl font-bold tracking-tight'>
-              Add E-Journal Subscriptions - Library {libid}
-            </h2>
-            <p className='text-muted-foreground text-sm'>
+      <Container className='bg-white pb-12 max-w-full'>
+        <div className='px-8 pt-4'>
+          <SubscriptionBreadcrumb 
+            surveyType="ejournal" 
+            year={year} 
+            libraryName={libraryName}
+            mode="add"
+          />
+        </div>
+        <div className='flex-1 flex-col px-8 pb-4 md:flex'>
+          <div className='mb-6 space-y-2'>
+            <h1 className='text-3xl font-bold tracking-tight'>
+              Add E-Journal Subscriptions - {libraryName}
+            </h1>
+            <p className='text-lg text-gray-600'>
               Subscribe to selected E-Journal records for {year}. This will add them to Library {libid}'s collection.
             </p>
           </div>

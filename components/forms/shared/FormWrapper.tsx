@@ -46,9 +46,6 @@ export function FormWrapper({
           </CardHeader>
           <CardContent>
             <p className="text-red-700 mb-4">{libraryYearStatus?.message}</p>
-            <p className="text-sm text-red-600">
-              Please contact the administrator to resolve this issue.
-            </p>
           </CardContent>
         </Card>
       </div>
