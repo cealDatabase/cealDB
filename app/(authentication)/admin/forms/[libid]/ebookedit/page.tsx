@@ -1,61 +1,279 @@
-"use client"
+// app/(authentication)/admin/forms/[libid]/ebookedit/page.tsx
+import { cookies } from "next/headers";
+import db from "@/lib/db";
+import { notFound } from "next/navigation";
+import { Container } from "@/components/Container";
+import SkeletonTableCard from "@/components/SkeletonTableCard";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import EBookEditClient from "./EBookEditClient";
 
-import React, { useState } from 'react'
-import { Container } from "@/components/Container"
-import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
-import { Button } from "@/components/ui/button"
-import { BookOpen, X } from "lucide-react"
+// Dynamic import for client component
+const EBookSubscriptionManagementClient = dynamic(
+  () => import('./EBookSubscriptionManagementClient'),
+  { loading: () => <SkeletonTableCard /> }
+);
 
-const EBookEditPage = () => {
-    const [showInstructions, setShowInstructions] = useState(false)
+type PageProps = {
+  // 👇 in Next 15 these are async
+  params: Promise<{ libid: string }>;
+  searchParams: Promise<{ ids?: string; year?: string }>;
+};
+
+export default async function Page({ params, searchParams }: PageProps) {
+  // ✅ await both before accessing properties
+  const { libid: libidStr } = await params;
+  const sp = await searchParams;
+
+  const cookieStore = await cookies();
+  
+  // Parse year early so we can use it in error messages
+  const year = sp.year ? Number(sp.year) : 2025;
+  
+  // Parse libid from URL params, but also check cookies for member users
+  let libid: number;
+  
+  // Debug all cookies first
+  const allCookies = cookieStore.getAll();
+  console.log("All cookies:", allCookies);
+  
+  const libidFromCookie = cookieStore.get("libid")?.value;
+  const roleFromCookie = cookieStore.get("role")?.value;
+  
+  console.log("Cookie values:", {
+    libidFromCookie,
+    roleFromCookie,
+    libidStr
+  });
+  
+  // If libidStr is "member" or not a valid number, get libid from cookies
+  if (libidStr === "member" || isNaN(Number(libidStr))) {
+    if (libidFromCookie && !isNaN(Number(libidFromCookie))) {
+      libid = Number(libidFromCookie);
+    } else {
+      console.error("No valid libid found in cookies. Available cookies:", allCookies);
+      return (
+        <main>
+          <Container className='bg-white p-12 max-w-full'>
+            <div className='flex-1 flex-col p-8 md:flex'>
+              <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+                Library ID Missing
+              </h2>
+              <p className='text-muted-foreground text-sm mt-2'>
+                Your library ID cookie is missing or invalid. This is required to manage E-Book subscriptions.
+              </p>
+              <div className="bg-gray-100 p-4 rounded mt-4">
+                <p className="text-sm font-medium mb-2">Debug Information:</p>
+                <p className="text-xs">URL libid: {libidStr}</p>
+                <p className="text-xs">Cookie libid: {libidFromCookie || "Not found"}</p>
+                <p className="text-xs">Available cookies: {allCookies.length > 0 ? allCookies.map(c => c.name).join(", ") : "None"}</p>
+              </div>
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">Quick Fixes:</p>
+                <a 
+                  href="/debug-cookies"
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm mr-2"
+                >
+                  Set Cookies
+                </a>
+                <a 
+                  href={`/admin/forms/56/ebookedit${sp.ids ? `?ids=${sp.ids}&year=${year}` : ''}`}
+                  className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                >
+                  Try with Library 56
+                </a>
+              </div>
+            </div>
+          </Container>
+        </main>
+      );
+    }
+  } else {
+    libid = Number(libidStr);
+  }
+  
+  // Enhanced debugging for URL parsing
+  console.log("🔍 DEBUG: Raw searchParams:", sp);
+  console.log("🔍 DEBUG: sp.ids value:", sp.ids);
+  console.log("🔍 DEBUG: sp.ids type:", typeof sp.ids);
+  
+  // Fix: Handle empty string and undefined properly
+  const idsParam = sp.ids;
+  let ids: number[] = [];
+  
+  if (idsParam && idsParam.trim() !== "") {
+    ids = idsParam
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isFinite(n));
+  }
+
+  // Debug logging to see what we're getting
+  console.log("🔍 DEBUG: Starting ebookedit page load");
+  console.log("Debug ebookedit page:", {
+    libidStr,
+    libid,
+    year,
+    idsParam,
+    ids,
+    searchParams: sp
+  });
+
+  console.log("🔍 DEBUG: ids.length =", ids.length, ", ids =", ids);
+  console.log("🔍 DEBUG: Will enter", ids.length === 0 ? "VIEW mode (show current subscriptions)" : "ADD mode (subscription editor)");
+  
+  // TEMPORARY: Force VIEW mode to troubleshoot the issue
+  // Override ids to be empty to force subscription management view
+  if (!sp.ids || sp.ids.trim() === "") {
+    console.log("🔍 DEBUG: No valid IDs detected, forcing VIEW mode");
+    ids = []; // Ensure empty array for VIEW mode
+  }
+
+  // Final validation
+  if (!libid || isNaN(libid)) {
+    console.error("Invalid libid after processing:", libid);
+    return (
+      <main>
+        <Container className='bg-white p-12 max-w-full'>
+          <div className='flex-1 flex-col p-8 md:flex'>
+            <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+              Invalid Library ID
+            </h2>
+            <p className='text-muted-foreground text-sm mt-2'>
+              The library ID could not be determined. Please check your access permissions.
+            </p>
+          </div>
+        </Container>
+      </main>
+    );
+  }
+
+  // If no ids are provided, show all current subscriptions for this library with delete functionality
+  if (ids.length === 0) {
+    console.log("🔍 DEBUG: No IDs provided - showing all current E-Book subscriptions for library", libid);
+    
+    // Find or create Library_Year record
+    let libraryYearRecord = await db.library_Year.findFirst({
+      where: { library: libid, year: year }
+    });
+    
+    if (!libraryYearRecord) {
+      libraryYearRecord = await db.library_Year.create({
+        data: {
+          library: libid,
+          year: year,
+          updated_at: new Date(),
+          is_open_for_editing: true,
+          is_active: true,
+        },
+      });
+    }
+
+    // Get all current E-Book subscriptions for this library and year
+    // At this point libraryYearRecord is guaranteed to exist (either found or created)
+    const subscriptions = await db.libraryYear_ListEBook.findMany({
+      where: { libraryyear_id: libraryYearRecord!.id },
+      include: { List_EBook: true },
+    });
+
+    const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
+    
+    if (subscribedEBooks.length === 0) {
+      return (
+        <main>
+          <Container className='bg-white p-12 max-w-full'>
+            <div className='flex-1 flex-col p-8 md:flex'>
+              <div className='space-y-2'>
+                <h2 className='text-2xl font-bold tracking-tight'>
+                  Library {libid} E-Book Subscription Management - {year}
+                </h2>
+                <p className='text-muted-foreground text-sm'>
+                  No E-Book subscriptions found for this library and year. Go to the survey page to add subscriptions.
+                </p>
+                <div className="mt-4">
+                  <a 
+                    href={`/admin/survey/ebook/${year}`}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Go to Survey Page to Add Subscriptions
+                  </a>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </main>
+      );
+    }
 
     return (
-        <>
-            <Container>
-                <AdminBreadcrumb libraryName="Library" />
-                <h1 className="text-3xl font-bold text-gray-900 mt-6">
-                    E-Book Database by Subscription
-                </h1>
-                <div className="flex items-center justify-between mb-6">
-                    <Button
-                        variant="outline"
-                        className="flex items-center gap-2 text-md font-bold"
-                        size="lg"
-                        onClick={() => setShowInstructions(!showInstructions)}
-                    >
-                        {showInstructions ? (
-                            <>
-                                <X className="h-4 w-4" />
-                                Hide Instructions
-                            </>
-                        ) : (
-                            <>
-                                <BookOpen className="h-4 w-4" />
-                                View Instructions
-                            </>
-                        )}
-                    </Button>
-                </div>
+      <main>
+        <Container className='bg-white p-12 max-w-full'>
+          <div className='flex-1 flex-col p-8 md:flex'>
+            <div className='space-y-2'>
+              <h2 className='text-2xl font-bold tracking-tight'>
+                Library {libid} E-Book Subscription Management - {year}
+              </h2>
+              <p className='text-muted-foreground text-sm'>
+                Currently subscribed to {subscribedEBooks.length} E-Book record{subscribedEBooks.length === 1 ? '' : 's'} for {year}. 
+                You can remove subscriptions below or go to the survey page to add more.
+              </p>
+            </div>
 
-                <div className="flex gap-6 max-w-full">
-                    {showInstructions && (
-                        <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-lg p-6 overflow-y-auto max-h-[80vh] sticky top-4">
-                            <div className="text-gray-600">
-                                <p>E-Book Database by Subscription instructions will be added here.</p>
-                            </div>
-                        </div>
-                    )}
+            <Suspense fallback={<SkeletonTableCard />}> 
+              <EBookSubscriptionManagementClient 
+                subscriptions={subscriptions}
+                libid={libid}
+                year={year}
+                mode="view"
+              />
+            </Suspense>
+          </div>
+        </Container>
+      </main>
+    );
+  }
 
-                    <div className={showInstructions ? "w-2/3" : "w-full max-w-[1200px]"}>
-                        <div className="bg-white rounded-lg shadow-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">E-Book Database by Subscription Form</h2>
-                            <p className="text-gray-600">E-Book Database by Subscription form will be implemented here.</p>
-                        </div>
-                    </div>
-                </div>
-            </Container>
-        </>
-    )
+  // When IDs are provided, show the subscription editor for adding new subscriptions
+  console.log("🔍 DEBUG: IDs provided - showing E-Book subscription editor for", ids.length, "records");
+  
+  const rows = await db.list_EBook.findMany({
+    where: { id: { in: ids } }
+  });
+
+  const data = rows.map((r) => ({
+    id: r.id,
+    title: r.title ?? "",
+    subtitle: r.subtitle ?? "",
+    cjk_title: r.cjk_title ?? "",
+    romanized_title: r.romanized_title ?? "",
+    description: r.description ?? "",
+    notes: r.notes ?? "",
+    sub_series_number: r.sub_series_number ?? "",
+    publisher: r.publisher ?? "",
+    data_source: r.data_source ?? "",
+    is_global: !!r.is_global,
+    updated_at: r.updated_at.toISOString(),
+  }));
+
+  return (
+    <main>
+      <Container className='bg-white p-12 max-w-full'>
+        <div className='flex-1 flex-col p-8 md:flex'>
+          <div className='space-y-2 mb-4'>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              Add E-Book Subscriptions - Library {libid}
+            </h2>
+            <p className='text-muted-foreground text-sm'>
+              Subscribe to selected E-Book records for {year}. This will add them to Library {libid}'s collection.
+            </p>
+          </div>
+          <EBookEditClient 
+            rows={data}
+            libid={libid}
+            year={year}
+          />
+        </div>
+      </Container>
+    </main>
+  );
 }
-
-export default EBookEditPage

@@ -7,19 +7,42 @@ import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 
-async function EJournalSinglePage(yearPassIn: number, roleIdPassIn: string | undefined) {
+async function EJournalSinglePage(
+  yearPassIn: number,
+  roleIdPassIn: string | undefined,
+  libid?: number
+) {
     const tasks = (await GetEJournalList(yearPassIn)).sort((a, b) => a.id - b.id);
-    return <EJournalDataTableClient data={tasks} year={yearPassIn} roleIdPassIn={roleIdPassIn} />;
+    return (
+      <EJournalDataTableClient
+        data={tasks}
+        year={yearPassIn}
+        roleIdPassIn={roleIdPassIn}
+        libid={libid}
+      />
+    );
 }
 
 export default async function EJournalListPage(
     props: {
         params: Promise<{ year: string }>;
+        searchParams?: Promise<{ libid?: string }>;
     }
 ) {
     const params = await props.params;
+    const sp = (await props.searchParams) ?? {};
+    
     const cookieStore = await cookies();
     const roleId = cookieStore.get("role")?.value;
+    
+    // Prefer libid from query (?libid=56); fall back to cookie if available
+    const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
+    const libidFromCookie = cookieStore.get("libid")?.value
+        ? Number(cookieStore.get("libid")!.value)
+        : undefined;
+    
+    const libid = libidFromQuery ?? libidFromCookie;
+    
     console.log("roleId", roleId);
 
     return (
@@ -42,7 +65,7 @@ export default async function EJournalListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {EJournalSinglePage(Number(params.year), roleId)}
+                        {await EJournalSinglePage(Number(params.year), roleId, libid)}
                     </Suspense>
                 </div>
             </Container>
