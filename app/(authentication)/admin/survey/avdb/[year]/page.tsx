@@ -11,7 +11,8 @@ import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 async function AVSinglePage(
   yearPassIn: number,
   roleIdPassIn: string | undefined,
-  libid?: number
+  libid?: number,
+  userRoles?: string[] | null
 ) {
   const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
   return (
@@ -20,6 +21,7 @@ async function AVSinglePage(
       year={yearPassIn}
       roleIdPassIn={roleIdPassIn}
       libid={libid}
+      userRoles={userRoles}
     />
   );
 }
@@ -33,6 +35,17 @@ export default async function AVListPage(props: {
 
   const cookieStore = await cookies();
   const roleId = cookieStore.get("role")?.value;
+
+  // Parse user roles for permission checking
+  let userRoles: string[] | null = null;
+  if (roleId) {
+    try {
+      // Role cookie can be JSON array or single value
+      userRoles = roleId.startsWith('[') ? JSON.parse(roleId) : [roleId];
+    } catch (error) {
+      console.error('Error parsing role cookie:', error);
+    }
+  }
 
   // Prefer libid from query (?libid=56); fall back to cookie if you have one
   const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
@@ -64,7 +77,7 @@ export default async function AVListPage(props: {
           <SelectYear yearCurrent={params.year} />
 
           <Suspense fallback={<SkeletonTableCard />}>
-            {await AVSinglePage(Number(params.year), roleId, libid)}
+            {await AVSinglePage(Number(params.year), roleId, libid, userRoles)}
           </Suspense>
         </div>
       </Container>

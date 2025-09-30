@@ -7,7 +7,7 @@ import {
 
 export const MainMenu = [
   {
-    label: "Libraries",
+    label: "Institutions",
     href: "/libraries",
   }
 ];

@@ -10,11 +10,13 @@ export default function AVDataTableClient({
   year,
   roleIdPassIn,
   libid,
+  userRoles,
 }: {
   data: listAV[];
   year: number;
-  roleIdPassIn?: string;
-  libid?: number;
+  libid: number | undefined;
+  roleIdPassIn: string | undefined;
+  userRoles?: string[] | null;
 }) {
   const columns = getColumns(year, roleIdPassIn);
 
@@ -23,5 +25,5 @@ export default function AVDataTableClient({
     <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
 
-  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} />;
+  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} />;
 }

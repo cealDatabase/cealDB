@@ -8,18 +8,20 @@ import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 
 async function EbookSinglePage(
-  yearPassIn: number,
-  roleIdPassIn: string | undefined,
-  libid?: number
+    yearPassIn: number,
+    roleIdPassIn: string | undefined,
+    libid?: number,
+    userRoles?: string[] | null
 ) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
     return (
-      <EBookDataTableClient
-        data={tasks}
-        year={yearPassIn}
-        roleIdPassIn={roleIdPassIn}
-        libid={libid}
-      />
+        <EBookDataTableClient
+            data={tasks}
+            year={yearPassIn}
+            roleIdPassIn={roleIdPassIn}
+            libid={libid}
+            userRoles={userRoles}
+        />
     );
 }
 
@@ -31,19 +33,30 @@ export default async function EbookListPage(
 ) {
     const params = await props.params;
     const sp = (await props.searchParams) ?? {};
-    
+
     const cookieStore = await cookies();
     const roleId = cookieStore.get("role")?.value;
-    
+
     // Prefer libid from query (?libid=56); fall back to cookie if available
     const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
     const libidFromCookie = cookieStore.get("libid")?.value
         ? Number(cookieStore.get("libid")!.value)
         : undefined;
-    
+
     const libid = libidFromQuery ?? libidFromCookie;
-    
+
     console.log("roleId", roleId);
+
+    // Parse user roles for permission checking
+    let userRoles: string[] | null = null;
+    if (roleId) {
+        try {
+            // Role cookie can be JSON array or single value
+            userRoles = roleId.startsWith('[') ? JSON.parse(roleId) : [roleId];
+        } catch (error) {
+            console.error('Error parsing role cookie:', error);
+        }
+    }
 
     return (
         <main>
@@ -65,7 +78,7 @@ export default async function EbookListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {await EbookSinglePage(Number(params.year), roleId, libid)}
+                        {await EbookSinglePage(Number(params.year), roleId, libid, userRoles)}
                     </Suspense>
                 </div>
             </Container>

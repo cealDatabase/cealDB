@@ -84,12 +84,12 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { year, action, userId, userRoles } = await request.json();
+    const { year, action, userRoles } = await request.json();
 
-    // Verify user is super admin
+    // Verify user is super admin (role ID 1) - no individual userId needed
     if (!userRoles || !userRoles.includes('1')) {
       return NextResponse.json(
-        { error: 'Unauthorized: Super admin access required' },
+        { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }
       );
     }

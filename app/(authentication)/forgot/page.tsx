@@ -78,7 +78,7 @@ export default function ForgotPage() {
               />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-700">
+              <h3 className="text-sm font-medium text-red-700 whitespace-pre-line">
                 {error}
               </h3>
             </div>

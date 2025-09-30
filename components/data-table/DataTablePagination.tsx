@@ -24,9 +24,10 @@ import {
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  userRoles?: string[] | null;
 }
 
-export function DataTablePagination<TData extends { id: number; counts?: number }>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends { id: number; counts?: number }>({ table, userRoles }: DataTablePaginationProps<TData>) {
   // Year options range from 2017 to the current year
   const beginYear = 2017;
   const years = Array.from({ length: new Date().getFullYear() - beginYear + 1 }, (_, i) => beginYear + i);
@@ -40,6 +41,9 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
   const router = useRouter();
   const pathname = usePathname();
 
+  // Check if user has Super Admin (role 1) or E-resource Editor (role 3) permission
+  const canCopy = userRoles ? (userRoles.includes('1') || userRoles.includes('3')) : false;
+
   // Determine resource segment (e.g. avdb, ebook, ejournal)
   const segments = pathname.split("/").filter(Boolean);
   const resourceSegment = segments[segments.length - 2] ?? "";
@@ -50,6 +54,14 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
   const selectedRows = table.getFilteredSelectedRowModel().rows;
 
   const handleCopy = async () => {
+    // Security check: prevent unauthorized access
+    if (!canCopy) {
+      console.error('[handleCopy] Unauthorized: User does not have permission to copy');
+      setCopyStatus("error");
+      setCopyMessage("Unauthorized: You do not have permission to copy records");
+      return;
+    }
+    
     if (!selectedRows.length) return;
     setIsCopying(true);
     // ===== Monitor Logs: handleCopy invoked =====
@@ -107,7 +119,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
         <span>
           {selectedRows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
         </span>
-        {selectedRows.length > 0 && (
+        {selectedRows.length > 0 && canCopy && (
           <>
             <Select
               value={String(targetYear)}

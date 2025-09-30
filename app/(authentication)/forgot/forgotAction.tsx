@@ -37,9 +37,12 @@ export default async function forgotAction(
     if (res.ok) {
       return json.message || "Password reset email sent successfully! Check your email inbox.";
     } else {
-      return json.message || "Unable to process password reset request.";
+      // Return detailed error message with hint if available
+      const errorMessage = json.message || "Unable to process password reset request.";
+      const hint = json.hint ? `\n\n${json.hint}` : "";
+      return `${errorMessage}${hint}`;
     }
   } catch (error) {
-    return "Unable to send password reset email. Please try again later.";
+    return "Error: Unable to send password reset email. Please try again later.";
   }
 }

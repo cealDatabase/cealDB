@@ -7,20 +7,20 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { openingDate, closingDate, year, userId, userRoles } = await request.json();
+    const { openingDate, closingDate, year, userRoles } = await request.json();
 
     // Verify user is super admin (role contains 1)
     if (!userRoles || !userRoles.includes('1')) {
       return NextResponse.json(
-        { error: 'Unauthorized: Super admin access required' },
+        { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }
       );
     }
 
     // Validate required fields
-    if (!openingDate || !closingDate || !year || !userId) {
+    if (!openingDate || !closingDate || !year) {
       return NextResponse.json(
-        { error: 'Missing required fields: openingDate, closingDate, year, userId' },
+        { error: 'Missing required fields: openingDate, closingDate, year' },
         { status: 400 }
       );
     }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Use the provided dates
     const totalDays = Math.ceil((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    // Check if forms are already open for this year
+    // Check if forms are already open for this year (informational only)
     const openLibraries = await prisma.library_Year.findMany({
       where: {
         year: year,
@@ -60,20 +60,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (openLibraries.length > 0) {
-      return NextResponse.json(
-        { error: `Forms are already open for ${openLibraries.length} libraries in year ${year}` },
-        { status: 409 }
-      );
+      console.log(`⚠️  Warning: ${openLibraries.length} libraries are already open for year ${year}. Proceeding with broadcast anyway.`);
     }
 
-    // Get broadcast list ID from environment
-    const broadcastListId = process.env.RESEND_BROADCAST_LIST_ID;
-    if (!broadcastListId) {
+    // Get audience ID from environment (for Resend Broadcast API)
+    const audienceId = process.env.RESEND_BROADCAST_LIST_ID;
+    if (!audienceId) {
       return NextResponse.json(
-        { error: 'Broadcast list ID not configured' },
+        { error: 'Broadcast audience ID not configured. Please set RESEND_BROADCAST_LIST_ID in environment variables.' },
         { status: 500 }
       );
     }
+
+    console.log('📧 Creating broadcast with Resend API...');
+    console.log('Audience ID:', audienceId);
+    console.log('Year:', year);
+    console.log('Opening Date:', openDate.toISOString());
+    console.log('Closing Date:', closeDate.toISOString());
 
     // Create email template
     const emailTemplate = `
@@ -124,13 +127,16 @@ export async function POST(request: NextRequest) {
       </div>
     `;
 
-    // Create broadcast via Resend API
+    // Create broadcast via Resend Broadcast API
+    // Reference: https://resend.com/docs/api-reference/broadcasts/create-broadcast
     const broadcast = await resend.broadcasts.create({
-      audienceId: broadcastListId,
+      audienceId: audienceId,
       from: 'CEAL Database <notifications@cealstats.org>',
       subject: `CEAL Database Forms Open for ${year} - Action Required`,
       html: emailTemplate
     });
+
+    console.log('✅ Broadcast created successfully:', broadcast.data?.id);
 
     // Update all Library_Year records to open for editing
     const updateResult = await prisma.library_Year.updateMany({

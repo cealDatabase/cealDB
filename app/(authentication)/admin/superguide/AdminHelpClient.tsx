@@ -2,9 +2,8 @@
 
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
-import BroadcastFormModal from '@/components/BroadcastFormModal'
 
 interface UserInfo {
     userId: number;
@@ -118,9 +117,6 @@ const openNewYearForm = async () => {
 
 export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
     const currentYear = new Date().getFullYear();
-    const [showBroadcastModal, setShowBroadcastModal] = useState(false);
-
-    console.log('🎭 AdminHelpClient received userInfo:', userInfo);
 
     return (
         <>
@@ -135,12 +131,11 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
 
                         {/* New Broadcast Button - Only show for super admins */}
                         {userInfo && userInfo.userRoles.includes('1') && (
-                            <Button
-                                className='w-[250px] bg-blue-600 hover:bg-blue-700'
-                                onClick={() => setShowBroadcastModal(true)}
-                            >
-                                📧 Open Forms & Broadcast
-                            </Button>
+                            <Link href="/admin/broadcast">
+                                <Button className='w-[250px] bg-blue-600 hover:bg-blue-700'>
+                                    📧 Open Forms & Broadcast
+                                </Button>
+                            </Link>
                         )}
                     </div>
 
@@ -352,16 +347,6 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
                     <li>Find the file in the list, to the right of the file name you will see its URL.&nbsp; Copy and paste this as the link to the file.</li>
                 </ol>
             </Container>
-
-            {/* Broadcast Modal */}
-            {userInfo && (
-                <BroadcastFormModal
-                    isOpen={showBroadcastModal}
-                    onClose={() => setShowBroadcastModal(false)}
-                    userId={userInfo.userId}
-                    userRoles={userInfo.userRoles}
-                />
-            )}
         </>
     )
 }

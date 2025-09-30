@@ -80,14 +80,21 @@ async function handlePasswordResetRequest(email: string) {
     });
 
     if (!user) {
-      // Don't reveal if user exists for security
+      // Return clear error message for user experience
       return NextResponse.json(
         {
-          success: true,
-          message: 'If an account with that email exists, a password reset link has been sent.',
-          hint: 'Check your email for password reset instructions.',
+          success: false,
+          errorType: 'USER_NOT_FOUND',
+          message: 'Error: No account found with this email address.',
+          hint: 'Please check your email spelling or contact the CEAL administrator to verify your account status.',
+          suggestions: [
+            'Double-check your email address for typos',
+            'Make sure you\'re using the email registered with CEAL',
+            'Contact your library\'s CEAL coordinator',
+            'Reach out to CEAL administrators for assistance'
+          ]
         },
-        { status: 200 }
+        { status: 404 }
       );
     }
 

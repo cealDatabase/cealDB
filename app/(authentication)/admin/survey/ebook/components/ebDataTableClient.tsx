@@ -10,18 +10,20 @@ export default function EBookDataTableClient({
   year,
   roleIdPassIn,
   libid,
+  userRoles,
 }: {
   data: listEBook[];
   year: number;
   roleIdPassIn: string | undefined;
+  userRoles?: string[] | null;
   libid?: number;
 }) {
   const columns = getColumns(year, roleIdPassIn);
-  
+
   // Inject libid + year + roleId into the toolbar
   const ToolbarWithLib = (props: any) => (
     <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
-  
-  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} />;
+
+  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} />;
 }

@@ -37,12 +37,17 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * boxes, faceted filters, etc.
    */
   Toolbar?: React.ComponentType<{ table: TableInstance<TData> }>;
+  /**
+   * User roles for permission checking (e.g., for copy functionality)
+   */
+  userRoles?: string[] | null;
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
   columns,
   data,
   Toolbar,
+  userRoles,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -134,7 +139,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} userRoles={userRoles} />
     </div>
   );
 }
