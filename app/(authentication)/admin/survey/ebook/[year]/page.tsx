@@ -7,19 +7,42 @@ import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 
-async function EbookSinglePage(yearPassIn: number, roleIdPassIn: string | undefined) {
+async function EbookSinglePage(
+  yearPassIn: number,
+  roleIdPassIn: string | undefined,
+  libid?: number
+) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
-    return <EBookDataTableClient data={tasks} year={yearPassIn} roleIdPassIn={roleIdPassIn} />;
+    return (
+      <EBookDataTableClient
+        data={tasks}
+        year={yearPassIn}
+        roleIdPassIn={roleIdPassIn}
+        libid={libid}
+      />
+    );
 }
 
 export default async function EbookListPage(
     props: {
         params: Promise<{ year: string }>;
+        searchParams?: Promise<{ libid?: string }>;
     }
 ) {
     const params = await props.params;
+    const sp = (await props.searchParams) ?? {};
+    
     const cookieStore = await cookies();
     const roleId = cookieStore.get("role")?.value;
+    
+    // Prefer libid from query (?libid=56); fall back to cookie if available
+    const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
+    const libidFromCookie = cookieStore.get("libid")?.value
+        ? Number(cookieStore.get("libid")!.value)
+        : undefined;
+    
+    const libid = libidFromQuery ?? libidFromCookie;
+    
     console.log("roleId", roleId);
 
     return (
@@ -42,7 +65,7 @@ export default async function EbookListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {await EbookSinglePage(Number(params.year), roleId)}
+                        {await EbookSinglePage(Number(params.year), roleId, libid)}
                     </Suspense>
                 </div>
             </Container>
