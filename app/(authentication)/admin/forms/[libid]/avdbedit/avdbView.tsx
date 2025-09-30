@@ -22,7 +22,7 @@ export default async function AvdbViewPage({ params, searchParams }: PageProps) 
   // Get library ID from params or cookie
   let libid: number;
   if (params.libid === "member" || isNaN(Number(params.libid))) {
-    const libidFromCookie = cookieStore.get("libid")?.value;
+    const libidFromCookie = cookieStore.get("library")?.value;
     if (!libidFromCookie) return nextNotFound();
     libid = Number(libidFromCookie);
   } else {

@@ -39,8 +39,8 @@ export default async function EbookListPage(
 
     // Prefer libid from query (?libid=56); fall back to cookie if available
     const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
-    const libidFromCookie = cookieStore.get("libid")?.value
-        ? Number(cookieStore.get("libid")!.value)
+    const libidFromCookie = cookieStore.get("library")?.value
+        ? Number(cookieStore.get("library")!.value)
         : undefined;
 
     const libid = libidFromQuery ?? libidFromCookie;

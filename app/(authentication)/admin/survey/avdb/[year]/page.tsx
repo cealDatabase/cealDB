@@ -49,8 +49,8 @@ export default async function AVListPage(props: {
 
   // Prefer libid from query (?libid=56); fall back to cookie if you have one
   const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
-  const libidFromCookie = cookieStore.get("libid")?.value
-    ? Number(cookieStore.get("libid")!.value)
+  const libidFromCookie = cookieStore.get("library")?.value
+    ? Number(cookieStore.get("library")!.value)
     : undefined;
 
   const libid = libidFromQuery ?? libidFromCookie;

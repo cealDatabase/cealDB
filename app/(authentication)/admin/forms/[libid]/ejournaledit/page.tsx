@@ -67,7 +67,8 @@ export default async function Page({ params, searchParams }: PageProps) {
   const allCookies = cookieStore.getAll();
   console.log("All cookies:", allCookies);
   
-  const libidFromCookie = cookieStore.get("libid")?.value;
+  // The cookie is named "library" not "libid"
+  const libidFromCookie = cookieStore.get("library")?.value;
   const roleFromCookie = cookieStore.get("role")?.value;
   
   console.log("Cookie values:", {
