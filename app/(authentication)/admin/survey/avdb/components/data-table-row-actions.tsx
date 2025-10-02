@@ -41,7 +41,7 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-[160px] bg-white'>
+        <DropdownMenuContent align='end' className='bg-white'>
           <DropdownMenuItem
             onClick={() => setOpenEdit(true)}
             className='hover:bg-blue-100/30'

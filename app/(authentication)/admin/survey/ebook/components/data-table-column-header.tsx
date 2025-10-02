@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface DataTableColumnHeaderProps<TData, TValue>
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   column: Column<TData, TValue>
-  title: string
+  title: string | React.ReactNode
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -28,7 +28,7 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn("text-xs text-left py-2", className)}>{title}</div>
   }
 
   return (
@@ -38,9 +38,9 @@ export function DataTableColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            className="-ml-3 h-8 data-[state=open]:bg-accent text-xs py-2"
           >
-            <span>{title}</span>
+            <span className="text-left">{title}</span>
             {column.getIsSorted() === "desc" ? (
               <ArrowDown className="ml-2 h-4 w-4" />
             ) : column.getIsSorted() === "asc" ? (

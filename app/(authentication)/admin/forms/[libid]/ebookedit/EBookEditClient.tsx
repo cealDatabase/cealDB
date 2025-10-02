@@ -69,7 +69,7 @@ export default function EBookEditClient({
       accessorKey: "title",
       header: "English Title",
       cell: ({ row }: any) => (
-        <div className="max-w-[300px] truncate">{row.getValue("title")}</div>
+        <div className="max-w-[200px] truncate">{row.getValue("title")}</div>
       ),
     },
     {

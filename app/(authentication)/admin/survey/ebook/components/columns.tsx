@@ -20,7 +20,7 @@ type EBookRow = listEBook & {
 
 const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   if (!content || (Array.isArray(content) && content.length === 0)) {
-    return <span className='text-muted-foreground italic'>No content</span>;
+    return <span className='text-muted-foreground italic'>null</span>;
   }
   const fullText = Array.isArray(content) ? content.join("\n") : content;
   const preview =
@@ -130,7 +130,7 @@ const ExpandableSubscribers = ({
     !subscribers ||
     (Array.isArray(subscribers) && subscribers.length === 0)
   ) {
-    return <span className='text-muted-foreground italic'>No subscribers</span>;
+    return <span className='text-muted-foreground italic'>null</span>;
   }
   const listArray = Array.isArray(subscribers)
     ? subscribers
@@ -192,40 +192,76 @@ export function getColumns(
       enableHiding: false,
     },
     {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ID' />
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} year={year} basePath='ebook' />
       ),
-      cell: ({ row }) => <div className='w-[40px]'>{row.getValue("id")}</div>,
+    },
+     /** Counts / Volumes / Chapters */
+     {
+      accessorKey: "counts",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={<>Counts<br />(# titles)</>} />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[80px]'>
+          {(row.getValue("counts") as number) ?? 0}
+        </div>
+      ),
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "volumes",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Volumes' />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[80px]'>
+          {(row.getValue("volumes") as number) ?? 0}
+        </div>
+      ),
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "chapters",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Chapters' />
+      ),
+      cell: ({ row }) => (
+        <div className='max-w-[80px]'>
+          {(row.getValue("chapters") as number) ?? 0}
+        </div>
+      ),
       enableSorting: true,
       enableHiding: false,
     },
 
-    
-
     /** Rest unchanged */
-    {
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='English Title' />
-      ),
-      cell: ({ row }) => (
-        <div className='flex space-x-2'>
-          <span className='min-w-[250px] max-w-[500px] font-medium'>
-            {row.getValue("title")}
-          </span>
-        </div>
-      ),
-    },
     {
       accessorKey: "cjk_title",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='CJK Title' />
+        <DataTableColumnHeader column={column} title={<>CJK<br />Title</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
           <span className='max-w-[500px] font-medium'>
             {row.getValue("cjk_title")}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={<>English<br />Title</>} />
+      ),
+      cell: ({ row }) => (
+        <div className='flex space-x-2'>
+          <span className='min-w-[150px] max-w-[500px] font-medium'>
+            {row.getValue("title")}
           </span>
         </div>
       ),
@@ -280,7 +316,7 @@ export function getColumns(
     {
       accessorKey: "sub_series_number",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Sub Series Number' />
+        <DataTableColumnHeader column={column} title={<>Sub Series<br />Number</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
@@ -306,7 +342,7 @@ export function getColumns(
     {
       accessorKey: "description",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Description & Source' />
+        <DataTableColumnHeader column={column} title={<>Description<br />& Source</>} />
       ),
       cell: ({ row }) => {
         const description =
@@ -331,46 +367,7 @@ export function getColumns(
       ),
     },
 
-    /** Counts / Volumes / Chapters */
-    {
-      accessorKey: "counts",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Counts (# titles)' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("counts") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "volumes",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Volumes' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("volumes") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "chapters",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Chapters' />
-      ),
-      cell: ({ row }) => (
-        <div className='max-w-[200px]'>
-          {(row.getValue("chapters") as number) ?? 0}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: false,
-    },
+   
     ...(roleIdPassIn?.trim() !== "2"
       ? ([
           {
@@ -390,7 +387,7 @@ export function getColumns(
               ) {
                 return (
                   <span className='text-muted-foreground italic'>
-                    No subscribers
+                    null
                   </span>
                 );
               }
@@ -402,11 +399,5 @@ export function getColumns(
           } as ColumnDef<EBookRow>,
         ] as ColumnDef<EBookRow>[])
       : []),
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <DataTableRowActions row={row} year={year} basePath='ebook' />
-      ),
-    },
   ];
 }

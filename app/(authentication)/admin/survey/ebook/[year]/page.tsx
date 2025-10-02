@@ -45,8 +45,6 @@ export default async function EbookListPage(
 
     const libid = libidFromQuery ?? libidFromCookie;
 
-    console.log("roleId", roleId);
-
     // Parse user roles for permission checking
     let userRoles: string[] | null = null;
     if (roleId) {

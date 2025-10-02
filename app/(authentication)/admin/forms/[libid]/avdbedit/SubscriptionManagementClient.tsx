@@ -76,12 +76,12 @@ export default function SubscriptionManagementClient({
     {
       accessorKey: "title",
       header: "English Title",
-      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("title")}</div>,
+      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("title")}</div>,
     },
     {
       accessorKey: "cjk_title",
       header: "CJK Title",
-      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("cjk_title")}</div>,
+      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("cjk_title")}</div>,
     },
     {
       accessorKey: "publisher",

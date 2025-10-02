@@ -15,7 +15,7 @@ import {
 // Utility to render text or list with popover capability
 const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   if (!content || (Array.isArray(content) && content.length === 0)) {
-    return <span className="text-muted-foreground italic">No content</span>
+    return <span className="text-muted-foreground italic">null</span>
   }
 
   // Convert array to display string
@@ -61,7 +61,7 @@ const ExpandableTextWithSource = ({
   dataSource: string | null | undefined
 }) => {
   // Handle missing description
-  if (!description) return <span className="text-muted-foreground italic">No description</span>
+  if (!description) return <span className="text-muted-foreground italic">null</span>
 
   // Check if data source is valid
   const isValidDataSource = !!dataSource &&
@@ -112,7 +112,7 @@ const ExpandableTextWithSource = ({
 // Expandable subscribers list: shows count as button and full list in popover
 const ExpandableSubscribers = ({ subscribers }: { subscribers: string[] | string | null }) => {
   if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-    return <span className="text-muted-foreground italic">No subscribers</span>;
+    return <span className="text-muted-foreground italic">null</span>;
   }
 
   const listArray = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
@@ -174,15 +174,15 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
         <DataTableColumnHeader column={column} title='Counts' />
       ),
       cell: ({ row }) => (
-        <div className='max-w-[200px]'>{row.getValue("counts")}</div>
+        <div className='max-w-[80px]'>{row.getValue("counts")}</div>
       ),
       enableSorting: true,
       enableHiding: false,
     },
     {
       accessorKey: "cjk_title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='CJK Title' />
+      header: ({ column}) => (
+        <DataTableColumnHeader column={column} title={<>CJK<br />Title</>} />
       ),
       cell: ({ row }) => {
         return (
@@ -197,12 +197,12 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
     {
       accessorKey: "title",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='English Title' />
+        <DataTableColumnHeader column={column} title={<>English<br />Title</>} />
       ),
       cell: ({ row }) => {
         return (
           <div className='flex space-x-2'>
-            <span className='min-w-[250px] max-w-[500px] font-medium'>
+            <span className='min-w-[150px] max-w-[500px] font-medium'>
               {row.getValue("title")}
             </span>
           </div>
@@ -304,7 +304,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
     {
       accessorKey: "description",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Description & Source' />
+        <DataTableColumnHeader column={column} title={<>Description<br />& Source</>} />
       ),
       cell: ({ row }) => {
         // Gracefully handle missing description / data_source so that rendering never crashes
@@ -337,7 +337,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
         cell: ({ row }: { row: any }) => {
           const subscribers = row.getValue("subscribers") as string[] | string | null | undefined;
           if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-            return <span className="text-muted-foreground italic">No subscribers</span>;
+            return <span className="text-muted-foreground italic">null</span>;
           }
 
           const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];

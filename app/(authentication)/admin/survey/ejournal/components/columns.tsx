@@ -22,7 +22,7 @@ type EJournalRow = listEJournal & {
 
 const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   if (!content || (Array.isArray(content) && content.length === 0)) {
-    return <span className='text-muted-foreground italic'>No content</span>;
+    return <span className='text-muted-foreground italic'>null</span>;
   }
 
   const fullText = Array.isArray(content) ? content.join("\n") : content;
@@ -70,7 +70,7 @@ const ExpandableTextWithSource = ({
   dataSource: string | null | undefined;
 }) => {
   if (!description)
-    return <span className='text-muted-foreground italic'>No description</span>;
+    return <span className='text-muted-foreground italic'>null</span>;
 
   const isValidDataSource =
     !!dataSource &&
@@ -133,7 +133,7 @@ const ExpandableSubscribers = ({
     !subscribers ||
     (Array.isArray(subscribers) && subscribers.length === 0)
   ) {
-    return <span className='text-muted-foreground italic'>No subscribers</span>;
+    return <span className='text-muted-foreground italic'>null</span>;
   }
 
   const listArray = Array.isArray(subscribers)
@@ -195,29 +195,26 @@ export function getColumns(
       enableSorting: false,
       enableHiding: false,
     },
-
     {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ID' />
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} year={year} basePath='ejournal' />
       ),
-      cell: ({ row }) => <div className='w-[40px]'>{row.getValue("id")}</div>,
-      enableSorting: true,
-      enableHiding: false,
     },
 
     /** Journals & Databases (per-year) */
     {
       accessorKey: "journals",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Journals (# titles)' />
+        <DataTableColumnHeader column={column} title={<>Journals<br />(# titles)</>} />
       ),
       cell: ({ row }) => {
         const v =
           (row.getValue("journals") as number | null | undefined) ??
           (row.original as any).counts ??
           0;
-        return <div className='max-w-[80px]'>{v}</div>;
+        return <div className='max-w-[60px]'>{v}</div>;
       },
       enableSorting: true,
       enableHiding: false,
@@ -229,36 +226,35 @@ export function getColumns(
       ),
       cell: ({ row }) => {
         const v = (row.getValue("dbs") as number | null | undefined) ?? 0;
-        return <div className='max-w-[80px]'>{v}</div>;
+        return <div className='max-w-[60px]'>{v}</div>;
       },
       enableSorting: true,
       enableHiding: false,
     },
 
-    /** Title kept as 'title' so toolbar can filter it */
+    /** CJK Title first, then English Title */
     {
-      accessorKey: "title",
+      accessorKey: "cjk_title",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='English Title' />
+        <DataTableColumnHeader column={column} title={<>CJK<br />Title</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='min-w-[250px] max-w-[500px] font-medium'>
-            {row.getValue("title")}
+          <span className='min-w-[100px] max-w-[500px] font-medium'>
+            {row.getValue("cjk_title")}
           </span>
         </div>
       ),
     },
-
     {
-      accessorKey: "cjk_title",
+      accessorKey: "title",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='CJK Title' />
+        <DataTableColumnHeader column={column} title={<>English<br />Title</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
-            {row.getValue("cjk_title")}
+          <span className='min-w-[200px] max-w-[500px] font-medium'>
+            {row.getValue("title")}
           </span>
         </div>
       ),
@@ -333,7 +329,7 @@ export function getColumns(
     {
       accessorKey: "sub_series_number",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Sub-Series Number' />
+        <DataTableColumnHeader column={column} title={<>Sub-Series<br />Number</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
@@ -360,7 +356,7 @@ export function getColumns(
     {
       accessorKey: "description",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Description & Source' />
+        <DataTableColumnHeader column={column} title={<>Description<br />& Source</>} />
       ),
       cell: ({ row }) => {
         const description =
@@ -421,7 +417,7 @@ export function getColumns(
               ) {
                 return (
                   <span className='text-muted-foreground italic'>
-                    No subscribers
+                    null
                   </span>
                 );
               }
@@ -433,12 +429,5 @@ export function getColumns(
           } as ColumnDef<EJournalRow>,
         ] as ColumnDef<EJournalRow>[])
       : []),
-
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <DataTableRowActions row={row} year={year} basePath='ejournal' />
-      ),
-    },
   ];
 }

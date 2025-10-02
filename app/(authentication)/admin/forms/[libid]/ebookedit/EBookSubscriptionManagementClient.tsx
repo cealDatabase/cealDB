@@ -101,7 +101,7 @@ export default function EBookSubscriptionManagementClient({
     {
       accessorKey: "title",
       header: "English Title",
-      cell: ({ row }: any) => <div className="max-w-[250px] truncate">{row.getValue("title")}</div>,
+      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("title")}</div>,
     },
     {
       accessorKey: "publisher",
