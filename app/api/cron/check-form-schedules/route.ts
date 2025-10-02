@@ -27,13 +27,23 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   console.log('🕐 Cron job started:', new Date().toISOString());
 
-  // Verify this is a legitimate cron request (Vercel adds this header)
-  const authHeader = request.headers.get('authorization');
+  // Verify this is a legitimate cron request from Vercel
+  // Vercel automatically adds the 'x-vercel-cron' header to cron requests
+  // See: https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs
   if (process.env.NODE_ENV === 'production') {
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      console.error('❌ Unauthorized cron request');
+    const cronHeader = request.headers.get('x-vercel-cron');
+    const authHeader = request.headers.get('authorization');
+    
+    // Accept either Vercel's x-vercel-cron header OR manual Bearer token
+    const isVercelCron = cronHeader !== null;
+    const isAuthorizedManual = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+    
+    if (!isVercelCron && !isAuthorizedManual) {
+      console.error('❌ Unauthorized cron request - missing x-vercel-cron header or valid Bearer token');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    
+    console.log('✅ Authorized cron request:', isVercelCron ? 'Vercel Cron' : 'Manual Bearer Token');
   }
 
   const now = new Date();
