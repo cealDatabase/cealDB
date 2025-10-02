@@ -393,24 +393,24 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5" />
-                  What happens when you create a session:
+                  Automated Schedule Process:
                 </h3>
                 <ul className="text-sm text-blue-800 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span>All library forms will be opened for editing immediately</span>
+                    <span><strong>Opening Date:</strong> Forms will automatically open on the selected date. Members will receive broadcast email when forms open.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span>Broadcast email sent to all CEAL members via Resend Broadcast API</span>
+                    <span><strong>Closing Date:</strong> Forms will automatically close at 11:59 PM Pacific Time on the selected date.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span>Forms will remain open until you manually close them</span>
+                    <span><strong>Super Admin Notification:</strong> You will receive an email notification 30 seconds after forms automatically close, confirming all forms are closed.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-1">•</span>
-                    <span>Each member can only edit their own library's forms</span>
+                    <span><strong>No Manual Action Required:</strong> Everything happens automatically based on your schedule.</span>
                   </li>
                 </ul>
               </div>
@@ -484,29 +484,38 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-5 mb-6">
                 <h3 className="font-bold text-yellow-900 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  ⚠️ Important: This action cannot be undone
+                  ⚠️ Review Schedule Details
                 </h3>
                 <ul className="text-sm text-yellow-800 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
-                    <span>Broadcast email will be sent <strong>immediately</strong> to all CEAL members</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>All library forms will be <strong>opened for editing</strong></span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
                     <span>
-                      Planned closing date: <strong>{
-                        new Date(closingDate)
+                      <strong>Opening:</strong> {
+                        new Date(openingDate)
                           .toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-                      }</strong>
+                      }
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
-                    <span>You will need to manually close forms using the "Close All Forms" button</span>
+                    <span>
+                      <strong>Closing:</strong> {
+                        new Date(closingDate)
+                          .toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                      } at <strong>11:59 PM Pacific Time</strong>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">•</span>
+                    <span>Forms will <strong>automatically open</strong> on the opening date and broadcast email will be sent to all CEAL members</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">•</span>
+                    <span>Forms will <strong>automatically close</strong> at 11:59 PM PT on closing date - no manual action required</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">•</span>
+                    <span>Super admins will receive confirmation email 30 seconds after automatic closure</span>
                   </li>
                 </ul>
               </div>
@@ -520,12 +529,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending Broadcast...
+                      Creating Schedule...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
-                      Send Broadcast & Open Forms
+                      Confirm & Create Schedule
                     </>
                   )}
                 </Button>
@@ -549,22 +558,23 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-green-800 mb-3">
-                  Broadcast Sent Successfully!
+                  Schedule Created Successfully!
                 </h2>
                 <p className="text-gray-700 text-lg mb-2">
-                  Form session for <strong>{year}</strong> has been created.
+                  Form schedule for <strong>{year}</strong> has been created.
                 </p>
                 <p className="text-gray-600">
-                  Notification emails have been sent to all CEAL members via Resend.
+                  Forms will automatically open on the scheduled date, and members will receive notification emails at that time.
                 </p>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-left">
-                <h3 className="font-semibold text-green-900 mb-2">Next Steps:</h3>
+                <h3 className="font-semibold text-green-900 mb-2">What Happens Next:</h3>
                 <ul className="text-sm text-green-800 space-y-1">
-                  <li>• Monitor library submissions through the admin dashboard</li>
-                  <li>• Close forms manually when data collection period ends</li>
-                  <li>• Check audit logs to track form activity</li>
+                  <li>• Forms will automatically open on <strong>{new Date(openingDate).toLocaleDateString()}</strong></li>
+                  <li>• Broadcast email sent to members when forms open</li>
+                  <li>• Forms will automatically close on <strong>{new Date(closingDate).toLocaleDateString()}</strong> at 11:59 PM PT</li>
+                  <li>• You will receive confirmation email 30 seconds after automatic closure</li>
                 </ul>
               </div>
 

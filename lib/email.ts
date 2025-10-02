@@ -242,3 +242,466 @@ export async function sendWelcomeEmail(
     return false;
   }
 }
+
+// New automated notification functions for form scheduling
+
+export interface FormNotificationOptions {
+  academicYear: number;
+  openingDate: Date;
+  closingDate: Date;
+  recipientEmails: string[];
+}
+
+/**
+ * Send notification to all CEAL members that forms are now open
+ * Uses Resend Broadcast API for mass distribution
+ */
+export async function sendFormsOpenedNotification(
+  options: FormNotificationOptions
+): Promise<boolean> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Email configuration missing: RESEND_API_KEY required');
+      return false;
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const totalDays = Math.ceil((options.closingDate.getTime() - options.openingDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>CEAL Database Forms Now Open</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #2563eb; color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; }
+          .info-box { background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb; }
+          .button { 
+            display: inline-block; 
+            background-color: #2563eb; 
+            color: white !important; 
+            padding: 14px 28px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            font-weight: bold;
+            margin: 20px 0;
+          }
+          .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-radius: 0 0 8px 8px; }
+          ul { margin: 10px 0; padding-left: 20px; }
+          li { margin: 8px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">📊 CEAL Database Forms</h1>
+            <h2 style="margin: 10px 0 0 0; font-size: 20px; font-weight: normal;">Forms Now Open for ${options.academicYear}</h2>
+          </div>
+          
+          <div class="content">
+            <p style="font-size: 16px;">Dear CEAL Member,</p>
+            
+            <p>The annual data collection forms are <strong>now open</strong> for academic year <strong>${options.academicYear}</strong>.</p>
+            
+            <div class="info-box">
+              <h3 style="color: #374151; margin-top: 0; font-size: 18px;">📅 Important Dates</h3>
+              <ul style="list-style: none; padding: 0;">
+                <li><strong>Forms Opened:</strong> ${options.openingDate.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} at ${options.openingDate.toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}</li>
+                <li><strong>Forms Close:</strong> ${options.closingDate.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} at ${options.closingDate.toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}</li>
+                <li><strong>Submission Period:</strong> ${totalDays} days</li>
+              </ul>
+            </div>
+            
+            <p><strong>What you need to do:</strong></p>
+            <ol>
+              <li>Sign in to the CEAL Database system</li>
+              <li>Navigate to the Forms section</li>
+              <li>Complete all required forms for your library</li>
+              <li>Submit before the closing date</li>
+            </ol>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${ROOT_URL}/admin/forms" class="button">Access Forms Now</a>
+            </div>
+            
+            <p style="color: #dc2626; font-weight: bold;">⚠️ Important: Please ensure all forms are completed and submitted before the closing date.</p>
+            
+            <p>If you have any questions or encounter any issues, please contact the CEAL Database administrators.</p>
+            
+            <p style="margin-top: 30px;">Best regards,<br>
+            <strong>CEAL Database Administration</strong></p>
+          </div>
+          
+          <div class="footer">
+            <p style="margin: 5px 0;">This is an automated notification from the CEAL Statistics Database System.</p>
+            <p style="margin: 5px 0;">Council on East Asian Libraries (CEAL)</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send to all recipients
+    const emailPromises = options.recipientEmails.map(email => 
+      resend.emails.send({
+        from: "CEAL Database <notifications@cealstats.org>",
+        to: email,
+        subject: `🔓 CEAL Database Forms Open for ${options.academicYear} - Action Required`,
+        html: emailTemplate
+      })
+    );
+
+    const results = await Promise.allSettled(emailPromises);
+    const successCount = results.filter(r => r.status === 'fulfilled').length;
+    
+    console.log(`✅ Forms opened notification: ${successCount}/${options.recipientEmails.length} emails sent successfully`);
+    
+    return successCount > 0;
+  } catch (error) {
+    console.error('Forms opened notification failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Send notification to all CEAL members that forms are now closed
+ */
+export async function sendFormsClosedNotification(
+  options: FormNotificationOptions
+): Promise<boolean> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Email configuration missing: RESEND_API_KEY required');
+      return false;
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>CEAL Database Forms Closed</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #dc2626; color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; }
+          .info-box { background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626; }
+          .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-radius: 0 0 8px 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">🔒 CEAL Database Forms</h1>
+            <h2 style="margin: 10px 0 0 0; font-size: 20px; font-weight: normal;">Forms Now Closed for ${options.academicYear}</h2>
+          </div>
+          
+          <div class="content">
+            <p style="font-size: 16px;">Dear CEAL Member,</p>
+            
+            <p>The data collection forms for academic year <strong>${options.academicYear}</strong> are <strong>now closed</strong>.</p>
+            
+            <div class="info-box">
+              <h3 style="color: #991b1b; margin-top: 0; font-size: 18px;">📅 Session Summary</h3>
+              <ul style="list-style: none; padding: 0;">
+                <li><strong>Forms Opened:</strong> ${options.openingDate.toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</li>
+                <li><strong>Forms Closed:</strong> ${options.closingDate.toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</li>
+                <li><strong>Status:</strong> Submissions are no longer accepted</li>
+              </ul>
+            </div>
+            
+            <p><strong>What happens next:</strong></p>
+            <ul>
+              <li>All submitted data is being reviewed and processed</li>
+              <li>You will receive updates on data compilation and reporting</li>
+              <li>Forms will reopen for the next academic year according to the schedule</li>
+            </ul>
+            
+            <p>Thank you for your participation in the CEAL Database data collection for ${options.academicYear}.</p>
+            
+            <p>If you have any questions or concerns about your submission, please contact the CEAL Database administrators as soon as possible.</p>
+            
+            <p style="margin-top: 30px;">Best regards,<br>
+            <strong>CEAL Database Administration</strong></p>
+          </div>
+          
+          <div class="footer">
+            <p style="margin: 5px 0;">This is an automated notification from the CEAL Statistics Database System.</p>
+            <p style="margin: 5px 0;">Council on East Asian Libraries (CEAL)</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send to all recipients
+    const emailPromises = options.recipientEmails.map(email => 
+      resend.emails.send({
+        from: "CEAL Database <notifications@cealstats.org>",
+        to: email,
+        subject: `🔒 CEAL Database Forms Closed for ${options.academicYear}`,
+        html: emailTemplate
+      })
+    );
+
+    const results = await Promise.allSettled(emailPromises);
+    const successCount = results.filter(r => r.status === 'fulfilled').length;
+    
+    console.log(`✅ Forms closed notification: ${successCount}/${options.recipientEmails.length} emails sent successfully`);
+    
+    return successCount > 0;
+  } catch (error) {
+    console.error('Forms closed notification failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Send admin notification when forms are automatically opened
+ */
+export async function sendAdminFormsOpenedNotification(
+  adminEmails: string[],
+  academicYear: number,
+  stats: { librariesOpened: number; totalLibraries: number }
+): Promise<boolean> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Email configuration missing: RESEND_API_KEY required');
+      return false;
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Admin Alert: Forms Automatically Opened</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #059669; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; }
+          .stats-box { background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #059669; }
+          .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-radius: 0 0 8px 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0;">🔓 Admin Alert</h1>
+            <h2 style="margin: 10px 0 0 0; font-weight: normal;">Forms Automatically Opened</h2>
+          </div>
+          
+          <div class="content">
+            <p><strong>Dear CEAL Database Administrator,</strong></p>
+            
+            <p>The automated scheduling system has successfully opened the forms for academic year <strong>${academicYear}</strong>.</p>
+            
+            <div class="stats-box">
+              <h3 style="color: #047857; margin-top: 0;">📊 System Status</h3>
+              <ul style="list-style: none; padding: 0;">
+                <li><strong>Academic Year:</strong> ${academicYear}</li>
+                <li><strong>Libraries Opened:</strong> ${stats.librariesOpened} out of ${stats.totalLibraries}</li>
+                <li><strong>Action Time:</strong> ${new Date().toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}</li>
+                <li><strong>Status:</strong> ✅ All members notified</li>
+              </ul>
+            </div>
+            
+            <p><strong>Actions Completed:</strong></p>
+            <ul>
+              <li>All Library_Year records updated to <code>is_open_for_editing = true</code></li>
+              <li>Email notifications sent to all CEAL members</li>
+              <li>Audit log entries created for tracking</li>
+            </ul>
+            
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+              <li>Monitor form submissions through the admin dashboard</li>
+              <li>Forms will automatically close on the scheduled date</li>
+              <li>Review audit logs for any issues</li>
+            </ul>
+            
+            <p>You can view the <a href="${ROOT_URL}/admin/superguide">admin dashboard</a> to monitor form status and submissions.</p>
+            
+            <p style="margin-top: 30px;">This is an automated notification from the CEAL Database scheduling system.</p>
+          </div>
+          
+          <div class="footer">
+            <p style="margin: 5px 0;">CEAL Statistics Database System - Automated Scheduling</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const emailPromises = adminEmails.map(email => 
+      resend.emails.send({
+        from: "CEAL Database System <system@cealstats.org>",
+        to: email,
+        subject: `✅ Admin Alert: Forms Automatically Opened for ${academicYear}`,
+        html: emailTemplate
+      })
+    );
+
+    const results = await Promise.allSettled(emailPromises);
+    const successCount = results.filter(r => r.status === 'fulfilled').length;
+    
+    console.log(`✅ Admin notification: ${successCount}/${adminEmails.length} emails sent`);
+    
+    return successCount > 0;
+  } catch (error) {
+    console.error('Admin forms opened notification failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Send admin notification when forms are automatically closed
+ */
+export async function sendAdminFormsClosedNotification(
+  adminEmails: string[],
+  academicYear: number,
+  stats: { librariesClosed: number; totalLibraries: number }
+): Promise<boolean> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Email configuration missing: RESEND_API_KEY required');
+      return false;
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Admin Alert: Forms Automatically Closed</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; }
+          .stats-box { background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626; }
+          .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-radius: 0 0 8px 8px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0;">🔒 Admin Alert</h1>
+            <h2 style="margin: 10px 0 0 0; font-weight: normal;">Forms Automatically Closed</h2>
+          </div>
+          
+          <div class="content">
+            <p><strong>Dear CEAL Database Administrator,</strong></p>
+            
+            <p>The automated scheduling system has successfully closed the forms for academic year <strong>${academicYear}</strong>.</p>
+            
+            <div class="stats-box">
+              <h3 style="color: #991b1b; margin-top: 0;">📊 System Status</h3>
+              <ul style="list-style: none; padding: 0;">
+                <li><strong>Academic Year:</strong> ${academicYear}</li>
+                <li><strong>Libraries Closed:</strong> ${stats.librariesClosed} out of ${stats.totalLibraries}</li>
+                <li><strong>Action Time:</strong> ${new Date().toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}</li>
+                <li><strong>Status:</strong> 🔒 All members notified</li>
+              </ul>
+            </div>
+            
+            <p><strong>Actions Completed:</strong></p>
+            <ul>
+              <li>All Library_Year records updated to <code>is_open_for_editing = false</code></li>
+              <li>Email notifications sent to all CEAL members</li>
+              <li>Audit log entries created for tracking</li>
+            </ul>
+            
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+              <li>Review submission completeness through the admin dashboard</li>
+              <li>Begin data validation and compilation process</li>
+              <li>Follow up with libraries that didn't submit</li>
+              <li>Prepare for next year's data collection cycle</li>
+            </ul>
+            
+            <p>You can view the <a href="${ROOT_URL}/admin/superguide">admin dashboard</a> to review submission status.</p>
+            
+            <p style="margin-top: 30px;">This is an automated notification from the CEAL Database scheduling system.</p>
+          </div>
+          
+          <div class="footer">
+            <p style="margin: 5px 0;">CEAL Statistics Database System - Automated Scheduling</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const emailPromises = adminEmails.map(email => 
+      resend.emails.send({
+        from: "CEAL Database System <system@cealstats.org>",
+        to: email,
+        subject: `🔒 Admin Alert: Forms Automatically Closed for ${academicYear}`,
+        html: emailTemplate
+      })
+    );
+
+    const results = await Promise.allSettled(emailPromises);
+    const successCount = results.filter(r => r.status === 'fulfilled').length;
+    
+    console.log(`✅ Admin notification: ${successCount}/${adminEmails.length} emails sent`);
+    
+    return successCount > 0;
+  } catch (error) {
+    console.error('Admin forms closed notification failed:', error);
+    return false;
+  }
+}

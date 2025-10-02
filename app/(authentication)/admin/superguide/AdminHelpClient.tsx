@@ -129,11 +129,11 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
                         <Button className='w-[200px]'><Link href="/admin/users" className='text-white'>Manage User Roles</Link></Button>
                         <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
 
-                        {/* New Broadcast Button - Only show for super admins */}
+                        {/* Automated Survey Schedule Button - Only show for super admins */}
                         {userInfo && userInfo.userRoles.includes('1') && (
-                            <Link href="/admin/broadcast">
-                                <Button className='w-[250px] bg-blue-600 hover:bg-blue-700'>
-                                    📧 Open Forms & Broadcast
+                            <Link href="/admin/survey-schedule">
+                                <Button className='w-[280px] bg-blue-600 hover:bg-blue-700'>
+                                    📅 Open/Close Annual Surveys
                                 </Button>
                             </Link>
                         )}
