@@ -61,22 +61,17 @@ export default function EJournalEditClient({
       enableHiding: false,
     },
     {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
+      accessorKey: "cjk_title",
+      header: "CJK Title",
+      cell: ({ row }: any) => (
+        <div className="max-w-[200px] truncate">{row.getValue("cjk_title")}</div>
+      ),
     },
     {
       accessorKey: "title",
-      header: "Title",
+      header: "English Title",
       cell: ({ row }: any) => (
-        <div className="max-w-[300px]">
-          <div className="font-medium truncate">{row.getValue("title")}</div>
-          {row.original.cjk_title && (
-            <div className="text-sm text-muted-foreground truncate">
-              {row.original.cjk_title}
-            </div>
-          )}
-        </div>
+        <div className="max-w-[300px] truncate">{row.getValue("title")}</div>
       ),
     },
     {

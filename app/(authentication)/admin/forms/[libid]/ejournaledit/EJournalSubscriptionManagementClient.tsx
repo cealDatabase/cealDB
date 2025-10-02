@@ -73,13 +73,37 @@ export default function EJournalSubscriptionManagementClient({
   // Define columns for the management view
   const getColumns = () => [
     {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }: any) => {
+        const journalId = row.getValue("id");
+        return (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => handleRemoveSubscription(journalId)}
+            disabled={isRemoving}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Remove
+          </Button>
+        );
+      },
+    },
+    {
       accessorKey: "id",
       header: "ID",
       cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "cjk_title",
+      header: "CJK Title",
+      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("cjk_title")}</div>,
     },
     {
       accessorKey: "title",
-      header: "Title",
+      header: "English Title",
       cell: ({ row }: any) => <div className="max-w-[250px] truncate">{row.getValue("title")}</div>,
     },
     {
@@ -111,24 +135,6 @@ export default function EJournalSubscriptionManagementClient({
       cell: ({ row }: any) => {
         const count = row.getValue("dbs") as number;
         return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
-      },
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => {
-        const journalId = row.getValue("id");
-        return (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => handleRemoveSubscription(journalId)}
-            disabled={isRemoving}
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Remove
-          </Button>
-        );
       },
     },
   ];

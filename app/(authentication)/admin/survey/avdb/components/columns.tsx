@@ -163,15 +163,10 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       enableSorting: false,
       enableHiding: false,
     },
-    // 要加水平滚动条，目前太难滚动了
     {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ID' />
-      ),
-      cell: ({ row }) => <div className='w-[40px]'>{row.getValue("id")}</div>,
-      enableSorting: true,
-      enableHiding: false,
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => <DataTableRowActions row={row} year={year} />,
     },
     {
       accessorKey: "counts",
@@ -185,21 +180,6 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       enableHiding: false,
     },
     {
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='English Title' />
-      ),
-      cell: ({ row }) => {
-        return (
-          <div className='flex space-x-2'>
-            <span className='min-w-[250px] max-w-[500px] font-medium'>
-              {row.getValue("title")}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
       accessorKey: "cjk_title",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='CJK Title' />
@@ -209,6 +189,21 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
           <div className='flex space-x-2'>
             <span className='max-w-[500px] font-medium'>
               {row.getValue("cjk_title")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='English Title' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className='flex space-x-2'>
+            <span className='min-w-[250px] max-w-[500px] font-medium'>
+              {row.getValue("title")}
             </span>
           </div>
         );
@@ -346,14 +341,9 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
           }
 
           const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
-
           return <ExpandableSubscribers subscribers={subscriberList} />;
         },
       }]
-      : []),
-    {
-      id: "actions",
-      cell: ({ row }) => <DataTableRowActions row={row} year={year} />,
-    },
+      : [])
   ];
 }
