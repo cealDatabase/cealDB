@@ -33,20 +33,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch the Library_Year record ID from the year number
-    const libraryYearRecord = await db.library_Year.findFirst({
-      where: { year: year },
-      select: { id: true }
-    });
+    // For global records, we don't need Library_Year ID
+    let libraryYearId = null;
+    
+    if (!is_global) {
+      // Fetch the Library_Year record ID from the year number (only for non-global records)
+      const libraryYearRecord = await db.library_Year.findFirst({
+        where: { year: year },
+        select: { id: true }
+      });
 
-    if (!libraryYearRecord) {
-      return NextResponse.json(
-        { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
-        { status: 404 }
-      );
+      if (!libraryYearRecord) {
+        return NextResponse.json(
+          { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
+          { status: 404 }
+        );
+      }
+
+      libraryYearId = libraryYearRecord.id;
     }
-
-    const libraryYearId = libraryYearRecord.id;
 
     const j = Number(journals);
     if (!Number.isFinite(j)) {
@@ -79,11 +84,13 @@ export async function POST(req: Request) {
         },
       });
 
-      // 2) m-m link - handle duplicates
-      await tx.libraryYear_ListEJournal.createMany({
-        data: [{ libraryyear_id: libraryYearId, listejournal_id: journal.id }],
-        skipDuplicates: true,
-      });
+      // 2) m-m link - only for non-global records
+      if (!is_global && libraryYearId) {
+        await tx.libraryYear_ListEJournal.createMany({
+          data: [{ libraryyear_id: libraryYearId, listejournal_id: journal.id }],
+          skipDuplicates: true,
+        });
+      }
 
       // 3) per-year counts
       await tx.list_EJournal_Counts.create({

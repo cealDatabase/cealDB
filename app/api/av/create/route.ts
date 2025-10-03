@@ -33,20 +33,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch the Library_Year record ID from the year number
-    const libraryYearRecord = await db.library_Year.findFirst({
-      where: { year: yearNum },
-      select: { id: true }
-    });
+    // For global records, we don't need Library_Year ID
+    let libraryYearId = null;
+    
+    if (!is_global) {
+      // Fetch the Library_Year record ID from the year number (only for non-global records)
+      const libraryYearRecord = await db.library_Year.findFirst({
+        where: { year: yearNum },
+        select: { id: true }
+      });
 
-    if (!libraryYearRecord) {
-      return NextResponse.json(
-        { error: `Library year ${yearNum} not found. Please ensure the year exists in the system.` },
-        { status: 404 }
-      );
+      if (!libraryYearRecord) {
+        return NextResponse.json(
+          { error: `Library year ${yearNum} not found. Please ensure the year exists in the system.` },
+          { status: 404 }
+        );
+      }
+
+      libraryYearId = libraryYearRecord.id;
     }
-
-    const libraryYearId = libraryYearRecord.id;
 
     if (!title || title.trim() === "") {
       return NextResponse.json(
@@ -87,11 +92,13 @@ export async function POST(req: Request) {
       },
     });
 
-    // ✅ Step 2: Link to Library_Year (m-m) - use createMany with skipDuplicates
-    await db.libraryYear_ListAV.createMany({
-      data: [{ libraryyear_id: libraryYearId, listav_id: newAV.id }],
-      skipDuplicates: true,
-    });
+    // ✅ Step 2: Link to Library_Year (m-m) - only for non-global records
+    if (!is_global && libraryYearId) {
+      await db.libraryYear_ListAV.createMany({
+        data: [{ libraryyear_id: libraryYearId, listav_id: newAV.id }],
+        skipDuplicates: true,
+      });
+    }
 
     // ✅ Step 3: Create AV counts entry
     await db.list_AV_Counts.upsert({

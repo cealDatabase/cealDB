@@ -33,22 +33,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch the Library_Year record ID from the year number
-    // Note: In a real app, you'd also need libid to uniquely identify Library_Year
-    // For now, assuming we're working with global records or year is unique enough
-    const libraryYearRecord = await db.library_Year.findFirst({
-      where: { year: year },
-      select: { id: true }
-    });
+    // For global records, we don't need Library_Year ID
+    let libraryYearId = null;
+    
+    if (!is_global) {
+      // Fetch the Library_Year record ID from the year number (only for non-global records)
+      const libraryYearRecord = await db.library_Year.findFirst({
+        where: { year: year },
+        select: { id: true }
+      });
 
-    if (!libraryYearRecord) {
-      return NextResponse.json(
-        { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
-        { status: 404 }
-      );
+      if (!libraryYearRecord) {
+        return NextResponse.json(
+          { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
+          { status: 404 }
+        );
+      }
+
+      libraryYearId = libraryYearRecord.id;
     }
-
-    const libraryYearId = libraryYearRecord.id;
     if (counts === undefined || !Number.isFinite(Number(counts))) {
       return NextResponse.json(
         { error: "Missing or invalid counts" },
@@ -80,11 +83,13 @@ export async function POST(req: Request) {
           },
         });
 
-        // 2) Link to Library_Year (m–m) - use createMany with skipDuplicates
-        await tx.libraryYear_ListEBook.createMany({
-          data: [{ libraryyear_id: libraryYearId, listebook_id: book.id }],
-          skipDuplicates: true,
-        });
+        // 2) Link to Library_Year (m–m) - only for non-global records
+        if (!is_global && libraryYearId) {
+          await tx.libraryYear_ListEBook.createMany({
+            data: [{ libraryyear_id: libraryYearId, listebook_id: book.id }],
+            skipDuplicates: true,
+          });
+        }
 
         // 3) Per-year counts row - wrapped with sequence fix
         await handleP2002WithSequenceFix(
