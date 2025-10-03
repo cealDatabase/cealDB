@@ -39,6 +39,21 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
     // Fetch survey dates (with defaults or admin-selected dates)
     const surveyDates = await getFormattedSurveyDates(currentYear)
 
+    // Create dynamic FAQ with correct dates
+    const dynamicInstructionGroup = {
+        ...instructionGroup,
+        "Survey Time Frame and Publication": [
+            {
+                question: "Input/Edit Time Frame",
+                answer: `The ${currentYear} Online Survey input/edit time frame is from ${surveyDates.shortDateRange} (11:59 pm Pacific Time)`,
+            },
+            {
+                question: "Publication Date",
+                answer: `The ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`,
+            },
+        ],
+    }
+
     return (
         <main className="min-h-screen">
             <div className="bg-gradient-to-r from-gray-200/10 to-gray-200/10 text-stone-900 w-full">
@@ -189,7 +204,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                         </div>
 
                         <Accordion type="multiple" className="space-y-4">
-                            {Object.keys(instructionGroup).map((key, index) => (
+                            {Object.keys(dynamicInstructionGroup).map((key, index) => (
                                 <AccordionItem
                                     key={index}
                                     value={key}
@@ -200,7 +215,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4">
                                         <div className="space-y-6">
-                                            {(instructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map(
+                                            {(dynamicInstructionGroup[key as InstructionGroupKeys] as { question: string; answer: string }[]).map(
                                                 (item, itemIndex) => (
                                                     <div
                                                         key={itemIndex}

@@ -56,17 +56,38 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
   const [hasActiveSession, setHasActiveSession] = useState(false);
 
-  // Set default dates when component mounts or year changes
+  // Fetch saved dates when component mounts or year changes
   useEffect(() => {
-    const defaultDates = getSurveyDates(year);
-    setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
-    setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+    fetchSavedDates();
   }, [year]);
 
   // Check current session on mount
   useEffect(() => {
     checkCurrentSession();
   }, []);
+
+  const fetchSavedDates = async () => {
+    try {
+      // Fetch dates from database (uses saved dates or defaults)
+      const response = await fetch(`/api/admin/survey-dates?year=${year}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setOpeningDate(data.dates.openingDate.split('T')[0]);
+        setClosingDate(data.dates.closingDate.split('T')[0]);
+      } else {
+        // Fallback to defaults if fetch fails
+        const defaultDates = getSurveyDates(year);
+        setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
+        setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch saved dates, using defaults:', error);
+      const defaultDates = getSurveyDates(year);
+      setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
+      setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+    }
+  };
 
   const checkCurrentSession = async () => {
     try {

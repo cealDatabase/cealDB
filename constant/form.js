@@ -11,6 +11,8 @@ import {
   CheckCircle,
   BarChart3,
   Shield,
+  Calendar,
+  Mail,
 } from "lucide-react";
 
 export const forms = [
@@ -60,7 +62,7 @@ export const instructionGroup = {
   "Survey Time Frame and Publication": [
     {
       question: "Input/Edit Time Frame",
-      answer: `The ${currentYear} Online Survey input/edit time frame is from October 1 through December 1, ${currentYear} (11:59 pm Central Time)`,
+      answer: `The ${currentYear} Online Survey input/edit time frame is from October 1 through December 1, ${currentYear} (11:59 pm Pacific Time)`,
     },
     {
       question: "Publication Date",
@@ -152,6 +154,22 @@ export const instructionGroup = {
 
 export const actions = [
     {
+      title: 'Survey Dates Management',
+      href: '/admin/survey-dates',
+      icon: Calendar,
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
+      description: 'Set opening and closing dates for surveys. Changes take effect immediately and appear on the Forms Management page.',
+    },
+    {
+      title: 'Open/Close Annual Surveys',
+      href: '/admin/broadcast',
+      icon: Mail,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      description: 'Open or close forms for editing and send broadcast notifications to CEAL members via email.',
+    },
+    {
       title: 'Audio/Visual Databases',
       href: `/admin/survey/avdb/${currentYear}`,
       icon: Database,
@@ -160,17 +178,17 @@ export const actions = [
       description: 'Create, update, or remove database records and their associated data.',
     },
     {
-      title: 'Enter/Edit Current or Past Surveys',
-      href: '/admin/custom-other',
-      icon: Settings,
-      iconColor: 'text-red-600',
-      iconBg: 'bg-red-100',
-      description: 'Use this option to modify individual institution survey results. After making changes, record the specific data updated (amount, category), along with the modification date and the name of the person who made the change in the corresponding notes field.',
-    },
-    {
       title: 'Ebook Databases',
       href: `/admin/survey/ebook/${currentYear}`,
       icon: BookOpen,
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
+      description: 'Create, update, or remove database records and their associated data.',
+    },
+    {
+      title: 'E-Journal Databases',
+      href: `/admin/survey/ejournal/${currentYear}`,
+      icon: BarChart3,
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
       description: 'Create, update, or remove database records and their associated data.',
@@ -184,19 +202,19 @@ export const actions = [
       description: 'Add or modify institution users, e-resource editors, viewers, and admins.',
     },
     {
-      title: 'E-Journal Databases',
-      href: `/admin/survey/ejournal/${currentYear}`,
-      icon: BarChart3,
-      iconColor: 'text-orange-600',
-      iconBg: 'bg-orange-100',
-      description: 'Create, update, or remove database records and their associated data.',
-    },
-    {
       title: 'Edit Institutions',
       href: '/admin/all-libraries',
       icon: Plus,
       iconColor: 'text-red-600',
       iconBg: 'bg-red-100',
       description: 'Add or modify institution information participating in surveys.',
+    },
+    {
+      title: 'Enter/Edit Current or Past Surveys',
+      href: '/admin/custom-other',
+      icon: Settings,
+      iconColor: 'text-purple-600',
+      iconBg: 'bg-purple-100',
+      description: 'Use this option to modify individual institution survey results. After making changes, record the specific data updated (amount, category), along with the modification date and the name of the person who made the change in the corresponding notes field.',
     },
   ]
