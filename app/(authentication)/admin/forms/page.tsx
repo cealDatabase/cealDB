@@ -5,6 +5,7 @@ import { forms, instructionGroup } from "@/constant/form"
 import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
 import { getLibraryById } from "@/data/fetchPrisma"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
+import { getFormattedSurveyDates } from "@/data/fetchSurveyDates"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -35,6 +36,9 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
     const previousYear = currentYear - 1
     const nextYear = currentYear + 1
 
+    // Fetch survey dates (with defaults or admin-selected dates)
+    const surveyDates = await getFormattedSurveyDates(currentYear)
+
     return (
         <main className="min-h-screen">
             <div className="bg-gradient-to-r from-gray-200/10 to-gray-200/10 text-stone-900 w-full">
@@ -44,7 +48,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                         <h1 className="text-4xl font-bold text-stone-900 mb-3">Forms Management</h1>
                         <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium">
                             <div className="w-2 h-2 bg-emerald-800 rounded-full mr-2"></div>
-                            Active Survey Period: Oct 1 - Dec 1, {currentYear}
+                            Active Survey Period: {surveyDates.shortDateRange}
                         </div>
                     </div>
                 </Container>
@@ -68,6 +72,14 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                         <div className="space-y-4">
                             <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
                                 <Link
+                                    href={`/admin/forms/${libid}/avdbedit`}
+                                    className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    🎵 Audio/Visual Database by Subscription for {libraryName} in {currentYear}
+                                </Link>
+                            </div>
+                            <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
+                                <Link
                                     href={`/admin/forms/${libid}/ebookedit`}
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
@@ -80,14 +92,6 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
                                     📰 E-Journal Database by Subscription for {libraryName} in {currentYear}
-                                </Link>
-                            </div>
-                            <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
-                                <Link
-                                    href={`/admin/forms/${libid}/avdbedit`}
-                                    className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
-                                >
-                                    🎵 Audio/Visual Database by Subscription for {libraryName} in {currentYear}
                                 </Link>
                             </div>
                         </div>
@@ -146,9 +150,9 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     {previousYear}-{currentYear} CEAL Statistics Online Survey
                                 </span>{" "}
                                 input/edit period is from{" "}
-                                <span className="font-semibold text-orange-600">October 1 to December 1, {currentYear}</span>, with the
-                                results published in the February {nextYear} issue of the Journal of East Asian Libraries. The survey
-                                covers the fiscal year from July 1, {previousYear}, to June 30, {currentYear}, with all figures rounded
+                                <span className="font-semibold text-orange-600">{surveyDates.shortDateRange}</span>, with the
+                                results published in the <span className="font-semibold text-blue-600">{surveyDates.publicationMonth}</span> issue of the Journal of East Asian Libraries. The survey
+                                covers the fiscal year <span className="font-semibold text-purple-600">{surveyDates.fiscalYearPeriod}</span>, with all figures rounded
                                 to whole numbers and currency converted to US dollars.
                             </p>
 

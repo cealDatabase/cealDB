@@ -40,6 +40,11 @@ model Library_Year {
   year                          Int
   updated_at                    DateTime
   is_active                     Boolean?                       @default(true)
+  opening_date                  DateTime?                      // Form opening date (default Oct 1)
+  closing_date                  DateTime?                      // Form closing date (default Dec 1)
+  fiscal_year_start             DateTime?                      // Fiscal year start (July 1, past year)
+  fiscal_year_end               DateTime?                      // Fiscal year end (June 30, current year)
+  publication_date              DateTime?                      // Publication date (February, next year)
   Electronic                    Electronic?
   Electronic_Books              Electronic_Books?
   Entry_Status                  Entry_Status?

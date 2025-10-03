@@ -21,7 +21,7 @@ async function loginStatus() {
           }}
         >
           <button>
-            <span className="underline">Sign out</span>
+            <span>Sign out</span>
           </button>
         </form>
       }

@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react'
 import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { LocalDateTime } from '@/components/LocalDateTime'
+import { getSurveyDates, formatSurveyDate } from '@/lib/surveyDates'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -54,6 +55,13 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   // Current session data
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
   const [hasActiveSession, setHasActiveSession] = useState(false);
+
+  // Set default dates when component mounts or year changes
+  useEffect(() => {
+    const defaultDates = getSurveyDates(year);
+    setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
+    setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+  }, [year]);
 
   // Check current session on mount
   useEffect(() => {

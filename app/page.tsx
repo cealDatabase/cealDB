@@ -2,8 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, BookOpen, BarChart3, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
-export default function Index() {
+export default async function Index() {
+  // Check if user is authenticated
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session');
+  const userCookie = cookieStore.get('uinf');
+  const isAuthenticated = !!(sessionCookie && userCookie);
+  
+  // Determine button text and link based on authentication
+  const buttonText = isAuthenticated ? "View Dashboard" : "Sign In";
+  const buttonLink = isAuthenticated ? "/admin" : "/signin";
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Fluid Background Animation */}
@@ -51,15 +61,15 @@ export default function Index() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center my-20">
               <Button asChild size="lg" className="group">
-                <Link href="/signin">
-                  Sign In
+                <Link href={buttonLink}>
+                  {buttonText}
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/libraries">
+                <Link href="/searchingdatabase">
                   <BookOpen className="mr-2 w-4 h-4" />
-                  Public View
+                  Searching Database
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">

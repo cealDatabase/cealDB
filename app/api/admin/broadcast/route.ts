@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
 import { logUserAction } from '@/lib/auditLogger';
+import { getSurveyDates } from '@/lib/surveyDates';
 
 const prisma = new PrismaClient();
 
@@ -138,10 +139,21 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Broadcast created successfully:', broadcast.data?.id);
 
-    // Update all Library_Year records to open for editing
+    // Calculate all survey dates (fiscal year and publication date are automatic)
+    const surveyDates = getSurveyDates(year, openDate, closeDate);
+
+    // Update all Library_Year records to open for editing with all date fields
     const updateResult = await prisma.library_Year.updateMany({
       where: { year: year },
-      data: { is_open_for_editing: true }
+      data: { 
+        is_open_for_editing: true,
+        opening_date: surveyDates.openingDate,
+        closing_date: surveyDates.closingDate,
+        fiscal_year_start: surveyDates.fiscalYearStart,
+        fiscal_year_end: surveyDates.fiscalYearEnd,
+        publication_date: surveyDates.publicationDate,
+        updated_at: new Date()
+      }
     });
 
     // Log the action
