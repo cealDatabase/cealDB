@@ -61,6 +61,7 @@ export function formatSurveyDate(date: Date, includeTime: boolean = false): stri
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   };
 
   if (includeTime) {
@@ -79,8 +80,20 @@ export function formatSurveyDate(date: Date, includeTime: boolean = false): stri
  */
 export function formatFiscalYear(year: number): string {
   const dates = getSurveyDates(year);
-  const startMonth = dates.fiscalYearStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  const endMonth = dates.fiscalYearEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  
+  // Use UTC dates to avoid timezone conversion issues
+  const startMonth = dates.fiscalYearStart.toLocaleDateString('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+  const endMonth = dates.fiscalYearEnd.toLocaleDateString('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
   return `${startMonth} to ${endMonth}`;
 }
 
@@ -91,7 +104,11 @@ export function formatFiscalYear(year: number): string {
  */
 export function formatPublicationDate(year: number): string {
   const dates = getSurveyDates(year);
-  return dates.publicationDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  return dates.publicationDate.toLocaleDateString('en-US', { 
+    month: 'long', 
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
 }
 
 /**
@@ -108,8 +125,16 @@ export function getShortDateRange(
 ): string {
   const dates = getSurveyDates(year, customOpeningDate, customClosingDate);
   
-  const openMonth = dates.openingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const closeMonth = dates.closingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const openMonth = dates.openingDate.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    timeZone: 'UTC'
+  });
+  const closeMonth = dates.closingDate.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    timeZone: 'UTC'
+  });
   
   return `${openMonth} - ${closeMonth}, ${year}`;
 }
