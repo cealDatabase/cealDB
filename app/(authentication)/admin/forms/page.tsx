@@ -45,11 +45,11 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
         "Survey Time Frame and Publication": [
             {
                 question: "Input/Edit Time Frame",
-                answer: `The ${currentYear} Online Survey input/edit time frame is from ${surveyDates.shortDateRange} (11:59 pm Pacific Time)`,
+                answer: `The ${previousYear} - ${currentYear} Online Survey input/edit time frame is from ${surveyDates.shortDateRange} (11:59 pm Pacific Time)`,
             },
             {
                 question: "Publication Date",
-                answer: `The ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`,
+                answer: `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`,
             },
         ],
     }
@@ -59,7 +59,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
             <div className="bg-gradient-to-r from-gray-200/10 to-gray-200/10 text-stone-900 w-full">
                 <Container>
                     <AdminBreadcrumb libraryName={libraryName} />
-                    <div className="py-12">
+                    <div className="pt-12">
                         <h1 className="text-4xl font-bold text-stone-900 mb-3">Forms Management</h1>
                         <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium">
                             <div className="w-2 h-2 bg-emerald-800 rounded-full mr-2"></div>
@@ -71,6 +71,52 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
 
             <Container className="py-12">
                 <div className="space-y-12">
+
+                    <section className="bg-white rounded-xl shadow-lg border border-emerald-200 p-8">
+                        <div className="mb-8">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                                    <OctagonAlert className="text-white text-sm font-bold" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Instructions</h2>
+                            </div>
+                            <p className="text-gray-600">Important information about the survey process</p>
+                        </div>
+
+                        <div className="prose prose-gray max-w-none">
+                            <p className="text-gray-700 leading-relaxed mb-6">
+                                The{" "}
+                                <span className="font-semibold text-emerald-700">
+                                    {previousYear}-{currentYear} CEAL Statistics Online Survey
+                                </span>{" "}
+                                input/edit period is from{" "}
+                                <span className="font-semibold text-orange-600">{surveyDates.shortDateRange}</span>, with the
+                                results published in the <span className="font-semibold text-blue-600">{surveyDates.publicationMonth}</span> issue of the Journal of East Asian Libraries. The survey
+                                covers the fiscal year <span className="font-semibold text-purple-600">{surveyDates.fiscalYearPeriod}</span>, with all figures rounded
+                                to whole numbers and currency converted to US dollars.
+                            </p>
+
+                            <p className="text-gray-700 leading-relaxed mb-6">
+                                <span className="font-semibold text-purple-700">Non-CJK items</span> refer to non-CJK language materials
+                                related to East Asia. Each institution, except law libraries, should submit a combined report, and
+                                significant data changes must be footnoted. Participants must log in to the CEAL Statistics Database
+                                using the registered contact's email and follow the password setup process if necessary.
+                            </p>
+
+                            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 rounded-lg p-6">
+                                <p className="text-emerald-900 font-semibold">
+                                    📖 For detailed instructions, visit:{" "}
+                                    <a
+                                        href="https://guides.lib.ku.edu/CEAL_Stats"
+                                        className="text-emerald-600 hover:text-emerald-800 underline decoration-2 underline-offset-2 transition-colors"
+                                    >
+                                        https://guides.lib.ku.edu/CEAL_Stats
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
                     <section className="bg-white rounded-xl shadow-lg border border-orange-200 p-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/10 to-red-400/10 rounded-full -mr-16 -mt-16"></div>
                         <div className="mb-8 relative">
@@ -147,50 +193,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                         </div>
                     </section>
 
-                    <section className="bg-white rounded-xl shadow-lg border border-emerald-200 p-8">
-                        <div className="mb-8">
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                                    <OctagonAlert className="text-white text-sm font-bold" />
-                                </div>
-                                <h2 className="text-2xl font-bold text-gray-900">Instructions</h2>
-                            </div>
-                            <p className="text-gray-600">Important information about the survey process</p>
-                        </div>
 
-                        <div className="prose prose-gray max-w-none">
-                            <p className="text-gray-700 leading-relaxed mb-6">
-                                The{" "}
-                                <span className="font-semibold text-emerald-700">
-                                    {previousYear}-{currentYear} CEAL Statistics Online Survey
-                                </span>{" "}
-                                input/edit period is from{" "}
-                                <span className="font-semibold text-orange-600">{surveyDates.shortDateRange}</span>, with the
-                                results published in the <span className="font-semibold text-blue-600">{surveyDates.publicationMonth}</span> issue of the Journal of East Asian Libraries. The survey
-                                covers the fiscal year <span className="font-semibold text-purple-600">{surveyDates.fiscalYearPeriod}</span>, with all figures rounded
-                                to whole numbers and currency converted to US dollars.
-                            </p>
-
-                            <p className="text-gray-700 leading-relaxed mb-6">
-                                <span className="font-semibold text-purple-700">Non-CJK items</span> refer to non-CJK language materials
-                                related to East Asia. Each institution, except law libraries, should submit a combined report, and
-                                significant data changes must be footnoted. Participants must log in to the CEAL Statistics Database
-                                using the registered contact's email and follow the password setup process if necessary.
-                            </p>
-
-                            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 rounded-lg p-6">
-                                <p className="text-emerald-900 font-semibold">
-                                    📖 For detailed instructions, visit:{" "}
-                                    <a
-                                        href="https://guides.lib.ku.edu/CEAL_Stats"
-                                        className="text-emerald-600 hover:text-emerald-800 underline decoration-2 underline-offset-2 transition-colors"
-                                    >
-                                        https://guides.lib.ku.edu/CEAL_Stats
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                    </section>
 
                     <section className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
                         <div className="mb-8">

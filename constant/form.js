@@ -62,11 +62,11 @@ export const instructionGroup = {
   "Survey Time Frame and Publication": [
     {
       question: "Input/Edit Time Frame",
-      answer: `The ${currentYear} Online Survey input/edit time frame is from October 1 through December 1, ${currentYear} (11:59 pm Pacific Time)`,
+      answer: `The ${previousYear} - ${currentYear} Online Survey input/edit time frame is from October 1 through December 1, ${currentYear} (11:59 pm Pacific Time)`,
     },
     {
       question: "Publication Date",
-      answer: `The ${currentYear} CEAL annual statistics will be published in the February ${currentYear} online issue of the <i>Journal of East Asian Libraries</i>.`,
+      answer: `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the February ${currentYear} online issue of the <i>Journal of East Asian Libraries</i>.`,
     },
   ],
   "Core Guidelines for Completing the Forms": [
@@ -147,7 +147,7 @@ export const instructionGroup = {
       question:
         "How can new library member establish accounts to participate in CEAL statistics?",
       answer:
-        "New member libraries should email <a href='https://www.eastasianlib.org/newsite/statistics/'>the Chair of CEAL Statistics Committee</a> to request an account.",
+        "New member libraries should email the Chair of  <a href='https://www.eastasianlib.org/newsite/statistics/' target='_blank'>CEAL Statistics Committee</a> to request an account.",
     },
   ],
 };
