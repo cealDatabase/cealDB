@@ -21,17 +21,32 @@ export async function POST(req: Request) {
       journals, // required number
       dbs, // optional number | ""
       language, // number[] | string[]
-      libraryyear, // required number
+      libraryyear, // year number (not Library_Year ID)
       is_global,
     } = body;
 
     const year = Number(libraryyear);
     if (!Number.isFinite(year)) {
       return NextResponse.json(
-        { error: "Missing or invalid libraryyear" },
+        { error: "Missing or invalid year" },
         { status: 400 }
       );
     }
+
+    // Fetch the Library_Year record ID from the year number
+    const libraryYearRecord = await db.library_Year.findFirst({
+      where: { year: year },
+      select: { id: true }
+    });
+
+    if (!libraryYearRecord) {
+      return NextResponse.json(
+        { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
+        { status: 404 }
+      );
+    }
+
+    const libraryYearId = libraryYearRecord.id;
 
     const j = Number(journals);
     if (!Number.isFinite(j)) {
@@ -60,13 +75,13 @@ export async function POST(req: Request) {
           romanized_title: romanized_title?.trim() ?? null,
           is_global: Boolean(is_global),
           updated_at: new Date(),
-          libraryyear: year,
+          libraryyear: libraryYearId,
         },
       });
 
       // 2) m-m link - handle duplicates
       await tx.libraryYear_ListEJournal.createMany({
-        data: [{ libraryyear_id: year, listejournal_id: journal.id }],
+        data: [{ libraryyear_id: libraryYearId, listejournal_id: journal.id }],
         skipDuplicates: true,
       });
 

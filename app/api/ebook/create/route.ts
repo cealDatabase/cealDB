@@ -21,17 +21,34 @@ export async function POST(req: Request) {
       volumes, // optional number | ""
       chapters, // optional number | ""
       language, // number[] | string[]
-      libraryyear, // required number
+      libraryyear, // year number (not Library_Year ID)
       is_global,
     } = body;
 
     const year = Number(libraryyear);
     if (!Number.isFinite(year)) {
       return NextResponse.json(
-        { error: "Missing or invalid libraryyear" },
+        { error: "Missing or invalid year" },
         { status: 400 }
       );
     }
+
+    // Fetch the Library_Year record ID from the year number
+    // Note: In a real app, you'd also need libid to uniquely identify Library_Year
+    // For now, assuming we're working with global records or year is unique enough
+    const libraryYearRecord = await db.library_Year.findFirst({
+      where: { year: year },
+      select: { id: true }
+    });
+
+    if (!libraryYearRecord) {
+      return NextResponse.json(
+        { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
+        { status: 404 }
+      );
+    }
+
+    const libraryYearId = libraryYearRecord.id;
     if (counts === undefined || !Number.isFinite(Number(counts))) {
       return NextResponse.json(
         { error: "Missing or invalid counts" },
@@ -59,13 +76,13 @@ export async function POST(req: Request) {
             romanized_title: romanized_title?.trim() ?? null,
             is_global: Boolean(is_global),
             updated_at: new Date(),
-            libraryyear: year,
+            libraryyear: libraryYearId,
           },
         });
 
         // 2) Link to Library_Year (m–m) - use createMany with skipDuplicates
         await tx.libraryYear_ListEBook.createMany({
-          data: [{ libraryyear_id: year, listebook_id: book.id }],
+          data: [{ libraryyear_id: libraryYearId, listebook_id: book.id }],
           skipDuplicates: true,
         });
 

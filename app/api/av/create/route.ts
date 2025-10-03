@@ -20,17 +20,33 @@ export async function POST(req: Request) {
       type,
       counts,
       language,
-      year, // year value from form
+      year, // year number from form
       is_global,
     } = body;
 
     // ✅ Validate required fields
-    if (!year || isNaN(Number(year))) {
+    const yearNum = Number(year);
+    if (!yearNum || isNaN(yearNum)) {
       return NextResponse.json(
         { error: "Missing or invalid year" },
         { status: 400 }
       );
     }
+
+    // Fetch the Library_Year record ID from the year number
+    const libraryYearRecord = await db.library_Year.findFirst({
+      where: { year: yearNum },
+      select: { id: true }
+    });
+
+    if (!libraryYearRecord) {
+      return NextResponse.json(
+        { error: `Library year ${yearNum} not found. Please ensure the year exists in the system.` },
+        { status: 404 }
+      );
+    }
+
+    const libraryYearId = libraryYearRecord.id;
 
     if (!title || title.trim() === "") {
       return NextResponse.json(
@@ -67,15 +83,22 @@ export async function POST(req: Request) {
         type: type.trim() || null,
         is_global: is_global ?? false,
         updated_at: new Date(),
+        libraryyear: libraryYearId,
       },
     });
 
-    // ✅ Step 2: Create AV counts entry
+    // ✅ Step 2: Link to Library_Year (m-m) - use createMany with skipDuplicates
+    await db.libraryYear_ListAV.createMany({
+      data: [{ libraryyear_id: libraryYearId, listav_id: newAV.id }],
+      skipDuplicates: true,
+    });
+
+    // ✅ Step 3: Create AV counts entry
     await db.list_AV_Counts.upsert({
       where: {
         listav_year_unique: {
           listav: newAV.id,
-          year: Number(year),
+          year: yearNum,
         },
       },
       update: {
@@ -85,14 +108,14 @@ export async function POST(req: Request) {
       },
       create: {
         titles: Number(counts),
-        year: Number(year),
+        year: yearNum,
         updatedat: new Date(),
         ishidden: false,
         listav: newAV.id,
       },
     });
 
-    // ✅ Step 3: Insert languages
+    // ✅ Step 4: Insert languages
     if (Array.isArray(language) && language.length > 0) {
       const languageEntries = language
         .filter(langId => !isNaN(Number(langId)))
@@ -118,7 +141,7 @@ export async function POST(req: Request) {
       {
         title: newAV.title,
         type: newAV.type,
-        year: Number(year),
+        year: yearNum,
         counts: Number(counts),
         languages: language.length,
       },
@@ -131,12 +154,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true, 
       newAV,
-      message: `AV entry "${title}" created successfully for year ${year}`,
+      message: `AV entry "${title}" created successfully for year ${yearNum}`,
       data: {
         id: newAV.id,
         title: newAV.title,
         type: newAV.type,
-        year: Number(year),
+        year: yearNum,
         counts: Number(counts),
         languages: language.length,
       }

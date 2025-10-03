@@ -174,26 +174,60 @@ async function processRecords(
       console.log(`/api/copy-records: Processing record`, { id: idNum, counts: val, year: yearNum });
       
       try {
+        // Fetch the original record to get ALL field values
+        const originalRecord = await countsModel.findFirst({
+          where: {
+            [listRefField]: idNum,
+            year: { not: yearNum } // Get from a different year
+          },
+          orderBy: {
+            year: 'desc' // Get most recent version
+          }
+        });
+        
+        if (!originalRecord) {
+          console.warn(`/api/copy-records: No original record found for ${listRefField}=${idNum}. Creating with count only.`);
+        }
+        
         // Since we've already checked for duplicates, we can directly create new records
         const recordId = nextId++; // increment after use
         console.log(`/api/copy-records: Using ID ${recordId} for new record`);
         
+        // Build data object with ALL fields from original record (excluding id, year, updatedat)
+        const dataToCreate: any = {
+          id: recordId,
+          [listRefField]: idNum,
+          [countsField]: val, // Use the count from the request (user may have modified it)
+          year: yearNum,
+          updatedat: new Date(),
+          ishidden: originalRecord?.ishidden ?? false,
+        };
+        
+        // Copy additional fields based on resource type
+        if (originalRecord) {
+          if (resource === 'ebook') {
+            // Copy volumes and chapters
+            dataToCreate.volumes = originalRecord.volumes ?? null;
+            dataToCreate.chapters = originalRecord.chapters ?? null;
+          } else if (resource === 'ejournal') {
+            // Copy databases
+            dataToCreate.dbs = originalRecord.dbs ?? null;
+          }
+          // AV only has titles, no additional fields to copy
+        }
+        
+        console.log(`/api/copy-records: Creating record with data`, dataToCreate);
+        
         // Create with explicit ID
         const newRecord = await countsModel.create({
-          data: {
-            id: recordId,
-            [listRefField]: idNum,
-            [countsField]: val,
-            year: yearNum,
-            updatedat: new Date(),
-            ishidden: false,
-          },
+          data: dataToCreate,
         });
         
         console.log(`/api/copy-records: Successfully created record`, { 
           id: newRecord.id,
           [listRefField]: newRecord[listRefField],
-          year: newRecord.year
+          year: newRecord.year,
+          allFields: newRecord
         });
         
         processedRecords.push(newRecord);
