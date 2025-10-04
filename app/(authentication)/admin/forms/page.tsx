@@ -6,6 +6,8 @@ import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
 import { getLibraryById } from "@/data/fetchPrisma"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { getFormattedSurveyDates } from "@/data/fetchSurveyDates"
+import { FormStatusBadge } from "@/components/FormStatusBadge"
+import { FormsAvailabilityBadge } from "@/components/FormsAvailabilityBadge"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -165,9 +167,13 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     <ClipboardType className="text-white text-sm font-bold" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-900">My Forms</h2>
-                                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">
-                                    {forms.length} Available
-                                </span>
+                                {libid && (
+                                    <FormsAvailabilityBadge
+                                        libid={libid}
+                                        year={currentYear}
+                                        totalForms={forms.length}
+                                    />
+                                )}
                             </div>
                             <p className="text-gray-600">All available forms for your library</p>
                         </div>
@@ -184,10 +190,13 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     >
                                         {index + 1}. {form.title}
                                     </Link>
-                                    <div className="mt-2 flex items-center text-sm text-purple-600">
-                                        <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
-                                        Ready to complete
-                                    </div>
+                                    {libid && (
+                                        <FormStatusBadge
+                                            formHref={form.href}
+                                            libid={libid}
+                                            year={currentYear}
+                                        />
+                                    )}
                                 </div>
                             ))}
                         </div>
