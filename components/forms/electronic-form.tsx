@@ -4,6 +4,8 @@ import * as z from "zod"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Download } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
@@ -206,6 +208,34 @@ export default function ElectronicForm() {
     (watchedValues.efulltext_electronic_title_korean || 0) +
     (watchedValues.efulltext_electronic_title_noncjk || 0)
 
+  // Import data from all databases function
+  const importAllData = async () => {
+    try {
+      const libraryId = Number(params.libid);
+      const currentYear = new Date().getFullYear();
+
+      const response = await fetch(`/api/electronic/import-all/${libraryId}/${currentYear}`);
+      if (response.ok) {
+        const result = await response.json();
+        const data = result.data;
+
+        // Set electronic full text fields
+        form.setValue('efulltext_electronic_title_chinese', data.chinese || 0, { shouldValidate: false });
+        form.setValue('efulltext_electronic_title_japanese', data.japanese || 0, { shouldValidate: false });
+        form.setValue('efulltext_electronic_title_korean', data.korean || 0, { shouldValidate: false });
+        form.setValue('efulltext_electronic_title_noncjk', data.noncjk || 0, { shouldValidate: false });
+
+        toast.success(`Imported ${result.breakdown.ebooks} e-books, ${result.breakdown.ejournals} e-journals, and ${result.breakdown.avs} audio-visual subscriptions successfully!`);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to import subscription data');
+      }
+    } catch (error: any) {
+      console.error('Import subscription data error:', error);
+      toast.error('Failed to import subscription data');
+    }
+  };
+
   async function onSubmit(values: FormData) {
     setIsSubmitting(true)
     setSuccessMessage(null)
@@ -405,6 +435,24 @@ export default function ElectronicForm() {
         title="2.2 Electronic Full Text Database and Periodicals"
         description="Before using the 'Import' feature, update your AV/E-book/E-journal lists."
       >
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>BEFORE using the import feature</strong>, please fill out or update the
+            &quot;E-Book Database by Subscription&quot;, &quot;E-Journal Database by Subscription&quot;,
+            and &quot;Audio-Visual Database by Subscription&quot; in order for the system to provide
+            the corresponding numbers automatically.
+          </p>
+          <Button
+            type="button"
+            onClick={importAllData}
+            className="flex items-center gap-2"
+            variant="default"
+          >
+            <Download className="h-4 w-4" />
+            Import from E-Book, E-Journal and Audio-Visual Databases
+          </Button>
+        </div>
+
         <LanguageFieldGroup
           control={form.control}
           fields={{

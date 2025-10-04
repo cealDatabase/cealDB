@@ -1,0 +1,262 @@
+import { NextResponse } from "next/server";
+import db from "@/lib/db";
+
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ libid: string; year: string }> }
+) {
+  try {
+    const { libid, year } = await params;
+
+    // Validate required fields
+    if (!libid || isNaN(Number(libid)) || !year || isNaN(Number(year))) {
+      return NextResponse.json(
+        { error: "Missing or invalid library ID or year" },
+        { status: 400 }
+      );
+    }
+
+    const libraryId = Number(libid);
+    const currentYear = Number(year);
+
+    // Find Library_Year record for the library and year
+    const libraryYear = await db.library_Year.findFirst({
+      where: {
+        library: libraryId,
+        year: currentYear,
+      },
+      select: { id: true }
+    });
+
+    if (!libraryYear) {
+      return NextResponse.json(
+        { error: `Library year ${currentYear} not found for library ${libraryId}` },
+        { status: 404 }
+      );
+    }
+
+    // Initialize aggregated counts
+    const countsByLanguage = {
+      chinese: 0,
+      japanese: 0,
+      korean: 0,
+      noncjk: 0,
+    };
+
+    // 1. Fetch E-Book subscriptions
+    const ebookSubscriptions = await db.libraryYear_ListEBook.findMany({
+      where: {
+        libraryyear_id: libraryYear.id,
+      },
+      include: {
+        List_EBook: {
+          include: {
+            List_EBook_Language: {
+              include: {
+                Language: true,
+              },
+            },
+            List_EBook_Counts: {
+              where: {
+                year: currentYear,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const globalEBooks = await db.list_EBook.findMany({
+      where: {
+        is_global: true,
+      },
+      include: {
+        List_EBook_Language: {
+          include: {
+            Language: true,
+          },
+        },
+        List_EBook_Counts: {
+          where: {
+            year: currentYear,
+          },
+        },
+      },
+    });
+
+    // Process E-Books
+    const allEBooks = [
+      ...ebookSubscriptions.map(sub => sub.List_EBook),
+      ...globalEBooks,
+    ];
+
+    for (const ebook of allEBooks) {
+      if (!ebook) continue;
+      const count = ebook.List_EBook_Counts?.[0]?.titles || 0;
+
+      for (const langEntry of ebook.List_EBook_Language) {
+        const langShort = langEntry.Language.short?.toUpperCase();
+        
+        if (langShort === "CHN") {
+          countsByLanguage.chinese += count;
+        } else if (langShort === "JPN") {
+          countsByLanguage.japanese += count;
+        } else if (langShort === "KOR") {
+          countsByLanguage.korean += count;
+        } else if (langShort === "NON") {
+          countsByLanguage.noncjk += count;
+        }
+      }
+    }
+
+    // 2. Fetch E-Journal subscriptions
+    const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
+      where: {
+        libraryyear_id: libraryYear.id,
+      },
+      include: {
+        List_EJournal: {
+          include: {
+            List_EJournal_Language: {
+              include: {
+                Language: true,
+              },
+            },
+            List_EJournal_Counts: {
+              where: {
+                year: currentYear,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const globalEJournals = await db.list_EJournal.findMany({
+      where: {
+        is_global: true,
+      },
+      include: {
+        List_EJournal_Language: {
+          include: {
+            Language: true,
+          },
+        },
+        List_EJournal_Counts: {
+          where: {
+            year: currentYear,
+          },
+        },
+      },
+    });
+
+    // Process E-Journals
+    const allEJournals = [
+      ...ejournalSubscriptions.map(sub => sub.List_EJournal),
+      ...globalEJournals,
+    ];
+
+    for (const ejournal of allEJournals) {
+      if (!ejournal) continue;
+      const count = ejournal.List_EJournal_Counts?.[0]?.journals || 0;
+
+      for (const langEntry of ejournal.List_EJournal_Language) {
+        const langShort = langEntry.Language.short?.toUpperCase();
+        
+        if (langShort === "CHN") {
+          countsByLanguage.chinese += count;
+        } else if (langShort === "JPN") {
+          countsByLanguage.japanese += count;
+        } else if (langShort === "KOR") {
+          countsByLanguage.korean += count;
+        } else if (langShort === "NON") {
+          countsByLanguage.noncjk += count;
+        }
+      }
+    }
+
+    // 3. Fetch Audio-Visual subscriptions
+    const avSubscriptions = await db.libraryYear_ListAV.findMany({
+      where: {
+        libraryyear_id: libraryYear.id,
+      },
+      include: {
+        List_AV: {
+          include: {
+            List_AV_Language: {
+              include: {
+                Language: true,
+              },
+            },
+            List_AV_Counts: {
+              where: {
+                year: currentYear,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const globalAVs = await db.list_AV.findMany({
+      where: {
+        is_global: true,
+      },
+      include: {
+        List_AV_Language: {
+          include: {
+            Language: true,
+          },
+        },
+        List_AV_Counts: {
+          where: {
+            year: currentYear,
+          },
+        },
+      },
+    });
+
+    // Process AVs
+    const allAVs = [
+      ...avSubscriptions.map(sub => sub.List_AV),
+      ...globalAVs,
+    ];
+
+    for (const av of allAVs) {
+      if (!av) continue;
+      const count = av.List_AV_Counts?.[0]?.titles || 0;
+
+      for (const langEntry of av.List_AV_Language) {
+        const langShort = langEntry.Language.short?.toUpperCase();
+        
+        if (langShort === "CHN") {
+          countsByLanguage.chinese += count;
+        } else if (langShort === "JPN") {
+          countsByLanguage.japanese += count;
+        } else if (langShort === "KOR") {
+          countsByLanguage.korean += count;
+        } else if (langShort === "NON") {
+          countsByLanguage.noncjk += count;
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: countsByLanguage,
+      breakdown: {
+        ebooks: allEBooks.length,
+        ejournals: allEJournals.length,
+        avs: allAVs.length,
+      },
+    });
+
+  } catch (error: any) {
+    console.error("API error (import all subscriptions to electronic):", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch subscription data", detail: error?.message },
+      { status: 500 }
+    );
+  }
+}

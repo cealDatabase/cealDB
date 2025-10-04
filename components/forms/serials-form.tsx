@@ -4,6 +4,8 @@ import * as z from "zod"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Download } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
@@ -132,6 +134,33 @@ export default function SerialsForm() {
   const printGrandTotal = purchasedPrintSubtotal + nonPurchasedPrintSubtotal;
   const overallGrandTotal = electronicGrandTotal + printGrandTotal;
 
+  // Import E-Journal data function
+  const importEJournalData = async () => {
+    try {
+      const libraryId = Number(params.libid);
+      const currentYear = new Date().getFullYear();
+
+      const response = await fetch(`/api/serials/import-ejournal/${libraryId}/${currentYear}`);
+      if (response.ok) {
+        const result = await response.json();
+        const data = result.data;
+
+        // Set purchased electronic serials fields
+        form.setValue('s_epurchased_chinese', data.chinese || 0, { shouldValidate: false });
+        form.setValue('s_epurchased_japanese', data.japanese || 0, { shouldValidate: false });
+        form.setValue('s_epurchased_korean', data.korean || 0, { shouldValidate: false });
+        form.setValue('s_epurchased_noncjk', data.noncjk || 0, { shouldValidate: false });
+
+        toast.success('E-Journal subscription data imported successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to import E-Journal data');
+      }
+    } catch (error: any) {
+      console.error('Import E-Journal data error:', error);
+      toast.error('Failed to import E-Journal subscription data');
+    }
+  };
 
   // Update calculated total fields in the form
   useEffect(() => {
@@ -216,6 +245,23 @@ export default function SerialsForm() {
         title="1. Serial Titles: Purchased (including Subscriptions) - Electronic"
         description="Enter the number of purchased electronic serials by language."
       >
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>BEFORE using the import feature</strong>, please fill out or update the
+            &quot;E-Journal Database by Subscription - List of&quot; in order for the
+            system to provide the corresponding numbers automatically.
+          </p>
+          <Button
+            type="button"
+            onClick={importEJournalData}
+            className="flex items-center gap-2"
+            variant="default"
+          >
+            <Download className="h-4 w-4" />
+            Import from E-Journal Database by Subscription
+          </Button>
+        </div>
+
         <LanguageFieldGroup
           control={form.control}
           fields={{
