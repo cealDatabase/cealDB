@@ -154,11 +154,8 @@ export default async function signinAction(
     cookieStore.set('uinf', user.username.toLowerCase(), cookieOptions);
     
     // Set user's actual role and library from database
-    console.log(`🔍 Raw User_Roles data:`, JSON.stringify(user.User_Roles, null, 2));
     const userRoleIds = user.User_Roles?.map(userRole => userRole.Role.id.toString()) || ['2'];
     const userLibraryId = user.User_Library?.[0]?.Library?.id?.toString() || '';
-    
-    console.log(`🎭 Processed Role IDs: [${userRoleIds.join(', ')}]`);
     
     // Store role IDs array as JSON string in cookie
     cookieStore.set('role', JSON.stringify(userRoleIds), cookieOptions);
@@ -192,10 +189,7 @@ export default async function signinAction(
       }
     });
 
-    console.log(`✅ Server Action: Login successful for ${username}`);
-    console.log(`🍪 Server Action: Cookies set directly via cookies() API`);
     console.log(`👤 User Role IDs: [${userRoleIds.join(', ')}], Library ID: ${userLibraryId}`);
-    console.log(`📊 Session created: ${sessionRecord.id}, Last login updated`);
 
     return {
       success: true,

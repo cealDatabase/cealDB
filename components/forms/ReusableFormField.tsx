@@ -63,19 +63,14 @@ export function ReusableFormField<T extends FieldValues>({
                 placeholder={placeholder}
                 disabled={disabled}
                 {...field}
-                value={field.value === 0 ? '' : field.value}
+                value={field.value ?? 0}
                 onChange={(e) => {
                   const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
                   field.onChange(value)
                 }}
                 onFocus={(e) => {
                   if (e.target.value === '0') {
-                    e.target.value = ''
-                  }
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') {
-                    field.onChange(0)
+                    e.target.select()
                   }
                 }}
               />
@@ -135,6 +130,7 @@ export function ReusableNumberFormField<T extends FieldValues>({
               placeholder={placeholder}
               disabled={disabled}
               {...field}
+              value={field.value ?? 0}
               onChange={(e) => {
                 const value = useFloat 
                   ? (parseFloat(e.target.value) || 0)

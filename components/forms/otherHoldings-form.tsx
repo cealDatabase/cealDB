@@ -4,6 +4,8 @@ import * as z from "zod"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Download } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
@@ -55,6 +57,30 @@ const formSchema = z.object({
   ohcustom1korean: z.number().min(0, { message: "Must be a non-negative number" }),
   ohcustom1noncjk: z.number().min(0, { message: "Must be a non-negative number" }),
 
+  // Online Map
+  ohonlinemapchinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlinemapjapanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlinemapkorean: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlinemapnoncjk: z.number().min(0, { message: "Must be a non-negative number" }),
+
+  // Online Image/Photograph
+  ohonlineimagechinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlineimagejapanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlineimagekorean: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohonlineimagenoncjk: z.number().min(0, { message: "Must be a non-negative number" }),
+
+  // Streaming Audio/Music
+  ohstreamingchinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingjapanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingkorean: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingnoncjk: z.number().min(0, { message: "Must be a non-negative number" }),
+
+  // Streaming Film/Video
+  ohstreamingvideochinese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingvideojapanese: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingvideokorean: z.number().min(0, { message: "Must be a non-negative number" }),
+  ohstreamingvideononcjk: z.number().min(0, { message: "Must be a non-negative number" }),
+
   // Notes
   ohnotes: z.string().optional(),
 })
@@ -98,6 +124,22 @@ export default function OtherHoldingsForm() {
       ohcustom1japanese: 0,
       ohcustom1korean: 0,
       ohcustom1noncjk: 0,
+      ohonlinemapchinese: 0,
+      ohonlinemapjapanese: 0,
+      ohonlinemapkorean: 0,
+      ohonlinemapnoncjk: 0,
+      ohonlineimagechinese: 0,
+      ohonlineimagejapanese: 0,
+      ohonlineimagekorean: 0,
+      ohonlineimagenoncjk: 0,
+      ohstreamingchinese: 0,
+      ohstreamingjapanese: 0,
+      ohstreamingkorean: 0,
+      ohstreamingnoncjk: 0,
+      ohstreamingvideochinese: 0,
+      ohstreamingvideojapanese: 0,
+      ohstreamingvideokorean: 0,
+      ohstreamingvideononcjk: 0,
       ohnotes: "",
     },
   })
@@ -142,7 +184,77 @@ export default function OtherHoldingsForm() {
     watchedValues.ohcustom1korean +
     watchedValues.ohcustom1noncjk
 
-  const grandTotal = microformSubtotal + graphicSubtotal + audioSubtotal + videoSubtotal + dvdSubtotal + customSubtotal
+  const onlineMapSubtotal =
+    (watchedValues.ohonlinemapchinese || 0) +
+    (watchedValues.ohonlinemapjapanese || 0) +
+    (watchedValues.ohonlinemapkorean || 0) +
+    (watchedValues.ohonlinemapnoncjk || 0)
+
+  const onlineImageSubtotal =
+    (watchedValues.ohonlineimagechinese || 0) +
+    (watchedValues.ohonlineimagejapanese || 0) +
+    (watchedValues.ohonlineimagekorean || 0) +
+    (watchedValues.ohonlineimagenoncjk || 0)
+
+  const streamingAudioSubtotal =
+    (watchedValues.ohstreamingchinese || 0) +
+    (watchedValues.ohstreamingjapanese || 0) +
+    (watchedValues.ohstreamingkorean || 0) +
+    (watchedValues.ohstreamingnoncjk || 0)
+
+  const streamingVideoSubtotal =
+    (watchedValues.ohstreamingvideochinese || 0) +
+    (watchedValues.ohstreamingvideojapanese || 0) +
+    (watchedValues.ohstreamingvideokorean || 0) +
+    (watchedValues.ohstreamingvideononcjk || 0)
+
+  const grandTotal = microformSubtotal + graphicSubtotal + audioSubtotal + videoSubtotal + dvdSubtotal + customSubtotal + onlineMapSubtotal + onlineImageSubtotal + streamingAudioSubtotal + streamingVideoSubtotal
+
+  // Import AV data function
+  const importAVData = async () => {
+    try {
+      const libraryId = Number(params.libid);
+      const currentYear = new Date().getFullYear();
+
+      const response = await fetch(`/api/otherHoldings/import-av/${libraryId}/${currentYear}`);
+      if (response.ok) {
+        const result = await response.json();
+        const data = result.data;
+
+        // Set online map fields
+        form.setValue('ohonlinemapchinese', data['online map'].chinese || 0, { shouldValidate: false });
+        form.setValue('ohonlinemapjapanese', data['online map'].japanese || 0, { shouldValidate: false });
+        form.setValue('ohonlinemapkorean', data['online map'].korean || 0, { shouldValidate: false });
+        form.setValue('ohonlinemapnoncjk', data['online map'].noncjk || 0, { shouldValidate: false });
+
+        // Set online image fields
+        form.setValue('ohonlineimagechinese', data['online image/photograph'].chinese || 0, { shouldValidate: false });
+        form.setValue('ohonlineimagejapanese', data['online image/photograph'].japanese || 0, { shouldValidate: false });
+        form.setValue('ohonlineimagekorean', data['online image/photograph'].korean || 0, { shouldValidate: false });
+        form.setValue('ohonlineimagenoncjk', data['online image/photograph'].noncjk || 0, { shouldValidate: false });
+
+        // Set streaming audio fields
+        form.setValue('ohstreamingchinese', data['streaming audio/music'].chinese || 0, { shouldValidate: false });
+        form.setValue('ohstreamingjapanese', data['streaming audio/music'].japanese || 0, { shouldValidate: false });
+        form.setValue('ohstreamingkorean', data['streaming audio/music'].korean || 0, { shouldValidate: false });
+        form.setValue('ohstreamingnoncjk', data['streaming audio/music'].noncjk || 0, { shouldValidate: false });
+
+        // Set streaming video fields
+        form.setValue('ohstreamingvideochinese', data['streaming film/video'].chinese || 0, { shouldValidate: false });
+        form.setValue('ohstreamingvideojapanese', data['streaming film/video'].japanese || 0, { shouldValidate: false });
+        form.setValue('ohstreamingvideokorean', data['streaming film/video'].korean || 0, { shouldValidate: false });
+        form.setValue('ohstreamingvideononcjk', data['streaming film/video'].noncjk || 0, { shouldValidate: false });
+
+        toast.success('Audio/Visual subscription data imported successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to import AV data');
+      }
+    } catch (error: any) {
+      console.error('Import AV data error:', error);
+      toast.error('Failed to import AV subscription data');
+    }
+  };
 
   async function onSubmit(values: FormData) {
     try {
@@ -158,6 +270,10 @@ export default function OtherHoldingsForm() {
         ohfilm_video_subtotal: videoSubtotal,
         ohdvd_subtotal: dvdSubtotal,
         ohcustom1subtotal: customSubtotal,
+        ohonlinemapsubtotal: onlineMapSubtotal,
+        ohonlineimagesubtotal: onlineImageSubtotal,
+        ohstreamingsubtotal: streamingAudioSubtotal,
+        ohstreamingvideosubtotal: streamingVideoSubtotal,
         ohgrandtotal: grandTotal,
         // Remove libraryyear - API will handle the relationship via libid
         libid: Number(params.libid),
@@ -305,6 +421,109 @@ export default function OtherHoldingsForm() {
         />
       </FormSection>
 
+      {/* Online Materials Section */}
+      <FormSection
+        title="Online Materials"
+        description="Subscription-based digital materials (auto-calculated from database)"
+      >
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>BEFORE using the import feature</strong>, please fill out or update the
+            &quot;Audio-Visual Database by Subscription - List of&quot; in order for the
+            system to provide the corresponding numbers automatically.
+          </p>
+          <Button
+            type="button"
+            onClick={importAVData}
+            className="flex items-center gap-2"
+            variant="default"
+          >
+            <Download className="h-4 w-4" />
+            Import from Audio/Video Database by Subscription
+          </Button>
+        </div>
+
+        {/* Online Map */}
+        <div className="mb-6">
+          <h4 className="font-semibold mb-3 text-cyan-700">Online Map</h4>
+          <LanguageFieldGroup
+            control={form.control as any}
+            fields={{
+              chinese: { name: "ohonlinemapchinese", label: "26. Online Map Chinese" },
+              japanese: { name: "ohonlinemapjapanese", label: "27. Online Map Japanese" },
+              korean: { name: "ohonlinemapkorean", label: "28. Online Map Korean" },
+              noncjk: { name: "ohonlinemapnoncjk", label: "29. Online Map Non-CJK" }
+            }}
+          />
+          <div className="mt-4"></div>
+          <SubtotalDisplay
+            label="30. Online Map Subtotal"
+            value={onlineMapSubtotal}
+            formula="26 + 27 + 28 + 29"
+          />
+        </div>
+
+        {/* Online Image/Photograph */}
+        <div className="mb-6">
+          <h4 className="font-semibold mb-3 text-cyan-700">Online Image/Photograph</h4>
+          <LanguageFieldGroup
+            control={form.control as any}
+            fields={{
+              chinese: { name: "ohonlineimagechinese", label: "31. Online Image/Photograph Chinese" },
+              japanese: { name: "ohonlineimagejapanese", label: "32. Online Image/Photograph Japanese" },
+              korean: { name: "ohonlineimagekorean", label: "33. Online Image/Photograph Korean" },
+              noncjk: { name: "ohonlineimagenoncjk", label: "34. Online Image/Photograph Non-CJK" }
+            }}
+          />
+          <div className="mt-4"></div>
+          <SubtotalDisplay
+            label="35. Online Image/Photograph Subtotal"
+            value={onlineImageSubtotal}
+            formula="31 + 32 + 33 + 34"
+          />
+        </div>
+
+        {/* Streaming Audio/Music */}
+        <div className="mb-6">
+          <h4 className="font-semibold mb-3 text-cyan-700">Streaming Audio/Music</h4>
+          <LanguageFieldGroup
+            control={form.control as any}
+            fields={{
+              chinese: { name: "ohstreamingchinese", label: "36. Streaming Audio Chinese" },
+              japanese: { name: "ohstreamingjapanese", label: "37. Streaming Audio Japanese" },
+              korean: { name: "ohstreamingkorean", label: "38. Streaming Audio Korean" },
+              noncjk: { name: "ohstreamingnoncjk", label: "39. Streaming Audio Non-CJK" }
+            }}
+          />
+          <div className="mt-4"></div>
+          <SubtotalDisplay
+            label="40. Streaming Audio/Music Subtotal"
+            value={streamingAudioSubtotal}
+            formula="36 + 37 + 38 + 39"
+          />
+        </div>
+
+        {/* Streaming Film/Video */}
+        <div className="mb-6">
+          <h4 className="font-semibold mb-3 text-cyan-700">Streaming Film/Video</h4>
+          <LanguageFieldGroup
+            control={form.control as any}
+            fields={{
+              chinese: { name: "ohstreamingvideochinese", label: "41. Streaming Film/Video Chinese" },
+              japanese: { name: "ohstreamingvideojapanese", label: "42. Streaming Film/Video Japanese" },
+              korean: { name: "ohstreamingvideokorean", label: "43. Streaming Film/Video Korean" },
+              noncjk: { name: "ohstreamingvideononcjk", label: "44. Streaming Film/Video Non-CJK" }
+            }}
+          />
+          <div className="mt-4"></div>
+          <SubtotalDisplay
+            label="45. Streaming Film/Video Subtotal"
+            value={streamingVideoSubtotal}
+            formula="41 + 42 + 43 + 44"
+          />
+        </div>
+      </FormSection>
+
       {/* Custom Materials Section */}
       <FormSection
         title="Custom Materials"
@@ -334,7 +553,7 @@ export default function OtherHoldingsForm() {
         <SubtotalDisplay
           label="51. GRAND TOTAL (Other Materials)"
           value={grandTotal}
-          formula="05 + 10 + 15 + 20 + 25 + 50"
+          formula="05 + 10 + 15 + 20 + 25 + 30 + 35 + 40 + 45 + 50"
           className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />

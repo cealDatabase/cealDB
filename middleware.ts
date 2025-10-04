@@ -53,7 +53,7 @@ export default async function middleware(request: NextRequest) {
         isAuthenticated = tokenUsername === decodedUserCookie;
         
         if (isAuthenticated) {
-          console.log(`✅ Authenticated: ${decodedUserCookie}`);
+          // console.log(`✅ Authenticated: ${decodedUserCookie}`);
         }
       }
     } catch (error) {

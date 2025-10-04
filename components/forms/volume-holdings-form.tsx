@@ -96,9 +96,8 @@ export default function VolumeHoldingsForm() {
 
   const grandTotal = previousYearSubtotal + addedGrossSubtotal - withdrawnSubtotal
 
-  // Load previous year data and ebook volume data on component mount
+  // Load previous year data on component mount
   useEffect(() => {
-
     const loadPreviousYearData = async () => {
       try {
         const libraryId = Number(params.libid);
@@ -109,40 +108,42 @@ export default function VolumeHoldingsForm() {
         if (response.ok) {
           const previousData = await response.json();
           if (previousData) {
-            // Auto-fill fields 01-05 with previous year's grand total data
-            form.setValue('vhprevious_year_chinese', previousData.vhgrandtotal || 0);
-            form.setValue('vhprevious_year_japanese', previousData.vhgrandtotal || 0);
-            form.setValue('vhprevious_year_korean', previousData.vhgrandtotal || 0);
-            form.setValue('vhprevious_year_noncjk', previousData.vhgrandtotal || 0);
+            // Calculate ending balance for each language from last year's data
+            // Formula: Previous + Added - Withdrawn = Ending Balance
+            const chineseEnding = (previousData.vhprevious_year_chinese || 0) + 
+                                  (previousData.vhadded_gross_chinese || 0) - 
+                                  (previousData.vhwithdrawn_chinese || 0);
+            
+            const japaneseEnding = (previousData.vhprevious_year_japanese || 0) + 
+                                   (previousData.vhadded_gross_japanese || 0) - 
+                                   (previousData.vhwithdrawn_japanese || 0);
+            
+            const koreanEnding = (previousData.vhprevious_year_korean || 0) + 
+                                 (previousData.vhadded_gross_korean || 0) - 
+                                 (previousData.vhwithdrawn_korean || 0);
+            
+            const noncjkEnding = (previousData.vhprevious_year_noncjk || 0) + 
+                                 (previousData.vhadded_gross_noncjk || 0) - 
+                                 (previousData.vhwithdrawn_noncjk || 0);
+
+            // Auto-fill fields 01-04 with last year's ending balance by language
+            form.setValue('vhprevious_year_chinese', chineseEnding);
+            form.setValue('vhprevious_year_japanese', japaneseEnding);
+            form.setValue('vhprevious_year_korean', koreanEnding);
+            form.setValue('vhprevious_year_noncjk', noncjkEnding);
           }
+        } else {
+          // No previous year data - leave fields at 0 (default)
+          console.log('No previous year data found, using default values (0)');
         }
       } catch (error) {
-        console.log('No previous year data available:', error);
-      }
-    };
-
-    const loadEbookVolumeData = async () => {
-      try {
-        const libraryId = Number(params.libid);
-        const currentYear = new Date().getFullYear();
-
-        const response = await fetch(`/api/volumeHoldings/ebookVolumeData/${libraryId}/${currentYear}`);
-        if (response.ok) {
-          const ebookData = await response.json();
-          if (ebookData) {
-            // Auto-fill fields 01-05 with previous year's grand total data
-            form.setValue('vhprevious_year_chinese', ebookData.vhgrandtotal || 0);
-            form.setValue('vhprevious_year_japanese', ebookData.vhgrandtotal || 0);
-          }
-        }
-      } catch (error) {
-        console.log('No ebook volume data available:', error);
+        console.log('Error loading previous year data:', error);
+        // On error, leave fields at 0 (default)
       }
     };
 
     if (params.libid) {
       loadPreviousYearData();
-      loadEbookVolumeData();
     }
   }, [params.libid, form]);
 
