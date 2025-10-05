@@ -3,60 +3,14 @@ model Public_Services {
   entryid                              String?
   libraryyear                          Int?          @unique
   
-  // Presentations
-  pspresentations_chinese              Int?
-  pspresentations_japanese             Int?
-  pspresentations_korean               Int?
-  pspresentations_eastasian            Int?
+  // Direct totals - no language breakdown needed
   pspresentations_subtotal             Int?
-  
-  // Presentation Participants
-  pspresentation_participants_chinese  Int?
-  pspresentation_participants_japanese Int?
-  pspresentation_participants_korean   Int?
-  pspresentation_participants_eastasian Int?
   pspresentation_participants_subtotal Int?
-  
-  // Reference Transactions
-  psreference_transactions_chinese     Int?
-  psreference_transactions_japanese    Int?
-  psreference_transactions_korean      Int?
-  psreference_transactions_eastasian   Int?
   psreference_transactions_subtotal    Int?
-  
-  // Total Circulations
-  pstotal_circulations_chinese         Int?
-  pstotal_circulations_japanese        Int?
-  pstotal_circulations_korean          Int?
-  pstotal_circulations_eastasian       Int?
   pstotal_circulations_subtotal        Int?
-  
-  // ILL Lending Requests
-  pslending_requests_filled_chinese    Int?
-  pslending_requests_filled_japanese   Int?
-  pslending_requests_filled_korean     Int?
-  pslending_requests_filled_eastasian  Int?
   pslending_requests_filled_subtotal   Int?
-  
-  // ILL Lending Requests Unfilled
-  pslending_requests_unfilled_chinese  Int?
-  pslending_requests_unfilled_japanese Int?
-  pslending_requests_unfilled_korean   Int?
-  pslending_requests_unfilled_eastasian Int?
   pslending_requests_unfilled_subtotal Int?
-  
-  // ILL Borrowing Requests Filled
-  psborrowing_requests_filled_chinese  Int?
-  psborrowing_requests_filled_japanese Int?
-  psborrowing_requests_filled_korean   Int?
-  psborrowing_requests_filled_eastasian Int?
   psborrowing_requests_filled_subtotal Int?
-  
-  // ILL Borrowing Requests Unfilled
-  psborrowing_requests_unfilled_chinese Int?
-  psborrowing_requests_unfilled_japanese Int?
-  psborrowing_requests_unfilled_korean  Int?
-  psborrowing_requests_unfilled_eastasian Int?
   psborrowing_requests_unfilled_subtotal Int?
   
   // Notes

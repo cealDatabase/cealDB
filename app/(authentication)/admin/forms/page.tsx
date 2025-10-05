@@ -97,7 +97,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                             submitted: !!libraryYear.Personnel_Support,
                             recordId: libraryYear.Personnel_Support?.id || null,
                         },
-                        'public-services': {
+                        publicServices: {
                             submitted: !!libraryYear.Public_Services,
                             recordId: libraryYear.Public_Services?.id || null,
                         },

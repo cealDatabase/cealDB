@@ -60,20 +60,20 @@ const formSchema = z.object({
   efulltext_electronic_title_korean: z.number().min(0).default(0),
   efulltext_electronic_title_noncjk: z.number().min(0).default(0),
 
-  // Expenditures
-  eonetime_computer_expenditure_chinese: z.number().min(0).default(0),
-  eonetime_computer_expenditure_japanese: z.number().min(0).default(0),
-  eonetime_computer_expenditure_korean: z.number().min(0).default(0),
-  eonetime_computer_expenditure_noncjk: z.number().min(0).default(0),
-  eindex_electronic_expenditure_chinese: z.number().min(0).default(0),
-  eindex_electronic_expenditure_japanese: z.number().min(0).default(0),
-  eindex_electronic_expenditure_korean: z.number().min(0).default(0),
-  eindex_electronic_expenditure_noncjk: z.number().min(0).default(0),
-  efulltext_electronic_expenditure_chinese: z.number().min(0).default(0),
-  efulltext_electronic_expenditure_japanese: z.number().min(0).default(0),
-  efulltext_electronic_expenditure_korean: z.number().min(0).default(0),
-  efulltext_electronic_expenditure_noncjk: z.number().min(0).default(0),
+  // Expenditures - Simplified to single grand total field
+  etotal_expenditure_grandtotal: z.number().min(0).default(0),
 
+  // Section-specific notes (renamed from memo)
+  eonetime_computer_memo: z.string().optional(),
+  eaccompanied_computer_memo: z.string().optional(),
+  egift_computer_memo: z.string().optional(),
+  etotal_computer_memo: z.string().optional(),
+  eindex_electronic_memo: z.string().optional(),
+  efulltext_electronic_memo: z.string().optional(),
+  etotal_electronic_memo: z.string().optional(),
+  etotal_expenditure_memo: z.string().optional(),
+  eprevious_memo: z.string().optional(),
+  
   // Notes
   enotes: z.string().optional(),
 })
@@ -121,18 +121,16 @@ export default function ElectronicForm() {
       efulltext_electronic_title_japanese: 0,
       efulltext_electronic_title_korean: 0,
       efulltext_electronic_title_noncjk: 0,
-      eonetime_computer_expenditure_chinese: 0,
-      eonetime_computer_expenditure_japanese: 0,
-      eonetime_computer_expenditure_korean: 0,
-      eonetime_computer_expenditure_noncjk: 0,
-      eindex_electronic_expenditure_chinese: 0,
-      eindex_electronic_expenditure_japanese: 0,
-      eindex_electronic_expenditure_korean: 0,
-      eindex_electronic_expenditure_noncjk: 0,
-      efulltext_electronic_expenditure_chinese: 0,
-      efulltext_electronic_expenditure_japanese: 0,
-      efulltext_electronic_expenditure_korean: 0,
-      efulltext_electronic_expenditure_noncjk: 0,
+      etotal_expenditure_grandtotal: 0,
+      eonetime_computer_memo: "",
+      eaccompanied_computer_memo: "",
+      egift_computer_memo: "",
+      etotal_computer_memo: "",
+      eindex_electronic_memo: "",
+      efulltext_electronic_memo: "",
+      etotal_electronic_memo: "",
+      etotal_expenditure_memo: "",
+      eprevious_memo: "",
       enotes: "",
     },
   })
@@ -208,6 +206,49 @@ export default function ElectronicForm() {
     (watchedValues.efulltext_electronic_title_korean || 0) +
     (watchedValues.efulltext_electronic_title_noncjk || 0)
 
+  // Calculate 1.4 Total Computer Files (sum of 1.1 + 1.2 + 1.3)
+  const totalComputerTitlesChinese = (watchedValues.eonetime_computer_title_chinese || 0) +
+    (watchedValues.eaccompanied_computer_title_chinese || 0) +
+    (watchedValues.egift_computer_title_chinese || 0)
+  const totalComputerTitlesJapanese = (watchedValues.eonetime_computer_title_japanese || 0) +
+    (watchedValues.eaccompanied_computer_title_japanese || 0) +
+    (watchedValues.egift_computer_title_japanese || 0)
+  const totalComputerTitlesKorean = (watchedValues.eonetime_computer_title_korean || 0) +
+    (watchedValues.eaccompanied_computer_title_korean || 0) +
+    (watchedValues.egift_computer_title_korean || 0)
+  const totalComputerTitlesNoncjk = (watchedValues.eonetime_computer_title_noncjk || 0) +
+    (watchedValues.eaccompanied_computer_title_noncjk || 0) +
+    (watchedValues.egift_computer_title_noncjk || 0)
+  const totalComputerTitlesSubtotal = totalComputerTitlesChinese + totalComputerTitlesJapanese + 
+    totalComputerTitlesKorean + totalComputerTitlesNoncjk
+
+  const totalComputerCdChinese = (watchedValues.eonetime_computer_cd_chinese || 0) +
+    (watchedValues.eaccompanied_computer_cd_chinese || 0) +
+    (watchedValues.egift_computer_cd_chinese || 0)
+  const totalComputerCdJapanese = (watchedValues.eonetime_computer_cd_japanese || 0) +
+    (watchedValues.eaccompanied_computer_cd_japanese || 0) +
+    (watchedValues.egift_computer_cd_japanese || 0)
+  const totalComputerCdKorean = (watchedValues.eonetime_computer_cd_korean || 0) +
+    (watchedValues.eaccompanied_computer_cd_korean || 0) +
+    (watchedValues.egift_computer_cd_korean || 0)
+  const totalComputerCdNoncjk = (watchedValues.eonetime_computer_cd_noncjk || 0) +
+    (watchedValues.eaccompanied_computer_cd_noncjk || 0) +
+    (watchedValues.egift_computer_cd_noncjk || 0)
+  const totalComputerCdSubtotal = totalComputerCdChinese + totalComputerCdJapanese + 
+    totalComputerCdKorean + totalComputerCdNoncjk
+
+  // Calculate 2.3 Total Electronic (sum of 2.1 + 2.2)
+  const totalElectronicChinese = (watchedValues.eindex_electronic_title_chinese || 0) +
+    (watchedValues.efulltext_electronic_title_chinese || 0)
+  const totalElectronicJapanese = (watchedValues.eindex_electronic_title_japanese || 0) +
+    (watchedValues.efulltext_electronic_title_japanese || 0)
+  const totalElectronicKorean = (watchedValues.eindex_electronic_title_korean || 0) +
+    (watchedValues.efulltext_electronic_title_korean || 0)
+  const totalElectronicNoncjk = (watchedValues.eindex_electronic_title_noncjk || 0) +
+    (watchedValues.efulltext_electronic_title_noncjk || 0)
+  const totalElectronicSubtotal = totalElectronicChinese + totalElectronicJapanese + 
+    totalElectronicKorean + totalElectronicNoncjk
+
   // Import data from all databases function
   const importAllData = async () => {
     try {
@@ -244,15 +285,37 @@ export default function ElectronicForm() {
     try {
       const submissionData = {
         ...values,
-        // Add calculated subtotals
+        // Add calculated subtotals for sections 1.1, 1.2, 1.3
         eonetime_computer_title_subtotal: oneTimeComputerTitlesSubtotal,
         eonetime_computer_cd_subtotal: oneTimeComputerCdSubtotal,
         eaccompanied_computer_title_subtotal: accompaniedComputerTitlesSubtotal,
         eaccompanied_computer_cd_subtotal: accompaniedComputerCdSubtotal,
         egift_computer_title_subtotal: giftComputerTitlesSubtotal,
         egift_computer_cd_subtotal: giftComputerCdSubtotal,
+        
+        // Add calculated totals for section 1.4 (Total Computer Files)
+        etotal_computer_title_chinese: totalComputerTitlesChinese,
+        etotal_computer_title_japanese: totalComputerTitlesJapanese,
+        etotal_computer_title_korean: totalComputerTitlesKorean,
+        etotal_computer_title_noncjk: totalComputerTitlesNoncjk,
+        etotal_computer_title_subtotal: totalComputerTitlesSubtotal,
+        etotal_computer_cd_chinese: totalComputerCdChinese,
+        etotal_computer_cd_japanese: totalComputerCdJapanese,
+        etotal_computer_cd_korean: totalComputerCdKorean,
+        etotal_computer_cd_noncjk: totalComputerCdNoncjk,
+        etotal_computer_cd_subtotal: totalComputerCdSubtotal,
+        
+        // Add calculated subtotals for sections 2.1, 2.2
         eindex_electronic_title_subtotal: indexElectronicSubtotal,
         efulltext_electronic_title_subtotal: fulltextElectronicSubtotal,
+        
+        // Add calculated totals for section 2.3 (Total Electronic)
+        etotal_electronic_title_chinese: totalElectronicChinese,
+        etotal_electronic_title_japanese: totalElectronicJapanese,
+        etotal_electronic_title_korean: totalElectronicKorean,
+        etotal_electronic_title_noncjk: totalElectronicNoncjk,
+        etotal_electronic_title_subtotal: totalElectronicSubtotal,
+        
         libid: Number(params.libid),
       }
 
@@ -291,80 +354,170 @@ export default function ElectronicForm() {
     >
       {/* One-time Computer Files */}
       <FormSection
-        title="1.1 Computer Files (One-time/Monographic)"
+        title="1.1 Computer Files (One-Time/Monographic)"
         description="Include the number of non-subscription, one-time files such as backfiles or literature collections."
       >
-        <div className="space-y-4">
-          <h4 className="font-medium">Titles</h4>
-          <LanguageFieldGroup
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">01. Chinese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_title_chinese"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_cd_chinese"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">02. Japanese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_title_japanese"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_cd_japanese"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">03. Korean</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_title_korean"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_cd_korean"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">04. Non-CJK</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_title_noncjk"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="eonetime_computer_cd_noncjk"
+                    label=""
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+              </tr>
+              <tr className="bg-gray-50">
+                <td className="border border-gray-300 p-2 font-bold">05. Subtotal<br/><span className="text-xs font-normal text-gray-600">(01 + 02 + 03 + 04)</span></td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{oneTimeComputerTitlesSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{oneTimeComputerCdSubtotal}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4">
+          <ReusableFormField
             control={form.control}
-            fields={{
-              chinese: { name: "eonetime_computer_title_chinese", label: "01. Chinese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "eonetime_computer_title_japanese", label: "02. Japanese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "eonetime_computer_title_korean", label: "03. Korean Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "eonetime_computer_title_noncjk", label: "04. Non-CJK Titles", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
-          />
-          <SubtotalDisplay
-            label="05. Titles Subtotal"
-            value={oneTimeComputerTitlesSubtotal}
-            formula="01 + 02 + 03 + 04"
-          />
-
-          <h4 className="font-medium">Items</h4>
-          <LanguageFieldGroup
-            control={form.control}
-            fields={{
-              chinese: { name: "eonetime_computer_cd_chinese", label: "06. Chinese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "eonetime_computer_cd_japanese", label: "07. Japanese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "eonetime_computer_cd_korean", label: "08. Korean Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "eonetime_computer_cd_noncjk", label: "09. Non-CJK Items", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
-          />
-          <SubtotalDisplay
-            label="10. Items Subtotal"
-            value={oneTimeComputerCdSubtotal}
-            formula="06 + 07 + 08 + 09"
+            name="eonetime_computer_memo"
+            label="Comment for 1.1"
+            placeholder="Optional notes for this section..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
       </FormSection>
 
       {/* Accompanied Computer Files */}
       <FormSection
-        title="1.2 Accompanied Computer Files"
+        title="1.2 Accompanied Computer Files (Monographic Purchase or Serial Subscription)"
         description="Include the number of CDs bundled with books or journals."
       >
-        <div className="space-y-4">
-          <h4 className="font-medium">Titles</h4>
-          <LanguageFieldGroup
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[  
+                { num: '06', lang: 'Chinese', title: 'eaccompanied_computer_title_chinese', cd: 'eaccompanied_computer_cd_chinese' },
+                { num: '07', lang: 'Japanese', title: 'eaccompanied_computer_title_japanese', cd: 'eaccompanied_computer_cd_japanese' },
+                { num: '08', lang: 'Korean', title: 'eaccompanied_computer_title_korean', cd: 'eaccompanied_computer_cd_korean' },
+                { num: '09', lang: 'Non-CJK', title: 'eaccompanied_computer_title_noncjk', cd: 'eaccompanied_computer_cd_noncjk' }
+              ].map((row) => (
+                <tr key={row.num}>
+                  <td className="border border-gray-300 p-2 font-medium">{row.num}. {row.lang}</td>
+                  <td className="border border-gray-300 p-2">
+                    <ReusableFormField control={form.control} name={row.title as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <ReusableFormField control={form.control} name={row.cd as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  </td>
+                </tr>
+              ))}
+              <tr className="bg-gray-50">
+                <td className="border border-gray-300 p-2 font-bold">10. Subtotal<br/><span className="text-xs font-normal text-gray-600">(06 + 07 + 08 + 09)</span></td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{accompaniedComputerTitlesSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{accompaniedComputerCdSubtotal}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4">
+          <ReusableFormField
             control={form.control}
-            fields={{
-              chinese: { name: "eaccompanied_computer_title_chinese", label: "11. Chinese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "eaccompanied_computer_title_japanese", label: "12. Japanese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "eaccompanied_computer_title_korean", label: "13. Korean Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "eaccompanied_computer_title_noncjk", label: "14. Non-CJK Titles", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
-          />
-          <SubtotalDisplay
-            label="15. Titles Subtotal"
-            value={accompaniedComputerTitlesSubtotal}
-            formula="11 + 12 + 13 + 14"
-          />
-
-          <h4 className="font-medium">Items</h4>
-          <LanguageFieldGroup
-            control={form.control}
-            fields={{
-              chinese: { name: "eaccompanied_computer_cd_chinese", label: "16. Chinese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "eaccompanied_computer_cd_japanese", label: "17. Japanese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "eaccompanied_computer_cd_korean", label: "18. Korean Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "eaccompanied_computer_cd_noncjk", label: "19. Non-CJK Items", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
-          />
-          <SubtotalDisplay
-            label="20. Items Subtotal"
-            value={accompaniedComputerCdSubtotal}
-            formula="16 + 17 + 18 + 19"
+            name="eaccompanied_computer_memo"
+            label="Comment for 1.2"
+            placeholder="Optional notes for this section..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
       </FormSection>
@@ -374,37 +527,235 @@ export default function ElectronicForm() {
         title="1.3 Computer Files (One Time Gift Item)"
         description="Include the number of one-time gift items not covered in 1.1 or 1.2."
       >
-        <div className="space-y-4">
-          <h4 className="font-medium">Titles</h4>
-          <LanguageFieldGroup
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[  
+                { num: '11', lang: 'Chinese', title: 'egift_computer_title_chinese', cd: 'egift_computer_cd_chinese' },
+                { num: '12', lang: 'Japanese', title: 'egift_computer_title_japanese', cd: 'egift_computer_cd_japanese' },
+                { num: '13', lang: 'Korean', title: 'egift_computer_title_korean', cd: 'egift_computer_cd_korean' },
+                { num: '14', lang: 'Non-CJK', title: 'egift_computer_title_noncjk', cd: 'egift_computer_cd_noncjk' }
+              ].map((row) => (
+                <tr key={row.num}>
+                  <td className="border border-gray-300 p-2 font-medium">{row.num}. {row.lang}</td>
+                  <td className="border border-gray-300 p-2">
+                    <ReusableFormField control={form.control} name={row.title as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <ReusableFormField control={form.control} name={row.cd as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  </td>
+                </tr>
+              ))}
+              <tr className="bg-gray-50">
+                <td className="border border-gray-300 p-2 font-bold">15. Subtotal<br/><span className="text-xs font-normal text-gray-600">(11 + 12 + 13 + 14)</span></td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{giftComputerTitlesSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{giftComputerCdSubtotal}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4">
+          <ReusableFormField
             control={form.control}
-            fields={{
-              chinese: { name: "egift_computer_title_chinese", label: "21. Chinese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "egift_computer_title_japanese", label: "22. Japanese Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "egift_computer_title_korean", label: "23. Korean Titles", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "egift_computer_title_noncjk", label: "24. Non-CJK Titles", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
+            name="egift_computer_memo"
+            label="Comment for 1.3"
+            placeholder="Optional notes for this section..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
           />
+        </div>
+      </FormSection>
+
+      {/* Section 1.4: Total Computer Files */}
+      <FormSection
+        title="1.4 Total Computer Files (sum of 1.1 + 1.2 + 1.3)"
+        description="Calculated totals for all computer files."
+      >
+        <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-medium">Titles (Calculated)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Chinese</label>
+              <div className="p-2 bg-white border rounded">{totalComputerTitlesChinese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Japanese</label>
+              <div className="p-2 bg-white border rounded">{totalComputerTitlesJapanese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Korean</label>
+              <div className="p-2 bg-white border rounded">{totalComputerTitlesKorean}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Non-CJK</label>
+              <div className="p-2 bg-white border rounded">{totalComputerTitlesNoncjk}</div>
+            </div>
+          </div>
           <SubtotalDisplay
-            label="25. Titles Subtotal"
-            value={giftComputerTitlesSubtotal}
-            formula="21 + 22 + 23 + 24"
+            label="Titles Subtotal"
+            value={totalComputerTitlesSubtotal}
+            formula="Sum of all language titles"
           />
 
-          <h4 className="font-medium">Items</h4>
-          <LanguageFieldGroup
-            control={form.control}
-            fields={{
-              chinese: { name: "egift_computer_cd_chinese", label: "26. Chinese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              japanese: { name: "egift_computer_cd_japanese", label: "27. Japanese Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              korean: { name: "egift_computer_cd_korean", label: "28. Korean Items", disabled: !libraryYearStatus?.is_open_for_editing },
-              eastasian: { name: "egift_computer_cd_noncjk", label: "29. Non-CJK Items", disabled: !libraryYearStatus?.is_open_for_editing }
-            }}
-          />
+          <h4 className="font-medium">Items (Calculated)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Chinese</label>
+              <div className="p-2 bg-white border rounded">{totalComputerCdChinese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Japanese</label>
+              <div className="p-2 bg-white border rounded">{totalComputerCdJapanese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Korean</label>
+              <div className="p-2 bg-white border rounded">{totalComputerCdKorean}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Non-CJK</label>
+              <div className="p-2 bg-white border rounded">{totalComputerCdNoncjk}</div>
+            </div>
+          </div>
           <SubtotalDisplay
-            label="30. Items Subtotal"
-            value={giftComputerCdSubtotal}
-            formula="26 + 27 + 28 + 29"
+            label="Items Subtotal"
+            value={totalComputerCdSubtotal}
+            formula="Sum of all language items"
+          />
+        </div>
+        <ReusableFormField
+          control={form.control}
+          name="etotal_computer_memo"
+          label="Comment for 1.4"
+          placeholder="Optional notes for total computer files..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
+        />
+      </FormSection>
+
+      {/* Section 1.5: Previous Year Total Computer Files */}
+      <FormSection
+        title="1.5 Previous Year Total Computer Files"
+        description="Data from the end of the previous survey year. This section is informational only."
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-amber-100">
+                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">16. Chinese</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">17. Japanese</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">18. Korean</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">19. Non-CJK</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+              </tr>
+              <tr className="bg-amber-50">
+                <td className="border border-gray-300 p-2 font-bold">19.1 Subtotal</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">--</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">--</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p className="text-sm text-amber-800">
+            <strong>Note:</strong> Previous year data will be automatically populated from last year's submission.
+          </p>
+        </div>
+        <div className="mt-4">
+          <ReusableFormField
+            control={form.control}
+            name="eprevious_memo"
+            label="Comment for 1.5"
+            placeholder="Optional notes about previous year data..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+          />
+        </div>
+      </FormSection>
+
+      {/* Section 1.6: Grand Total Computer Files */}
+      <FormSection
+        title="1.6 Grand Total Computer Files (Sum 1.4 + 1.5)"
+        description="Grand total combining current year and previous year computer files."
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-blue-100">
+                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">20. Chinese</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesChinese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdChinese}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">21. Japanese</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesJapanese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdJapanese}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">22. Korean</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesKorean}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdKorean}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">23. Non-CJK</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesNoncjk}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdNoncjk}</td>
+              </tr>
+              <tr className="bg-blue-50">
+                <td className="border border-gray-300 p-2 font-bold">23.1 Subtotal</td>
+                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{totalComputerTitlesSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{totalComputerCdSubtotal}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> Electronic databases counted in 2.2 should NOT be reported here again.
+            Report the total count by language of computer files held as of June 30 of the current survey year.
+          </p>
+        </div>
+        <div className="mt-4">
+          <ReusableFormField
+            control={form.control}
+            name="etotal_computer_memo"
+            label="Comment for 1.6"
+            placeholder="Optional notes for grand total computer files..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
       </FormSection>
@@ -427,6 +778,14 @@ export default function ElectronicForm() {
           label="35. Subtotal"
           value={indexElectronicSubtotal}
           formula="31 + 32 + 33 + 34"
+        />
+        <ReusableFormField
+          control={form.control}
+          name="eindex_electronic_memo"
+          label="Comment for 2.1"
+          placeholder="Optional notes for this section..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
 
@@ -467,52 +826,79 @@ export default function ElectronicForm() {
           value={fulltextElectronicSubtotal}
           formula="36 + 37 + 38 + 39"
         />
+        <ReusableFormField
+          control={form.control}
+          name="efulltext_electronic_memo"
+          label="Comment for 2.2"
+          placeholder="Optional notes for this section..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
+        />
+      </FormSection>
+
+      {/* Section 2.3: Total Electronic */}
+      <FormSection
+        title="2.3 Total Electronic (sum of 2.1 + 2.2)"
+        description="Calculated totals for all electronic resources."
+      >
+        <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-medium">Titles (Calculated)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Chinese</label>
+              <div className="p-2 bg-white border rounded">{totalElectronicChinese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Japanese</label>
+              <div className="p-2 bg-white border rounded">{totalElectronicJapanese}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Korean</label>
+              <div className="p-2 bg-white border rounded">{totalElectronicKorean}</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Non-CJK</label>
+              <div className="p-2 bg-white border rounded">{totalElectronicNoncjk}</div>
+            </div>
+          </div>
+          <SubtotalDisplay
+            label="Subtotal"
+            value={totalElectronicSubtotal}
+            formula="Sum of 2.1 + 2.2"
+          />
+        </div>
+        <ReusableFormField
+          control={form.control}
+          name="etotal_electronic_memo"
+          label="Comment for 2.3"
+          placeholder="Optional notes for total electronic resources..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
+        />
       </FormSection>
 
       {/* Expenditures */}
       <FormSection
         title="3. Total Electronic Resources Expenditure"
-        description="Record total expenditures for computer files and electronic subscriptions in U.S. dollars."
+        description="Item #41 includes expenditures for the above resources and also expenditures for Electronic Books."
       >
-        <div className="space-y-6">
-          <div>
-            <h4 className="font-medium mb-4">One-time Computer Files Expenditure</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "eonetime_computer_expenditure_chinese", label: "41. Chinese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                japanese: { name: "eonetime_computer_expenditure_japanese", label: "42. Japanese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                korean: { name: "eonetime_computer_expenditure_korean", label: "43. Korean ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                eastasian: { name: "eonetime_computer_expenditure_noncjk", label: "44. Non-CJK ($)", disabled: !libraryYearStatus?.is_open_for_editing }
-              }}
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Electronic Indexes Expenditure</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "eindex_electronic_expenditure_chinese", label: "45. Chinese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                japanese: { name: "eindex_electronic_expenditure_japanese", label: "46. Japanese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                korean: { name: "eindex_electronic_expenditure_korean", label: "47. Korean ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                eastasian: { name: "eindex_electronic_expenditure_noncjk", label: "48. Non-CJK ($)", disabled: !libraryYearStatus?.is_open_for_editing }
-              }}
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Electronic Full Text Expenditure</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "efulltext_electronic_expenditure_chinese", label: "49. Chinese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                japanese: { name: "efulltext_electronic_expenditure_japanese", label: "50. Japanese ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                korean: { name: "efulltext_electronic_expenditure_korean", label: "51. Korean ($)", disabled: !libraryYearStatus?.is_open_for_editing },
-                eastasian: { name: "efulltext_electronic_expenditure_noncjk", label: "52. Non-CJK ($)", disabled: !libraryYearStatus?.is_open_for_editing }
-              }}
-            />
-          </div>
+        <div className="space-y-4">
+          <ReusableFormField
+            control={form.control}
+            name="etotal_expenditure_grandtotal"
+            label="41. Grand Total Expenditure"
+            placeholder="Enter total expenditure amount in USD"
+            type="number"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+          />
+          <ReusableFormField
+            control={form.control}
+            name="etotal_expenditure_memo"
+            label="Comment for 3"
+            placeholder="Optional notes for expenditures..."
+            type="textarea"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+          />
         </div>
       </FormSection>
 
