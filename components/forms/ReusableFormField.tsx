@@ -7,12 +7,13 @@ import { Textarea } from "@/components/ui/textarea"
 interface ReusableFormFieldProps<T extends FieldValues> {
   control: Control<T>
   name: FieldPath<T>
-  label: string
+  label?: string
   type: "number" | "string" | "textarea"
   placeholder?: string
   disabled?: boolean
   min?: string
   className?: string
+  hideLabel?: boolean
 }
 
 export function ReusableFormField<T extends FieldValues>({
@@ -23,7 +24,8 @@ export function ReusableFormField<T extends FieldValues>({
   placeholder = "0",
   disabled = false,
   min,
-  className
+  className,
+  hideLabel = false
 }: ReusableFormFieldProps<T>) {
   if (type === "textarea") {
     return (
@@ -32,7 +34,7 @@ export function ReusableFormField<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className={className}>
-            <FormLabel>{label}</FormLabel>
+            {!hideLabel && label && <FormLabel>{label}</FormLabel>}
             <FormControl>
               <Textarea
                 placeholder={placeholder}
@@ -55,7 +57,7 @@ export function ReusableFormField<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className={className}>
-            <FormLabel>{label}</FormLabel>
+            {!hideLabel && label && <FormLabel>{label}</FormLabel>}
             <FormControl>
               <Input
                 type="number"
@@ -89,7 +91,7 @@ export function ReusableFormField<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
-          <FormLabel>{label}</FormLabel>
+          {!hideLabel && label && <FormLabel>{label}</FormLabel>}
           <FormControl>
             <Input
               type="text"

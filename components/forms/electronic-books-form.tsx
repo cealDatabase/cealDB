@@ -4,6 +4,8 @@ import * as z from "zod"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Download } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
@@ -60,19 +62,7 @@ const formSchema = z.object({
   ebooks_subscription_volumes_korean: z.number().min(0).default(0),
   ebooks_subscription_volumes_noncjk: z.number().min(0).default(0),
 
-  // Purchased Expenditure
-  ebpurchased_expenditure_chinese: z.number().min(0).default(0),
-  ebpurchased_expenditure_japanese: z.number().min(0).default(0),
-  ebpurchased_expenditure_korean: z.number().min(0).default(0),
-  ebpurchased_expenditure_noncjk: z.number().min(0).default(0),
-
-  // Subscription Expenditure
-  ebsubscription_expenditure_chinese: z.number().min(0).default(0),
-  ebsubscription_expenditure_japanese: z.number().min(0).default(0),
-  ebsubscription_expenditure_korean: z.number().min(0).default(0),
-  ebsubscription_expenditure_noncjk: z.number().min(0).default(0),
-
-  // Grand Total Expenditure
+  // Expenditure (Field #33 - note: main expenditure is in Electronic form #41)
   ebooks_expenditure_grandtotal: z.number().min(0).default(0),
 
   // Notes
@@ -122,14 +112,6 @@ export default function ElectronicBooksForm() {
       ebooks_subscription_volumes_japanese: 0,
       ebooks_subscription_volumes_korean: 0,
       ebooks_subscription_volumes_noncjk: 0,
-      ebpurchased_expenditure_chinese: 0,
-      ebpurchased_expenditure_japanese: 0,
-      ebpurchased_expenditure_korean: 0,
-      ebpurchased_expenditure_noncjk: 0,
-      ebsubscription_expenditure_chinese: 0,
-      ebsubscription_expenditure_japanese: 0,
-      ebsubscription_expenditure_korean: 0,
-      ebsubscription_expenditure_noncjk: 0,
       ebooks_expenditure_grandtotal: 0,
       ebooks_notes: "",
     },
@@ -166,14 +148,14 @@ export default function ElectronicBooksForm() {
   const watchedValues = form.watch()
 
   // Calculate subtotals and totals
-  const purchasedPrevTitlesSubtotal = (watchedValues.ebooks_purchased_prev_titles_chinese || 0) + 
-    (watchedValues.ebooks_purchased_prev_titles_japanese || 0) + 
-    (watchedValues.ebooks_purchased_prev_titles_korean || 0) + 
+  const purchasedPrevTitlesSubtotal = (watchedValues.ebooks_purchased_prev_titles_chinese || 0) +
+    (watchedValues.ebooks_purchased_prev_titles_japanese || 0) +
+    (watchedValues.ebooks_purchased_prev_titles_korean || 0) +
     (watchedValues.ebooks_purchased_prev_titles_noncjk || 0)
 
-  const purchasedAddTitlesSubtotal = (watchedValues.ebooks_purchased_add_titles_chinese || 0) + 
-    (watchedValues.ebooks_purchased_add_titles_japanese || 0) + 
-    (watchedValues.ebooks_purchased_add_titles_korean || 0) + 
+  const purchasedAddTitlesSubtotal = (watchedValues.ebooks_purchased_add_titles_chinese || 0) +
+    (watchedValues.ebooks_purchased_add_titles_japanese || 0) +
+    (watchedValues.ebooks_purchased_add_titles_korean || 0) +
     (watchedValues.ebooks_purchased_add_titles_noncjk || 0)
 
   const purchasedTotalTitlesChinese = (watchedValues.ebooks_purchased_prev_titles_chinese || 0) + (watchedValues.ebooks_purchased_add_titles_chinese || 0)
@@ -182,24 +164,24 @@ export default function ElectronicBooksForm() {
   const purchasedTotalTitlesNoncjk = (watchedValues.ebooks_purchased_prev_titles_noncjk || 0) + (watchedValues.ebooks_purchased_add_titles_noncjk || 0)
   const purchasedTotalTitlesSubtotal = purchasedTotalTitlesChinese + purchasedTotalTitlesJapanese + purchasedTotalTitlesKorean + purchasedTotalTitlesNoncjk
 
-  const nonPurchasedTitlesSubtotal = (watchedValues.ebooks_nonpurchased_titles_chinese || 0) + 
-    (watchedValues.ebooks_nonpurchased_titles_japanese || 0) + 
-    (watchedValues.ebooks_nonpurchased_titles_korean || 0) + 
+  const nonPurchasedTitlesSubtotal = (watchedValues.ebooks_nonpurchased_titles_chinese || 0) +
+    (watchedValues.ebooks_nonpurchased_titles_japanese || 0) +
+    (watchedValues.ebooks_nonpurchased_titles_korean || 0) +
     (watchedValues.ebooks_nonpurchased_titles_noncjk || 0)
 
-  const subscriptionTitlesSubtotal = (watchedValues.ebooks_subscription_titles_chinese || 0) + 
-    (watchedValues.ebooks_subscription_titles_japanese || 0) + 
-    (watchedValues.ebooks_subscription_titles_korean || 0) + 
+  const subscriptionTitlesSubtotal = (watchedValues.ebooks_subscription_titles_chinese || 0) +
+    (watchedValues.ebooks_subscription_titles_japanese || 0) +
+    (watchedValues.ebooks_subscription_titles_korean || 0) +
     (watchedValues.ebooks_subscription_titles_noncjk || 0)
 
-  const purchasedPrevVolumesSubtotal = (watchedValues.ebooks_purchased_prev_volumes_chinese || 0) + 
-    (watchedValues.ebooks_purchased_prev_volumes_japanese || 0) + 
-    (watchedValues.ebooks_purchased_prev_volumes_korean || 0) + 
+  const purchasedPrevVolumesSubtotal = (watchedValues.ebooks_purchased_prev_volumes_chinese || 0) +
+    (watchedValues.ebooks_purchased_prev_volumes_japanese || 0) +
+    (watchedValues.ebooks_purchased_prev_volumes_korean || 0) +
     (watchedValues.ebooks_purchased_prev_volumes_noncjk || 0)
 
-  const purchasedAddVolumesSubtotal = (watchedValues.ebooks_purchased_add_volumes_chinese || 0) + 
-    (watchedValues.ebooks_purchased_add_volumes_japanese || 0) + 
-    (watchedValues.ebooks_purchased_add_volumes_korean || 0) + 
+  const purchasedAddVolumesSubtotal = (watchedValues.ebooks_purchased_add_volumes_chinese || 0) +
+    (watchedValues.ebooks_purchased_add_volumes_japanese || 0) +
+    (watchedValues.ebooks_purchased_add_volumes_korean || 0) +
     (watchedValues.ebooks_purchased_add_volumes_noncjk || 0)
 
   const purchasedTotalVolumesChinese = (watchedValues.ebooks_purchased_prev_volumes_chinese || 0) + (watchedValues.ebooks_purchased_add_volumes_chinese || 0)
@@ -208,18 +190,66 @@ export default function ElectronicBooksForm() {
   const purchasedTotalVolumesNoncjk = (watchedValues.ebooks_purchased_prev_volumes_noncjk || 0) + (watchedValues.ebooks_purchased_add_volumes_noncjk || 0)
   const purchasedTotalVolumesSubtotal = purchasedTotalVolumesChinese + purchasedTotalVolumesJapanese + purchasedTotalVolumesKorean + purchasedTotalVolumesNoncjk
 
-  const nonPurchasedVolumesSubtotal = (watchedValues.ebooks_nonpurchased_volumes_chinese || 0) + 
-    (watchedValues.ebooks_nonpurchased_volumes_japanese || 0) + 
-    (watchedValues.ebooks_nonpurchased_volumes_korean || 0) + 
+  const nonPurchasedVolumesSubtotal = (watchedValues.ebooks_nonpurchased_volumes_chinese || 0) +
+    (watchedValues.ebooks_nonpurchased_volumes_japanese || 0) +
+    (watchedValues.ebooks_nonpurchased_volumes_korean || 0) +
     (watchedValues.ebooks_nonpurchased_volumes_noncjk || 0)
 
-  const subscriptionVolumesSubtotal = (watchedValues.ebooks_subscription_volumes_chinese || 0) + 
-    (watchedValues.ebooks_subscription_volumes_japanese || 0) + 
-    (watchedValues.ebooks_subscription_volumes_korean || 0) + 
+  const subscriptionVolumesSubtotal = (watchedValues.ebooks_subscription_volumes_chinese || 0) +
+    (watchedValues.ebooks_subscription_volumes_japanese || 0) +
+    (watchedValues.ebooks_subscription_volumes_korean || 0) +
     (watchedValues.ebooks_subscription_volumes_noncjk || 0)
 
   const totalTitles = purchasedTotalTitlesSubtotal + nonPurchasedTitlesSubtotal
   const totalVolumes = purchasedTotalVolumesSubtotal + nonPurchasedVolumesSubtotal
+
+  // Import subscription titles function
+  const importSubscriptionTitles = async () => {
+    try {
+      const libraryId = Number(params.libid);
+      const currentYear = new Date().getFullYear();
+
+      const response = await fetch(`/api/electronic-books/import-subscription-titles/${libraryId}/${currentYear}`);
+      if (response.ok) {
+        const data = await response.json();
+        form.setValue('ebooks_subscription_titles_chinese', data.chinese || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_titles_japanese', data.japanese || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_titles_korean', data.korean || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_titles_noncjk', data.noncjk || 0, { shouldValidate: false });
+        toast.success('Subscription titles imported successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to import subscription titles');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast.error('Failed to import subscription titles');
+    }
+  };
+
+  // Import subscription volumes function
+  const importSubscriptionVolumes = async () => {
+    try {
+      const libraryId = Number(params.libid);
+      const currentYear = new Date().getFullYear();
+
+      const response = await fetch(`/api/electronic-books/import-subscription-volumes/${libraryId}/${currentYear}`);
+      if (response.ok) {
+        const data = await response.json();
+        form.setValue('ebooks_subscription_volumes_chinese', data.chinese || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_volumes_japanese', data.japanese || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_volumes_korean', data.korean || 0, { shouldValidate: false });
+        form.setValue('ebooks_subscription_volumes_noncjk', data.noncjk || 0, { shouldValidate: false });
+        toast.success('Subscription volumes imported successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to import subscription volumes');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast.error('Failed to import subscription volumes');
+    }
+  };
 
   async function onSubmit(values: FormData) {
     setIsSubmitting(true)
@@ -269,7 +299,7 @@ export default function ElectronicBooksForm() {
       const result = await response.json()
       setSuccessMessage('Electronic books form submitted successfully!')
       toast.success('Form submitted successfully!')
-      
+
     } catch (error: any) {
       console.error('Form submission error:', error)
       setSuccessMessage(null);
@@ -291,57 +321,127 @@ export default function ElectronicBooksForm() {
         title="Purchased Titles"
         description="Report the number of purchased electronic book titles."
       >
-        <div className="space-y-6">
-          <div>
-            <h4 className="font-medium mb-4">Previous Year (System-supplied)</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "ebooks_purchased_prev_titles_chinese", label: "01. Chinese (Previous)", disabled: true },
-                japanese: { name: "ebooks_purchased_prev_titles_japanese", label: "02. Japanese (Previous)", disabled: true },
-                korean: { name: "ebooks_purchased_prev_titles_korean", label: "03. Korean (Previous)", disabled: true },
-                eastasian: { name: "ebooks_purchased_prev_titles_noncjk", label: "04. Non-CJK (Previous)", disabled: true }
-              }}
-            />
-            <SubtotalDisplay
-              label="05. Previous Subtotal"
-              value={purchasedPrevTitlesSubtotal}
-              formula="01 + 02 + 03 + 04"
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Add This Year (Manual Entry)</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "ebooks_purchased_add_titles_chinese", label: "06. Chinese (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                japanese: { name: "ebooks_purchased_add_titles_japanese", label: "07. Japanese (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                korean: { name: "ebooks_purchased_add_titles_korean", label: "08. Korean (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                eastasian: { name: "ebooks_purchased_add_titles_noncjk", label: "09. Non-CJK (Add)", disabled: !libraryYearStatus?.is_open_for_editing }
-              }}
-            />
-            <SubtotalDisplay
-              label="10. Add Subtotal"
-              value={purchasedAddTitlesSubtotal}
-              formula="06 + 07 + 08 + 09"
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Total (Previous + Add)</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <SubtotalDisplay label="11. Chinese Total" value={purchasedTotalTitlesChinese} formula="01 + 06" />
-              <SubtotalDisplay label="12. Japanese Total" value={purchasedTotalTitlesJapanese} formula="02 + 07" />
-              <SubtotalDisplay label="13. Korean Total" value={purchasedTotalTitlesKorean} formula="03 + 08" />
-              <SubtotalDisplay label="14. Non-CJK Total" value={purchasedTotalTitlesNoncjk} formula="04 + 09" />
-            </div>
-            <SubtotalDisplay
-              label="15. Purchased Titles Total"
-              value={purchasedTotalTitlesSubtotal}
-              formula="11 + 12 + 13 + 14"
-            />
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left w-1/4"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Previous</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Add</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">01. Chinese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_titles_chinese"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_titles_chinese"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesChinese}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">02. Japanese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_titles_japanese"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_titles_japanese"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesJapanese}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">03. Korean</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_titles_korean"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_titles_korean"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesKorean}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">04. Non-CJK</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_titles_noncjk"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_titles_noncjk"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesNoncjk}</div>
+                </td>
+              </tr>
+              <tr className="bg-gray-100">
+                <td className="border border-gray-300 p-2 font-bold">05. Subtotal<br /><span className="text-xs font-normal">(01 + 02 + 03 + 04)</span></td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedPrevTitlesSubtotal}</div>
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedAddTitlesSubtotal}</div>
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedTotalTitlesSubtotal}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </FormSection>
 
@@ -353,16 +453,16 @@ export default function ElectronicBooksForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_nonpurchased_titles_chinese", label: "16. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_nonpurchased_titles_japanese", label: "17. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_nonpurchased_titles_korean", label: "18. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_nonpurchased_titles_noncjk", label: "19. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "ebooks_nonpurchased_titles_chinese", label: "06. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
+            japanese: { name: "ebooks_nonpurchased_titles_japanese", label: "07. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
+            korean: { name: "ebooks_nonpurchased_titles_korean", label: "08. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
+            eastasian: { name: "ebooks_nonpurchased_titles_noncjk", label: "09. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
         />
         <SubtotalDisplay
-          label="20. Non-Purchased Titles Subtotal"
+          label="10. Non-Purchased Titles Subtotal (06 + 07 + 08 + 09)"
           value={nonPurchasedTitlesSubtotal}
-          formula="16 + 17 + 18 + 19"
+          formula="06 + 07 + 08 + 09"
         />
       </FormSection>
 
@@ -371,19 +471,35 @@ export default function ElectronicBooksForm() {
         title="Subscription Titles"
         description="Use the 'Import from E-Book Database by Subscription' feature after updating your subscription list."
       >
+        <div className="mb-4">
+          <p className="text-sm text-gray-600 mb-3">
+            Note: Title subscriptions do not count towards total titles. Please maintain
+            &quot;E-Book Database by Subscription&quot; before using the import feature.
+          </p>
+          <Button
+            type="button"
+            onClick={importSubscriptionTitles}
+            className="flex items-center gap-2"
+            variant="default"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+          >
+            <Download className="h-4 w-4" />
+            Import from E-Book Database by Subscription
+          </Button>
+        </div>
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_subscription_titles_chinese", label: "21. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_subscription_titles_japanese", label: "22. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_subscription_titles_korean", label: "23. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_subscription_titles_noncjk", label: "24. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "ebooks_subscription_titles_chinese", label: "11. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
+            japanese: { name: "ebooks_subscription_titles_japanese", label: "12. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
+            korean: { name: "ebooks_subscription_titles_korean", label: "13. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
+            eastasian: { name: "ebooks_subscription_titles_noncjk", label: "14. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
         />
         <SubtotalDisplay
-          label="25. Subscription Titles Subtotal"
+          label="15. Subscription Titles Subtotal (11 + 12 + 13 + 14)"
           value={subscriptionTitlesSubtotal}
-          formula="21 + 22 + 23 + 24"
+          formula="11 + 12 + 13 + 14"
         />
       </FormSection>
 
@@ -392,57 +508,127 @@ export default function ElectronicBooksForm() {
         title="Purchased Volumes"
         description="Report the number of purchased electronic book volumes."
       >
-        <div className="space-y-6">
-          <div>
-            <h4 className="font-medium mb-4">Previous Year (System-supplied)</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "ebooks_purchased_prev_volumes_chinese", label: "26. Chinese (Previous)", disabled: true },
-                japanese: { name: "ebooks_purchased_prev_volumes_japanese", label: "27. Japanese (Previous)", disabled: true },
-                korean: { name: "ebooks_purchased_prev_volumes_korean", label: "28. Korean (Previous)", disabled: true },
-                eastasian: { name: "ebooks_purchased_prev_volumes_noncjk", label: "29. Non-CJK (Previous)", disabled: true }
-              }}
-            />
-            <SubtotalDisplay
-              label="30. Previous Volumes Subtotal"
-              value={purchasedPrevVolumesSubtotal}
-              formula="26 + 27 + 28 + 29"
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Add This Year (Manual Entry)</h4>
-            <LanguageFieldGroup
-              control={form.control}
-              fields={{
-                chinese: { name: "ebooks_purchased_add_volumes_chinese", label: "31. Chinese (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                japanese: { name: "ebooks_purchased_add_volumes_japanese", label: "32. Japanese (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                korean: { name: "ebooks_purchased_add_volumes_korean", label: "33. Korean (Add)", disabled: !libraryYearStatus?.is_open_for_editing },
-                eastasian: { name: "ebooks_purchased_add_volumes_noncjk", label: "34. Non-CJK (Add)", disabled: !libraryYearStatus?.is_open_for_editing }
-              }}
-            />
-            <SubtotalDisplay
-              label="35. Add Volumes Subtotal"
-              value={purchasedAddVolumesSubtotal}
-              formula="31 + 32 + 33 + 34"
-            />
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Total (Previous + Add)</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <SubtotalDisplay label="36. Chinese Total" value={purchasedTotalVolumesChinese} formula="26 + 31" />
-              <SubtotalDisplay label="37. Japanese Total" value={purchasedTotalVolumesJapanese} formula="27 + 32" />
-              <SubtotalDisplay label="38. Korean Total" value={purchasedTotalVolumesKorean} formula="28 + 33" />
-              <SubtotalDisplay label="39. Non-CJK Total" value={purchasedTotalVolumesNoncjk} formula="29 + 34" />
-            </div>
-            <SubtotalDisplay
-              label="40. Purchased Volumes Total"
-              value={purchasedTotalVolumesSubtotal}
-              formula="36 + 37 + 38 + 39"
-            />
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left w-1/4"></th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Previous</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Add</th>
+                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">16. Chinese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_volumes_chinese"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_volumes_chinese"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesChinese}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">17. Japanese</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_volumes_japanese"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_volumes_japanese"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesJapanese}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">18. Korean</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_volumes_korean"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_volumes_korean"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesKorean}</div>
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2 font-medium">19. Non-CJK</td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_prev_volumes_noncjk"
+                    type="number"
+                    disabled={true}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <ReusableFormField
+                    control={form.control}
+                    name="ebooks_purchased_add_volumes_noncjk"
+                    type="number"
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    hideLabel
+                  />
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-50">
+                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesNoncjk}</div>
+                </td>
+              </tr>
+              <tr className="bg-gray-100">
+                <td className="border border-gray-300 p-2 font-bold">20. Subtotal<br /><span className="text-xs font-normal">(16 + 17 + 18 + 19)</span></td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedPrevVolumesSubtotal}</div>
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedAddVolumesSubtotal}</div>
+                </td>
+                <td className="border border-gray-300 p-2 bg-gray-200">
+                  <div className="p-3 text-center font-bold">{purchasedTotalVolumesSubtotal}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </FormSection>
 
@@ -454,16 +640,16 @@ export default function ElectronicBooksForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_nonpurchased_volumes_chinese", label: "41. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_nonpurchased_volumes_japanese", label: "42. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_nonpurchased_volumes_korean", label: "43. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_nonpurchased_volumes_noncjk", label: "44. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "ebooks_nonpurchased_volumes_chinese", label: "21. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
+            japanese: { name: "ebooks_nonpurchased_volumes_japanese", label: "22. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
+            korean: { name: "ebooks_nonpurchased_volumes_korean", label: "23. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
+            eastasian: { name: "ebooks_nonpurchased_volumes_noncjk", label: "24. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
         />
         <SubtotalDisplay
-          label="45. Non-Purchased Volumes Subtotal"
+          label="25. Non-Purchased Volumes Subtotal (21 + 22 + 23 + 24)"
           value={nonPurchasedVolumesSubtotal}
-          formula="41 + 42 + 43 + 44"
+          formula="21 + 22 + 23 + 24"
         />
       </FormSection>
 
@@ -472,19 +658,35 @@ export default function ElectronicBooksForm() {
         title="Subscription Volumes"
         description="Use the 'Import from E-Book Database by Subscription' feature after updating your subscription list."
       >
+        <div className="mb-4">
+          <p className="text-sm text-gray-600 mb-3">
+            Note: Volume subscriptions do not count towards total volumes. Please maintain
+            &quot;E-Book Database by Subscription&quot; before using the import feature.
+          </p>
+          <Button
+            type="button"
+            onClick={importSubscriptionVolumes}
+            className="flex items-center gap-2"
+            variant="default"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+          >
+            <Download className="h-4 w-4" />
+            Import from E-Book Database by Subscription
+          </Button>
+        </div>
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_subscription_volumes_chinese", label: "46. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_subscription_volumes_japanese", label: "47. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_subscription_volumes_korean", label: "48. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_subscription_volumes_noncjk", label: "49. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "ebooks_subscription_volumes_chinese", label: "26. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
+            japanese: { name: "ebooks_subscription_volumes_japanese", label: "27. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
+            korean: { name: "ebooks_subscription_volumes_korean", label: "28. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
+            eastasian: { name: "ebooks_subscription_volumes_noncjk", label: "29. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
         />
         <SubtotalDisplay
-          label="50. Subscription Volumes Subtotal"
+          label="30. Subscription Volumes Subtotal (26 + 27 + 28 + 29)"
           value={subscriptionVolumesSubtotal}
-          formula="46 + 47 + 48 + 49"
+          formula="26 + 27 + 28 + 29"
         />
       </FormSection>
 
@@ -495,14 +697,14 @@ export default function ElectronicBooksForm() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SubtotalDisplay
-            label="51. Title Total"
+            label="31. Title Total"
             value={totalTitles}
-            formula="15 + 20"
+            formula="05 + 10"
           />
           <SubtotalDisplay
-            label="52. Volume Total"
+            label="32. Volume Total"
             value={totalVolumes}
-            formula="40 + 45"
+            formula="20 + 25"
           />
         </div>
       </FormSection>
@@ -510,43 +712,77 @@ export default function ElectronicBooksForm() {
       {/* Expenditure */}
       <FormSection
         title="Expenditure"
-        description="Record total expenditures for electronic books in U.S. dollars."
+        description="Field #41 (Grand Total Expenditures) in Electronic Form includes expenditures for Electronic Books. Please enter data there."
       >
         <ReusableFormField
           control={form.control}
           name="ebooks_expenditure_grandtotal"
-          label="53. Expenditure Total ($)"
-          placeholder="0.00"
+          label="33. Expenditure Total"
+          placeholder=""
           type="number"
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
+
+        <ReusableFormField
+          control={form.control}
+          name="ebooks_notes"
+          label="34. Memo/Footnote for this form"
+          placeholder="Enter any notes, footnotes, or additional information..."
+          type="textarea"
+          disabled={!libraryYearStatus?.is_open_for_editing}
+        />
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-2">
+              Physical Volumes Total
+            </label>
+            <input
+              type="number"
+              value={0}
+              disabled
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed mb-2"
+            />
+            <div className="text-sm text-gray-600 italic">
+              (From Physical Volume Holdings Form)
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-2">
+              Grand Total Volume Holdings
+            </label>
+            <input
+              type="number"
+              value={0}
+              disabled
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed mb-2"
+            />
+            <div className="text-sm text-gray-600 italic">
+              (Automatically calculated; including E-Books)
+            </div>
+          </div>
+        </div>
       </FormSection>
 
       {/* Notes */}
       <FormSection
         title="Notes"
-        description="Additional information or comments about electronic books."
+        description=""
       >
-        <div className="text-lg font-semibold p-4 bg-gray-50 rounded">
-          Total Expenditure: ${
-            (form.watch('ebpurchased_expenditure_chinese') || 0) +
-            (form.watch('ebpurchased_expenditure_japanese') || 0) +
-            (form.watch('ebpurchased_expenditure_korean') || 0) +
-            (form.watch('ebpurchased_expenditure_noncjk') || 0) +
-            (form.watch('ebsubscription_expenditure_chinese') || 0) +
-            (form.watch('ebsubscription_expenditure_japanese') || 0) +
-            (form.watch('ebsubscription_expenditure_korean') || 0) +
-            (form.watch('ebsubscription_expenditure_noncjk') || 0)
-          }
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+          <ol className="list-decimal list-inside space-y-3 text-sm text-gray-700">
+            <li>
+              The <span className="font-semibold">&quot;Calculate Totals&quot;</span> feature will overwrite any entered numbers in the Subtotal and Total fields! Do not click if you do not wish to have the subtotals automatically calculated.
+            </li>
+            <li>
+              The E-Books Volume Total (item #32 on this Form) will be used together with item #16 on the Physical Volume Holdings Form to calculate the Grand Total Volume Holdings for your institution.
+            </li>
+            <li>
+              Both the Physical Volumes Total and the Grand Total Volume Holdings are for information only, and do not belong to this form.
+            </li>
+          </ol>
         </div>
-        <ReusableFormField
-          control={form.control}
-          name="ebooks_notes"
-          label="Notes/Memo for this form"
-          placeholder="Enter any notes, footnotes, or additional information..."
-          type="textarea"
-          disabled={!libraryYearStatus?.is_open_for_editing}
-        />
       </FormSection>
 
       <FormSubmitSection
