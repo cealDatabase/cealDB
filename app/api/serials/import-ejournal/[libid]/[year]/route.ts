@@ -35,7 +35,7 @@ export async function GET(
       );
     }
 
-    // Fetch all E-Journal subscriptions for this library and year
+    // Fetch E-Journal subscriptions for this library and year (ONLY subscribed items)
     // Include language information
     const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
       where: {
@@ -59,30 +59,8 @@ export async function GET(
       },
     });
 
-    // Also fetch global subscriptions
-    const globalSubscriptions = await db.list_EJournal.findMany({
-      where: {
-        is_global: true,
-      },
-      include: {
-        List_EJournal_Language: {
-          include: {
-            Language: true,
-          },
-        },
-        List_EJournal_Counts: {
-          where: {
-            year: currentYear,
-          },
-        },
-      },
-    });
-
-    // Combine library-specific and global subscriptions
-    const allEJournalEntries = [
-      ...ejournalSubscriptions.map(sub => sub.List_EJournal),
-      ...globalSubscriptions,
-    ];
+    // Process only library-specific subscriptions (no global items unless subscribed)
+    const allEJournalEntries = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
 
     // Group by language for purchased electronic serials
     const countsByLanguage = {

@@ -43,7 +43,7 @@ export async function GET(
       noncjk: 0,
     };
 
-    // 1. Fetch E-Book subscriptions
+    // 1. Fetch E-Book subscriptions (ONLY library-specific subscriptions)
     const ebookSubscriptions = await db.libraryYear_ListEBook.findMany({
       where: {
         libraryyear_id: libraryYear.id,
@@ -66,29 +66,8 @@ export async function GET(
       },
     });
 
-    const globalEBooks = await db.list_EBook.findMany({
-      where: {
-        is_global: true,
-      },
-      include: {
-        List_EBook_Language: {
-          include: {
-            Language: true,
-          },
-        },
-        List_EBook_Counts: {
-          where: {
-            year: currentYear,
-          },
-        },
-      },
-    });
-
-    // Process E-Books
-    const allEBooks = [
-      ...ebookSubscriptions.map(sub => sub.List_EBook),
-      ...globalEBooks,
-    ];
+    // Process E-Books (only from subscriptions - no global items unless subscribed)
+    const allEBooks = ebookSubscriptions.map(sub => sub.List_EBook).filter(Boolean);
 
     for (const ebook of allEBooks) {
       if (!ebook) continue;
@@ -109,7 +88,7 @@ export async function GET(
       }
     }
 
-    // 2. Fetch E-Journal subscriptions
+    // 2. Fetch E-Journal subscriptions (ONLY library-specific subscriptions)
     const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
       where: {
         libraryyear_id: libraryYear.id,
@@ -132,29 +111,8 @@ export async function GET(
       },
     });
 
-    const globalEJournals = await db.list_EJournal.findMany({
-      where: {
-        is_global: true,
-      },
-      include: {
-        List_EJournal_Language: {
-          include: {
-            Language: true,
-          },
-        },
-        List_EJournal_Counts: {
-          where: {
-            year: currentYear,
-          },
-        },
-      },
-    });
-
-    // Process E-Journals
-    const allEJournals = [
-      ...ejournalSubscriptions.map(sub => sub.List_EJournal),
-      ...globalEJournals,
-    ];
+    // Process E-Journals (only from subscriptions - no global items unless subscribed)
+    const allEJournals = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
 
     for (const ejournal of allEJournals) {
       if (!ejournal) continue;
@@ -175,7 +133,7 @@ export async function GET(
       }
     }
 
-    // 3. Fetch Audio-Visual subscriptions
+    // 3. Fetch Audio-Visual subscriptions (ONLY library-specific subscriptions)
     const avSubscriptions = await db.libraryYear_ListAV.findMany({
       where: {
         libraryyear_id: libraryYear.id,
@@ -198,29 +156,8 @@ export async function GET(
       },
     });
 
-    const globalAVs = await db.list_AV.findMany({
-      where: {
-        is_global: true,
-      },
-      include: {
-        List_AV_Language: {
-          include: {
-            Language: true,
-          },
-        },
-        List_AV_Counts: {
-          where: {
-            year: currentYear,
-          },
-        },
-      },
-    });
-
-    // Process AVs
-    const allAVs = [
-      ...avSubscriptions.map(sub => sub.List_AV),
-      ...globalAVs,
-    ];
+    // Process AVs (only from subscriptions - no global items unless subscribed)
+    const allAVs = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
 
     for (const av of allAVs) {
       if (!av) continue;

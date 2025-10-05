@@ -35,7 +35,7 @@ export async function GET(
       );
     }
 
-    // Fetch all AV subscriptions for this library and year
+    // Fetch AV subscriptions for this library and year (ONLY subscribed items)
     // Include language information
     const avSubscriptions = await db.libraryYear_ListAV.findMany({
       where: {
@@ -59,30 +59,8 @@ export async function GET(
       },
     });
 
-    // Also fetch global subscriptions
-    const globalSubscriptions = await db.list_AV.findMany({
-      where: {
-        is_global: true,
-      },
-      include: {
-        List_AV_Language: {
-          include: {
-            Language: true,
-          },
-        },
-        List_AV_Counts: {
-          where: {
-            year: currentYear,
-          },
-        },
-      },
-    });
-
-    // Combine library-specific and global subscriptions
-    const allAVEntries = [
-      ...avSubscriptions.map(sub => sub.List_AV),
-      ...globalSubscriptions,
-    ];
+    // Process only library-specific subscriptions (no global items unless subscribed)
+    const allAVEntries = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
 
     // Group by type and language
     const countsByType = {

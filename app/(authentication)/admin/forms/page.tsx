@@ -8,6 +8,7 @@ import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { getFormattedSurveyDates } from "@/data/fetchSurveyDates"
 import { FormStatusBadge } from "@/components/FormStatusBadge"
 import { FormsAvailabilityBadge } from "@/components/FormsAvailabilityBadge"
+import db from "@/lib/db"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -40,6 +41,81 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
 
     // Fetch survey dates (with defaults or admin-selected dates)
     const surveyDates = await getFormattedSurveyDates(currentYear)
+
+    // Fetch form status data once server-side (if libid is available)
+    let formStatusData = null
+    if (libid) {
+        try {
+            const libraryYear = await db.library_Year.findFirst({
+                where: {
+                    library: parseInt(libid),
+                    year: currentYear,
+                },
+                include: {
+                    Monographic_Acquisitions: true,
+                    Volume_Holdings: true,
+                    Serials: true,
+                    Other_Holdings: true,
+                    Unprocessed_Backlog_Materials: true,
+                    Fiscal_Support: true,
+                    Personnel_Support: true,
+                    Public_Services: true,
+                    Electronic: true,
+                    Electronic_Books: true,
+                },
+            })
+
+            if (libraryYear) {
+                formStatusData = {
+                    isFormsClosed: !libraryYear.is_open_for_editing,
+                    forms: {
+                        monographic: {
+                            submitted: !!libraryYear.Monographic_Acquisitions,
+                            recordId: libraryYear.Monographic_Acquisitions?.id || null,
+                        },
+                        volumeHoldings: {
+                            submitted: !!libraryYear.Volume_Holdings,
+                            recordId: libraryYear.Volume_Holdings?.id || null,
+                        },
+                        serials: {
+                            submitted: !!libraryYear.Serials,
+                            recordId: libraryYear.Serials?.id || null,
+                        },
+                        otherHoldings: {
+                            submitted: !!libraryYear.Other_Holdings,
+                            recordId: libraryYear.Other_Holdings?.id || null,
+                        },
+                        unprocessed: {
+                            submitted: !!libraryYear.Unprocessed_Backlog_Materials,
+                            recordId: libraryYear.Unprocessed_Backlog_Materials?.id || null,
+                        },
+                        fiscal: {
+                            submitted: !!libraryYear.Fiscal_Support,
+                            recordId: libraryYear.Fiscal_Support?.id || null,
+                        },
+                        personnel: {
+                            submitted: !!libraryYear.Personnel_Support,
+                            recordId: libraryYear.Personnel_Support?.id || null,
+                        },
+                        'public-services': {
+                            submitted: !!libraryYear.Public_Services,
+                            recordId: libraryYear.Public_Services?.id || null,
+                        },
+                        electronic: {
+                            submitted: !!libraryYear.Electronic,
+                            recordId: libraryYear.Electronic?.id || null,
+                        },
+                        electronicBooks: {
+                            submitted: !!libraryYear.Electronic_Books,
+                            recordId: libraryYear.Electronic_Books?.id || null,
+                        },
+                    },
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching form status:', error)
+        }
+    }
 
     // Create dynamic FAQ with correct dates
     const dynamicInstructionGroup = {
@@ -167,11 +243,10 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     <ClipboardType className="text-white text-sm font-bold" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-900">My Forms</h2>
-                                {libid && (
+                                {libid && formStatusData && (
                                     <FormsAvailabilityBadge
-                                        libid={libid}
-                                        year={currentYear}
                                         totalForms={forms.length}
+                                        isFormsClosed={formStatusData.isFormsClosed}
                                     />
                                 )}
                             </div>
@@ -188,13 +263,12 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                         href={`/admin/forms/${libid}/${form.href}`}
                                         className="block text-gray-900 hover:text-purple-600 font-semibold transition-colors group-hover:translate-x-1 transform duration-200 no-underline"
                                     >
-                                        {index + 1}. {form.title}
+                                        {form.title}
                                     </Link>
-                                    {libid && (
+                                    {formStatusData && (
                                         <FormStatusBadge
                                             formHref={form.href}
-                                            libid={libid}
-                                            year={currentYear}
+                                            statusData={formStatusData}
                                         />
                                     )}
                                 </div>

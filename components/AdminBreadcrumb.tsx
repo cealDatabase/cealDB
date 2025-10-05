@@ -30,19 +30,16 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
 
   // Form mapping for better display names
   const formMap: Record<string, string> = {
-    monographic: "Monographic Acquisitions",
-    volumeHoldings: "Physical Volume Holdings",
-    serials: "Serial Titles",
-    otherHoldings: "Holdings of Other Materials",
-    unprocessed: "Unprocessed Backlog Materials",
-    fiscal: "Fiscal Support",
-    personnel: "Personnel Support",
-    publicServices: "Public Services",
-    electronic: "Electronic",
-    electronicBooks: "Electronic Books",
-    ebookedit: "E-Book Database by Subscription",
-    ejournaledit: "E-Journal Database by Subscription",
-    avdbedit: "Audio/Visual Database by Subscription"
+    monographic: "1. Monographic Acquisitions",
+    volumeHoldings: "2. Physical Volume Holdings",
+    serials: "3. Serial Titles",
+    otherHoldings: "4. Holdings of Other Materials",
+    unprocessed: "5. Unprocessed Backlog Materials",
+    fiscal: "6. Fiscal Support",
+    personnel: "7. Personnel Support",
+    publicServices: "8. Public Services",
+    electronic: "9. Electronic",
+    electronicBooks: "10. Electronic Books",
   }
 
   // Get current form from pathname
@@ -120,28 +117,6 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
                         </Link>
                       </DropdownMenuItem>
                     ))}
-                    {/* Special edit forms */}
-                    {currentForm !== 'ebookedit' && (
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/ebookedit`} className="no-underline">
-                          E-Book Database by Subscription
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    {currentForm !== 'ejournaledit' && (
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/ejournaledit`} className="no-underline">
-                          E-Journal Database by Subscription
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    {currentForm !== 'avdbedit' && (
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/forms/${libid}/avdbedit`} className="no-underline">
-                          Audio/Visual Database by Subscription
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </BreadcrumbItem>

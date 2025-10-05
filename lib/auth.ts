@@ -1,4 +1,4 @@
-import * as argon2 from 'argon2';
+import { hash, verify } from '@node-rs/argon2';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
@@ -6,6 +6,16 @@ import db from './db';
 
 // Authentication secret - should be in environment variables in production
 const AUTH_SECRET = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
+
+// Argon2id configuration
+const ARGON2_OPTS = {
+  memoryCost: 65536, // 64 MB
+  timeCost: 3,
+  parallelism: 4,
+  hashLength: 32,
+  saltLength: 16,
+  type: 2, // 0=argon2d, 1=argon2i, 2=argon2id
+};
 
 export interface SessionUser {
   id: number;
@@ -26,12 +36,7 @@ export interface JWTPayload {
 // Password hashing with Argon2id
 export async function hashPassword(password: string): Promise<string> {
   try {
-    return await argon2.hash(password, {
-      type: argon2.argon2id,
-      memoryCost: 65536, // 64 MB
-      timeCost: 3,
-      parallelism: 4,
-    });
+    return await hash(password, ARGON2_OPTS);
   } catch (error) {
     console.error('Password hashing error:', error);
     throw new Error('Failed to hash password');
@@ -52,7 +57,7 @@ export async function verifyPassword(plainPassword: string, hashedPassword: stri
       return false;
     }
 
-    return await argon2.verify(hashedPassword, plainPassword);
+    return await verify(hashedPassword, plainPassword);
   } catch (error) {
     console.error('Argon2id password verification error:', error);
     return false;

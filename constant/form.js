@@ -17,43 +17,43 @@ import {
 
 export const forms = [
   {
-    title: "Monographic Acquisitions",
+    title: "1. Monographic Acquisitions",
     href: "monographic",
   },
   {
-    title: "Physical Volume Holdings",
+    title: "2. Physical Volume Holdings",
     href: "volumeHoldings",
   },
   {
-    title: "Serial Titles: Purchased and Non-Purchased",
+    title: "3. Serial Titles: Purchased and Non-Purchased",
     href: "serials",
   },
   {
-    title: "Holdings of Other Materials",
+    title: "4. Holdings of Other Materials",
     href: "otherHoldings",
   },
   {
-    title: "Unprocessed BackLog Materials (volumes or pieces)",
+    title: "5. Unprocessed BackLog Materials (volumes or pieces)",
     href: "unprocessed",
   },
   {
-    title: "Fiscal Support",
+    title: "6. Fiscal Support",
     href: "fiscal",
   },
   {
-    title: "Personnel Support",
+    title: "7. Personnel Support",
     href: "personnel",
   },
   {
-    title: "Public Services",
+    title: "8. Public Services",
     href: "public-services",
   },
   {
-    title: "Electronic",
+    title: "9. Electronic",
     href: "electronic",
   },
   {
-    title: "Electronic Books",
+    title: "10. Electronic Books",
     href: "electronicBooks",
   },
 ];
