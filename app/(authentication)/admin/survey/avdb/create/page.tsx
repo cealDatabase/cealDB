@@ -1,18 +1,30 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
+import { cookies } from "next/headers";
 import { Suspense } from 'react'
-import CreateAVForm from "../components/forms/createAVForm";
+import CreateAVFormClient from "../components/forms/createAVFormClient";
 import { Container } from "@/components/Container";
-import { useAutoSequenceFix } from "@/hooks/useAutoSequenceFix";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 
-function SelectYear() {
-  const searchParams = useSearchParams();
-  const selectedYear = Number(searchParams.get("year"));
-  
-  // Auto-fix sequences when page loads
-  const { isFixing, hasRun } = useAutoSequenceFix(true);
+async function CreateAVContent({
+  year,
+}: {
+  year: string;
+}) {
+  const cookieStore = await cookies();
+  const roleId = cookieStore.get("role")?.value;
+  const libraryId = cookieStore.get("library")?.value;
+
+  // Parse user roles
+  let userRoles: string[] = [];
+  if (roleId) {
+    try {
+      userRoles = roleId.startsWith('[') ? JSON.parse(roleId) : [roleId];
+    } catch (error) {
+      console.error('Error parsing role cookie:', error);
+      userRoles = [roleId];
+    }
+  }
+
+  const selectedYear = Number(year);
 
   return (
     <div className='p-6'>
@@ -20,17 +32,26 @@ function SelectYear() {
         <SurveyBreadcrumb surveyType="avdb" year={selectedYear.toString()} />
         <h1 className='text-2xl font-semibold mb-4 text-sky-700'>
           Create New AV Entry for {selectedYear}
-          {isFixing && <span className="text-sm text-blue-600 ml-2">(Preparing database...)</span>}
         </h1>
-        <CreateAVForm selectedYear={selectedYear}/>
+        <CreateAVFormClient 
+          selectedYear={selectedYear}
+          userRoles={userRoles}
+          libraryId={libraryId ? Number(libraryId) : undefined}
+        />
       </Container>
     </div>
   );
 }
-export default function CreateAVPage() {
+
+export default async function CreateAVPage(props: {
+  searchParams: Promise<{ year?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const year = searchParams.year || new Date().getFullYear().toString();
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <SelectYear />
+      <CreateAVContent year={year} />
     </Suspense>
   );
 }

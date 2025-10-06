@@ -47,11 +47,21 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateEBookForm({
   selectedYear,
+  userRoles,
+  libraryId,
 }: {
   selectedYear: number;
+  userRoles: string[];
+  libraryId?: number;
 }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Determine if user can create global entries (Super Admin: 1, or Editor: 3)
+  const canCreateGlobal = userRoles.includes("1") || userRoles.includes("3");
+  
+  // Member (role 2) can only create library-specific entries
+  const isMemberOnly = userRoles.length === 1 && userRoles[0] === "2";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -69,22 +79,27 @@ export default function CreateEBookForm({
       volumes: 0,
       chapters: 0,
       language: [],
-      is_global: false,
+      is_global: canCreateGlobal, // Default to true for admins, false for members
     },
   });
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
+      // For members (role 2), force is_global to false and add library_id
+      const submissionData = {
+        ...values,
+        libraryyear: selectedYear,
+        volumes: values.volumes || null,
+        chapters: values.chapters || null,
+        is_global: isMemberOnly ? false : values.is_global,
+        library_id: isMemberOnly && libraryId ? libraryId : undefined,
+      };
+
       const response = await fetch("/api/ebook/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...values,
-          libraryyear: selectedYear,
-          volumes: values.volumes || null,
-          chapters: values.chapters || null,
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await response.json();
@@ -377,33 +392,44 @@ export default function CreateEBookForm({
               />
             </div>
 
-            {/* Settings Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                Settings
-              </h3>
+            {/* Settings Section - Only show for admins */}
+            {canCreateGlobal && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                  Settings
+                </h3>
 
-              <FormField
-                control={form.control}
-                name="is_global"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Global Resource</FormLabel>
-                      <FormDescription>
-                        Check this if this is a globally available resource.
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name="is_global"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Global Resource</FormLabel>
+                        <FormDescription>
+                          Check this if this is a globally available resource (default for admins).
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {/* Info for members */}
+            {isMemberOnly && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> This entry will be created as a library-specific resource for your institution.
+                </p>
+              </div>
+            )}
 
             {/* Submit Button */}
             <div className="flex justify-end space-x-4 pt-6 border-t">

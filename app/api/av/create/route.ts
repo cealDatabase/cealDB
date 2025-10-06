@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       language,
       year, // year number from form
       is_global,
+      library_id, // optional library ID for member-created entries
     } = body;
 
     // ✅ Validate required fields
@@ -37,20 +38,39 @@ export async function POST(req: Request) {
     let libraryYearId = null;
     
     if (!is_global) {
-      // Fetch the Library_Year record ID from the year number (only for non-global records)
-      const libraryYearRecord = await db.library_Year.findFirst({
-        where: { year: yearNum },
-        select: { id: true }
-      });
+      // For library-specific entries, find the Library_Year record
+      if (library_id) {
+        // Member-created entry: find Library_Year by both year and library
+        const libraryYearRecord = await db.library_Year.findFirst({
+          where: { 
+            year: yearNum,
+            library: Number(library_id)
+          },
+          select: { id: true }
+        });
 
-      if (!libraryYearRecord) {
-        return NextResponse.json(
-          { error: `Library year ${yearNum} not found. Please ensure the year exists in the system.` },
-          { status: 404 }
-        );
+        if (!libraryYearRecord) {
+          return NextResponse.json(
+            { error: `Library year ${yearNum} not found for your institution. Please ensure the year is open for editing.` },
+            { status: 404 }
+          );
+        }
+        libraryYearId = libraryYearRecord.id;
+      } else {
+        // Admin-created entry: find any Library_Year by year
+        const libraryYearRecord = await db.library_Year.findFirst({
+          where: { year: yearNum },
+          select: { id: true }
+        });
+
+        if (!libraryYearRecord) {
+          return NextResponse.json(
+            { error: `Library year ${yearNum} not found. Please ensure the year exists in the system.` },
+            { status: 404 }
+          );
+        }
+        libraryYearId = libraryYearRecord.id;
       }
-
-      libraryYearId = libraryYearRecord.id;
     }
 
     if (!title || title.trim() === "") {
