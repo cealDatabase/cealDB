@@ -170,8 +170,19 @@ export function getColumns(
   year: number,
   roleIdPassIn?: string
 ): ColumnDef<EJournalRow>[] {
+  // Parse role cookie (can be JSON array or single value)
+  let userRoles: string[] = [];
+  if (roleIdPassIn) {
+    try {
+      userRoles = roleIdPassIn.startsWith('[') ? JSON.parse(roleIdPassIn) : [roleIdPassIn];
+    } catch (error) {
+      console.error('Error parsing role in columns:', error);
+      userRoles = [roleIdPassIn];
+    }
+  }
+  
   // Check if user should see Actions column (hide for roles 2 and 4)
-  const shouldShowActions = roleIdPassIn?.trim() !== "2" && roleIdPassIn?.trim() !== "4";
+  const shouldShowActions = !userRoles.includes("2") && !userRoles.includes("4");
 
   return [
     {
