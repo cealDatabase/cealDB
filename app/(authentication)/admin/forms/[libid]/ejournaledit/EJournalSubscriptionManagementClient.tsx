@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
+import EditEJournalSubscriptionDialog from "./EditEJournalSubscriptionDialog";
 
 interface EJournalSubscriptionManagementClientProps {
   subscriptions: Array<{
@@ -29,6 +30,7 @@ interface EJournalSubscriptionManagementClientProps {
       is_global: boolean | null;
       libraryyear: number | null;
       List_EJournal_Counts?: Array<{ journals: number | null; dbs: number | null }>;
+      List_EJournal_Language?: Array<{ Language: { short: string | null } }>;
     };
   }>;
   libid: number;
@@ -47,6 +49,8 @@ export default function EJournalSubscriptionManagementClient({
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
+  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Convert subscription data to table format
   const data = subscriptions
@@ -68,7 +72,18 @@ export default function EJournalSubscriptionManagementClient({
       updated_at: sub.List_EJournal.updated_at.toISOString(),
       journals: sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0,
       dbs: sub.List_EJournal.List_EJournal_Counts?.[0]?.dbs ?? 0,
+      language: sub.List_EJournal.List_EJournal_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
     }));
+
+  const handleEdit = (record: any) => {
+    setEditingRecord(record);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    router.refresh();
+    toast.success("Subscription updated successfully!");
+  };
 
   // Define columns for the management view
   const getColumns = () => [
@@ -76,17 +91,28 @@ export default function EJournalSubscriptionManagementClient({
       id: "actions",
       header: "Actions",
       cell: ({ row }: any) => {
-        const journalId = row.getValue("id");
+        const record = row.original;
         return (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => handleRemoveSubscription(journalId)}
-            disabled={isRemoving}
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Remove
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(record)}
+              disabled={isRemoving}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleRemoveSubscription(record.id)}
+              disabled={isRemoving}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Remove
+            </Button>
+          </div>
         );
       },
     },
@@ -289,6 +315,17 @@ export default function EJournalSubscriptionManagementClient({
           Toolbar={ManagementToolbar}
         />
       </div>
+
+      {editingRecord && (
+        <EditEJournalSubscriptionDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          record={editingRecord}
+          libid={libid}
+          year={year}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </div>
   );
 }
