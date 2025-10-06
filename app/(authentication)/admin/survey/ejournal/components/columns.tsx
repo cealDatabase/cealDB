@@ -181,8 +181,9 @@ export function getColumns(
     }
   }
   
-  // Check if user should see Actions column (hide for roles 2 and 4)
-  const shouldShowActions = !userRoles.includes("2") && !userRoles.includes("4");
+  // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
+  // Show Actions for admins, super admins, or users with multiple roles
+  const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
 
   return [
     {
