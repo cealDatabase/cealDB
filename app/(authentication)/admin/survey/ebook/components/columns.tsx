@@ -166,6 +166,9 @@ export function getColumns(
   year: number,
   roleIdPassIn?: string
 ): ColumnDef<EBookRow>[] {
+  // Check if user should see Actions column (hide for roles 2 and 4)
+  const shouldShowActions = roleIdPassIn?.trim() !== "2" && roleIdPassIn?.trim() !== "4";
+
   return [
     {
       id: "select",
@@ -191,13 +194,15 @@ export function getColumns(
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => (
-        <DataTableRowActions row={row} year={year} basePath='ebook' />
-      ),
-    },
+    ...(shouldShowActions
+      ? [{
+          id: "actions",
+          header: "Actions",
+          cell: ({ row }: { row: any }) => (
+            <DataTableRowActions row={row} year={year} basePath='ebook' />
+          ),
+        } as ColumnDef<EBookRow>]
+      : []),
      /** Counts / Volumes / Chapters */
      {
       accessorKey: "counts",

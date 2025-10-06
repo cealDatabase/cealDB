@@ -138,6 +138,9 @@ const ExpandableSubscribers = ({ subscribers }: { subscribers: string[] | string
   );
 };
 export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listAV>[] {
+  // Check if user should see Actions column (hide for roles 2 and 4)
+  const shouldShowActions = roleIdPassIn?.trim() !== "2" && roleIdPassIn?.trim() !== "4";
+
   return [
     {
       id: "select",
@@ -163,11 +166,13 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => <DataTableRowActions row={row} year={year} />,
-    },
+    ...(shouldShowActions
+      ? [{
+          id: "actions",
+          header: "Actions",
+          cell: ({ row }: { row: any }) => <DataTableRowActions row={row} year={year} />,
+        } as ColumnDef<listAV>]
+      : []),
     {
       accessorKey: "counts",
       header: ({ column }) => (
