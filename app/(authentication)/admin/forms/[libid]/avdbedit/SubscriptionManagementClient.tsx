@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
+import EditSubscriptionDialog from "./EditSubscriptionDialog";
 
 interface SubscriptionManagementClientProps {
   subscriptions: Array<{
@@ -26,6 +27,7 @@ interface SubscriptionManagementClientProps {
       is_global: boolean | null;
       updated_at: Date;
       List_AV_Counts?: Array<{ titles: number | null }>;
+      List_AV_Language?: Array<{ Language: { short: string | null } }>;
     };
   }>;
   libid: number;
@@ -44,6 +46,8 @@ export default function SubscriptionManagementClient({
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
+  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Convert subscription data to table format
   const data = subscriptions
@@ -60,11 +64,21 @@ export default function SubscriptionManagementClient({
       data_source: sub.List_AV.data_source ?? "",
       type: sub.List_AV.type ?? "",
       counts: sub.List_AV.List_AV_Counts?.[0]?.titles ?? 0,
-      language: [],
+      language: sub.List_AV.List_AV_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
       is_global: !!sub.List_AV.is_global,
       subscribers: [],
       updated_at: sub.List_AV.updated_at.toISOString(),
     }));
+
+  const handleEdit = (record: any) => {
+    setEditingRecord(record);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    router.refresh();
+    toast.success("Subscription updated successfully!");
+  };
 
   // Define columns for the management view
   const getColumns = () => [
@@ -105,17 +119,28 @@ export default function SubscriptionManagementClient({
       id: "actions",
       header: "Actions",
       cell: ({ row }: any) => {
-        const avId = row.getValue("id");
+        const record = row.original;
         return (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => handleRemoveSubscription(avId)}
-            disabled={isRemoving}
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Remove
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(record)}
+              disabled={isRemoving}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleRemoveSubscription(record.id)}
+              disabled={isRemoving}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Remove
+            </Button>
+          </div>
         );
       },
     },
@@ -264,6 +289,17 @@ export default function SubscriptionManagementClient({
         columns={getColumns()} 
         Toolbar={ManagementToolbar}
       />
+      
+      {editingRecord && (
+        <EditSubscriptionDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          record={editingRecord}
+          libid={libid}
+          year={year}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </div>
   );
 }

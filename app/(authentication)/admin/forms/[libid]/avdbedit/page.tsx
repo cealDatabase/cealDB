@@ -165,6 +165,9 @@ export default async function Page({ params, searchParams }: PageProps) {
             List_AV_Counts: {
               where: { year },
               select: { titles: true }
+            },
+            List_AV_Language: {
+              select: { Language: { select: { short: true } } }
             }
           }
         } 

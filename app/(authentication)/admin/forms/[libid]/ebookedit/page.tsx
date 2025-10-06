@@ -186,6 +186,9 @@ export default async function Page({ params, searchParams }: PageProps) {
             List_EBook_Counts: {
               where: { year },
               select: { titles: true, volumes: true, chapters: true }
+            },
+            List_EBook_Language: {
+              select: { Language: { select: { short: true } } }
             }
           }
         } 

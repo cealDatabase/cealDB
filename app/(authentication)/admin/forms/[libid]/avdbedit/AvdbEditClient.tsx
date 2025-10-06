@@ -69,7 +69,8 @@ export default function AvdbEditClient({
     loadSubscriptionStatus();
   }, [libid, year, rows]);
 
-  const columns = getColumns(year, "2");
+  // Get columns but filter out the 'actions' column since we don't want edit functionality on ADD page
+  const columns = getColumns(year, "2").filter(col => (col as any).id !== "actions");
 
   const handleSubscribeSelected = async (selectedRowIds: number[]) => {
     if (selectedRowIds.length === 0) {

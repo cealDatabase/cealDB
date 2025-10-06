@@ -217,6 +217,9 @@ export default async function Page({ params, searchParams }: PageProps) {
             List_EJournal_Counts: {
               where: { year },
               select: { journals: true, dbs: true }
+            },
+            List_EJournal_Language: {
+              select: { Language: { select: { short: true } } }
             }
           }
         } 
