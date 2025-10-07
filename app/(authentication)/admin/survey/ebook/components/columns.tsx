@@ -403,8 +403,7 @@ export function getColumns(
                 (Array.isArray(subscribers) && subscribers.length === 0)
               ) {
                 return (
-                  <span className='text-muted-foreground italic'>
-                    null
+                  <span>
                   </span>
                 );
               }

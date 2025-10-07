@@ -15,14 +15,14 @@ import {
 // Utility to render text or list with popover capability
 const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   if (!content || (Array.isArray(content) && content.length === 0)) {
-    return <span className="text-muted-foreground italic">null</span>
+    return <span></span>
   }
 
   // Convert array to display string
   const fullText = Array.isArray(content) ? content.join("\n") : content;
 
-  const preview = fullText.length > 80 ? fullText.substring(0, 80) + "..." : fullText;
-  const needsPopover = fullText.length > 80 || (Array.isArray(content) && content.length > 1)
+  const preview = fullText.length > 60 ? fullText.substring(0, 60) + "..." : fullText;
+  const needsPopover = fullText.length > 60 || (Array.isArray(content) && content.length > 1)
 
   if (!needsPopover) {
     return <span className="font-medium">{content}</span>
@@ -61,7 +61,7 @@ const ExpandableTextWithSource = ({
   dataSource: string | null | undefined
 }) => {
   // Handle missing description
-  if (!description) return <span className="text-muted-foreground italic">null</span>
+  if (!description) return <span></span>
 
   // Check if data source is valid
   const isValidDataSource = !!dataSource &&
@@ -69,8 +69,7 @@ const ExpandableTextWithSource = ({
     dataSource.trim() !== '' &&
     (dataSource.startsWith('http://') || dataSource.startsWith('https://'))
 
-  const preview = description.length > 80 ? description.substring(0, 80) + '...' : description
-  const needsPopover = description.length > 80 || isValidDataSource
+  const needsPopover = description.length > 60 || isValidDataSource
 
   if (!needsPopover) {
     return <span className="font-medium">{description}</span>
@@ -79,8 +78,10 @@ const ExpandableTextWithSource = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[300px] min-w-[250px] truncate">
-          {preview}
+        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
+          <div className="line-clamp-3">
+            {description}
+          </div>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-80 max-h-[400px] overflow-y-scroll" side="right">
@@ -112,7 +113,7 @@ const ExpandableTextWithSource = ({
 // Expandable subscribers list: shows count as button and full list in popover
 const ExpandableSubscribers = ({ subscribers }: { subscribers: string[] | string | null }) => {
   if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-    return <span className="text-muted-foreground italic">null</span>;
+    return <span></span>;
   }
 
   const listArray = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
@@ -136,6 +137,36 @@ const ExpandableSubscribers = ({ subscribers }: { subscribers: string[] | string
       </PopoverContent>
     </Popover>
   );
+};
+
+// Notes column component with 2-line clamp
+const ExpandableNotes = ({ content }: { content: string | null }) => {
+  if (!content) {
+    return <span></span>
+  }
+
+  const needsPopover = content.length > 60; // Approximate check for 3 lines
+
+  if (!needsPopover) {
+    return <span className="font-medium">{content}</span>
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
+          <div className="line-clamp-3">
+            {content}
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 max-h-[400px] overflow-y-scroll" side="right">
+        <div className="text-sm">
+          <p className="font-medium whitespace-pre-wrap">{content}</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
 };
 export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listAV>[] {
   // Parse role cookie (can be JSON array or single value)
@@ -266,7 +297,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
           <div className='flex space-x-2 justify-center'>
             {(row.getValue("language") as string[])?.map((lang) => (
               <span key={lang} className='max-w-[200px] font-medium'>
-                {lang}
+                {lang === "NON" ? "NON-CJK" : lang}
               </span>
             ))}
           </div>
@@ -342,7 +373,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
         <DataTableColumnHeader column={column} title='Notes' />
       ),
       cell: ({ row }) => {
-        return <ExpandableText content={row.getValue("notes")} />;
+        return <ExpandableNotes content={row.getValue("notes")} />;
       },
     },
     ...(roleIdPassIn?.trim() !== "2"
@@ -354,7 +385,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
         cell: ({ row }: { row: any }) => {
           const subscribers = row.getValue("subscribers") as string[] | string | null | undefined;
           if (!subscribers || (Array.isArray(subscribers) && subscribers.length === 0)) {
-            return <span className="text-muted-foreground italic">null</span>;
+            return <span></span>;
           }
 
           const subscriberList = Array.isArray(subscribers) ? subscribers : [String(subscribers)];
