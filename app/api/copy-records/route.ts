@@ -230,6 +230,54 @@ async function processRecords(
           allFields: newRecord
         });
         
+        // 🆕 Copy language associations for this record
+        if (resource === 'av') {
+          const existingLanguages = await db.list_AV_Language.findMany({
+            where: { listav_id: idNum }
+          });
+          
+          if (existingLanguages.length > 0) {
+            console.log(`/api/copy-records: Copying ${existingLanguages.length} language associations for AV ${idNum}`);
+            await db.list_AV_Language.createMany({
+              data: existingLanguages.map(lang => ({
+                listav_id: idNum,
+                language_id: lang.language_id
+              })),
+              skipDuplicates: true
+            });
+          }
+        } else if (resource === 'ebook') {
+          const existingLanguages = await db.list_EBook_Language.findMany({
+            where: { listebook_id: idNum }
+          });
+          
+          if (existingLanguages.length > 0) {
+            console.log(`/api/copy-records: Copying ${existingLanguages.length} language associations for EBook ${idNum}`);
+            await db.list_EBook_Language.createMany({
+              data: existingLanguages.map(lang => ({
+                listebook_id: idNum,
+                language_id: lang.language_id
+              })),
+              skipDuplicates: true
+            });
+          }
+        } else if (resource === 'ejournal') {
+          const existingLanguages = await db.list_EJournal_Language.findMany({
+            where: { listejournal_id: idNum }
+          });
+          
+          if (existingLanguages.length > 0) {
+            console.log(`/api/copy-records: Copying ${existingLanguages.length} language associations for EJournal ${idNum}`);
+            await db.list_EJournal_Language.createMany({
+              data: existingLanguages.map(lang => ({
+                listejournal_id: idNum,
+                language_id: lang.language_id
+              })),
+              skipDuplicates: true
+            });
+          }
+        }
+        
         processedRecords.push(newRecord);
       } catch (e: any) {
         console.error(`/api/copy-records: Error creating record for ${idNum}`, e);

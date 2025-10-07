@@ -52,8 +52,30 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+  // Restore sorting state from sessionStorage
+  const [sorting, setSorting] = React.useState<SortingState>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('table-sorting');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return [];
+        }
+      }
+    }
+    return [];
+  });
+  
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
+
+  // Save sorting state to sessionStorage whenever it changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('table-sorting', JSON.stringify(sorting));
+    }
+  }, [sorting]);
 
   const table = useReactTable({
     data,

@@ -28,8 +28,8 @@ export default function EditAVModal({
 }) {
   const router = useRouter(); // ✅ NEW
 
-  const normalizeLabel = (label: string) =>
-    label === "NON" ? "NONCJK" : label;
+  // No normalization needed - match exactly with languages array
+  const normalizeLabel = (label: string) => label;
 
   const [saving, setSaving] = useState(false); // ✅ NEW
 
@@ -137,9 +137,8 @@ export default function EditAVModal({
       // Close modal
       onOpenChangeAction(false);
       
-      // ✅ Force complete page reload to clear all caches
-      // Using window.location.reload as router.refresh() isn't clearing React Query cache
-      window.location.reload();
+      // ✅ Refresh data without losing table state (sorting, filters)
+      router.refresh();
     } catch (error) {
       console.error("Request error:", error);
       toast.error("An error occurred while updating the record");
