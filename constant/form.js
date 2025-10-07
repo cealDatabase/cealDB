@@ -178,7 +178,7 @@ export const actions = [
       description: 'Create, update, or remove database records and their associated data.',
     },
     {
-      title: 'Ebook Databases',
+      title: 'E-Book Databases',
       href: `/admin/survey/ebook/${currentYear}`,
       icon: BookOpen,
       iconColor: 'text-orange-600',
