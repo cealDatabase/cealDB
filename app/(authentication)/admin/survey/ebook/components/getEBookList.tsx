@@ -22,18 +22,17 @@ const getEBookListByYear = async (userSelectedYear: number) => {
   const outputArray: any[] = [];
   const ListEBookIdArray: number[] = [];
 
-  /** ⬇️ keep parallel arrays, like original code */
-  const listEBookCountNumberArray: number[] = [];
-  const volumesNumberArray: (number | null)[] = []; // ⬅️ NEW
-  const chaptersNumberArray: (number | null)[] = []; // ⬅️ NEW
+  /** ⬇️ Use Map instead of parallel arrays to prevent misalignment */
+  const countsMap = new Map<number, { titles: number; volumes: number | null; chapters: number | null }>();
 
   listEBookCountsByYear?.forEach((object) => {
-    listEBookCountNumberArray.push(object.titles ?? 0);
-    volumesNumberArray.push(object.volumes ?? 0); // ⬅️ NEW
-    chaptersNumberArray.push(object.chapters ?? 0); // ⬅️ NEW
-
     if (object.listebook !== null) {
       ListEBookIdArray.push(object.listebook);
+      countsMap.set(object.listebook, {
+        titles: object.titles ?? 0,
+        volumes: object.volumes ?? 0,
+        chapters: object.chapters ?? 0,
+      });
     }
   });
 
@@ -72,15 +71,16 @@ const getEBookListByYear = async (userSelectedYear: number) => {
         new Set(subscriberLibraryNames.filter(Boolean))
       ).sort();
 
-      const idx = ListEBookIdArray.indexOf(listEBookId); // same pattern as original
+      // Get counts from Map - guaranteed correct mapping
+      const countsData = countsMap.get(listEBookId) ?? { titles: 0, volumes: 0, chapters: 0 };
 
       outputArray.push({
         id: listEBookId,
         title: listEBookItem.title,
-        counts: listEBookCountNumberArray[idx],
-        /** ⬇️ NEW fields surfaced to the table */
-        volumes: volumesNumberArray[idx],
-        chapters: chaptersNumberArray[idx],
+        counts: countsData.titles,
+        /** ⬇️ fields from counts table */
+        volumes: countsData.volumes,
+        chapters: countsData.chapters,
 
         sub_series_number: listEBookItem.sub_series_number,
         publisher: listEBookItem.publisher,

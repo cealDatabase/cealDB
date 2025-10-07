@@ -283,6 +283,9 @@ export const getListEBookCountsByYear = async (year: number) => {
         year,
         ishidden: false,
       },
+      orderBy: {
+        listebook: 'asc'  // Ensure consistent ordering
+      }
     });
     return listEBookCountsArray;
   } catch {
