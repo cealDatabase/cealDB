@@ -13,18 +13,26 @@ const getAVListByYear = async (userSelectedYear: number) => {
   const listAVCountsByYear = await getListAVCountsByYear(userSelectedYear);
   const outputArray: any[] = [];
   const ListAVIdArray: number[] = [];
-  const listAVCountNumberArray: number[] = [];
+  
+  // Use a Map instead of parallel arrays to prevent misalignment
+  const countsMap = new Map<number, number>();
 
-  listAVCountsByYear?.forEach((object) => {
-    if (object.titles !== null) {
-      listAVCountNumberArray.push(object.titles);
-    } else {
-      listAVCountNumberArray.push(0);
-    }
+  console.log(`🔢 Found ${listAVCountsByYear?.length || 0} count records for year ${userSelectedYear}`);
+
+  listAVCountsByYear?.forEach((object, index) => {
     if (object.listav !== null) {
       ListAVIdArray.push(object.listav);
+      const countValue = object.titles !== null ? object.titles : 0;
+      countsMap.set(object.listav, countValue);
+      
+      // Log first 5 records to see the mapping
+      if (index < 5) {
+        console.log(`  [${index}] listav=${object.listav}, titles=${object.titles} -> Map stores: ${countValue}`);
+      }
     }
   });
+
+  console.log('\n📋 Map built with', countsMap.size, 'entries');
 
   if (ListAVIdArray.length === 0) return [];
 
@@ -63,10 +71,22 @@ const getAVListByYear = async (userSelectedYear: number) => {
 
       // console.log("getAVList type:", listAVItem.type);
 
+      // Get counts from Map - guaranteed correct mapping
+      const countsValue = countsMap.get(listAVId) ?? 0;
+      
+      // Debug logging for first 3 records
+      if (ListAVIdArray.indexOf(listAVId) < 3) {
+        console.log(`📊 Building record for listAVId=${listAVId}:`, {
+          listAVId,
+          countsValue,
+          title: listAVItem.title,
+        });
+      }
+
       outputArray.push({
         id: listAVId,
         type: listAVItem.type?.toLowerCase().replace("/ ", "/"),
-        counts: listAVCountNumberArray[ListAVIdArray.indexOf(listAVId)],
+        counts: countsValue,
         title: listAVItem.title,
         cjk_title: listAVItem.cjk_title,
         romanized_title: listAVItem.romanized_title,

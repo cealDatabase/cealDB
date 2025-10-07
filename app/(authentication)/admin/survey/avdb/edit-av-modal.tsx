@@ -9,8 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // ✅ NEW
+import { toast } from "sonner"; // ✅ NEW
 import { listAV } from "./data/schema";
 import { languages, type } from "./data/data";
 
@@ -55,6 +56,41 @@ export default function EditAVModal({
     type: rowData.type || "",
   });
 
+  // Reset form data when modal opens with new rowData
+  useEffect(() => {
+    if (open) {
+      console.log("🔄 Modal opened with rowData:", {
+        id: rowData.id,
+        title: rowData.title,
+        counts: rowData.counts,
+        countsType: typeof rowData.counts
+      });
+      
+      setFormData({
+        title: rowData.title,
+        cjk_title: rowData.cjk_title || "",
+        romanized_title: rowData.romanized_title || "",
+        subtitle: rowData.subtitle || "",
+        description: rowData.description || "",
+        counts: rowData.counts,
+        publisher: rowData.publisher || "",
+        notes: rowData.notes || "",
+        data_source: rowData.data_source || "",
+        language: Array.isArray(rowData.language)
+          ? rowData.language
+              .map(
+                (langLabel) =>
+                  languages.find((l) => l.label === normalizeLabel(langLabel))
+                    ?.value
+              )
+              .filter((id) => id !== undefined)
+              .map((id) => String(id))
+          : [],
+        type: rowData.type || "",
+      });
+    }
+  }, [open, rowData]);
+
   const handleLanguageChange = (id: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -66,27 +102,49 @@ export default function EditAVModal({
 
   const handleSubmit = async () => {
     try {
-      setSaving(true); // ✅ NEW
+      setSaving(true);
+      
+      const payload = { id: rowData.id, year, ...formData };
+      
+      // Debug logging
+      console.log("📤 Sending update request:", {
+        id: rowData.id,
+        year,
+        counts: formData.counts,
+        countsType: typeof formData.counts,
+        fullPayload: payload
+      });
+      
       const res = await fetch("/api/av/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // ✅ include `year` so API can upsert counts by (listav, year) and revalidate tags
-        body: JSON.stringify({ id: rowData.id, year, ...formData }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
+      
+      console.log("📥 API Response:", { ok: res.ok, status: res.status, data });
+      
       if (!res.ok) {
         console.error("Update failed:", data?.error || data);
+        toast.error(data?.error || "Failed to update AV record");
         return;
       }
 
-      // ✅ instant UI update: refetch server components
-      router.refresh();
+      // ✅ Show success message
+      toast.success("AV record updated successfully");
+      
+      // Close modal
       onOpenChangeAction(false);
+      
+      // ✅ Force complete page reload to clear all caches
+      // Using window.location.reload as router.refresh() isn't clearing React Query cache
+      window.location.reload();
     } catch (error) {
       console.error("Request error:", error);
+      toast.error("An error occurred while updating the record");
     } finally {
-      setSaving(false); // ✅ NEW
+      setSaving(false);
     }
   };
 

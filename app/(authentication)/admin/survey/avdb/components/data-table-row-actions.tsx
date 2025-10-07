@@ -18,6 +18,20 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
 
+  // Debug: Log what data is in the row
+  const handleEditClick = () => {
+    console.log("🎯 Edit clicked for row:", {
+      id: row.original.id,
+      title: row.original.title,
+      counts: row.original.counts,
+      countsType: typeof row.original.counts,
+      is_global: row.original.is_global,
+      libraryyear: row.original.libraryyear,
+      fullRow: row.original
+    });
+    setOpenEdit(true);
+  };
+
   async function handleDelete() {
     const ok = confirm(`Delete “${row.original.title}” for ${year}?`);
     if (!ok) return;
@@ -43,7 +57,7 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='bg-white'>
           <DropdownMenuItem
-            onClick={() => setOpenEdit(true)}
+            onClick={handleEditClick}
             className='hover:bg-blue-100/30'
           >
             Edit
