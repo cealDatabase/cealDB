@@ -25,16 +25,19 @@ export default function EditEbookModal({
   onOpenChangeAction,
   rowData,
   year,
+  userRoles,
 }: {
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
   rowData: EBookWithCounts;
   year: number;
+  userRoles?: string[];
 }) {
   const router = useRouter(); // ✅ NEW
   const [saving, setSaving] = useState(false); // ✅ NEW
 
-  const normalizeLabel = (l: string) => (l === "NON" ? "NONCJK" : l);
+  // No normalization needed - match exactly with languages array
+  const normalizeLabel = (l: string) => l;
 
   const [form, setForm] = useState({
     title: "",
@@ -52,6 +55,9 @@ export default function EditEbookModal({
     language: [] as string[],
     is_global: false,
   });
+
+  // Check if user is super admin (role 1) or eresource editor (role 3)
+  const isAutoGlobal = userRoles?.includes("1") || userRoles?.includes("3");
 
   useEffect(() => {
     if (!open) return;
@@ -77,9 +83,9 @@ export default function EditEbookModal({
             .filter(Boolean)
             .map((id) => String(id))
         : [],
-      is_global: !!rowData.is_global,
+      is_global: isAutoGlobal ? true : (!!rowData.is_global),
     });
-  }, [open, rowData]);
+  }, [open, rowData, userRoles]);
 
   const set = (k: string, v: unknown) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -214,8 +220,11 @@ export default function EditEbookModal({
               id='is_global'
               checked={form.is_global}
               onCheckedChange={() => set("is_global", !form.is_global)}
+              disabled={isAutoGlobal}
             />
-            <Label htmlFor='is_global'>Is Global</Label>
+            <Label htmlFor='is_global'>
+              Is Global {isAutoGlobal && <span className='text-xs text-muted-foreground'>(Auto-enabled for your role)</span>}
+            </Label>
           </div>
 
           <div className='flex justify-end'>

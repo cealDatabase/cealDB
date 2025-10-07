@@ -14,7 +14,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import EditAVModal from "../edit-av-modal";
 
-export function DataTableRowActions({ row, year }: { row: Row<any>, year: number }) {
+export function DataTableRowActions({ row, year, userRoles }: { row: Row<any>, year: number, userRoles?: string[] }) {
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
 
@@ -76,6 +76,7 @@ export function DataTableRowActions({ row, year }: { row: Row<any>, year: number
         onOpenChangeAction={setOpenEdit}
         rowData={row.original}
         year={year}
+        userRoles={userRoles}
       />
     </>
   );

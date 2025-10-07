@@ -20,11 +20,13 @@ export default function EditAVModal({
   onOpenChangeAction,
   rowData,
   year,
+  userRoles,
 }: {
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
   rowData: listAV;
   year: number;
+  userRoles?: string[];
 }) {
   const router = useRouter(); // ✅ NEW
 
@@ -32,6 +34,9 @@ export default function EditAVModal({
   const normalizeLabel = (label: string) => label;
 
   const [saving, setSaving] = useState(false); // ✅ NEW
+
+  // Check if user is super admin (role 1) or eresource editor (role 3)
+  const isAutoGlobal = userRoles?.includes("1") || userRoles?.includes("3");
 
   const [formData, setFormData] = useState({
     title: rowData.title,
@@ -54,6 +59,7 @@ export default function EditAVModal({
           .map((id) => String(id))
       : [],
     type: rowData.type || "",
+    is_global: isAutoGlobal ? true : !!rowData.is_global,
   });
 
   // Reset form data when modal opens with new rowData
@@ -87,9 +93,10 @@ export default function EditAVModal({
               .map((id) => String(id))
           : [],
         type: rowData.type || "",
+        is_global: isAutoGlobal ? true : !!rowData.is_global,
       });
     }
-  }, [open, rowData]);
+  }, [open, rowData, userRoles]);
 
   const handleLanguageChange = (id: string, checked: boolean) => {
     setFormData((prev) => ({
@@ -288,6 +295,21 @@ export default function EditAVModal({
                 );
               })}
             </div>
+          </div>
+
+          <div className='flex items-center space-x-2'>
+            <Checkbox
+              id='is_global'
+              checked={formData.is_global}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, is_global: Boolean(checked) })
+              }
+              disabled={isAutoGlobal}
+              className='hover:bg-blue-300/30 hover:cursor-pointer'
+            />
+            <label htmlFor='is_global' className='text-sm font-medium'>
+              Is Global {isAutoGlobal && <span className='text-xs text-muted-foreground'>(Auto-enabled for your role)</span>}
+            </label>
           </div>
 
           <div className='flex justify-end'>

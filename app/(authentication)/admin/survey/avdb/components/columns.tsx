@@ -60,16 +60,32 @@ const ExpandableTextWithSource = ({
   description: string | null,
   dataSource: string | null | undefined
 }) => {
-  // Handle missing description
-  if (!description) return <span></span>
-
-  // Check if data source is valid
   const isValidDataSource = !!dataSource &&
     typeof dataSource === 'string' &&
     dataSource.trim() !== '' &&
     (dataSource.startsWith('http://') || dataSource.startsWith('https://'))
 
-  const needsPopover = description.length > 60 || isValidDataSource
+  // If no description and no valid data source, show empty
+  if (!description && !isValidDataSource) {
+    return <span></span>
+  }
+
+  // If no description but has data source, show only data source link
+  if (!description && isValidDataSource) {
+    return (
+      <a
+        href={dataSource}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-teal-700 hover:text-primary hover:underline font-medium break-all"
+      >
+        {dataSource}
+      </a>
+    )
+  }
+
+  // Has description
+  const needsPopover = description!.length > 60 || isValidDataSource
 
   if (!needsPopover) {
     return <span className="font-medium">{description}</span>
@@ -213,7 +229,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       ? [{
           id: "actions",
           header: "Actions",
-          cell: ({ row }: { row: any }) => <DataTableRowActions row={row} year={year} />,
+          cell: ({ row }: { row: any }) => <DataTableRowActions row={row} year={year} userRoles={userRoles} />,
         } as ColumnDef<listAV>]
       : []),
     {

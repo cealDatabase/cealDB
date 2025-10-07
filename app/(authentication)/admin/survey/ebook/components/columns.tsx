@@ -20,7 +20,7 @@ type EBookRow = listEBook & {
 
 const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   if (!content || (Array.isArray(content) && content.length === 0)) {
-    return <span className='text-muted-foreground italic'>null</span>;
+    return <span></span>;
   }
   const fullText = Array.isArray(content) ? content.join("\n") : content;
   const preview =
@@ -33,7 +33,7 @@ const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[300px] min-w-[250px] truncate'>
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[250px] min-w-[180px] truncate'>
           {preview}
         </button>
       </PopoverTrigger>
@@ -66,26 +66,43 @@ const ExpandableTextWithSource = ({
   description: string | null;
   dataSource: string | null | undefined;
 }) => {
-  if (!description)
-    return <span className='text-muted-foreground italic'>No description</span>;
-
   const isValidDataSource =
     !!dataSource &&
     typeof dataSource === "string" &&
     dataSource.trim() !== "" &&
     (dataSource.startsWith("http://") || dataSource.startsWith("https://"));
 
-  const preview =
-    description.length > 80 ? description.substring(0, 80) + "…" : description;
-  const needsPopover = description.length > 80 || isValidDataSource;
+  // If no description and no valid data source, show empty
+  if (!description && !isValidDataSource) {
+    return <span></span>;
+  }
+
+  // If no description but has data source, show only data source link
+  if (!description && isValidDataSource) {
+    return (
+      <a
+        href={dataSource}
+        target='_blank'
+        rel='noopener noreferrer'
+        className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
+      >
+        {dataSource}
+      </a>
+    );
+  }
+
+  // Has description
+  const needsPopover = description!.length > 60 || isValidDataSource;
 
   if (!needsPopover) return <span className='font-medium'>{description}</span>;
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[300px] min-w-[250px] truncate'>
-          {preview}
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
+          <div className='line-clamp-3'>
+            {description}
+          </div>
         </button>
       </PopoverTrigger>
       <PopoverContent
@@ -130,7 +147,7 @@ const ExpandableSubscribers = ({
     !subscribers ||
     (Array.isArray(subscribers) && subscribers.length === 0)
   ) {
-    return <span className='text-muted-foreground italic'>null</span>;
+    return <span></span>;
   }
   const listArray = Array.isArray(subscribers)
     ? subscribers
@@ -211,7 +228,7 @@ export function getColumns(
           id: "actions",
           header: "Actions",
           cell: ({ row }: { row: any }) => (
-            <DataTableRowActions row={row} year={year} basePath='ebook' />
+            <DataTableRowActions row={row} year={year} basePath='ebook' userRoles={userRoles} />
           ),
         } as ColumnDef<EBookRow>]
       : []),
@@ -318,7 +335,7 @@ export function getColumns(
         <div className='flex space-x-2 justify-center'>
           {(row.getValue("language") as string[])?.map((lang) => (
             <span key={lang} className='max-w-[200px] font-medium'>
-              {lang}
+              {lang === "NON" ? "NON-CJK" : lang}
             </span>
           ))}
         </div>

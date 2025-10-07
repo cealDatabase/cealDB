@@ -18,10 +18,12 @@ export function DataTableRowActions({
   row,
   year,
   basePath,
+  userRoles,
 }: {
   row: Row<any>;
   year: number;
   basePath?: string;
+  userRoles?: string[];
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
@@ -72,6 +74,7 @@ export function DataTableRowActions({
         onOpenChangeAction={setOpenEdit}
         rowData={row.original}
         year={year}
+        userRoles={userRoles}
       />
     </>
   );
