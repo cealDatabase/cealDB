@@ -246,9 +246,8 @@ export function getColumns(
       cell: ({ row }) => {
         const v =
           (row.getValue("journals") as number | null | undefined) ??
-          (row.original as any).counts ??
-          0;
-        return <div className='max-w-[60px]'>{v}</div>;
+          (row.original as any).counts;
+        return <div className='max-w-[60px]'>{v != null ? v : ""}</div>;
       },
       enableSorting: true,
       enableHiding: false,
@@ -259,8 +258,8 @@ export function getColumns(
         <DataTableColumnHeader column={column} title='Databases' />
       ),
       cell: ({ row }) => {
-        const v = (row.getValue("dbs") as number | null | undefined) ?? 0;
-        return <div className='max-w-[60px]'>{v}</div>;
+        const v = row.getValue("dbs") as number | null | undefined;
+        return <div className='max-w-[60px]'>{v != null ? v : ""}</div>;
       },
       enableSorting: true,
       enableHiding: false,

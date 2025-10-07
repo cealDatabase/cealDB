@@ -237,9 +237,12 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Counts' />
       ),
-      cell: ({ row }) => (
-        <div className='max-w-[80px]'>{row.getValue("counts")}</div>
-      ),
+      cell: ({ row }) => {
+        const value = row.getValue("counts") as number | null | undefined;
+        return (
+          <div className='max-w-[80px]'>{value != null ? value : ""}</div>
+        );
+      },
       enableSorting: true,
       enableHiding: false,
     },

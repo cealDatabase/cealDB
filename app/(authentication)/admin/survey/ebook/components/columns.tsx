@@ -238,11 +238,14 @@ export function getColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={<>Counts<br />(# titles)</>} />
       ),
-      cell: ({ row }) => (
-        <div className='max-w-[80px]'>
-          {(row.getValue("counts") as number) ?? 0}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const value = row.getValue("counts") as number | null | undefined;
+        return (
+          <div className='max-w-[80px]'>
+            {value != null ? value : ""}
+          </div>
+        );
+      },
       enableSorting: true,
       enableHiding: false,
     },
@@ -251,11 +254,14 @@ export function getColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Volumes' />
       ),
-      cell: ({ row }) => (
-        <div className='max-w-[80px]'>
-          {(row.getValue("volumes") as number) ?? 0}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const value = row.getValue("volumes") as number | null | undefined;
+        return (
+          <div className='max-w-[80px]'>
+            {value != null ? value : ""}
+          </div>
+        );
+      },
       enableSorting: true,
       enableHiding: false,
     },
@@ -264,11 +270,14 @@ export function getColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Chapters' />
       ),
-      cell: ({ row }) => (
-        <div className='max-w-[80px]'>
-          {(row.getValue("chapters") as number) ?? 0}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const value = row.getValue("chapters") as number | null | undefined;
+        return (
+          <div className='max-w-[80px]'>
+            {value != null ? value : ""}
+          </div>
+        );
+      },
       enableSorting: true,
       enableHiding: false,
     },
