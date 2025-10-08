@@ -26,16 +26,16 @@ interface EditEJournalSubscriptionDialogProps {
   record: {
     id: number;
     title: string;
-    subtitle: string;
-    cjk_title: string;
-    romanized_title: string;
-    description: string;
-    notes: string;
-    publisher: string;
-    vendor: string;
-    series: string;
-    data_source: string;
-    sub_series_number: string;
+    subtitle?: string;
+    cjk_title?: string;
+    romanized_title?: string;
+    description?: string;
+    notes?: string;
+    publisher?: string;
+    vendor?: string;
+    series?: string;
+    data_source?: string;
+    sub_series_number?: string;
     journals: number;
     dbs: number;
     language: string[];
@@ -77,51 +77,56 @@ export default function EditEJournalSubscriptionDialog({
 
   const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
 
+  // Debug: Log the record to see what we're receiving
+  console.log("🔍 DEBUG EditEJournalDialog - Received record:", record);
+  console.log("🔍 DEBUG EditEJournalDialog - record.series value:", record.series);
+
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
-    title: record.title || "",
-    cjk_title: record.cjk_title || "",
-    romanized_title: record.romanized_title || "",
-    subtitle: record.subtitle || "",
-    series: record.series || "",
-    vendor: record.vendor || "",
-    description: record.description || "",
-    journals: record.journals || 0,
-    dbs: record.dbs || 0,
-    publisher: record.publisher || "",
-    notes: record.notes || "",
-    data_source: record.data_source || "",
-    sub_series_number: record.sub_series_number || "",
+    title: record.title ?? "",
+    cjk_title: record.cjk_title ?? "",
+    romanized_title: record.romanized_title ?? "",
+    subtitle: record.subtitle ?? "",
+    series: record.series ?? "",
+    vendor: record.vendor ?? "",
+    description: record.description ?? "",
+    journals: record.journals ?? 0,
+    dbs: record.dbs ?? 0,
+    publisher: record.publisher ?? "",
+    notes: record.notes ?? "",
+    data_source: record.data_source ?? "",
+    sub_series_number: record.sub_series_number ?? "",
     language: record.language
-      .map((langLabel) => {
+      ?.map((langLabel) => {
         const normalized = normalizeLabel(langLabel);
         return languages.find((l) => l.label === normalized)?.value;
       })
-      .filter((id): id is number => id !== undefined),
+      .filter((id): id is number => id !== undefined) ?? [],
   });
 
   // Update form data when record changes
   useEffect(() => {
+    console.log("🔍 DEBUG EditEJournalDialog useEffect - Updating formData with record:", record);
     setFormData({
-      title: record.title || "",
-      cjk_title: record.cjk_title || "",
-      romanized_title: record.romanized_title || "",
-      subtitle: record.subtitle || "",
-      series: record.series || "",
-      vendor: record.vendor || "",
-      description: record.description || "",
-      journals: record.journals || 0,
-      dbs: record.dbs || 0,
-      publisher: record.publisher || "",
-      notes: record.notes || "",
-      data_source: record.data_source || "",
-      sub_series_number: record.sub_series_number || "",
+      title: record.title ?? "",
+      cjk_title: record.cjk_title ?? "",
+      romanized_title: record.romanized_title ?? "",
+      subtitle: record.subtitle ?? "",
+      series: record.series ?? "",
+      vendor: record.vendor ?? "",
+      description: record.description ?? "",
+      journals: record.journals ?? 0,
+      dbs: record.dbs ?? 0,
+      publisher: record.publisher ?? "",
+      notes: record.notes ?? "",
+      data_source: record.data_source ?? "",
+      sub_series_number: record.sub_series_number ?? "",
       language: record.language
-        .map((langLabel) => {
+        ?.map((langLabel) => {
           const normalized = normalizeLabel(langLabel);
           return languages.find((l) => l.label === normalized)?.value;
         })
-        .filter((id): id is number => id !== undefined),
+        .filter((id): id is number => id !== undefined) ?? [],
     });
   }, [record]);
 
