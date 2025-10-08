@@ -16,7 +16,6 @@ interface EJournalSubscriptionManagementClientProps {
     List_EJournal: {
       id: number;
       title: string | null;
-      sub_series_number: string | null;
       publisher: string | null;
       description: string | null;
       notes: string | null;
@@ -53,21 +52,13 @@ export default function EJournalSubscriptionManagementClient({
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
   const [editingRecord, setEditingRecord] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
   // Convert subscription data to table format
   const data = subscriptions
     .filter(sub => !removedIds.has(sub.listejournal_id))
     .map((sub) => {
-      console.log("🔍 DEBUG Mapping EJournal subscription:", {
-        id: sub.List_EJournal.id,
-        series: sub.List_EJournal.series,
-        vendor: sub.List_EJournal.vendor,
-        title: sub.List_EJournal.title
-      });
       return {
         id: sub.List_EJournal.id,
         title: sub.List_EJournal.title ?? "",
-        sub_series_number: sub.List_EJournal.sub_series_number ?? "",
         publisher: sub.List_EJournal.publisher ?? "",
         description: sub.List_EJournal.description ?? "",
         notes: sub.List_EJournal.notes ?? "",
@@ -86,8 +77,6 @@ export default function EJournalSubscriptionManagementClient({
     });
 
   const handleEdit = (record: any) => {
-    console.log("🔍 DEBUG EditEJournal - Record being passed to dialog:", record);
-    console.log("🔍 DEBUG EditEJournal - Series value:", record.series);
     setEditingRecord(record);
     setIsEditDialogOpen(true);
   };
@@ -108,31 +97,25 @@ export default function EJournalSubscriptionManagementClient({
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => handleEdit(record)}
               disabled={isRemoving}
+              title="Edit"
             >
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
+              <Edit className="h-4 w-4" />
             </Button>
             <Button
               variant="destructive"
-              size="sm"
+              size="icon"
               onClick={() => handleRemoveSubscription(record.id)}
               disabled={isRemoving}
+              title="Remove"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Remove
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         );
       },
-    },
-    {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
-      enableHiding: true,
     },
     {
       accessorKey: "cjk_title",
@@ -158,6 +141,22 @@ export default function EJournalSubscriptionManagementClient({
       accessorKey: "series",
       header: "Series",
       cell: ({ row }: any) => <div className="max-w-[120px] truncate">{row.getValue("series")}</div>,
+    },
+    {
+      accessorKey: "language",
+      header: "Language",
+      cell: ({ row }: any) => {
+        const langs = row.getValue("language") as string[];
+        return (
+          <div className="flex gap-1 flex-wrap">
+            {langs.map((lang, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
+                {lang === "NON" ? "NON-CJK" : lang}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "journals",
@@ -226,16 +225,16 @@ export default function EJournalSubscriptionManagementClient({
     return (
       <div className="space-y-4">
         {/* Header with Add More Subscriptions button */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200 shadow-sm">
+        <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200 shadow-sm">
           <div>
-            <h3 className="text-xl font-semibold text-green-900">Current Subscriptions</h3>
-            <p className="text-sm text-green-700 mt-1">
+            <h3 className="text-xl font-semibold text-blue-900">Current Subscriptions</h3>
+            <p className="text-sm text-blue-700 mt-1">
               {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
             </p>
           </div>
           <Button
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white shadow-md"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/ejournal/${year}`)}
           >
             ➕ Add More Subscriptions

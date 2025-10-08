@@ -59,7 +59,13 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       const saved = sessionStorage.getItem('table-sorting');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsedSorting = JSON.parse(saved) as SortingState;
+          // Validate that sorting columns exist in current column definitions
+          const validColumnIds = columns.map(col => col.id || (col as any).accessorKey);
+          const validSorting = parsedSorting.filter(sort => 
+            validColumnIds.includes(sort.id)
+          );
+          return validSorting;
         } catch {
           return [];
         }

@@ -35,7 +35,6 @@ interface EditEJournalSubscriptionDialogProps {
     vendor?: string;
     series?: string;
     data_source?: string;
-    sub_series_number?: string;
     journals: number;
     dbs: number;
     language: string[];
@@ -75,11 +74,12 @@ export default function EditEJournalSubscriptionDialog({
   const shouldDisableFields = record.is_global && isMemberRole;
   const isRestrictedEdit = shouldDisableFields;
 
-  const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
-
-  // Debug: Log the record to see what we're receiving
-  console.log("🔍 DEBUG EditEJournalDialog - Received record:", record);
-  console.log("🔍 DEBUG EditEJournalDialog - record.series value:", record.series);
+  // Normalize language labels to match the languages array
+  // Handle both "NON" and "NON-CJK" formats from database
+  const normalizeLabel = (label: string) => {
+    if (label === "NON" || label === "NONCJK") return "NON-CJK";
+    return label;
+  };
 
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
@@ -95,7 +95,6 @@ export default function EditEJournalSubscriptionDialog({
     publisher: record.publisher ?? "",
     notes: record.notes ?? "",
     data_source: record.data_source ?? "",
-    sub_series_number: record.sub_series_number ?? "",
     language: record.language
       ?.map((langLabel) => {
         const normalized = normalizeLabel(langLabel);
@@ -106,7 +105,6 @@ export default function EditEJournalSubscriptionDialog({
 
   // Update form data when record changes
   useEffect(() => {
-    console.log("🔍 DEBUG EditEJournalDialog useEffect - Updating formData with record:", record);
     setFormData({
       title: record.title ?? "",
       cjk_title: record.cjk_title ?? "",
@@ -120,7 +118,6 @@ export default function EditEJournalSubscriptionDialog({
       publisher: record.publisher ?? "",
       notes: record.notes ?? "",
       data_source: record.data_source ?? "",
-      sub_series_number: record.sub_series_number ?? "",
       language: record.language
         ?.map((langLabel) => {
           const normalized = normalizeLabel(langLabel);
@@ -275,17 +272,6 @@ export default function EditEJournalSubscriptionDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium">Sub Series Number</label>
-            <Input
-              value={formData.sub_series_number ?? ""}
-              onChange={(e) =>
-                setFormData({ ...formData, sub_series_number: e.target.value })
-              }
-              disabled={isRestrictedEdit}
-            />
-          </div>
-
-          <div>
             <label className="text-sm font-medium">Description</label>
             <textarea
               className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
@@ -394,7 +380,7 @@ export default function EditEJournalSubscriptionDialog({
             <Button
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               {saving ? "Saving..." : "Save Changes"}
             </Button>

@@ -6,7 +6,6 @@ import { logUserAction } from "@/lib/auditLogger";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Editing AV with body:", body);
 
     const {
       id, // original record ID

@@ -74,7 +74,7 @@ export default function EditEBookSubscriptionDialog({
   const shouldDisableFields = record.is_global && isMemberRole;
   const isRestrictedEdit = shouldDisableFields;
 
-  const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
+  const normalizeLabel = (label: string) => label === "NON" ? "NON-CJK" : label;
 
   // Initialize form data with current record values
   const [formData, setFormData] = useState({

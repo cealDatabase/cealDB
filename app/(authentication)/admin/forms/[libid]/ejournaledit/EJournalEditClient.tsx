@@ -20,7 +20,6 @@ interface EJournalRecord {
   data_source: string;
   series: string;
   vendor: string;
-  sub_series_number: string;
   is_global: boolean;
   updated_at: string;
 }

@@ -22,7 +22,6 @@ export async function POST(req: Request) {
       data_source,
       cjk_title,
       romanized_title,
-      sub_series_number,
       journals,
       dbs,
       language,
@@ -105,7 +104,6 @@ export async function POST(req: Request) {
             data_source: data_source?.trim() || null,
             cjk_title: cjk_title?.trim() || null,
             romanized_title: romanized_title?.trim() || null,
-            sub_series_number: sub_series_number?.trim() || null,
             is_global: false, // IMPORTANT: NOT global
             libraryyear: libraryYearId,
             updated_at: new Date(),
@@ -196,7 +194,6 @@ export async function POST(req: Request) {
             data_source: data_source?.trim() || null,
             cjk_title: cjk_title?.trim() || null,
             romanized_title: romanized_title?.trim() || null,
-            sub_series_number: sub_series_number?.trim() || null,
             updated_at: new Date(),
           },
         });

@@ -49,8 +49,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Found Library_Year record:", libraryYearRecord);
-
     if (!libraryYearRecord) {
       return NextResponse.json(
         { 

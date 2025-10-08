@@ -55,7 +55,6 @@ export default function EditEjournalModal({
     publisher: rowData.publisher || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
-    sub_series_number: (rowData as any).sub_series_number || "",
     is_global: isAutoGlobal ? true : !!rowData.is_global,
     // ↴ Use journals/dbs if present; fall back to counts for journals; dbs default 0
     journals: (rowData as any).journals ?? (rowData as any).counts ?? 0,
@@ -98,7 +97,6 @@ export default function EditEjournalModal({
           publisher: formData.publisher,
           notes: formData.notes,
           data_source: formData.data_source,
-          sub_series_number: formData.sub_series_number,
           is_global: !!formData.is_global,
           // languages as numbers:
           language: formData.language.map(Number),
@@ -136,7 +134,6 @@ export default function EditEjournalModal({
             ["Publisher", "publisher"],
             ["Data Source", "data_source"],
             ["Series", "series"],
-            ["Sub-series Number", "sub_series_number"],
           ].map(([label, key]) => (
             <div key={key}>
               <label className='text-sm font-medium'>{label}</label>
@@ -239,7 +236,7 @@ export default function EditEjournalModal({
               onClick={handleSubmit}
               variant='outline'
               disabled={saving}
-              className='hover:bg-gray-900 hover:text-white hover:cursor-pointer'
+              className='hover:bg-blue-900 hover:text-white hover:cursor-pointer'
             >
               {saving ? "Saving…" : "Save Changes"}
             </Button>

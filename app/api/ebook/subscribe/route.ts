@@ -74,8 +74,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Found Library_Year record:", libraryYearRecord);
-
     if (!libraryYearRecord) {
       // Try to create the Library_Year record if it doesn't exist
       console.log(`Creating Library_Year record for library ${libid} and year ${year}`);

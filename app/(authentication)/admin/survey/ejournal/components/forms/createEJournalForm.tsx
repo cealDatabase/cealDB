@@ -30,7 +30,6 @@ const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   subtitle: z.string().optional(),
   series: z.string().optional(),
-  sub_series_number: z.string().optional(),
   vendor: z.string().optional(),
   description: z.string().optional(),
   notes: z.string().optional(),
@@ -70,7 +69,6 @@ export default function CreateEJournalForm({
       title: "",
       subtitle: "",
       series: "",
-      sub_series_number: "",
       vendor: "",
       description: "",
       notes: "",
@@ -131,10 +129,10 @@ export default function CreateEJournalForm({
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             {/* Basic Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Basic Information
               </h3>
 
@@ -196,40 +194,24 @@ export default function CreateEJournalForm({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="series"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Series</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter series" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="sub_series_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sub-series Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter sub-series number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="series"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Series</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter series" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Publication Details Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Publication Details
               </h3>
 
@@ -322,7 +304,7 @@ export default function CreateEJournalForm({
 
             {/* Additional Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Additional Information
               </h3>
 
@@ -365,7 +347,7 @@ export default function CreateEJournalForm({
 
             {/* Languages Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Languages *
               </h3>
 
