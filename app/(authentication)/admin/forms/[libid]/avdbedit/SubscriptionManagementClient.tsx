@@ -85,9 +85,33 @@ export default function SubscriptionManagementClient({
   // Define columns for the management view
   const getColumns = () => [
     {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }: any) => {
+        const record = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleEdit(record)}
+              disabled={isRemoving}
+              title="Edit"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => handleRemoveSubscription(record.id)}
+              disabled={isRemoving}
+              title="Remove"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "cjk_title",
@@ -131,35 +155,6 @@ export default function SubscriptionManagementClient({
       cell: ({ row }: any) => {
         const count = row.getValue("counts") as number;
         return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
-      },
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => {
-        const record = row.original;
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleEdit(record)}
-              disabled={isRemoving}
-            >
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleRemoveSubscription(record.id)}
-              disabled={isRemoving}
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Remove
-            </Button>
-          </div>
-        );
       },
     },
   ];
