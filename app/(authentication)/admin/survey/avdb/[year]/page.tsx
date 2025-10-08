@@ -72,9 +72,8 @@ export default async function AVListPage(props: {
               Please check the boxes next to each subscription your library has,
               for each language Chinese, Japanese, Korean, and Non-CJK. Data in
               this list is linked to Form 4: Holdings of Other Materials and
-              Form 9: Electronic Resources. If you subscribe to a subset of one
-              of these collections, click &quot;customize&quot;, and then enter
-              the appropriate counts in each of the fields.
+              Form 9: Electronic Resources. If your institution holds a customized collection or a subset of certain
+              resources, edit the relevant data after clicking &quot;Add to My Subscription&quot;.
             </p>
           </div>
 

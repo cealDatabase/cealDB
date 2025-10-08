@@ -135,6 +135,7 @@ export default function EditEjournalModal({
             ["Romanized Title", "romanized_title"],
             ["Publisher", "publisher"],
             ["Data Source", "data_source"],
+            ["Series", "series"],
             ["Sub-series Number", "sub_series_number"],
           ].map(([label, key]) => (
             <div key={key}>
