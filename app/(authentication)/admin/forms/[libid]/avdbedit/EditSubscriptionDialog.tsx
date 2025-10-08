@@ -13,11 +13,11 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
-const languages = [
+const languages: Array<{ value: number; label: string; displayLabel?: string }> = [
   { value: 1, label: "CHN" },
   { value: 2, label: "JPN" },
   { value: 3, label: "KOR" },
-  { value: 4, label: "NON" },
+  { value: 4, label: "NON", displayLabel: "NON-CJK" },
 ];
 
 const types = [
@@ -92,8 +92,7 @@ export default function EditSubscriptionDialog({
     type: record.type || "",
     language: record.language
       .map((langLabel) => {
-        const normalized = langLabel === "NON" ? "NONCJK" : langLabel;
-        return languages.find((l) => l.label === normalized)?.value;
+        return languages.find((l) => l.label === langLabel)?.value;
       })
       .filter((id): id is number => id !== undefined),
   });
@@ -113,8 +112,7 @@ export default function EditSubscriptionDialog({
       type: record.type || "",
       language: record.language
         .map((langLabel) => {
-          const normalized = langLabel === "NON" ? "NONCJK" : langLabel;
-          return languages.find((l) => l.label === normalized)?.value;
+          return languages.find((l) => l.label === langLabel)?.value;
         })
         .filter((id): id is number => id !== undefined),
     });
@@ -345,7 +343,7 @@ export default function EditSubscriptionDialog({
                     disabled={isRestrictedEdit}
                   />
                   <label htmlFor={`lang-${lang.value}`} className="text-sm">
-                    {lang.label}
+                    {lang.displayLabel || lang.label}
                   </label>
                 </div>
               ))}

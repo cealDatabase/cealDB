@@ -90,14 +90,14 @@ export default function SubscriptionManagementClient({
       cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
     },
     {
-      accessorKey: "title",
-      header: "English Title",
-      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("title")}</div>,
-    },
-    {
       accessorKey: "cjk_title",
       header: "CJK Title",
       cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("cjk_title")}</div>,
+    },
+    {
+      accessorKey: "title",
+      header: "English Title",
+      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("title")}</div>,
     },
     {
       accessorKey: "publisher",
@@ -108,6 +108,22 @@ export default function SubscriptionManagementClient({
       accessorKey: "type",
       header: "Type",
       cell: ({ row }: any) => <Badge variant="outline">{row.getValue("type")}</Badge>,
+    },
+    {
+      accessorKey: "language",
+      header: "Language",
+      cell: ({ row }: any) => {
+        const langs = row.getValue("language") as string[];
+        return (
+          <div className="flex gap-1 flex-wrap">
+            {langs.map((lang, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
+                {lang === "NON" ? "NON-CJK" : lang}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "counts",

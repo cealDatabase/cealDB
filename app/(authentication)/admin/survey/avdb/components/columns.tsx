@@ -385,7 +385,7 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
           />
         );
       },
-    }, // 太占篇幅，但还是要保留
+    },
     {
       accessorKey: "notes",
       header: ({ column }) => (
@@ -395,7 +395,8 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
         return <ExpandableNotes content={row.getValue("notes")} />;
       },
     },
-    ...(roleIdPassIn?.trim() !== "2"
+    
+    ...(!(userRoles.length === 1 && userRoles[0] === "2")
       ? [{
         accessorKey: "subscribers",
         header: ({ column }: { column: any }) => (
