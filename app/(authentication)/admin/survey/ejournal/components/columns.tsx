@@ -36,7 +36,8 @@ const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[250px] min-w-[200px] truncate'>
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        transition-colors cursor-pointer w-full max-w-[250px] min-w-[200px] truncate'>
           {preview}
         </button>
       </PopoverTrigger>
@@ -102,7 +103,8 @@ const ExpandableTextWithSource = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
           <div className='line-clamp-3'>
             {description}
           </div>
@@ -197,7 +199,7 @@ export function getColumns(
       userRoles = [roleIdPassIn];
     }
   }
-  
+
   // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
   // Show Actions for admins, super admins, or users with multiple roles
   const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
@@ -229,12 +231,12 @@ export function getColumns(
     },
     ...(shouldShowActions
       ? [{
-          id: "actions",
-          header: "Actions",
-          cell: ({ row }: { row: any }) => (
-            <DataTableRowActions row={row} year={year} basePath='ejournal' userRoles={userRoles} />
-          ),
-        } as ColumnDef<EJournalRow>]
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }: { row: any }) => (
+          <DataTableRowActions row={row} year={year} basePath='ejournal' userRoles={userRoles} />
+        ),
+      } as ColumnDef<EJournalRow>]
       : []),
 
     /** Journals & Databases (per-year) */
@@ -436,34 +438,34 @@ export function getColumns(
 
     ...(roleIdPassIn?.trim() !== "2"
       ? ([
-          {
-            accessorKey: "subscribers",
-            header: ({ column }: { column: any }) => (
-              <DataTableColumnHeader column={column} title='Subscribers' />
-            ),
-            cell: ({ row }: { row: any }) => {
-              const subscribers = row.getValue("subscribers") as
-                | string[]
-                | string
-                | null
-                | undefined;
-              if (
-                !subscribers ||
-                (Array.isArray(subscribers) && subscribers.length === 0)
-              ) {
-                return (
-                  <span className='text-muted-foreground italic'>
-                    null
-                  </span>
-                );
-              }
-              const list = Array.isArray(subscribers)
-                ? subscribers
-                : [String(subscribers)];
-              return <ExpandableSubscribers subscribers={list} />;
-            },
-          } as ColumnDef<EJournalRow>,
-        ] as ColumnDef<EJournalRow>[])
+        {
+          accessorKey: "subscribers",
+          header: ({ column }: { column: any }) => (
+            <DataTableColumnHeader column={column} title='Subscribers' />
+          ),
+          cell: ({ row }: { row: any }) => {
+            const subscribers = row.getValue("subscribers") as
+              | string[]
+              | string
+              | null
+              | undefined;
+            if (
+              !subscribers ||
+              (Array.isArray(subscribers) && subscribers.length === 0)
+            ) {
+              return (
+                <span className='text-muted-foreground italic'>
+                  null
+                </span>
+              );
+            }
+            const list = Array.isArray(subscribers)
+              ? subscribers
+              : [String(subscribers)];
+            return <ExpandableSubscribers subscribers={list} />;
+          },
+        } as ColumnDef<EJournalRow>,
+      ] as ColumnDef<EJournalRow>[])
       : []),
   ];
 }
