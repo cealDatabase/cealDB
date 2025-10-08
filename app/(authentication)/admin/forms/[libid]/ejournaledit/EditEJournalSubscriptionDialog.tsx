@@ -74,13 +74,6 @@ export default function EditEJournalSubscriptionDialog({
   const shouldDisableFields = record.is_global && isMemberRole;
   const isRestrictedEdit = shouldDisableFields;
 
-  // Normalize language labels to match the languages array
-  // Handle both "NON" and "NON-CJK" formats from database
-  const normalizeLabel = (label: string) => {
-    if (label === "NON" || label === "NONCJK") return "NON-CJK";
-    return label;
-  };
-
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
     title: record.title ?? "",
@@ -97,8 +90,7 @@ export default function EditEJournalSubscriptionDialog({
     data_source: record.data_source ?? "",
     language: record.language
       ?.map((langLabel) => {
-        const normalized = normalizeLabel(langLabel);
-        return languages.find((l) => l.label === normalized)?.value;
+        return languages.find((l) => l.label === langLabel)?.value;
       })
       .filter((id): id is number => id !== undefined) ?? [],
   });
@@ -120,8 +112,7 @@ export default function EditEJournalSubscriptionDialog({
       data_source: record.data_source ?? "",
       language: record.language
         ?.map((langLabel) => {
-          const normalized = normalizeLabel(langLabel);
-          return languages.find((l) => l.label === normalized)?.value;
+          return languages.find((l) => l.label === langLabel)?.value;
         })
         .filter((id): id is number => id !== undefined) ?? [],
     });
