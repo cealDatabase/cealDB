@@ -267,6 +267,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 year={year}
                 mode="view"
                 libraryName={libraryName}
+                roleId={roleFromCookie}
               />
             </Suspense>
           </div>

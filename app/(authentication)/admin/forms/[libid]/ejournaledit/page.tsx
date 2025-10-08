@@ -38,6 +38,7 @@ interface EJournalSubscriptionManagementClientProps {
   year: number;
   mode: "view" | "add";
   libraryName: string;
+  roleId?: string;
 }
 
 // Use dynamic import with proper typing for client component
@@ -226,6 +227,11 @@ export default async function Page({ params, searchParams }: PageProps) {
       },
     });
 
+    // Debug: Check what fields are actually in the subscriptions
+    console.log("🔍 DEBUG page.tsx - First subscription sample:", subscriptions[0]);
+    console.log("🔍 DEBUG page.tsx - First List_EJournal data:", subscriptions[0]?.List_EJournal);
+    console.log("🔍 DEBUG page.tsx - Series field value:", subscriptions[0]?.List_EJournal?.series);
+
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
     
     if (subscribedEJournals.length === 0) {
@@ -298,6 +304,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 year={year}
                 mode="view"
                 libraryName={libraryName}
+                roleId={roleFromCookie}
               />
             </Suspense>
           </div>

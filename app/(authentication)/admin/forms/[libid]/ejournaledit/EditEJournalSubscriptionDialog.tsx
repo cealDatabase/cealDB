@@ -26,16 +26,16 @@ interface EditEJournalSubscriptionDialogProps {
   record: {
     id: number;
     title: string;
-    subtitle: string;
-    cjk_title: string;
-    romanized_title: string;
-    description: string;
-    notes: string;
-    publisher: string;
-    vendor: string;
-    series: string;
-    data_source: string;
-    sub_series_number: string;
+    subtitle?: string;
+    cjk_title?: string;
+    romanized_title?: string;
+    description?: string;
+    notes?: string;
+    publisher?: string;
+    vendor?: string;
+    series?: string;
+    data_source?: string;
+    sub_series_number?: string;
     journals: number;
     dbs: number;
     language: string[];
@@ -44,6 +44,7 @@ interface EditEJournalSubscriptionDialogProps {
   libid: number;
   year: number;
   onSuccess: () => void;
+  roleId?: string;
 }
 
 export default function EditEJournalSubscriptionDialog({
@@ -53,56 +54,79 @@ export default function EditEJournalSubscriptionDialog({
   libid,
   year,
   onSuccess,
+  roleId,
 }: EditEJournalSubscriptionDialogProps) {
   const [saving, setSaving] = useState(false);
+  
+  // Check if fields should be disabled (role 2 or 4, and editing a global record)
+  // For E-Journal: Only journals and dbs should be editable
+  // Role cookie is stored as JSON array, e.g., '["2"]' or '["1","4"]'
+  const getUserRoles = (): string[] => {
+    if (!roleId) return [];
+    try {
+      return JSON.parse(roleId);
+    } catch {
+      return [];
+    }
+  };
+  
+  const userRoles = getUserRoles();
+  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
+  const shouldDisableFields = record.is_global && isMemberRole;
+  const isRestrictedEdit = shouldDisableFields;
 
   const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
 
+  // Debug: Log the record to see what we're receiving
+  console.log("🔍 DEBUG EditEJournalDialog - Received record:", record);
+  console.log("🔍 DEBUG EditEJournalDialog - record.series value:", record.series);
+
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
-    title: record.title || "",
-    cjk_title: record.cjk_title || "",
-    romanized_title: record.romanized_title || "",
-    subtitle: record.subtitle || "",
-    series: record.series || "",
-    vendor: record.vendor || "",
-    description: record.description || "",
-    journals: record.journals || 0,
-    dbs: record.dbs || 0,
-    publisher: record.publisher || "",
-    notes: record.notes || "",
-    data_source: record.data_source || "",
-    sub_series_number: record.sub_series_number || "",
+    title: record.title ?? "",
+    cjk_title: record.cjk_title ?? "",
+    romanized_title: record.romanized_title ?? "",
+    subtitle: record.subtitle ?? "",
+    series: record.series ?? "",
+    vendor: record.vendor ?? "",
+    description: record.description ?? "",
+    journals: record.journals ?? 0,
+    dbs: record.dbs ?? 0,
+    publisher: record.publisher ?? "",
+    notes: record.notes ?? "",
+    data_source: record.data_source ?? "",
+    sub_series_number: record.sub_series_number ?? "",
     language: record.language
-      .map((langLabel) => {
+      ?.map((langLabel) => {
         const normalized = normalizeLabel(langLabel);
         return languages.find((l) => l.label === normalized)?.value;
       })
-      .filter((id): id is number => id !== undefined),
+      .filter((id): id is number => id !== undefined) ?? [],
   });
 
   // Update form data when record changes
   useEffect(() => {
+    console.log("🔍 DEBUG EditEJournalDialog useEffect - Updating formData with record:", record);
     setFormData({
-      title: record.title || "",
-      cjk_title: record.cjk_title || "",
-      romanized_title: record.romanized_title || "",
-      subtitle: record.subtitle || "",
-      series: record.series || "",
-      vendor: record.vendor || "",
-      description: record.description || "",
-      journals: record.journals || 0,
-      dbs: record.dbs || 0,
-      publisher: record.publisher || "",
-      notes: record.notes || "",
-      data_source: record.data_source || "",
-      sub_series_number: record.sub_series_number || "",
+      title: record.title ?? "",
+      cjk_title: record.cjk_title ?? "",
+      romanized_title: record.romanized_title ?? "",
+      subtitle: record.subtitle ?? "",
+      series: record.series ?? "",
+      vendor: record.vendor ?? "",
+      description: record.description ?? "",
+      journals: record.journals ?? 0,
+      dbs: record.dbs ?? 0,
+      publisher: record.publisher ?? "",
+      notes: record.notes ?? "",
+      data_source: record.data_source ?? "",
+      sub_series_number: record.sub_series_number ?? "",
       language: record.language
-        .map((langLabel) => {
+        ?.map((langLabel) => {
           const normalized = normalizeLabel(langLabel);
           return languages.find((l) => l.label === normalized)?.value;
         })
-        .filter((id): id is number => id !== undefined),
+        .filter((id): id is number => id !== undefined) ?? [],
     });
   }, [record]);
 
@@ -187,81 +211,91 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Title *</label>
             <Input
-              value={formData.title}
+              value={formData.title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">CJK Title</label>
             <Input
-              value={formData.cjk_title}
+              value={formData.cjk_title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, cjk_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Romanized Title</label>
             <Input
-              value={formData.romanized_title}
+              value={formData.romanized_title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, romanized_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Subtitle</label>
             <Input
-              value={formData.subtitle}
+              value={formData.subtitle ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, subtitle: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Series</label>
             <Input
-              value={formData.series}
+              value={formData.series ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, series: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Vendor</label>
             <Input
-              value={formData.vendor}
+              value={formData.vendor ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, vendor: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Sub Series Number</label>
             <Input
-              value={formData.sub_series_number}
+              value={formData.sub_series_number ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, sub_series_number: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Description</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
-              value={formData.description}
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
+              value={formData.description ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -294,31 +328,36 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Publisher</label>
             <Input
-              value={formData.publisher}
+              value={formData.publisher ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, publisher: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Notes</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
-              value={formData.notes}
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
+              value={formData.notes ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Data Source</label>
             <Input
-              value={formData.data_source}
+              value={formData.data_source ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, data_source: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -334,6 +373,7 @@ export default function EditEJournalSubscriptionDialog({
                     onCheckedChange={(checked) =>
                       handleLanguageChange(lang.value, Boolean(checked))
                     }
+                    disabled={isRestrictedEdit}
                   />
                   <label htmlFor={`lang-${lang.value}`} className="text-sm">
                     {lang.label}

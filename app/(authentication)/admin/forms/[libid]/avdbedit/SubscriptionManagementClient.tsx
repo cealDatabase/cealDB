@@ -34,6 +34,7 @@ interface SubscriptionManagementClientProps {
   year: number;
   mode: "view" | "add";
   libraryName: string;
+  roleId?: string;
 }
 
 export default function SubscriptionManagementClient({
@@ -41,7 +42,8 @@ export default function SubscriptionManagementClient({
   libid,
   year,
   mode,
-  libraryName
+  libraryName,
+  roleId
 }: SubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -298,6 +300,7 @@ export default function SubscriptionManagementClient({
           libid={libid}
           year={year}
           onSuccess={handleEditSuccess}
+          roleId={roleId}
         />
       )}
     </div>

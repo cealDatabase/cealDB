@@ -48,6 +48,7 @@ interface EditSubscriptionDialogProps {
   libid: number;
   year: number;
   onSuccess: () => void;
+  roleId?: string;
 }
 
 export default function EditSubscriptionDialog({
@@ -57,8 +58,25 @@ export default function EditSubscriptionDialog({
   libid,
   year,
   onSuccess,
+  roleId,
 }: EditSubscriptionDialogProps) {
   const [saving, setSaving] = useState(false);
+  
+  // Check if fields should be disabled (role 2 or 4, and editing a global record)
+  // Role cookie is stored as JSON array, e.g., '["2"]' or '["1","4"]'
+  const getUserRoles = (): string[] => {
+    if (!roleId) return [];
+    try {
+      return JSON.parse(roleId);
+    } catch {
+      return [];
+    }
+  };
+  
+  const userRoles = getUserRoles();
+  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
+  const shouldDisableFields = record.is_global && isMemberRole;
+  const isRestrictedEdit = shouldDisableFields;
 
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
@@ -192,6 +210,7 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -202,6 +221,7 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, cjk_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -212,6 +232,7 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, romanized_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -222,17 +243,21 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, subtitle: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Description</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -255,17 +280,21 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, publisher: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
           <div>
             <label className="text-sm font-medium">Notes</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
               value={formData.notes}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -276,6 +305,7 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, data_source: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -286,7 +316,10 @@ export default function EditSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, type: e.target.value })
               }
-              className="w-full border rounded-md px-3 py-2 text-sm"
+              className={`w-full border rounded-md px-3 py-2 text-sm ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
+              disabled={isRestrictedEdit}
             >
               <option value="">Select type...</option>
               {types.map((t) => (
@@ -309,6 +342,7 @@ export default function EditSubscriptionDialog({
                     onCheckedChange={(checked) =>
                       handleLanguageChange(lang.value, Boolean(checked))
                     }
+                    disabled={isRestrictedEdit}
                   />
                   <label htmlFor={`lang-${lang.value}`} className="text-sm">
                     {lang.label}
