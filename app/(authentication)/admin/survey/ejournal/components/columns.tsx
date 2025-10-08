@@ -273,7 +273,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='min-w-[100px] max-w-[500px] font-medium'>
+          <span className='min-w-[100px] max-w-[200px] font-medium'>
             {row.getValue("cjk_title")}
           </span>
         </div>
@@ -286,7 +286,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='min-w-[200px] max-w-[500px] font-medium'>
+          <span className='min-w-[180px] max-w-[200px] font-medium'>
             {row.getValue("title")}
           </span>
         </div>
@@ -299,7 +299,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("romanized_title")}
           </span>
         </div>
@@ -312,7 +312,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("series")}
           </span>
         </div>
@@ -326,7 +326,7 @@ export function getColumns(
       cell: ({ row }) => (
         <div className='flex space-x-2'>
           <span
-            className='max-w-[500px] font-medium'
+            className='max-w-[200px] font-medium'
             // matches your existing usage
             dangerouslySetInnerHTML={{
               __html: (row.getValue("subtitle") as string) || "",
@@ -359,19 +359,20 @@ export function getColumns(
       },
     },
 
-    {
-      accessorKey: "sub_series_number",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={<>Sub-Series<br />Number</>} />
-      ),
-      cell: ({ row }) => (
-        <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
-            {row.getValue("sub_series_number")}
-          </span>
-        </div>
-      ),
-    },
+    // {
+    //   accessorKey: "sub_series_number",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title={<>Sub-Series<br />Number</>} />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className='flex space-x-2'>
+    //       <span className='max-w-[500px] font-medium'>
+    //         {row.getValue("sub_series_number")}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
+
     {
       accessorKey: "publisher",
       header: ({ column }) => (
@@ -379,7 +380,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("publisher")}
           </span>
         </div>
@@ -393,7 +394,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("vendor")}
           </span>
         </div>

@@ -205,9 +205,6 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
                       className="text-sm font-normal cursor-pointer flex-1"
                     >
                       {role.name}
-                      <span className="text-xs text-muted-foreground ml-1">
-                        ({role.role})
-                      </span>
                     </Label>
                   </div>
                 ))}
