@@ -206,7 +206,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Title *</label>
             <Input
-              value={formData.title}
+              value={formData.title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
@@ -217,7 +217,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">CJK Title</label>
             <Input
-              value={formData.cjk_title}
+              value={formData.cjk_title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, cjk_title: e.target.value })
               }
@@ -228,7 +228,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Romanized Title</label>
             <Input
-              value={formData.romanized_title}
+              value={formData.romanized_title ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, romanized_title: e.target.value })
               }
@@ -239,7 +239,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Subtitle</label>
             <Input
-              value={formData.subtitle}
+              value={formData.subtitle ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, subtitle: e.target.value })
               }
@@ -250,7 +250,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Series</label>
             <Input
-              value={formData.series}
+              value={formData.series ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, series: e.target.value })
               }
@@ -261,7 +261,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Vendor</label>
             <Input
-              value={formData.vendor}
+              value={formData.vendor ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, vendor: e.target.value })
               }
@@ -272,7 +272,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Sub Series Number</label>
             <Input
-              value={formData.sub_series_number}
+              value={formData.sub_series_number ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, sub_series_number: e.target.value })
               }
@@ -284,7 +284,7 @@ export default function EditEJournalSubscriptionDialog({
             <label className="text-sm font-medium">Description</label>
             <textarea
               className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
-              value={formData.description}
+              value={formData.description ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
@@ -321,7 +321,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Publisher</label>
             <Input
-              value={formData.publisher}
+              value={formData.publisher ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, publisher: e.target.value })
               }
@@ -333,7 +333,7 @@ export default function EditEJournalSubscriptionDialog({
             <label className="text-sm font-medium">Notes</label>
             <textarea
               className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
-              value={formData.notes}
+              value={formData.notes ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
               }
@@ -344,7 +344,7 @@ export default function EditEJournalSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Data Source</label>
             <Input
-              value={formData.data_source}
+              value={formData.data_source ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, data_source: e.target.value })
               }
