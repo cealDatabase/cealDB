@@ -57,27 +57,37 @@ export default function EJournalSubscriptionManagementClient({
   // Convert subscription data to table format
   const data = subscriptions
     .filter(sub => !removedIds.has(sub.listejournal_id))
-    .map((sub) => ({
-      id: sub.List_EJournal.id,
-      title: sub.List_EJournal.title ?? "",
-      sub_series_number: sub.List_EJournal.sub_series_number ?? "",
-      publisher: sub.List_EJournal.publisher ?? "",
-      description: sub.List_EJournal.description ?? "",
-      notes: sub.List_EJournal.notes ?? "",
-      subtitle: sub.List_EJournal.subtitle ?? "",
-      cjk_title: sub.List_EJournal.cjk_title ?? "",
-      romanized_title: sub.List_EJournal.romanized_title ?? "",
-      data_source: sub.List_EJournal.data_source ?? "",
-      series: sub.List_EJournal.series ?? "",
-      vendor: sub.List_EJournal.vendor ?? "",
-      is_global: !!sub.List_EJournal.is_global,
-      updated_at: sub.List_EJournal.updated_at.toISOString(),
-      journals: sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0,
-      dbs: sub.List_EJournal.List_EJournal_Counts?.[0]?.dbs ?? 0,
-      language: sub.List_EJournal.List_EJournal_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
-    }));
+    .map((sub) => {
+      console.log("🔍 DEBUG Mapping EJournal subscription:", {
+        id: sub.List_EJournal.id,
+        series: sub.List_EJournal.series,
+        vendor: sub.List_EJournal.vendor,
+        title: sub.List_EJournal.title
+      });
+      return {
+        id: sub.List_EJournal.id,
+        title: sub.List_EJournal.title ?? "",
+        sub_series_number: sub.List_EJournal.sub_series_number ?? "",
+        publisher: sub.List_EJournal.publisher ?? "",
+        description: sub.List_EJournal.description ?? "",
+        notes: sub.List_EJournal.notes ?? "",
+        subtitle: sub.List_EJournal.subtitle ?? "",
+        cjk_title: sub.List_EJournal.cjk_title ?? "",
+        romanized_title: sub.List_EJournal.romanized_title ?? "",
+        data_source: sub.List_EJournal.data_source ?? "",
+        series: sub.List_EJournal.series ?? "",
+        vendor: sub.List_EJournal.vendor ?? "",
+        is_global: !!sub.List_EJournal.is_global,
+        updated_at: sub.List_EJournal.updated_at.toISOString(),
+        journals: sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0,
+        dbs: sub.List_EJournal.List_EJournal_Counts?.[0]?.dbs ?? 0,
+        language: sub.List_EJournal.List_EJournal_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
+      };
+    });
 
   const handleEdit = (record: any) => {
+    console.log("🔍 DEBUG EditEJournal - Record being passed to dialog:", record);
+    console.log("🔍 DEBUG EditEJournal - Series value:", record.series);
     setEditingRecord(record);
     setIsEditDialogOpen(true);
   };
