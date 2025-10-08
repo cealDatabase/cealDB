@@ -70,34 +70,37 @@ const ExpandableTextWithSource = ({
   description: string | null;
   dataSource: string | null | undefined;
 }) => {
-  const isValidDataSource =
-    !!dataSource &&
-    typeof dataSource === "string" &&
-    dataSource.trim() !== "" &&
-    (dataSource.startsWith("http://") || dataSource.startsWith("https://"));
+  const hasDataSource = !!dataSource && dataSource.trim() !== "";
+  const isUrl = hasDataSource && (dataSource!.startsWith("http://") || dataSource!.startsWith("https://"));
 
-  // If no description and no valid data source, show empty
-  if (!description && !isValidDataSource) {
+  // If neither description nor data source, show empty
+  if (!description && !hasDataSource) {
     return <span></span>;
   }
 
-  // If no description but has data source, show only data source link
-  if (!description && isValidDataSource) {
-    return (
-      <a
-        href={dataSource}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
-      >
-        {dataSource}
-      </a>
-    );
+  // If only data source (no description)
+  if (!description && hasDataSource) {
+    // If it's a URL, make it clickable
+    if (isUrl) {
+      return (
+        <a
+          href={dataSource}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
+        >
+          {dataSource}
+        </a>
+      );
+    }
+    // Otherwise show as plain text
+    return <span className='font-medium'>{dataSource}</span>;
   }
 
-  // Has description
-  const needsPopover = description!.length > 60 || isValidDataSource;
+  // Has description - show popover if description is long OR we have a data source to show
+  const needsPopover = description!.length > 60 || hasDataSource;
 
+  // If no popover needed (short description, no source), just show description
   if (!needsPopover) return <span className='font-medium'>{description}</span>;
 
   return (
@@ -122,19 +125,23 @@ const ExpandableTextWithSource = ({
             <p className='font-medium'>{description}</p>
           </div>
 
-          {isValidDataSource && (
+          {hasDataSource && (
             <div>
               <h4 className='font-semibold text-xs uppercase text-muted-foreground mb-1'>
                 Data Source
               </h4>
-              <a
-                href={dataSource}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='hover:underline break-all text-orange-800'
-              >
-                {dataSource}
-              </a>
+              {isUrl ? (
+                <a
+                  href={dataSource}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='hover:underline break-all text-orange-800'
+                >
+                  {dataSource}
+                </a>
+              ) : (
+                <p className='font-medium break-all'>{dataSource}</p>
+              )}
             </div>
           )}
         </div>
@@ -436,7 +443,7 @@ export function getColumns(
 
 
 
-    ...(roleIdPassIn?.trim() !== "2"
+    ...(!(userRoles.length === 1 && userRoles[0] === "2")
       ? ([
         {
           accessorKey: "subscribers",
@@ -453,11 +460,7 @@ export function getColumns(
               !subscribers ||
               (Array.isArray(subscribers) && subscribers.length === 0)
             ) {
-              return (
-                <span className='text-muted-foreground italic'>
-                  null
-                </span>
-              );
+              return <span></span>;
             }
             const list = Array.isArray(subscribers)
               ? subscribers

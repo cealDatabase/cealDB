@@ -53,8 +53,13 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   
-  // Restore sorting state from sessionStorage
-  const [sorting, setSorting] = React.useState<SortingState>(() => {
+  // Initialize sorting state as empty (hydration-safe)
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+
+  // Restore sorting state from sessionStorage after hydration
+  React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = sessionStorage.getItem('table-sorting');
       if (saved) {
@@ -65,16 +70,15 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           const validSorting = parsedSorting.filter(sort => 
             validColumnIds.includes(sort.id)
           );
-          return validSorting;
+          if (validSorting.length > 0) {
+            setSorting(validSorting);
+          }
         } catch {
-          return [];
+          // Ignore invalid saved state
         }
       }
     }
-    return [];
-  });
-  
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  }, []); // Run once on mount
 
   // Save sorting state to sessionStorage whenever it changes
   React.useEffect(() => {
