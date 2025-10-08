@@ -44,6 +44,7 @@ interface EditEJournalSubscriptionDialogProps {
   libid: number;
   year: number;
   onSuccess: () => void;
+  roleId?: string;
 }
 
 export default function EditEJournalSubscriptionDialog({
@@ -53,8 +54,14 @@ export default function EditEJournalSubscriptionDialog({
   libid,
   year,
   onSuccess,
+  roleId,
 }: EditEJournalSubscriptionDialogProps) {
   const [saving, setSaving] = useState(false);
+  
+  // Check if fields should be disabled (role 2 or 4, and editing a global record)
+  // For E-Journal: Only journals and dbs should be editable
+  const shouldDisableFields = record.is_global && (roleId === "2" || roleId === "4" || roleId === "2; 4" || roleId === "4; 2");
+  const isRestrictedEdit = shouldDisableFields;
 
   const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
 
@@ -191,6 +198,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -201,6 +209,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, cjk_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -211,6 +220,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, romanized_title: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -221,6 +231,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, subtitle: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -231,6 +242,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, series: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -241,6 +253,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, vendor: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -251,6 +264,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, sub_series_number: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -262,6 +276,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -298,6 +313,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, publisher: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -309,6 +325,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -319,6 +336,7 @@ export default function EditEJournalSubscriptionDialog({
               onChange={(e) =>
                 setFormData({ ...formData, data_source: e.target.value })
               }
+              disabled={isRestrictedEdit}
             />
           </div>
 
@@ -334,6 +352,7 @@ export default function EditEJournalSubscriptionDialog({
                     onCheckedChange={(checked) =>
                       handleLanguageChange(lang.value, Boolean(checked))
                     }
+                    disabled={isRestrictedEdit}
                   />
                   <label htmlFor={`lang-${lang.value}`} className="text-sm">
                     {lang.label}

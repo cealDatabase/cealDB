@@ -35,6 +35,7 @@ interface EBookSubscriptionManagementClientProps {
   year: number;
   mode: "view" | "add";
   libraryName: string;
+  roleId?: string;
 }
 
 export default function EBookSubscriptionManagementClient({
@@ -42,7 +43,8 @@ export default function EBookSubscriptionManagementClient({
   libid,
   year,
   mode,
-  libraryName
+  libraryName,
+  roleId
 }: EBookSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -324,6 +326,7 @@ export default function EBookSubscriptionManagementClient({
           libid={libid}
           year={year}
           onSuccess={handleEditSuccess}
+          roleId={roleId}
         />
       )}
     </div>

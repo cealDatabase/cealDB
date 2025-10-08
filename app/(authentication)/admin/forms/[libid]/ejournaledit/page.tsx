@@ -38,6 +38,7 @@ interface EJournalSubscriptionManagementClientProps {
   year: number;
   mode: "view" | "add";
   libraryName: string;
+  roleId?: string;
 }
 
 // Use dynamic import with proper typing for client component
@@ -298,6 +299,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 year={year}
                 mode="view"
                 libraryName={libraryName}
+                roleId={roleFromCookie}
               />
             </Suspense>
           </div>

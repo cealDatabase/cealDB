@@ -37,6 +37,7 @@ interface EJournalSubscriptionManagementClientProps {
   year: number;
   mode: "view" | "add";
   libraryName: string;
+  roleId?: string;
 }
 
 export default function EJournalSubscriptionManagementClient({
@@ -44,7 +45,8 @@ export default function EJournalSubscriptionManagementClient({
   libid,
   year,
   mode,
-  libraryName
+  libraryName,
+  roleId
 }: EJournalSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -324,6 +326,7 @@ export default function EJournalSubscriptionManagementClient({
           libid={libid}
           year={year}
           onSuccess={handleEditSuccess}
+          roleId={roleId}
         />
       )}
     </div>
