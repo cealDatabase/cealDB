@@ -1,5 +1,6 @@
 // /app/api/av/subscribe/route.ts
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
 
 export async function POST(req: Request) {
@@ -7,14 +8,22 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("Subscribing to AV records with body:", body);
 
-    const { libid, year, recordIds } = body;
+    let { libid, year, recordIds } = body;
 
-    // Validate required fields
+    // If libid is not provided, try to get it from cookies
     if (!libid || isNaN(Number(libid))) {
-      return NextResponse.json(
-        { error: "Missing or invalid library ID" },
-        { status: 400 }
-      );
+      const cookieStore = await cookies();
+      const libidFromCookie = cookieStore.get("library")?.value;
+      
+      if (libidFromCookie && !isNaN(Number(libidFromCookie))) {
+        libid = Number(libidFromCookie);
+        console.log("Using library ID from cookie:", libid);
+      } else {
+        return NextResponse.json(
+          { error: "Missing or invalid library ID" },
+          { status: 400 }
+        );
+      }
     }
 
     if (!year || isNaN(Number(year))) {

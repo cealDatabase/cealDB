@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions"
 import { languages } from "../data/data"
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter"
+import { toast } from "sonner"
+import { useState } from "react"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -23,6 +25,7 @@ export function DataTableToolbar<TData>({
   roleId,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter()
+  const [isSubscribing, setIsSubscribing] = useState(false)
   const isFiltered = table.getState().columnFilters.length > 0
   
   const selectedIds = table
@@ -30,25 +33,48 @@ export function DataTableToolbar<TData>({
     .rows.map((r) => (r.original as any).id as number)
     .filter((n) => Number.isFinite(n))
 
-  const goToEditor = () => {
+  const handleDirectSubscribe = async () => {
     if (selectedIds.length === 0) return
     
-    const targetLibid = libid || "member"
+    setIsSubscribing(true)
     
-    const qs = new URLSearchParams({
-      ids: selectedIds.join(","),
-      year: String(year),
-    }).toString()
-    
-    console.log("Navigating to ebookedit with:", {
-      targetLibid,
-      selectedIds,
-      year,
-      queryString: qs,
-      fullUrl: `/admin/forms/${targetLibid}/ebookedit?${qs}`
-    })
-    
-    router.push(`/admin/forms/${targetLibid}/ebookedit?${qs}`)
+    try {
+      // Use libid if available, otherwise it will be resolved from cookies on the server
+      const targetLibid = libid || "member"
+      
+      // Make API call to subscribe
+      const response = await fetch("/api/ebook/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          libid: typeof targetLibid === 'number' ? targetLibid : undefined,
+          year,
+          recordIds: selectedIds,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
+        throw new Error(errorData.error || `Failed to subscribe to records`)
+      }
+
+      const result = await response.json()
+      
+      toast.success(`Successfully subscribed to ${selectedIds.length} record${selectedIds.length === 1 ? "" : "s"}! Redirecting...`)
+      
+      // Redirect directly to subscription management page (without ids parameter to trigger VIEW mode)
+      setTimeout(() => {
+        router.push(`/admin/forms/${result.data.libid}/ebookedit`)
+      }, 1500)
+
+    } catch (error) {
+      console.error("Subscription error:", error)
+      toast.error(error instanceof Error ? error.message : "Failed to subscribe to records")
+    } finally {
+      setIsSubscribing(false)
+    }
   }
 
   const isMemberUser = roleId?.trim() === "2"
@@ -87,8 +113,8 @@ export function DataTableToolbar<TData>({
       {/* Action visible only to Super Admin (not role 2) */}
       {!isMemberUser && (
         <Button
-          onClick={goToEditor}
-          disabled={selectedIds.length === 0}
+          onClick={handleDirectSubscribe}
+          disabled={selectedIds.length === 0 || isSubscribing}
           className="h-8"
           title={
             selectedIds.length === 0
@@ -96,7 +122,7 @@ export function DataTableToolbar<TData>({
               : "Add to My Subscription"
           }
         >
-          Add to My Subscription ({selectedIds.length})
+          {isSubscribing ? "Subscribing..." : `Add to My Subscription (${selectedIds.length})`}
         </Button>
       )}
       
