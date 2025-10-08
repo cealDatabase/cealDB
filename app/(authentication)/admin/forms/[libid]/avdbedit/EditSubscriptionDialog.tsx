@@ -63,7 +63,19 @@ export default function EditSubscriptionDialog({
   const [saving, setSaving] = useState(false);
   
   // Check if fields should be disabled (role 2 or 4, and editing a global record)
-  const shouldDisableFields = record.is_global && (roleId === "2" || roleId === "4" || roleId === "2; 4" || roleId === "4; 2");
+  // Role cookie is stored as JSON array, e.g., '["2"]' or '["1","4"]'
+  const getUserRoles = (): string[] => {
+    if (!roleId) return [];
+    try {
+      return JSON.parse(roleId);
+    } catch {
+      return [];
+    }
+  };
+  
+  const userRoles = getUserRoles();
+  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
+  const shouldDisableFields = record.is_global && isMemberRole;
   const isRestrictedEdit = shouldDisableFields;
 
   // Initialize form data with current record values

@@ -60,7 +60,19 @@ export default function EditEJournalSubscriptionDialog({
   
   // Check if fields should be disabled (role 2 or 4, and editing a global record)
   // For E-Journal: Only journals and dbs should be editable
-  const shouldDisableFields = record.is_global && (roleId === "2" || roleId === "4" || roleId === "2; 4" || roleId === "4; 2");
+  // Role cookie is stored as JSON array, e.g., '["2"]' or '["1","4"]'
+  const getUserRoles = (): string[] => {
+    if (!roleId) return [];
+    try {
+      return JSON.parse(roleId);
+    } catch {
+      return [];
+    }
+  };
+  
+  const userRoles = getUserRoles();
+  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
+  const shouldDisableFields = record.is_global && isMemberRole;
   const isRestrictedEdit = shouldDisableFields;
 
   const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
