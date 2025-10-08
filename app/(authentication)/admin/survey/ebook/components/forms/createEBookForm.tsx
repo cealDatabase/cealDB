@@ -130,10 +130,10 @@ export default function CreateEBookForm({
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             {/* Basic Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Basic Information
               </h3>
 
@@ -212,7 +212,7 @@ export default function CreateEBookForm({
 
             {/* Publication Details Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Publication Details
               </h3>
 
@@ -311,7 +311,7 @@ export default function CreateEBookForm({
 
             {/* Additional Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Additional Information
               </h3>
 
@@ -354,7 +354,7 @@ export default function CreateEBookForm({
 
             {/* Languages Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Languages *
               </h3>
 

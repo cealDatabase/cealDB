@@ -376,7 +376,7 @@ export default function EditEBookSubscriptionDialog({
             <Button
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               {saving ? "Saving..." : "Save Changes"}
             </Button>

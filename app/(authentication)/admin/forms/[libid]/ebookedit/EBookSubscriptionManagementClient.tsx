@@ -95,31 +95,25 @@ export default function EBookSubscriptionManagementClient({
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => handleEdit(record)}
               disabled={isRemoving}
+              title="Edit"
             >
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
+              <Edit className="h-4 w-4" />
             </Button>
             <Button
               variant="destructive"
-              size="sm"
+              size="icon"
               onClick={() => handleRemoveSubscription(record.id)}
               disabled={isRemoving}
+              title="Remove"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Remove
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         );
       },
-    },
-    {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
-      enableHiding: true,
     },
     {
       accessorKey: "cjk_title",
@@ -140,6 +134,27 @@ export default function EBookSubscriptionManagementClient({
       accessorKey: "subtitle",
       header: "Subtitle",
       cell: ({ row }: any) => <div className="max-w-[150px] truncate">{row.getValue("subtitle")}</div>,
+    },
+    {
+      accessorKey: "sub_series_number",
+      header: "Sub Series Number",
+      cell: ({ row }: any) => <div className="max-w-[120px] truncate">{row.getValue("sub_series_number")}</div>,
+    },
+    {
+      accessorKey: "language",
+      header: "Language",
+      cell: ({ row }: any) => {
+        const langs = row.getValue("language") as string[];
+        return (
+          <div className="flex gap-1 flex-wrap">
+            {langs.map((lang, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
+                {lang === "NON" ? "NON-CJK" : lang}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "titles",
@@ -216,16 +231,16 @@ export default function EBookSubscriptionManagementClient({
     return (
       <div className="space-y-4">
         {/* Header with Add More Subscriptions button */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200 shadow-sm">
+        <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 shadow-sm">
           <div>
-            <h3 className="text-xl font-semibold text-purple-900">Current Subscriptions</h3>
-            <p className="text-sm text-purple-700 mt-1">
+            <h3 className="text-xl font-semibold text-blue-900">Current Subscriptions</h3>
+            <p className="text-sm text-blue-700 mt-1">
               {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
             </p>
           </div>
           <Button
             size="lg"
-            className="bg-purple-600 hover:bg-purple-700 text-white shadow-md"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/ebook/${year}`)}
           >
             ➕ Add More Subscriptions

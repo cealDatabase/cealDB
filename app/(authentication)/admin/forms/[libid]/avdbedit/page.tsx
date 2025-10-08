@@ -62,29 +62,8 @@ export default async function Page({ params, searchParams }: PageProps) {
                 Library ID Missing
               </h2>
               <p className='text-muted-foreground text-sm mt-2'>
-                Your library ID cookie is missing or invalid. This is required to manage subscriptions.
+                Please sign in first. This is required to manage subscriptions.
               </p>
-              <div className="bg-gray-100 p-4 rounded mt-4">
-                <p className="text-sm font-medium mb-2">Debug Information:</p>
-                <p className="text-xs">URL libid: {libidStr}</p>
-                <p className="text-xs">Cookie libid: {libidFromCookie || "Not found"}</p>
-                <p className="text-xs">Available cookies: {allCookies.length > 0 ? allCookies.map(c => c.name).join(", ") : "None"}</p>
-              </div>
-              <div className="mt-4 space-y-2">
-                <p className="text-sm font-medium">Quick Fixes:</p>
-                <a 
-                  href="/debug-cookies"
-                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm mr-2"
-                >
-                  Set Cookies
-                </a>
-                <a 
-                  href={`/admin/forms/56/avdbedit${sp.ids ? `?ids=${sp.ids}&year=${year}` : ''}`}
-                  className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
-                >
-                  Try with Library 56
-                </a>
-              </div>
             </div>
           </Container>
         </main>

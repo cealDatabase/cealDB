@@ -177,6 +177,36 @@ const ExpandableSubscribers = ({
   );
 };
 
+// Notes column component with 3-line clamp
+const ExpandableNotes = ({ content }: { content: string | null }) => {
+  if (!content) {
+    return <span></span>
+  }
+
+  const needsPopover = content.length > 60; // Approximate check for 3 lines
+
+  if (!needsPopover) {
+    return <span className="font-medium">{content}</span>
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
+          <div className="line-clamp-3">
+            {content}
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 max-h-[400px] overflow-y-scroll" side="right">
+        <div className="text-sm">
+          <p className="font-medium whitespace-pre-wrap">{content}</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+};
+
 /* ----------------------- Columns ----------------------- */
 
 export function getColumns(
@@ -406,12 +436,11 @@ export function getColumns(
         <DataTableColumnHeader column={column} title='Notes' />
       ),
       cell: ({ row }) => (
-        <ExpandableText content={row.getValue("notes") as string | null} />
+        <ExpandableNotes content={row.getValue("notes")} />
       ),
     },
 
-   
-    ...(roleIdPassIn?.trim() !== "2"
+    ...(!(userRoles.length === 1 && userRoles[0] === "2")
       ? ([
           {
             accessorKey: "subscribers",
