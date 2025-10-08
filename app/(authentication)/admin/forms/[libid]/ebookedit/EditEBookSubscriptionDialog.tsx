@@ -258,7 +258,9 @@ export default function EditEBookSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Description</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
@@ -319,7 +321,9 @@ export default function EditEBookSubscriptionDialog({
           <div>
             <label className="text-sm font-medium">Notes</label>
             <textarea
-              className="w-full border rounded px-2 py-1 min-h-[80px] resize-y"
+              className={`w-full border rounded px-2 py-1 min-h-[80px] resize-y ${
+                isRestrictedEdit ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+              }`}
               value={formData.notes}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })

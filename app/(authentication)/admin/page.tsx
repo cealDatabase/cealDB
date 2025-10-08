@@ -1,26 +1,19 @@
 import { cookies } from "next/headers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   getUserByUserName,
   getRoleById,
   getLibraryById,
 } from "@/data/fetchPrisma";
-import { SingleUserType } from "@/types/types";
 import Link from "next/link";
-import { LocalDateTime } from "@/components/LocalDateTime";
 import {
-  User,
-  Calendar,
-  Mail,
   BookOpen,
-  Building,
   FileText,
-  Settings,
 } from "lucide-react";
 
 import { actions } from "@/constant/form";
+import { UserProfile } from "@/components/UserProfile";
 
 
 async function getUserDetailByEmail({
@@ -98,95 +91,11 @@ async function getUserDetailByEmail({
   const lastLogin = await findLastLogin();
 
   return {
-    user: singleUser as unknown as SingleUserType,
+    user: singleUser as any,
     roles: Array.isArray(roleData) ? roleData : [],
     library: libraryData,
     lastLogin: lastLogin || undefined
   };
-}
-
-function UserProfile({
-  user,
-  roles,
-  library,
-  lastLogin,
-}: {
-  user: SingleUserType;
-  roles: string[];
-  library: { id: number; name: string } | null;
-  lastLogin?: string;
-}) {
-  if (!user) {
-    return null;
-  }
-
-  return (
-    <Card>
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <CardTitle className="text-xl">Hello {user.firstname}</CardTitle>
-            <CardDescription>Welcome back to your dashboard</CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-3">
-          {lastLogin && (
-            <div className="flex items-center gap-3 text-sm">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Last Login:</span>
-              <span className="font-medium">
-                <LocalDateTime dateString={lastLogin} />
-              </span>
-            </div>
-          )}
-
-          {(user.firstname || user.lastname) && (
-            <div className="flex items-center gap-3 text-sm">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Name:</span>
-              <span className="font-medium">{user.firstname} {user.lastname}</span>
-            </div>
-          )}
-
-          {user.username && (
-            <div className="flex items-center gap-3 text-sm">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Email:</span>
-              <Link href={`mailto:${user.username}`} className="font-medium">
-                {user.username}
-              </Link>
-            </div>
-          )}
-
-          {roles && roles.length > 0 && (
-            <div className="flex items-start gap-3 text-sm">
-              <Settings className="w-4 h-4 text-muted-foreground mt-0.5" />
-              <span className="text-muted-foreground">Role:</span>
-              <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-1">
-                {roles.map((role, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {role}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {library && (
-            <div className="flex items-center gap-3 text-sm">
-              <Building className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Institution:</span>
-              <Link href={`/libraries/${library.id}`} className="font-medium">
-                {library.name}
-              </Link>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
 }
 
 async function UserLoggedInPage() {
@@ -212,6 +121,11 @@ async function UserLoggedInPage() {
     userRoleIds.length > 1 || !userRoleIds.includes("2") || userRoleIds.includes("1")
   );
 
+  // Check if user has ONLY role ID 2 (regular member institution user)
+  const isRegularUserOnly = Array.isArray(userRoleIds) && 
+    userRoleIds.length === 1 && 
+    userRoleIds.includes("2");
+
   if (!userData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -227,9 +141,9 @@ async function UserLoggedInPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className={`grid grid-cols-1 gap-8 ${isRegularUserOnly ? 'max-w-2xl mx-auto' : 'lg:grid-cols-3'}`}>
           {/* User Profile Section - Left Column */}
-          <div className="lg:col-span-1">
+          <div className={isRegularUserOnly ? '' : 'lg:col-span-1'}>
             <UserProfile
               user={userData.user}
               roles={userData.roles || []}
@@ -239,7 +153,7 @@ async function UserLoggedInPage() {
           </div>
 
           {/* Main Content Area - Right Columns */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className={`space-y-8 ${isRegularUserOnly ? '' : 'lg:col-span-2'}`}>
             {/* Forms Management Section */}
             <Card className="border-2 border-primary/20">
               <CardHeader>
