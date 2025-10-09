@@ -53,6 +53,7 @@ export default function EditEjournalModal({
     subtitle: rowData.subtitle || "",
     description: rowData.description || "",
     publisher: rowData.publisher || "",
+    vendor: rowData.vendor || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
     is_global: isAutoGlobal ? true : !!rowData.is_global,
@@ -95,6 +96,7 @@ export default function EditEjournalModal({
           subtitle: formData.subtitle,
           description: formData.description,
           publisher: formData.publisher,
+          vendor: formData.vendor,
           notes: formData.notes,
           data_source: formData.data_source,
           is_global: !!formData.is_global,
@@ -132,6 +134,7 @@ export default function EditEjournalModal({
             ["CJK Title", "cjk_title"],
             ["Romanized Title", "romanized_title"],
             ["Publisher", "publisher"],
+            ["Vendor", "vendor"],
             ["Data Source", "data_source"],
             ["Series", "series"],
           ].map(([label, key]) => (

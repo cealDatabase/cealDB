@@ -6,7 +6,6 @@ import db from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Subscribing to E-Journal records with body:", body);
 
     let { libid, year, recordIds } = body;
 
