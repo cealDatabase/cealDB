@@ -200,9 +200,6 @@ export const getYearsByLibId = async (id: number) => {
 // Survey: Get AV List.
 export const getListAVCountsByYear = async (year: number) => {
   try {
-    // Add logging to verify fresh data
-    console.log(`🔄 Fetching AV counts for year ${year} at ${new Date().toISOString()}`);
-    
     const listAVCountsArray = await db.list_AV_Counts.findMany({
       where: {
         year,
