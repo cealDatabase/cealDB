@@ -63,14 +63,13 @@ export default async function EJournalListPage(
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold tracking-tight text-start">
-                            E-Journal Database by Subscription - {params.year}
+                            E-Journal Database - {params.year}
                         </h1>
                         <p className="text-muted-foreground text-sm">
-                            Please check the boxes next to each subscription your library has,
-                            for each language Chinese, Japanese, Korean, and Non-CJK. Data in
-                            this list is linked to Form 4: Holdings of Other Materials and
-                            Form 9: Electronic Resources. If your institution holds a customized collection or a subset of certain
-                            resources, edit the relevant data after clicking &quot;Add to My Subscription&quot;.
+                            Please check the boxes for each entry your institution holds under each language category Chinese, Japanese, Korean, and Non-CJK.
+                            Data in this list are linked to “My Forms.”
+                            If your institution holds a customized collection or a subset of certain resources,
+                            edit the relevant data after clicking &quot;Add to My Subscription&quot;.
                         </p>
                     </div>
                     <SelectYear yearCurrent={params.year} />
