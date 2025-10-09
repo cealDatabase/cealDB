@@ -100,11 +100,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     enableRowSelection: true,
     enableGlobalFilter: true,
     globalFilterFn: (row, columnId, value) => {
-      // Search across title and cjk_title columns (and subtitle for more comprehensive search) 
+      // Search across title, cjk_title, romanized_title, subtitle, and publisher columns
       const searchValue = String(value || "").toLowerCase();
       
       // Try to get values from common searchable columns
-      const searchableColumns = ["title", "cjk_title", "subtitle", "publisher"];
+      const searchableColumns = ["title", "cjk_title", "romanized_title", "subtitle", "publisher"];
       
       return searchableColumns.some(column => {
         try {
