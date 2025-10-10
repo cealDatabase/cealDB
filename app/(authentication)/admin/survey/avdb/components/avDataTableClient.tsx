@@ -73,6 +73,7 @@ export default function AVDataTableClient({
       initialGlobalFilter={initialSearch}
       initialPaginationState={initialPagination}
       highlightRowId={highlightId}
+      tableKey={`avdb-survey-${year}`}
     />
   );
 }

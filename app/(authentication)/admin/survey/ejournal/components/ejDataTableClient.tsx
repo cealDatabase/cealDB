@@ -69,6 +69,7 @@ export default function EJournalDataTableClient({
       initialGlobalFilter={initialSearch}
       initialPaginationState={initialPagination}
       highlightRowId={highlightId}
+      tableKey={`ejournal-survey-${year}`}
     />
   );
 }

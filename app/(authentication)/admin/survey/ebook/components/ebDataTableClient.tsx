@@ -69,6 +69,7 @@ export default function EBookDataTableClient({
       initialGlobalFilter={initialSearch}
       initialPaginationState={initialPagination}
       highlightRowId={highlightId}
+      tableKey={`ebook-survey-${year}`}
     />
   );
 }

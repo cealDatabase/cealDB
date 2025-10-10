@@ -53,6 +53,10 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * ID of row to highlight (e.g., newly created record)
    */
   highlightRowId?: number;
+  /**
+   * Unique key for this table (to isolate sessionStorage between different tables)
+   */
+  tableKey?: string;
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
@@ -63,6 +67,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   initialGlobalFilter,
   initialPaginationState,
   highlightRowId,
+  tableKey = 'default',
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -71,7 +76,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   // Restore sorting state from sessionStorage
   const [sorting, setSorting] = React.useState<SortingState>(() => {
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('table-sorting');
+      const saved = sessionStorage.getItem(`table-sorting-${tableKey}`);
       if (saved) {
         try {
           return JSON.parse(saved);
@@ -92,7 +97,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     
     // Otherwise, restore from sessionStorage
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('table-pagination');
+      const saved = sessionStorage.getItem(`table-pagination-${tableKey}`);
       if (saved) {
         try {
           return JSON.parse(saved);
@@ -109,16 +114,16 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   // Save sorting state to sessionStorage whenever it changes
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('table-sorting', JSON.stringify(sorting));
+      sessionStorage.setItem(`table-sorting-${tableKey}`, JSON.stringify(sorting));
     }
-  }, [sorting]);
+  }, [sorting, tableKey]);
 
   // Save pagination state to sessionStorage whenever it changes
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('table-pagination', JSON.stringify(pagination));
+      sessionStorage.setItem(`table-pagination-${tableKey}`, JSON.stringify(pagination));
     }
-  }, [pagination]);
+  }, [pagination, tableKey]);
 
   const table = useReactTable({
     data,
