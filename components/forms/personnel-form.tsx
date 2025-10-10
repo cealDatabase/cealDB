@@ -51,6 +51,7 @@ export default function PersonnelForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const params = useParams()
 
   const form = useForm<FormData>({
@@ -75,32 +76,18 @@ export default function PersonnelForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/personnel/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/personnel/status')
 
-  // Load existing data
+  // Pre-populate form with existing data
   useEffect(() => {
-    const loadExistingData = async () => {
-      try {
-        const response = await fetch(`/api/personnel/status/${params.libid}`)
-        if (response.ok) {
-          const data = await response.json()
-          if (data.existingData) {
-            Object.keys(data.existingData).forEach(key => {
-              if (key !== 'entryid' && key !== 'libid' && key !== 'year') {
-                form.setValue(key as keyof FormData, data.existingData[key])
-              }
-            })
-          }
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
         }
-      } catch (error) {
-        console.log('No existing data found:', error)
-      }
+      })
     }
-
-    if (params.libid) {
-      loadExistingData()
-    }
-  }, [params.libid, form])
+  }, [existingData, form])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -161,6 +148,46 @@ export default function PersonnelForm() {
       setErrorMessage(error.message || 'An error occurred while submitting the form');
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        psfprofessional_subtotal: professionalSubtotal,
+        psfsupport_staff_subtotal: supportStaffSubtotal,
+        psfstudent_assistants_subtotal: studentAssistantsSubtotal,
+        psftotal: totalPersonnel,
+        libid: Number(params.libid),
+      }
+
+      const response = await fetch('/api/personnel/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -348,9 +375,11 @@ export default function PersonnelForm() {
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
         submitButtonText="Submit Personnel Support Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { LoaderCircle } from "lucide-react"
+import { LoaderCircle, Save } from "lucide-react"
 import { StatusMessage } from "../StatusMessage"
 
 interface FormSubmitSectionProps {
@@ -8,6 +8,8 @@ interface FormSubmitSectionProps {
   errorMessage: string | null
   submitButtonText: string
   className?: string
+  onSaveDraft?: () => Promise<void>
+  isSavingDraft?: boolean
 }
 
 export function FormSubmitSection({
@@ -15,7 +17,9 @@ export function FormSubmitSection({
   successMessage,
   errorMessage,
   submitButtonText,
-  className = "space-y-4"
+  className = "space-y-4",
+  onSaveDraft,
+  isSavingDraft = false
 }: FormSubmitSectionProps) {
   return (
     <div className={className}>
@@ -31,10 +35,32 @@ export function FormSubmitSection({
         show={!!errorMessage}
       />
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end gap-3 mb-4">
+        {onSaveDraft && (
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={onSaveDraft}
+            disabled={isSubmitting || isSavingDraft}
+            className="min-w-[150px]"
+          >
+            {isSavingDraft ? (
+              <>
+                <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                Saving Draft...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Draft
+              </>
+            )}
+          </Button>
+        )}
+        
         <Button 
           type="submit" 
-          disabled={isSubmitting}
+          disabled={isSubmitting || isSavingDraft}
           className="min-w-[200px]"
         >
           {isSubmitting ? (

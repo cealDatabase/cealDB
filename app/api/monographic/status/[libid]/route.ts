@@ -33,9 +33,17 @@ export async function GET(
         exists: false,
         is_open_for_editing: false,
         is_active: false,
+        data: null,
         message: "No library_year record exists for this library and year. Please contact the administrator."
       });
     }
+
+    // Get existing monographic data
+    const existingData = await db.monographic_Acquisitions.findFirst({
+      where: {
+        libraryyear: libraryYear.id,
+      },
+    });
 
     return NextResponse.json({
       exists: true,
@@ -43,6 +51,7 @@ export async function GET(
       is_active: libraryYear.is_active,
       year: libraryYear.year,
       library_id: libraryYear.library,
+      data: existingData,
       message: libraryYear.is_open_for_editing 
         ? "Form is available for editing" 
         : "Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help."
