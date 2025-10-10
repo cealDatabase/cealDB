@@ -45,10 +45,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
-    // Fetch the original record to check if it's global and which year it belongs to
+    // Fetch the original record to check if it's global
     const originalRecord = await db.list_AV.findUnique({
       where: { id: avId },
-      select: { is_global: true, libraryyear: true },
+      select: { is_global: true },
     });
 
     if (!originalRecord) {
@@ -81,21 +81,11 @@ export async function POST(req: Request) {
     let resultRecord: any;
     let isNewRecord = false;
 
-    // KEY LOGIC: 
-    // 1. If the record is global, create a NEW library-specific record
-    // 2. If the record belongs to a different year, create a year-specific copy
-    // 3. Otherwise, update in place
-    const shouldCreateCopy = originalRecord.is_global || 
-                            (originalRecord.libraryyear !== null && 
-                             originalRecord.libraryyear !== libraryYearId);
+    // KEY LOGIC: If the record is global, create a NEW library-specific record
+    if (originalRecord.is_global) {
+      console.log("Original record is global - creating library-specific copy");
 
-    if (shouldCreateCopy) {
-      const reason = originalRecord.is_global 
-        ? "Original record is global - creating library-specific copy"
-        : "Record belongs to different year - creating year-specific copy";
-      console.log(reason);
-
-      // Create a NEW library-specific or year-specific record
+      // Create a NEW library-specific record
       const newAV = await db.$transaction(async (tx) => {
         // 1) Create new List_AV record
         const av = await tx.list_AV.create({
@@ -143,20 +133,11 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Handle subscription logic
-        if (!originalRecord.is_global) {
-          // This is a year-specific copy (not global)
-          // Remove old subscription to the original year's record
-          await tx.libraryYear_ListAV.deleteMany({
-            where: {
-              libraryyear_id: libraryYearId,
-              listav_id: avId,
-            },
-          });
-        }
-        // If global, keep subscription to global record (don't delete it!)
+        // 4) Keep subscription to global record (don't delete it!)
+        // The library should remain subscribed to the global record
+        // This maintains the relationship while having custom counts
 
-        // 5) Add new subscription (library/year-specific record)
+        // 5) Add new subscription (library-specific record)
         await tx.libraryYear_ListAV.create({
           data: {
             libraryyear_id: libraryYearId,
@@ -259,21 +240,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Determine the appropriate message
-    let message = "Updated record successfully";
-    if (isNewRecord) {
-      if (originalRecord.is_global) {
-        message = "Created library-specific copy successfully";
-      } else {
-        message = "Created year-specific copy successfully";
-      }
-    }
-
     return NextResponse.json({
       success: true,
       id: resultRecord.id,
       isNewRecord,
-      message,
+      message: isNewRecord
+        ? "Created library-specific copy successfully"
+        : "Updated record successfully",
     });
   } catch (error: any) {
     console.error("API error (edit AV):", error);
