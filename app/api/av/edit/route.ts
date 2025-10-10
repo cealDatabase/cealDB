@@ -133,13 +133,9 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Remove old subscription (global record)
-        await tx.libraryYear_ListAV.deleteMany({
-          where: {
-            libraryyear_id: libraryYearId,
-            listav_id: avId,
-          },
-        });
+        // 4) Keep subscription to global record (don't delete it!)
+        // The library should remain subscribed to the global record
+        // This maintains the relationship while having custom counts
 
         // 5) Add new subscription (library-specific record)
         await tx.libraryYear_ListAV.create({
