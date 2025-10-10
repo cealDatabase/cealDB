@@ -83,6 +83,27 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     return [];
   });
   
+  // Restore pagination state from sessionStorage or use initialPaginationState
+  const [pagination, setPagination] = React.useState(() => {
+    // If initialPaginationState is provided (new record), use it
+    if (initialPaginationState) {
+      return initialPaginationState;
+    }
+    
+    // Otherwise, restore from sessionStorage
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('table-pagination');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return { pageIndex: 0, pageSize: 10 };
+        }
+      }
+    }
+    return { pageIndex: 0, pageSize: 10 };
+  });
+  
   const [globalFilter, setGlobalFilter] = React.useState<string>(initialGlobalFilter || "");
 
   // Save sorting state to sessionStorage whenever it changes
@@ -91,6 +112,13 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       sessionStorage.setItem('table-sorting', JSON.stringify(sorting));
     }
   }, [sorting]);
+
+  // Save pagination state to sessionStorage whenever it changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('table-pagination', JSON.stringify(pagination));
+    }
+  }, [pagination]);
 
   const table = useReactTable({
     data,
@@ -101,9 +129,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       rowSelection,
       columnFilters,
       globalFilter,
-    },
-    initialState: {
-      pagination: initialPaginationState || { pageIndex: 0, pageSize: 10 },
+      pagination,
     },
     enableRowSelection: true,
     enableGlobalFilter: true,
@@ -129,6 +155,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
