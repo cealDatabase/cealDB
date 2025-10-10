@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
@@ -91,10 +91,11 @@ export default function OtherHoldingsForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/otherHoldings/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/otherHoldings/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -143,6 +144,17 @@ export default function OtherHoldingsForm() {
       ohnotes: "",
     },
   })
+
+  // Pre-populate form with existing data
+  useEffect(() => {
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
+        }
+      })
+    }
+  }, [existingData, form])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -321,7 +333,6 @@ export default function OtherHoldingsForm() {
       const result = await response.json()
       toast.success('Other holdings record created successfully!')
       setSuccessMessage(result.message || 'Other holdings record submitted successfully!')
-      form.reset()
 
     } catch (error: any) {
       console.error('Form submission error:', error)
@@ -330,6 +341,53 @@ export default function OtherHoldingsForm() {
       toast.error(message)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        ohmicroform_subtotal: microformSubtotal,
+        ohcarto_graphic_subtotal: graphicSubtotal,
+        ohaudio_subtotal: audioSubtotal,
+        ohfilm_video_subtotal: videoSubtotal,
+        ohdvd_subtotal: dvdSubtotal,
+        ohcustom1subtotal: customSubtotal,
+        ohonlinemapsubtotal: onlineMapSubtotal,
+        ohonlineimagesubtotal: onlineImageSubtotal,
+        ohstreamingsubtotal: streamingAudioSubtotal,
+        ohstreamingvideosubtotal: streamingVideoSubtotal,
+        ohgrandtotal: grandTotal,
+        libid: Number(params.libid),
+      }
+
+      const response = await fetch('/api/otherHoldings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -611,9 +669,11 @@ export default function OtherHoldingsForm() {
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Other Holdings Data"
+        submitButtonText="Save Other Holdings Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )

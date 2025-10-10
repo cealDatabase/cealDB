@@ -47,10 +47,12 @@ export default function VolumeHoldingsForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [ebookVolumesTotal, setEbookVolumesTotal] = useState(0)
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/volumeHoldings/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/volumeHoldings/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -94,7 +96,19 @@ export default function VolumeHoldingsForm() {
     watchedValues.vhwithdrawn_korean +
     watchedValues.vhwithdrawn_noncjk
 
-  const grandTotal = previousYearSubtotal + addedGrossSubtotal - withdrawnSubtotal
+  const physicalGrandTotal = previousYearSubtotal + addedGrossSubtotal - withdrawnSubtotal
+  const overallGrandTotal = physicalGrandTotal + ebookVolumesTotal
+
+  // Pre-populate form with existing data
+  useEffect(() => {
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
+        }
+      })
+    }
+  }, [existingData, form])
 
   // Load previous year data on component mount
   useEffect(() => {
@@ -147,6 +161,34 @@ export default function VolumeHoldingsForm() {
     }
   }, [params.libid, form]);
 
+  // Load Electronic Books Purchased Volume Total from subscriptions
+  useEffect(() => {
+    const loadEBookVolumes = async () => {
+      try {
+        const libraryId = Number(params.libid);
+        const currentYear = new Date().getFullYear();
+
+        const response = await fetch(`/api/electronic-books/import-subscription-volumes/${libraryId}/${currentYear}`);
+        if (response.ok) {
+          const data = await response.json();
+          const total = data.total || 0;
+          setEbookVolumesTotal(total);
+          console.log('E-Book volumes total loaded:', total);
+        } else {
+          console.log('No E-Book subscription data found');
+          setEbookVolumesTotal(0);
+        }
+      } catch (error) {
+        console.log('Error loading E-Book volumes:', error);
+        setEbookVolumesTotal(0);
+      }
+    };
+
+    if (params.libid) {
+      loadEBookVolumes();
+    }
+  }, [params.libid]);
+
   async function onSubmit(values: FormData) {
     try {
       setIsSubmitting(true);
@@ -159,7 +201,7 @@ export default function VolumeHoldingsForm() {
         vhprevious_year_subtotal: previousYearSubtotal,
         vhadded_gross_subtotal: addedGrossSubtotal,
         vhwithdrawn_subtotal: withdrawnSubtotal,
-        vhgrandtotal: grandTotal,
+        vhgrandtotal: physicalGrandTotal,
         libid: Number(params.libid), // Get library ID from URL params
       }
 
@@ -182,9 +224,6 @@ export default function VolumeHoldingsForm() {
       // Set success message for display near submit button
       setSuccessMessage(result.message || 'Volume holdings record submitted successfully!');
 
-      // Optional: Reset form or redirect
-      form.reset()
-
     } catch (error: any) {
       console.error('Form submission error:', error)
       toast.error(error.message || 'Something went wrong')
@@ -192,6 +231,46 @@ export default function VolumeHoldingsForm() {
       setErrorMessage(error.message || 'An error occurred while submitting the form');
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        vhprevious_year_subtotal: previousYearSubtotal,
+        vhadded_gross_subtotal: addedGrossSubtotal,
+        vhwithdrawn_subtotal: withdrawnSubtotal,
+        vhgrandtotal: physicalGrandTotal,
+        libid: Number(params.libid),
+      }
+
+      const response = await fetch('/api/volumeHoldings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -272,7 +351,7 @@ export default function VolumeHoldingsForm() {
       >
         <SubtotalDisplay
           label="16. Grand Total (Physical Vols)"
-          value={grandTotal}
+          value={physicalGrandTotal}
           formula="05 + 10 - 15"
           className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
@@ -294,33 +373,33 @@ export default function VolumeHoldingsForm() {
         />
       </FormSection>
 
-      {/* TODO: need to add db query to calculate Electronic Books Purchased Volume Total
-          Then added value from 16 to calculate the WHOLE GRAND TOTAL
-          */}
-      {/* Total Electronic Books Purchased Volume Holdings */}
+      {/* Grand Total Volume Holdings */}
       <FormSection
         title="Grand Total Volume Holdings"
       >
         <SubtotalDisplay
           label="Electronic Books Purchased Volume Total"
-          value={0}
+          value={ebookVolumesTotal}
+          formula="Imported from E-Book subscriptions"
           className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />
         <SubtotalDisplay
           label="Grand Total Volume Holdings"
-          value={0}
-          formula="Automatically calculated; including purchased E-Books"
-          className="bg-blue-50 p-4 rounded-lg"
-          valueClassName="bg-blue-200 px-3 py-1 rounded"
+          value={overallGrandTotal}
+          formula={`Physical (${physicalGrandTotal}) + E-Books (${ebookVolumesTotal})`}
+          className="bg-green-50 p-4 rounded-lg border-2 border-green-300"
+          valueClassName="bg-green-300 px-3 py-1 rounded font-bold"
         />
       </FormSection>
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
         submitButtonText="Submit Volume Holdings Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )
