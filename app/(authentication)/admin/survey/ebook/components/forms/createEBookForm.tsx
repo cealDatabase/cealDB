@@ -106,7 +106,10 @@ export default function CreateEBookForm({
 
       if (response.ok) {
         toast.success("E-Book entry created successfully!");
-        router.push(`/admin/survey/ebook/${selectedYear}`);
+        
+        // Redirect with search parameter to filter to the new record
+        const searchTitle = encodeURIComponent(data.newEBook?.title || values.title);
+        router.push(`/admin/survey/ebook/${selectedYear}?search=${searchTitle}`);
       } else {
         toast.error(`Failed to create E-Book entry: ${data.detail || data.error}`);
       }

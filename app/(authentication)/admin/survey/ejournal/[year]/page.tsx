@@ -11,7 +11,8 @@ async function EJournalSinglePage(
     yearPassIn: number,
     roleIdPassIn: string | undefined,
     libid?: number,
-    userRoles?: string[] | null
+    userRoles?: string[] | null,
+    initialSearch?: string
 ) {
     const tasks = (await GetEJournalList(yearPassIn)).sort((a, b) => a.id - b.id);
     return (
@@ -21,6 +22,7 @@ async function EJournalSinglePage(
             roleIdPassIn={roleIdPassIn}
             libid={libid}
             userRoles={userRoles}
+            initialSearch={initialSearch}
         />
     );
 }
@@ -28,7 +30,7 @@ async function EJournalSinglePage(
 export default async function EJournalListPage(
     props: {
         params: Promise<{ year: string }>;
-        searchParams?: Promise<{ libid?: string }>;
+        searchParams?: Promise<{ libid?: string; search?: string }>;
     }
 ) {
     const params = await props.params;
@@ -44,6 +46,9 @@ export default async function EJournalListPage(
         : undefined;
 
     const libid = libidFromQuery ?? libidFromCookie;
+    
+    // Get search parameter from URL (for highlighting newly created/edited records)
+    const initialSearch = sp.search ? decodeURIComponent(sp.search) : undefined;
 
     // Parse user roles for permission checking
     let userRoles: string[] | null = null;
@@ -76,7 +81,7 @@ export default async function EJournalListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {await EJournalSinglePage(Number(params.year), roleId, libid, userRoles)}
+                        {await EJournalSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch)}
                     </Suspense>
                 </div>
             </Container>

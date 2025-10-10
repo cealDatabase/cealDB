@@ -107,7 +107,10 @@ export default function CreateEJournalForm({
 
       if (response.ok) {
         toast.success("E-Journal entry created successfully!");
-        router.push(`/admin/survey/ejournal/${selectedYear}`);
+        
+        // Redirect with search parameter to filter to the new record
+        const searchTitle = encodeURIComponent(data.newEJournal?.title || values.title);
+        router.push(`/admin/survey/ejournal/${selectedYear}?search=${searchTitle}`);
       } else {
         toast.error(`Failed to create E-Journal entry: ${data.detail || data.error}`);
       }

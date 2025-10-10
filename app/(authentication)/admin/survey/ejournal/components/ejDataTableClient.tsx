@@ -11,12 +11,14 @@ export default function EJournalDataTableClient({
   roleIdPassIn,
   libid,
   userRoles,
+  initialSearch,
 }: {
   data: listEJournal[];
   year: number;
   roleIdPassIn: string | undefined;
   libid?: number;
   userRoles?: string[] | null;
+  initialSearch?: string;
 }) {
   const columns = getColumns(year, roleIdPassIn);
 
@@ -24,5 +26,5 @@ export default function EJournalDataTableClient({
   const ToolbarWithLib = (props: any) => (
     <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
-  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} />;
+  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} initialGlobalFilter={initialSearch} />;
 }

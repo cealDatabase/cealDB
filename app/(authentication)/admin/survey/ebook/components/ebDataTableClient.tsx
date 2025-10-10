@@ -11,12 +11,14 @@ export default function EBookDataTableClient({
   roleIdPassIn,
   libid,
   userRoles,
+  initialSearch,
 }: {
   data: listEBook[];
   year: number;
   roleIdPassIn: string | undefined;
   userRoles?: string[] | null;
   libid?: number;
+  initialSearch?: string;
 }) {
   const columns = getColumns(year, roleIdPassIn);
 
@@ -25,5 +27,5 @@ export default function EBookDataTableClient({
     <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
 
-  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} />;
+  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} initialGlobalFilter={initialSearch} />;
 }
