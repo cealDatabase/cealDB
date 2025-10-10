@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { filterAVSubscriptions } from "@/lib/subscription-filter";
 
 export async function GET(
   req: Request,
@@ -62,6 +63,9 @@ export async function GET(
     // Process only library-specific subscriptions (no global items unless subscribed)
     const allAVEntries = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
 
+    // Filter to prefer library-specific records over global (prevents duplicate counting)
+    const filteredAVEntries = filterAVSubscriptions(allAVEntries);
+
     // Group by type and language
     const countsByType = {
       "online map": { chinese: 0, japanese: 0, korean: 0, noncjk: 0 },
@@ -70,8 +74,8 @@ export async function GET(
       "streaming film/video": { chinese: 0, japanese: 0, korean: 0, noncjk: 0 },
     };
 
-    // Process each AV entry
-    for (const av of allAVEntries) {
+    // Process each AV entry (using filtered list to avoid duplicates)
+    for (const av of filteredAVEntries) {
       if (!av || !av.type) continue;
 
       const type = av.type.toLowerCase();

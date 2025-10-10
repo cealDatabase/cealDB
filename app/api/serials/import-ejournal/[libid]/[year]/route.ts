@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { filterEJournalSubscriptions } from "@/lib/subscription-filter";
 
 export async function GET(
   req: Request,
@@ -62,6 +63,9 @@ export async function GET(
     // Process only library-specific subscriptions (no global items unless subscribed)
     const allEJournalEntries = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
 
+    // Filter to prefer library-specific records over global (prevents duplicate counting)
+    const filteredEJournalEntries = filterEJournalSubscriptions(allEJournalEntries);
+
     // Group by language for purchased electronic serials
     const countsByLanguage = {
       chinese: 0,
@@ -70,8 +74,8 @@ export async function GET(
       noncjk: 0,
     };
 
-    // Process each E-Journal entry
-    for (const ejournal of allEJournalEntries) {
+    // Process each E-Journal entry (using filtered list to avoid duplicates)
+    for (const ejournal of filteredEJournalEntries) {
       if (!ejournal) continue;
 
       // Get counts for this year (journals count)
