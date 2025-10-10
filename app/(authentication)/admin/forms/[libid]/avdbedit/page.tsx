@@ -149,7 +149,32 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     const subscribedAVs = subscriptions.map((s) => s.List_AV);
     
-    if (subscribedAVs.length === 0) {
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + type) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedAVs[0][]>();
+    
+    subscribedAVs.forEach((av) => {
+      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(av);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredAVs = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(av => !av.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered AVs
+    const filteredAVIds = new Set(filteredAVs.map(av => av.id));
+    const filteredSubscriptions = subscriptions.filter(sub => 
+      filteredAVIds.has(sub.List_AV.id)
+    );
+    
+    if (filteredAVs.length === 0) {
       return (
         <main>
           <Container className='bg-white pb-12 max-w-full'>
@@ -209,13 +234,13 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - AV Subscription Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {subscribedAVs.length} subscription{subscribedAVs.length === 1 ? '' : 's'}
+                Year: {year} • {filteredAVs.length} subscription{filteredAVs.length === 1 ? '' : 's'}
               </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
               <SubscriptionManagementClient 
-                subscriptions={subscriptions}
+                subscriptions={filteredSubscriptions}
                 libid={libid}
                 year={year}
                 mode="view"

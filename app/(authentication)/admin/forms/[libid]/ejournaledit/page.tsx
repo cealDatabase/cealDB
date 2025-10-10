@@ -203,7 +203,32 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
     
-    if (subscribedEJournals.length === 0) {
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + publisher) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedEJournals[0][]>();
+    
+    subscribedEJournals.forEach((ejournal) => {
+      const identifier = `${ejournal.title?.toLowerCase() || ''}_${ejournal.publisher?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(ejournal);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredEJournals = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(ejournal => !ejournal.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered EJournals
+    const filteredEJournalIds = new Set(filteredEJournals.map(ejournal => ejournal.id));
+    const filteredSubscriptions = subscriptions.filter(sub => 
+      filteredEJournalIds.has(sub.List_EJournal.id)
+    );
+    
+    if (filteredEJournals.length === 0) {
       return (
         <main>
           <Container className='bg-white pb-12 max-w-full'>
@@ -262,13 +287,13 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - E-Journal Subscription Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {subscribedEJournals.length} subscription{subscribedEJournals.length === 1 ? '' : 's'}
+                Year: {year} • {filteredEJournals.length} subscription{filteredEJournals.length === 1 ? '' : 's'}
               </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
               <EJournalSubscriptionManagementClient 
-                subscriptions={subscriptions}
+                subscriptions={filteredSubscriptions}
                 libid={libid}
                 year={year}
                 mode="view"

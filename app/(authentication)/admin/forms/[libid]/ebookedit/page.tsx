@@ -171,7 +171,32 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
     
-    if (subscribedEBooks.length === 0) {
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + publisher) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedEBooks[0][]>();
+    
+    subscribedEBooks.forEach((ebook) => {
+      const identifier = `${ebook.title?.toLowerCase() || ''}_${ebook.publisher?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(ebook);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredEBooks = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(ebook => !ebook.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered EBooks
+    const filteredEBookIds = new Set(filteredEBooks.map(ebook => ebook.id));
+    const filteredSubscriptions = subscriptions.filter(sub => 
+      filteredEBookIds.has(sub.List_EBook.id)
+    );
+    
+    if (filteredEBooks.length === 0) {
       return (
         <main>
           <Container className='bg-white pb-12 max-w-full'>
@@ -230,13 +255,13 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - E-Book Subscription Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {subscribedEBooks.length} subscription{subscribedEBooks.length === 1 ? '' : 's'}
+                Year: {year} • {filteredEBooks.length} subscription{filteredEBooks.length === 1 ? '' : 's'}
               </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
               <EBookSubscriptionManagementClient 
-                subscriptions={subscriptions}
+                subscriptions={filteredSubscriptions}
                 libid={libid}
                 year={year}
                 mode="view"

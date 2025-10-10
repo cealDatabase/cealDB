@@ -70,8 +70,9 @@ export default function EditEBookSubscriptionDialog({
   };
   
   const userRoles = getUserRoles();
-  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
-  const shouldDisableFields = record.is_global && isMemberRole;
+  const isMemberOnly = userRoles.length === 1 && userRoles[0] === "2"; // Only role 2, no other roles
+  const isAssistantAdmin = userRoles.includes("4");
+  const shouldDisableFields = isMemberOnly || isAssistantAdmin; // Disable fields for member-only and assistant admin
   const isRestrictedEdit = shouldDisableFields;
 
   const normalizeLabel = (label: string) => label === "NON" ? "NON-CJK" : label;
@@ -191,10 +192,15 @@ export default function EditEBookSubscriptionDialog({
               </Badge>
             )}
           </DialogTitle>
-          {record.is_global && (
+          {isMemberOnly && record.is_global && (
             <p className="text-sm text-amber-600 mt-2">
-              ⚠️ This is a global record. Saving changes will create a
+              ⚠️ This is a global record. You can only edit titles, volumes, and chapters. Saving changes will create a
               library-specific copy for your library.
+            </p>
+          )}
+          {isMemberOnly && !record.is_global && (
+            <p className="text-sm text-blue-600 mt-2">
+              ℹ️ This is your library-specific record. You can only edit titles, volumes, and chapters.
             </p>
           )}
         </DialogHeader>
