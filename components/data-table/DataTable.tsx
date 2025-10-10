@@ -45,6 +45,14 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * Initial value for global filter (e.g., from URL search params)
    */
   initialGlobalFilter?: string;
+  /**
+   * Initial pagination state (pageIndex and pageSize)
+   */
+  initialPaginationState?: { pageIndex: number; pageSize: number };
+  /**
+   * ID of row to highlight (e.g., newly created record)
+   */
+  highlightRowId?: number;
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
@@ -53,6 +61,8 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   Toolbar,
   userRoles,
   initialGlobalFilter,
+  initialPaginationState,
+  highlightRowId,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -91,6 +101,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       rowSelection,
       columnFilters,
       globalFilter,
+    },
+    initialState: {
+      pagination: initialPaginationState || { pageIndex: 0, pageSize: 10 },
     },
     enableRowSelection: true,
     enableGlobalFilter: true,
@@ -147,15 +160,22 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const isHighlighted = highlightRowId && row.original.id === highlightRowId;
+                return (
+                  <TableRow 
+                    key={row.id} 
+                    data-state={row.getIsSelected() && "selected"}
+                    className={isHighlighted ? "bg-yellow-50 animate-pulse" : ""}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
