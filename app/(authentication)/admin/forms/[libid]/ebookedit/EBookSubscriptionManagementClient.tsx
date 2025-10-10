@@ -137,7 +137,7 @@ export default function EBookSubscriptionManagementClient({
     },
     {
       accessorKey: "sub_series_number",
-      header: "Sub Series Number",
+      header: "Sub Series",
       cell: ({ row }: any) => <div className="max-w-[120px] truncate">{row.getValue("sub_series_number")}</div>,
     },
     {

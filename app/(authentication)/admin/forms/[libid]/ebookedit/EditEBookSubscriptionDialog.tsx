@@ -251,7 +251,7 @@ export default function EditEBookSubscriptionDialog({
           </div>
 
           <div>
-            <label className="text-sm font-medium">Sub Series Number</label>
+            <label className="text-sm font-medium">Sub Series</label>
             <Input
               value={formData.sub_series_number}
               onChange={(e) =>

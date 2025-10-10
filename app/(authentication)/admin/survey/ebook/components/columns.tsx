@@ -389,7 +389,7 @@ export function getColumns(
     {
       accessorKey: "sub_series_number",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={<>Sub Series<br />Number</>} />
+        <DataTableColumnHeader column={column} title={<>Sub Series</>} />
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
