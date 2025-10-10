@@ -47,10 +47,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
-    // Fetch the original record to check if it's global
+    // Fetch the original record to check if it's global and which year it belongs to
     const originalRecord = await db.list_EJournal.findUnique({
       where: { id: ejournalId },
-      select: { is_global: true },
+      select: { is_global: true, libraryyear: true },
     });
 
     if (!originalRecord) {
@@ -84,11 +84,21 @@ export async function POST(req: Request) {
     let resultRecord: any;
     let isNewRecord = false;
 
-    // KEY LOGIC: If the record is global, create a NEW library-specific record
-    if (originalRecord.is_global) {
-      console.log("Original record is global - creating library-specific copy");
+    // KEY LOGIC: 
+    // 1. If the record is global, create a NEW library-specific record
+    // 2. If the record belongs to a different year, create a year-specific copy
+    // 3. Otherwise, update in place
+    const shouldCreateCopy = originalRecord.is_global || 
+                            (originalRecord.libraryyear !== null && 
+                             originalRecord.libraryyear !== libraryYearId);
 
-      // Create a NEW library-specific record
+    if (shouldCreateCopy) {
+      const reason = originalRecord.is_global 
+        ? "Original record is global - creating library-specific copy"
+        : "Record belongs to different year - creating year-specific copy";
+      console.log(reason);
+
+      // Create a NEW library-specific or year-specific record
       const newEJournal = await db.$transaction(async (tx) => {
         // 1) Create new List_EJournal record
         const ejournal = await tx.list_EJournal.create({
@@ -138,11 +148,20 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Keep subscription to global record (don't delete it!)
-        // The library should remain subscribed to the global record
-        // This maintains the relationship while having custom counts
+        // 4) Handle subscription logic
+        if (!originalRecord.is_global) {
+          // This is a year-specific copy (not global)
+          // Remove old subscription to the original year's record
+          await tx.libraryYear_ListEJournal.deleteMany({
+            where: {
+              libraryyear_id: libraryYearId,
+              listejournal_id: ejournalId,
+            },
+          });
+        }
+        // If global, keep subscription to global record (don't delete it!)
 
-        // 5) Add new subscription (library-specific record)
+        // 5) Add new subscription (library/year-specific record)
         await tx.libraryYear_ListEJournal.create({
           data: {
             libraryyear_id: libraryYearId,
@@ -235,13 +254,21 @@ export async function POST(req: Request) {
       );
     }
 
+    // Determine the appropriate message
+    let message = "Updated record successfully";
+    if (isNewRecord) {
+      if (originalRecord.is_global) {
+        message = "Created library-specific copy successfully";
+      } else {
+        message = "Created year-specific copy successfully";
+      }
+    }
+
     return NextResponse.json({
       success: true,
       id: resultRecord.id,
       isNewRecord,
-      message: isNewRecord
-        ? "Created library-specific copy successfully"
-        : "Updated record successfully",
+      message,
     });
   } catch (error: any) {
     console.error("API error (edit E-Journal):", error);
