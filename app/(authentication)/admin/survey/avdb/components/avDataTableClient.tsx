@@ -11,12 +11,14 @@ export default function AVDataTableClient({
   roleIdPassIn,
   libid,
   userRoles,
+  initialSearch,
 }: {
   data: listAV[];
   year: number;
   libid: number | undefined;
   roleIdPassIn: string | undefined;
   userRoles?: string[] | null;
+  initialSearch?: string;
 }) {
   const columns = getColumns(year, roleIdPassIn);
 
@@ -25,5 +27,5 @@ export default function AVDataTableClient({
     <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
   );
 
-  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} />;
+  return <DataTable data={data} columns={columns} Toolbar={ToolbarWithLib} userRoles={userRoles} initialGlobalFilter={initialSearch} />;
 }

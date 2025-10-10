@@ -41,6 +41,10 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * User roles for permission checking (e.g., for copy functionality)
    */
   userRoles?: string[] | null;
+  /**
+   * Initial value for global filter (e.g., from URL search params)
+   */
+  initialGlobalFilter?: string;
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
@@ -48,6 +52,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   data,
   Toolbar,
   userRoles,
+  initialGlobalFilter,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -68,7 +73,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     return [];
   });
   
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  const [globalFilter, setGlobalFilter] = React.useState<string>(initialGlobalFilter || "");
 
   // Save sorting state to sessionStorage whenever it changes
   React.useEffect(() => {

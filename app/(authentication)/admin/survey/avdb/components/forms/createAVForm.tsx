@@ -107,7 +107,10 @@ export default function CreateAVForm({
 
       if (response.ok) {
         toast.success("AV entry created successfully!");
-        router.push(`/admin/survey/avdb/${selectedYear}`);
+        
+        // Redirect with search parameter to filter to the new record
+        const searchTitle = encodeURIComponent(data.newAV?.title || values.title);
+        router.push(`/admin/survey/avdb/${selectedYear}?search=${searchTitle}`);
       } else {
         toast.error(`Failed to create AV entry: ${data.detail || data.error}`);
       }
