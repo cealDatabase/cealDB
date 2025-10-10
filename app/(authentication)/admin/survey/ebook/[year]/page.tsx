@@ -12,7 +12,8 @@ async function EbookSinglePage(
     roleIdPassIn: string | undefined,
     libid?: number,
     userRoles?: string[] | null,
-    initialSearch?: string
+    initialSearch?: string,
+    newRecordId?: number
 ) {
     const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
     return (
@@ -23,6 +24,7 @@ async function EbookSinglePage(
             libid={libid}
             userRoles={userRoles}
             initialSearch={initialSearch}
+            newRecordId={newRecordId}
         />
     );
 }
@@ -30,7 +32,7 @@ async function EbookSinglePage(
 export default async function EbookListPage(
     props: {
         params: Promise<{ year: string }>;
-        searchParams?: Promise<{ libid?: string; search?: string }>;
+        searchParams?: Promise<{ libid?: string; search?: string; newRecord?: string }>;
     }
 ) {
     const params = await props.params;
@@ -49,6 +51,9 @@ export default async function EbookListPage(
     
     // Get search parameter from URL (for highlighting newly created/edited records)
     const initialSearch = sp.search ? decodeURIComponent(sp.search) : undefined;
+    
+    // Get newRecord ID for pagination calculation
+    const newRecordId = sp.newRecord ? Number(sp.newRecord) : undefined;
 
     // Parse user roles for permission checking
     let userRoles: string[] | null = null;
@@ -81,7 +86,7 @@ export default async function EbookListPage(
                     </div>
                     <SelectYear yearCurrent={params.year} />
                     <Suspense fallback={<SkeletonTableCard />}>
-                        {await EbookSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch)}
+                        {await EbookSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch, newRecordId)}
                     </Suspense>
                 </div>
             </Container>
