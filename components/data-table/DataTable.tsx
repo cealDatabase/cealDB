@@ -92,20 +92,26 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [pagination, setPagination] = React.useState(() => {
     // If initialPaginationState is provided (new record), use it
     if (initialPaginationState) {
+      console.log(`📄 Using initialPaginationState for ${tableKey}:`, initialPaginationState);
       return initialPaginationState;
     }
     
     // Otherwise, restore from sessionStorage
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem(`table-pagination-${tableKey}`);
+      const key = `table-pagination-${tableKey}`;
+      const saved = sessionStorage.getItem(key);
+      console.log(`📄 Restoring pagination for ${tableKey} from sessionStorage:`, saved);
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          console.log(`📄 Restored pagination state:`, parsed);
+          return parsed;
         } catch {
           return { pageIndex: 0, pageSize: 10 };
         }
       }
     }
+    console.log(`📄 No saved pagination for ${tableKey}, using default`);
     return { pageIndex: 0, pageSize: 10 };
   });
   
@@ -121,7 +127,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   // Save pagination state to sessionStorage whenever it changes
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem(`table-pagination-${tableKey}`, JSON.stringify(pagination));
+      const key = `table-pagination-${tableKey}`;
+      console.log(`💾 Saving pagination for ${tableKey}:`, pagination);
+      sessionStorage.setItem(key, JSON.stringify(pagination));
     }
   }, [pagination, tableKey]);
 
