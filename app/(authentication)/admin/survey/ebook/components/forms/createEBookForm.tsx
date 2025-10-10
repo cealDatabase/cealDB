@@ -200,9 +200,9 @@ export default function CreateEBookForm({
                 name="sub_series_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Series / Number</FormLabel>
+                    <FormLabel>Sub-series Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter series or number" {...field} />
+                      <Input placeholder="Enter sub-series number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
