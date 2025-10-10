@@ -63,7 +63,7 @@ export default async function EJournalListPage(
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold tracking-tight text-start">
-                            E-Journal Database - {params.year}
+                            E-Journal Databases - {params.year}
                         </h1>
                         <p className="text-muted-foreground text-sm">
                             Please check the boxes for each entry your institution holds under each language category Chinese, Japanese, Korean, and Non-CJK.

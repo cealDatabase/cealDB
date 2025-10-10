@@ -46,15 +46,9 @@ export default async function middleware(request: NextRequest) {
       const tokenData = await verifyJWTToken(sessionCookie.value);
       
       if (tokenData && tokenData.username) {
-        // Handle URL-encoded cookie values
         const decodedUserCookie = decodeURIComponent(userCookie.value).toLowerCase();
         const tokenUsername = tokenData.username.toLowerCase();
-        
         isAuthenticated = tokenUsername === decodedUserCookie;
-        
-        if (isAuthenticated) {
-          // console.log(`✅ Authenticated: ${decodedUserCookie}`);
-        }
       }
     } catch (error) {
       isAuthenticated = false;

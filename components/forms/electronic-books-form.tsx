@@ -469,12 +469,12 @@ export default function ElectronicBooksForm() {
       {/* Subscription Titles */}
       <FormSection
         title="Subscription Titles"
-        description="Use the 'Import from E-Book Database by Subscription' feature after updating your subscription list."
+        description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
       >
         <div className="mb-4">
           <p className="text-sm text-gray-600 mb-3">
             Note: Title subscriptions do not count towards total titles. Please maintain
-            &quot;E-Book Database by Subscription&quot; before using the import feature.
+            &quot;E-Book Databases by Subscription&quot; before using the import feature.
           </p>
           <Button
             type="button"
@@ -484,7 +484,7 @@ export default function ElectronicBooksForm() {
             disabled={!libraryYearStatus?.is_open_for_editing}
           >
             <Download className="h-4 w-4" />
-            Import from E-Book Database by Subscription
+            Import from E-Book Databases by Subscription
           </Button>
         </div>
         <LanguageFieldGroup
@@ -656,12 +656,12 @@ export default function ElectronicBooksForm() {
       {/* Subscription Volumes */}
       <FormSection
         title="Subscription Volumes"
-        description="Use the 'Import from E-Book Database by Subscription' feature after updating your subscription list."
+        description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
       >
         <div className="mb-4">
           <p className="text-sm text-gray-600 mb-3">
             Note: Volume subscriptions do not count towards total volumes. Please maintain
-            &quot;E-Book Database by Subscription&quot; before using the import feature.
+            &quot;E-Book Databases by Subscription&quot; before using the import feature.
           </p>
           <Button
             type="button"
@@ -671,7 +671,7 @@ export default function ElectronicBooksForm() {
             disabled={!libraryYearStatus?.is_open_for_editing}
           >
             <Download className="h-4 w-4" />
-            Import from E-Book Database by Subscription
+            Import from E-Book Databases by Subscription
           </Button>
         </div>
         <LanguageFieldGroup

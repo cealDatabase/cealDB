@@ -248,7 +248,7 @@ export default function SerialsForm() {
         <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800 mb-2">
             <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;E-Journal Database by Subscription - List of&quot; in order for the
+            &quot;E-Journal Databases by Subscription - List of&quot; in order for the
             system to provide the corresponding numbers automatically.
           </p>
           <Button
@@ -258,7 +258,7 @@ export default function SerialsForm() {
             variant="default"
           >
             <Download className="h-4 w-4" />
-            Import from E-Journal Database by Subscription
+            Import from E-Journal Databases by Subscription
           </Button>
         </div>
 

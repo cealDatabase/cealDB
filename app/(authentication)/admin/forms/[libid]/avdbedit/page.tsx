@@ -42,12 +42,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   const libidFromCookie = cookieStore.get("library")?.value;
   const roleFromCookie = cookieStore.get("role")?.value;
   
-  console.log("Cookie values:", {
-    libidFromCookie,
-    roleFromCookie,
-    libidStr
-  });
-  
   // If libidStr is "member" or not a valid number, get libid from cookies
   if (libidStr === "member" || isNaN(Number(libidStr))) {
     if (libidFromCookie && !isNaN(Number(libidFromCookie))) {

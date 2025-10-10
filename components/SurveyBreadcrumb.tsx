@@ -22,9 +22,9 @@ export function SurveyBreadcrumb({ surveyType, year }: SurveyBreadcrumbProps) {
   
   // Survey type display names
   const surveyNames = {
-    avdb: "Audio/Visual Database",
-    ebook: "E-Book Database", 
-    ejournal: "E-Journal Database"
+    avdb: "Audio/Visual Databases",
+    ebook: "E-Book Databases", 
+    ejournal: "E-Journal Databases"
   }
   
   // Check if we're on create page

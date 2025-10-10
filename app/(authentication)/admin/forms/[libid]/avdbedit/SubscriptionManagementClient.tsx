@@ -114,6 +114,11 @@ export default function SubscriptionManagementClient({
       },
     },
     {
+      accessorKey: "id",
+      header: "Record ID",
+      cell: ({ row }: any) => <div className="text-center font-mono text-sm">{row.getValue("id")}</div>,
+    },
+    {
       accessorKey: "cjk_title",
       header: "CJK Title",
       cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("cjk_title")}</div>,
@@ -132,6 +137,22 @@ export default function SubscriptionManagementClient({
       accessorKey: "type",
       header: "Type",
       cell: ({ row }: any) => <Badge variant="outline">{row.getValue("type")}</Badge>,
+    },
+    {
+      accessorKey: "is_global",
+      header: "Global",
+      cell: ({ row }: any) => {
+        const isGlobal = row.getValue("is_global") as boolean;
+        return (
+          <div className="flex justify-center">
+            {isGlobal ? (
+              <Badge className="bg-green-100 text-green-800 border-green-300">Global</Badge>
+            ) : (
+              <Badge variant="secondary" className="bg-gray-100 text-gray-700">Library</Badge>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "language",

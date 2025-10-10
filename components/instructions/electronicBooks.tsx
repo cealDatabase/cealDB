@@ -58,7 +58,7 @@ export const ElectronicBooksInstructions = () => {
                         <h4 className="font-semibold text-gray-900 mb-2">Subscription Titles</h4>
                         <p className="text-gray-700 mb-2">Report e-books accessed through subscription services.</p>
                         <div className="bg-purple-50 border border-purple-200 rounded p-2 mt-2">
-                            <p className="text-purple-800 text-xs"><strong>Tip:</strong> Use the "Import from E-Book Database by Subscription" feature after updating your subscription list.</p>
+                            <p className="text-purple-800 text-xs"><strong>Tip:</strong> Use the "Import from E-Book Databases by Subscription" feature after updating your subscription list.</p>
                         </div>
                         <p className="text-xs text-gray-500 mt-2">Languages: Chinese, Japanese, Korean, Non-CJK</p>
                     </div>
