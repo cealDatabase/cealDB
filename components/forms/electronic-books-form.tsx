@@ -514,9 +514,9 @@ export default function ElectronicBooksForm() {
         title="Subscription Titles"
         description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
       >
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-3">
-            Note: Title subscriptions do not count towards total titles. Please maintain
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>Note:</strong> Title subscriptions do not count towards total titles. Please maintain
             &quot;E-Book Databases by Subscription&quot; before using the import feature.
           </p>
           <Button
@@ -701,9 +701,9 @@ export default function ElectronicBooksForm() {
         title="Subscription Volumes"
         description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
       >
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-3">
-            Note: Volume subscriptions do not count towards total volumes. Please maintain
+        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>Note:</strong> Volume subscriptions do not count towards total volumes. Please maintain
             &quot;E-Book Databases by Subscription&quot; before using the import feature.
           </p>
           <Button
