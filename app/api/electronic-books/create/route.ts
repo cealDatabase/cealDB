@@ -7,7 +7,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
       id, // Extract id but don't use it
-      entryid,
       libid,
       ebpurchased_title_chinese,
       ebpurchased_title_japanese,
@@ -91,7 +90,6 @@ export async function POST(req: Request) {
     });
 
     const electronicBooksData = {
-      entryid: entryid || null,
       libraryyear: libraryYear.id,
       ebpurchased_title_chinese: ebpurchased_title_chinese || 0,
       ebpurchased_title_japanese: ebpurchased_title_japanese || 0,
