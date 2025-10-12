@@ -17,18 +17,11 @@ const getAVListByYear = async (userSelectedYear: number) => {
   // Use a Map instead of parallel arrays to prevent misalignment
   const countsMap = new Map<number, number>();
 
-  console.log(`🔢 Found ${listAVCountsByYear?.length || 0} count records for year ${userSelectedYear}`);
-
   listAVCountsByYear?.forEach((object, index) => {
     if (object.listav !== null) {
       ListAVIdArray.push(object.listav);
       const countValue = object.titles !== null ? object.titles : 0;
       countsMap.set(object.listav, countValue);
-      
-      // Log first 5 records to see the mapping
-      if (index < 5) {
-        console.log(`  [${index}] listav=${object.listav}, titles=${object.titles} -> Map stores: ${countValue}`);
-      }
     }
   });
 
@@ -73,15 +66,6 @@ const getAVListByYear = async (userSelectedYear: number) => {
 
       // Get counts from Map - guaranteed correct mapping
       const countsValue = countsMap.get(listAVId) ?? 0;
-      
-      // Debug logging for first 3 records
-      if (ListAVIdArray.indexOf(listAVId) < 3) {
-        console.log(`📊 Building record for listAVId=${listAVId}:`, {
-          listAVId,
-          countsValue,
-          title: listAVItem.title,
-        });
-      }
 
       outputArray.push({
         id: listAVId,

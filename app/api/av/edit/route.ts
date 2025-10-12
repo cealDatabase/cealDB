@@ -6,7 +6,6 @@ import { logUserAction } from "@/lib/auditLogger";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Editing AV with body:", body);
 
     const {
       id, // original record ID
@@ -134,13 +133,9 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Remove old subscription (global record)
-        await tx.libraryYear_ListAV.deleteMany({
-          where: {
-            libraryyear_id: libraryYearId,
-            listav_id: avId,
-          },
-        });
+        // 4) Keep subscription to global record (don't delete it!)
+        // The library should remain subscribed to the global record
+        // This maintains the relationship while having custom counts
 
         // 5) Add new subscription (library-specific record)
         await tx.libraryYear_ListAV.create({

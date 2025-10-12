@@ -30,7 +30,7 @@ async function CreateAVContent({
     <div className='p-6'>
       <Container>
         <SurveyBreadcrumb surveyType="avdb" year={selectedYear.toString()} />
-        <h1 className='text-2xl font-semibold mb-4 text-sky-700'>
+        <h1 className='text-2xl font-semibold mb-4'>
           Create New AV Entry for {selectedYear}
         </h1>
         <CreateAVFormClient 

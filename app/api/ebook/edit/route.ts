@@ -6,7 +6,6 @@ import { logUserAction } from "@/lib/auditLogger";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Editing E-Book with body:", body);
 
     const {
       id, // original record ID
@@ -140,13 +139,9 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Remove old subscription (global record)
-        await tx.libraryYear_ListEBook.deleteMany({
-          where: {
-            libraryyear_id: libraryYearId,
-            listebook_id: ebookId,
-          },
-        });
+        // 4) Keep subscription to global record (don't delete it!)
+        // The library should remain subscribed to the global record
+        // This maintains the relationship while having custom counts
 
         // 5) Add new subscription (library-specific record)
         await tx.libraryYear_ListEBook.create({

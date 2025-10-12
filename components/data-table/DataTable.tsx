@@ -73,15 +73,28 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   
-  // Restore sorting state from sessionStorage
-  const [sorting, setSorting] = React.useState<SortingState>(() => {
+  // Initialize sorting state as empty (hydration-safe)
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+
+  // Restore sorting state from sessionStorage after hydration
+  React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = sessionStorage.getItem(`table-sorting-${tableKey}`);
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsedSorting = JSON.parse(saved) as SortingState;
+          // Validate that sorting columns exist in current column definitions
+          const validColumnIds = columns.map(col => col.id || (col as any).accessorKey);
+          const validSorting = parsedSorting.filter(sort => 
+            validColumnIds.includes(sort.id)
+          );
+          if (validSorting.length > 0) {
+            setSorting(validSorting);
+          }
         } catch {
-          return [];
+          // Ignore invalid saved state
         }
       }
     }
@@ -147,11 +160,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     enableRowSelection: true,
     enableGlobalFilter: true,
     globalFilterFn: (row, columnId, value) => {
-      // Search across title and cjk_title columns (and subtitle for more comprehensive search) 
+      // Search across title, cjk_title, romanized_title, subtitle, and publisher columns
       const searchValue = String(value || "").toLowerCase();
       
       // Try to get values from common searchable columns
-      const searchableColumns = ["title", "cjk_title", "subtitle", "publisher"];
+      const searchableColumns = ["title", "cjk_title", "romanized_title", "subtitle", "publisher"];
       
       return searchableColumns.some(column => {
         try {

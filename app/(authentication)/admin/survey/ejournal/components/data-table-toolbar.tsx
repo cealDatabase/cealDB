@@ -90,7 +90,7 @@ export function DataTableToolbar<TData>({
     <div className='flex items-center justify-between gap-3'>
       <div className='flex flex-1 items-center space-x-2'>
         <Input
-          placeholder='Search in English or CJK title...'
+          placeholder='Search in title, CJK, or romanized...'
           value={(table.getState().globalFilter as string) ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className='h-8 w-[150px] lg:w-[250px]'

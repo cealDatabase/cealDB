@@ -18,7 +18,6 @@ interface EJournalSubscriptionManagementClientProps {
     List_EJournal: {
       id: number;
       title: string | null;
-      sub_series_number: string | null;
       publisher: string | null;
       description: string | null;
       notes: string | null;
@@ -70,17 +69,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   
   // Debug all cookies first
   const allCookies = cookieStore.getAll();
-  console.log("All cookies:", allCookies);
   
   // The cookie is named "library" not "libid"
   const libidFromCookie = cookieStore.get("library")?.value;
   const roleFromCookie = cookieStore.get("role")?.value;
-  
-  console.log("Cookie values:", {
-    libidFromCookie,
-    roleFromCookie,
-    libidStr
-  });
   
   // If libidStr is "member" or not a valid number, get libid from cookies
   if (libidStr === "member" || isNaN(Number(libidStr))) {
@@ -128,10 +120,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     libid = Number(libidStr);
   }
   
-  // Enhanced debugging for URL parsing
-  console.log("🔍 DEBUG: Raw searchParams:", sp);
-  console.log("🔍 DEBUG: sp.ids value:", sp.ids);
-  console.log("🔍 DEBUG: sp.ids type:", typeof sp.ids);
   
   // Fix: Handle empty string and undefined properly
   const idsParam = sp.ids;
@@ -143,20 +131,6 @@ export default async function Page({ params, searchParams }: PageProps) {
       .map((s) => Number(s.trim()))
       .filter((n) => Number.isFinite(n));
   }
-
-  // Debug logging to see what we're getting
-  console.log("🔍 DEBUG: Starting ejournaledit page load");
-  console.log("Debug ejournaledit page:", {
-    libidStr,
-    libid,
-    year,
-    idsParam,
-    ids,
-    searchParams: sp
-  });
-
-  console.log("🔍 DEBUG: ids.length =", ids.length, ", ids =", ids);
-  console.log("🔍 DEBUG: Will enter", ids.length === 0 ? "VIEW mode (show current subscriptions)" : "ADD mode (subscription editor)");
   
   // TEMPORARY: Force VIEW mode to troubleshoot the issue
   // Override ids to be empty to force subscription management view
@@ -227,14 +201,34 @@ export default async function Page({ params, searchParams }: PageProps) {
       },
     });
 
-    // Debug: Check what fields are actually in the subscriptions
-    console.log("🔍 DEBUG page.tsx - First subscription sample:", subscriptions[0]);
-    console.log("🔍 DEBUG page.tsx - First List_EJournal data:", subscriptions[0]?.List_EJournal);
-    console.log("🔍 DEBUG page.tsx - Series field value:", subscriptions[0]?.List_EJournal?.series);
-
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
     
-    if (subscribedEJournals.length === 0) {
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + publisher) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedEJournals[0][]>();
+    
+    subscribedEJournals.forEach((ejournal) => {
+      const identifier = `${ejournal.title?.toLowerCase() || ''}_${ejournal.publisher?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(ejournal);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredEJournals = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(ejournal => !ejournal.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered EJournals
+    const filteredEJournalIds = new Set(filteredEJournals.map(ejournal => ejournal.id));
+    const filteredSubscriptions = subscriptions.filter(sub => 
+      filteredEJournalIds.has(sub.List_EJournal.id)
+    );
+    
+    if (filteredEJournals.length === 0) {
       return (
         <main>
           <Container className='bg-white pb-12 max-w-full'>
@@ -293,13 +287,13 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - E-Journal Subscription Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {subscribedEJournals.length} subscription{subscribedEJournals.length === 1 ? '' : 's'}
+                Year: {year} • {filteredEJournals.length} subscription{filteredEJournals.length === 1 ? '' : 's'}
               </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
               <EJournalSubscriptionManagementClient 
-                subscriptions={subscriptions}
+                subscriptions={filteredSubscriptions}
                 libid={libid}
                 year={year}
                 mode="view"
@@ -332,7 +326,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     data_source: r.data_source ?? "",
     series: r.series ?? "",
     vendor: r.vendor ?? "",
-    sub_series_number: r.sub_series_number ?? "",
     is_global: !!r.is_global,
     updated_at: r.updated_at.toISOString(),
   }));

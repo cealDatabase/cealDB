@@ -42,12 +42,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   const libidFromCookie = cookieStore.get("library")?.value;
   const roleFromCookie = cookieStore.get("role")?.value;
   
-  console.log("Cookie values:", {
-    libidFromCookie,
-    roleFromCookie,
-    libidStr
-  });
-  
   // If libidStr is "member" or not a valid number, get libid from cookies
   if (libidStr === "member" || isNaN(Number(libidStr))) {
     if (libidFromCookie && !isNaN(Number(libidFromCookie))) {
@@ -62,29 +56,8 @@ export default async function Page({ params, searchParams }: PageProps) {
                 Library ID Missing
               </h2>
               <p className='text-muted-foreground text-sm mt-2'>
-                Your library ID cookie is missing or invalid. This is required to manage subscriptions.
+                Please sign in first. This is required to manage subscriptions.
               </p>
-              <div className="bg-gray-100 p-4 rounded mt-4">
-                <p className="text-sm font-medium mb-2">Debug Information:</p>
-                <p className="text-xs">URL libid: {libidStr}</p>
-                <p className="text-xs">Cookie libid: {libidFromCookie || "Not found"}</p>
-                <p className="text-xs">Available cookies: {allCookies.length > 0 ? allCookies.map(c => c.name).join(", ") : "None"}</p>
-              </div>
-              <div className="mt-4 space-y-2">
-                <p className="text-sm font-medium">Quick Fixes:</p>
-                <a 
-                  href="/debug-cookies"
-                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm mr-2"
-                >
-                  Set Cookies
-                </a>
-                <a 
-                  href={`/admin/forms/56/avdbedit${sp.ids ? `?ids=${sp.ids}&year=${year}` : ''}`}
-                  className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
-                >
-                  Try with Library 56
-                </a>
-              </div>
             </div>
           </Container>
         </main>
@@ -176,7 +149,32 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     const subscribedAVs = subscriptions.map((s) => s.List_AV);
     
-    if (subscribedAVs.length === 0) {
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + type) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedAVs[0][]>();
+    
+    subscribedAVs.forEach((av) => {
+      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(av);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredAVs = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(av => !av.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered AVs
+    const filteredAVIds = new Set(filteredAVs.map(av => av.id));
+    const filteredSubscriptions = subscriptions.filter(sub => 
+      filteredAVIds.has(sub.List_AV.id)
+    );
+    
+    if (filteredAVs.length === 0) {
       return (
         <main>
           <Container className='bg-white pb-12 max-w-full'>
@@ -236,13 +234,13 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - AV Subscription Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {subscribedAVs.length} subscription{subscribedAVs.length === 1 ? '' : 's'}
+                Year: {year} • {filteredAVs.length} subscription{filteredAVs.length === 1 ? '' : 's'}
               </p>
             </div>
 
             <Suspense fallback={<SkeletonTableCard />}> 
               <SubscriptionManagementClient 
-                subscriptions={subscriptions}
+                subscriptions={filteredSubscriptions}
                 libid={libid}
                 year={year}
                 mode="view"

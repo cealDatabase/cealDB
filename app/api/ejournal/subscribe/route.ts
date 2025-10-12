@@ -6,7 +6,6 @@ import db from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Subscribing to E-Journal records with body:", body);
 
     let { libid, year, recordIds } = body;
 
@@ -73,8 +72,6 @@ export async function POST(req: Request) {
         year: Number(year),
       },
     });
-
-    console.log("Found Library_Year record:", libraryYearRecord);
 
     if (!libraryYearRecord) {
       // Try to create the Library_Year record if it doesn't exist

@@ -35,7 +35,6 @@ interface EditEJournalSubscriptionDialogProps {
     vendor?: string;
     series?: string;
     data_source?: string;
-    sub_series_number?: string;
     journals: number;
     dbs: number;
     language: string[];
@@ -71,15 +70,10 @@ export default function EditEJournalSubscriptionDialog({
   };
   
   const userRoles = getUserRoles();
-  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
-  const shouldDisableFields = record.is_global && isMemberRole;
+  const isMemberOnly = userRoles.length === 1 && userRoles[0] === "2"; // Only role 2, no other roles
+  const isAssistantAdmin = userRoles.includes("4");
+  const shouldDisableFields = isMemberOnly || isAssistantAdmin; // Disable fields for member-only and assistant admin
   const isRestrictedEdit = shouldDisableFields;
-
-  const normalizeLabel = (label: string) => label === "NON" ? "NONCJK" : label;
-
-  // Debug: Log the record to see what we're receiving
-  console.log("🔍 DEBUG EditEJournalDialog - Received record:", record);
-  console.log("🔍 DEBUG EditEJournalDialog - record.series value:", record.series);
 
   // Initialize form data with current record values
   const [formData, setFormData] = useState({
@@ -95,18 +89,15 @@ export default function EditEJournalSubscriptionDialog({
     publisher: record.publisher ?? "",
     notes: record.notes ?? "",
     data_source: record.data_source ?? "",
-    sub_series_number: record.sub_series_number ?? "",
     language: record.language
       ?.map((langLabel) => {
-        const normalized = normalizeLabel(langLabel);
-        return languages.find((l) => l.label === normalized)?.value;
+        return languages.find((l) => l.label === langLabel)?.value;
       })
       .filter((id): id is number => id !== undefined) ?? [],
   });
 
   // Update form data when record changes
   useEffect(() => {
-    console.log("🔍 DEBUG EditEJournalDialog useEffect - Updating formData with record:", record);
     setFormData({
       title: record.title ?? "",
       cjk_title: record.cjk_title ?? "",
@@ -120,11 +111,9 @@ export default function EditEJournalSubscriptionDialog({
       publisher: record.publisher ?? "",
       notes: record.notes ?? "",
       data_source: record.data_source ?? "",
-      sub_series_number: record.sub_series_number ?? "",
       language: record.language
         ?.map((langLabel) => {
-          const normalized = normalizeLabel(langLabel);
-          return languages.find((l) => l.label === normalized)?.value;
+          return languages.find((l) => l.label === langLabel)?.value;
         })
         .filter((id): id is number => id !== undefined) ?? [],
     });
@@ -199,10 +188,15 @@ export default function EditEJournalSubscriptionDialog({
               </Badge>
             )}
           </DialogTitle>
-          {record.is_global && (
+          {isMemberOnly && record.is_global && (
             <p className="text-sm text-amber-600 mt-2">
-              ⚠️ This is a global record. Saving changes will create a
+              ⚠️ This is a global record. You can only edit journals and DBs. Saving changes will create a
               library-specific copy for your library.
+            </p>
+          )}
+          {isMemberOnly && !record.is_global && (
+            <p className="text-sm text-blue-600 mt-2">
+              ℹ️ This is your library-specific record. You can only edit journals and DBs.
             </p>
           )}
         </DialogHeader>
@@ -269,17 +263,6 @@ export default function EditEJournalSubscriptionDialog({
               value={formData.vendor ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, vendor: e.target.value })
-              }
-              disabled={isRestrictedEdit}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Sub Series Number</label>
-            <Input
-              value={formData.sub_series_number ?? ""}
-              onChange={(e) =>
-                setFormData({ ...formData, sub_series_number: e.target.value })
               }
               disabled={isRestrictedEdit}
             />
@@ -394,7 +377,7 @@ export default function EditEJournalSubscriptionDialog({
             <Button
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               {saving ? "Saving..." : "Save Changes"}
             </Button>

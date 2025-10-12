@@ -13,11 +13,11 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
-const languages = [
+const languages: Array<{ value: number; label: string; displayLabel?: string }> = [
   { value: 1, label: "CHN" },
   { value: 2, label: "JPN" },
   { value: 3, label: "KOR" },
-  { value: 4, label: "NON" },
+  { value: 4, label: "NON", displayLabel: "NON-CJK" },
 ];
 
 const types = [
@@ -74,8 +74,9 @@ export default function EditSubscriptionDialog({
   };
   
   const userRoles = getUserRoles();
-  const isMemberRole = userRoles.includes("2") || userRoles.includes("4");
-  const shouldDisableFields = record.is_global && isMemberRole;
+  const isMemberOnly = userRoles.length === 1 && userRoles[0] === "2"; // Only role 2, no other roles
+  const isAssistantAdmin = userRoles.includes("4");
+  const shouldDisableFields = isMemberOnly || isAssistantAdmin; // Disable fields for member-only and assistant admin
   const isRestrictedEdit = shouldDisableFields;
 
   // Initialize form data with current record values
@@ -92,8 +93,7 @@ export default function EditSubscriptionDialog({
     type: record.type || "",
     language: record.language
       .map((langLabel) => {
-        const normalized = langLabel === "NON" ? "NONCJK" : langLabel;
-        return languages.find((l) => l.label === normalized)?.value;
+        return languages.find((l) => l.label === langLabel)?.value;
       })
       .filter((id): id is number => id !== undefined),
   });
@@ -113,8 +113,7 @@ export default function EditSubscriptionDialog({
       type: record.type || "",
       language: record.language
         .map((langLabel) => {
-          const normalized = langLabel === "NON" ? "NONCJK" : langLabel;
-          return languages.find((l) => l.label === normalized)?.value;
+          return languages.find((l) => l.label === langLabel)?.value;
         })
         .filter((id): id is number => id !== undefined),
     });
@@ -194,10 +193,15 @@ export default function EditSubscriptionDialog({
               </Badge>
             )}
           </DialogTitle>
-          {record.is_global && (
+          {isMemberOnly && record.is_global && (
             <p className="text-sm text-amber-600 mt-2">
-              ⚠️ This is a global record. Saving changes will create a
+              ⚠️ This is a global record. You can only edit counts. Saving changes will create a
               library-specific copy for your library.
+            </p>
+          )}
+          {isMemberOnly && !record.is_global && (
+            <p className="text-sm text-blue-600 mt-2">
+              ℹ️ This is your library-specific record. You can only edit counts.
             </p>
           )}
         </DialogHeader>
@@ -345,7 +349,7 @@ export default function EditSubscriptionDialog({
                     disabled={isRestrictedEdit}
                   />
                   <label htmlFor={`lang-${lang.value}`} className="text-sm">
-                    {lang.label}
+                    {lang.displayLabel || lang.label}
                   </label>
                 </div>
               ))}

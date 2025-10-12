@@ -8,12 +8,6 @@ async function getUserInfoFromCookies() {
     const userEmailCookie = cookieStore.get('uinf')?.value;
     const roleCookie = cookieStore.get('role')?.value;
 
-    console.log('🍪 Server-side Debug cookies found:', {
-        userEmailCookie,
-        roleCookie,
-        cookieNames: Array.from(cookieStore).map(([name]) => name)
-    });
-
     if (!userEmailCookie) {
         console.log('❌ No user cookie found (uinf) - user not signed in');
         return null;
@@ -27,11 +21,9 @@ async function getUserInfoFromCookies() {
             try {
                 // Try parsing as JSON array first (signinAction format)
                 userRoles = JSON.parse(roleCookie);
-                console.log('📊 Parsed role as JSON array:', userRoles);
             } catch {
                 // If JSON parsing fails, treat as single role value (API route format)
                 userRoles = [roleCookie];
-                console.log('📊 Parsed role as single value:', userRoles);
             }
         } else {
             // Default role if no role cookie found
@@ -42,8 +34,6 @@ async function getUserInfoFromCookies() {
             userId: 0, // Not needed for this component, setting to 0
             userRoles: userRoles
         };
-        
-        // const isSuperAdmin = userRoles.includes('1');
 
         return userInfo;
     } catch (error) {

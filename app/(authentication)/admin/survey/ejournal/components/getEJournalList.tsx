@@ -86,7 +86,6 @@ const getEJournalListByYear = async (userSelectedYear: number) => {
         // ⬅️ keep legacy field so existing Zod/table code is happy
         counts: c?.journals ?? 0,
 
-        sub_series_number: ej.sub_series_number,
         publisher: ej.publisher,
         description: ej.description,
         notes: ej.notes,

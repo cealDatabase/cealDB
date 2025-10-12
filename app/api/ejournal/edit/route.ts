@@ -6,7 +6,6 @@ import { logUserAction } from "@/lib/auditLogger";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Editing E-Journal with body:", body);
 
     const {
       id, // original record ID
@@ -22,7 +21,6 @@ export async function POST(req: Request) {
       data_source,
       cjk_title,
       romanized_title,
-      sub_series_number,
       journals,
       dbs,
       language,
@@ -105,7 +103,6 @@ export async function POST(req: Request) {
             data_source: data_source?.trim() || null,
             cjk_title: cjk_title?.trim() || null,
             romanized_title: romanized_title?.trim() || null,
-            sub_series_number: sub_series_number?.trim() || null,
             is_global: false, // IMPORTANT: NOT global
             libraryyear: libraryYearId,
             updated_at: new Date(),
@@ -141,13 +138,9 @@ export async function POST(req: Request) {
           }
         }
 
-        // 4) Remove old subscription (global record)
-        await tx.libraryYear_ListEJournal.deleteMany({
-          where: {
-            libraryyear_id: libraryYearId,
-            listejournal_id: ejournalId,
-          },
-        });
+        // 4) Keep subscription to global record (don't delete it!)
+        // The library should remain subscribed to the global record
+        // This maintains the relationship while having custom counts
 
         // 5) Add new subscription (library-specific record)
         await tx.libraryYear_ListEJournal.create({
@@ -196,7 +189,6 @@ export async function POST(req: Request) {
             data_source: data_source?.trim() || null,
             cjk_title: cjk_title?.trim() || null,
             romanized_title: romanized_title?.trim() || null,
-            sub_series_number: sub_series_number?.trim() || null,
             updated_at: new Date(),
           },
         });

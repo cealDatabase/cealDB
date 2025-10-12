@@ -4,7 +4,6 @@ export const listEJournalSchema = z.object({
   id: z.number(),
   title: z.string(),
   counts: z.number(),
-  sub_series_number: z.string().nullish(),
   publisher: z.string().nullish(),
   description: z.string().nullish(),
   notes: z.string().nullish(),

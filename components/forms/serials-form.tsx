@@ -67,10 +67,11 @@ export default function SerialsForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/serials/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/serials/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -162,6 +163,17 @@ export default function SerialsForm() {
     }
   };
 
+  // Pre-populate form with existing data
+  useEffect(() => {
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
+        }
+      })
+    }
+  }, [existingData, form])
+
   // Update calculated total fields in the form
   useEffect(() => {
     form.setValue('s_etotal_chinese', totalElectronicChinese);
@@ -221,8 +233,6 @@ export default function SerialsForm() {
       
       setSuccessMessage(result.message || 'Serials record submitted successfully!');
       
-      form.reset()
-      
     } catch (error: any) {
       console.error('Form submission error:', error)
       toast.error(error.message || 'Something went wrong')
@@ -230,6 +240,56 @@ export default function SerialsForm() {
       setErrorMessage(error.message || 'An error occurred while submitting the form');
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        s_epurchased_subtotal: purchasedElectronicSubtotal,
+        spurchased_subtotal: purchasedPrintSubtotal,
+        s_enonpurchased_subtotal: nonPurchasedElectronicSubtotal,
+        snonpurchased_subtotal: nonPurchasedPrintSubtotal,
+        s_etotal_chinese: totalElectronicChinese,
+        s_etotal_japanese: totalElectronicJapanese,
+        s_etotal_korean: totalElectronicKorean,
+        s_etotal_noncjk: totalElectronicNonCJK,
+        stotal_chinese: totalPrintChinese,
+        stotal_japanese: totalPrintJapanese,
+        stotal_korean: totalPrintKorean,
+        stotal_noncjk: totalPrintNonCJK,
+        s_egrandtotal: electronicGrandTotal,
+        sgrandtotal: printGrandTotal,
+        libid: params.libid,
+      }
+
+      const response = await fetch('/api/serials/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -248,7 +308,7 @@ export default function SerialsForm() {
         <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800 mb-2">
             <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;E-Journal Database by Subscription - List of&quot; in order for the
+            &quot;E-Journal Databases by Subscription - List of&quot; in order for the
             system to provide the corresponding numbers automatically.
           </p>
           <Button
@@ -258,7 +318,7 @@ export default function SerialsForm() {
             variant="default"
           >
             <Download className="h-4 w-4" />
-            Import from E-Journal Database by Subscription
+            Import from E-Journal Databases by Subscription
           </Button>
         </div>
 
@@ -413,9 +473,11 @@ export default function SerialsForm() {
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
         submitButtonText="Submit Serials Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )

@@ -85,19 +85,48 @@ export default function SubscriptionManagementClient({
   // Define columns for the management view
   const getColumns = () => [
     {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }: any) => <div className="w-16">{row.getValue("id")}</div>,
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }: any) => {
+        const record = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleEdit(record)}
+              disabled={isRemoving}
+              title="Edit"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => handleRemoveSubscription(record.id)}
+              disabled={isRemoving}
+              title="Remove"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "title",
-      header: "English Title",
-      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("title")}</div>,
+      accessorKey: "id",
+      header: "Record ID",
+      cell: ({ row }: any) => <div className="text-center font-mono text-sm">{row.getValue("id")}</div>,
     },
     {
       accessorKey: "cjk_title",
       header: "CJK Title",
       cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("cjk_title")}</div>,
+    },
+    {
+      accessorKey: "title",
+      header: "English Title",
+      cell: ({ row }: any) => <div className="max-w-[180px] truncate">{row.getValue("title")}</div>,
     },
     {
       accessorKey: "publisher",
@@ -110,40 +139,43 @@ export default function SubscriptionManagementClient({
       cell: ({ row }: any) => <Badge variant="outline">{row.getValue("type")}</Badge>,
     },
     {
+      accessorKey: "is_global",
+      header: "Global",
+      cell: ({ row }: any) => {
+        const isGlobal = row.getValue("is_global") as boolean;
+        return (
+          <div className="flex justify-center">
+            {isGlobal ? (
+              <Badge className="bg-green-100 text-green-800 border-green-300">Global</Badge>
+            ) : (
+              <Badge variant="secondary" className="bg-gray-100 text-gray-700">Library</Badge>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "language",
+      header: "Language",
+      cell: ({ row }: any) => {
+        const langs = row.getValue("language") as string[];
+        return (
+          <div className="flex gap-1 flex-wrap">
+            {langs.map((lang, idx) => (
+              <Badge key={idx} variant="secondary" className="text-xs">
+                {lang === "NON" ? "NON-CJK" : lang}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "counts",
       header: "Titles",
       cell: ({ row }: any) => {
         const count = row.getValue("counts") as number;
         return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
-      },
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => {
-        const record = row.original;
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleEdit(record)}
-              disabled={isRemoving}
-            >
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleRemoveSubscription(record.id)}
-              disabled={isRemoving}
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Remove
-            </Button>
-          </div>
-        );
       },
     },
   ];

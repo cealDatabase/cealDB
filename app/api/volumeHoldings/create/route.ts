@@ -27,8 +27,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Found Library_Year record:", libraryYear);
-
     if (!libraryYear) {
       return NextResponse.json(
         { error: "No library_year record exists for this library and year. Please contact the administrator." },

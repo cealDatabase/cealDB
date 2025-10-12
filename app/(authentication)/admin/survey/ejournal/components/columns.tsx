@@ -36,7 +36,8 @@ const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[250px] min-w-[200px] truncate'>
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        transition-colors cursor-pointer w-full max-w-[250px] min-w-[200px] truncate'>
           {preview}
         </button>
       </PopoverTrigger>
@@ -69,40 +70,44 @@ const ExpandableTextWithSource = ({
   description: string | null;
   dataSource: string | null | undefined;
 }) => {
-  const isValidDataSource =
-    !!dataSource &&
-    typeof dataSource === "string" &&
-    dataSource.trim() !== "" &&
-    (dataSource.startsWith("http://") || dataSource.startsWith("https://"));
+  const hasDataSource = !!dataSource && dataSource.trim() !== "";
+  const isUrl = hasDataSource && (dataSource!.startsWith("http://") || dataSource!.startsWith("https://"));
 
-  // If no description and no valid data source, show empty
-  if (!description && !isValidDataSource) {
+  // If neither description nor data source, show empty
+  if (!description && !hasDataSource) {
     return <span></span>;
   }
 
-  // If no description but has data source, show only data source link
-  if (!description && isValidDataSource) {
-    return (
-      <a
-        href={dataSource}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
-      >
-        {dataSource}
-      </a>
-    );
+  // If only data source (no description)
+  if (!description && hasDataSource) {
+    // If it's a URL, make it clickable
+    if (isUrl) {
+      return (
+        <a
+          href={dataSource}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
+        >
+          {dataSource}
+        </a>
+      );
+    }
+    // Otherwise show as plain text
+    return <span className='font-medium'>{dataSource}</span>;
   }
 
-  // Has description
-  const needsPopover = description!.length > 60 || isValidDataSource;
+  // Has description - show popover if description is long OR we have a data source to show
+  const needsPopover = description!.length > 60 || hasDataSource;
 
+  // If no popover needed (short description, no source), just show description
   if (!needsPopover) return <span className='font-medium'>{description}</span>;
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
+        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
           <div className='line-clamp-3'>
             {description}
           </div>
@@ -120,19 +125,23 @@ const ExpandableTextWithSource = ({
             <p className='font-medium'>{description}</p>
           </div>
 
-          {isValidDataSource && (
+          {hasDataSource && (
             <div>
               <h4 className='font-semibold text-xs uppercase text-muted-foreground mb-1'>
                 Data Source
               </h4>
-              <a
-                href={dataSource}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='hover:underline break-all text-orange-800'
-              >
-                {dataSource}
-              </a>
+              {isUrl ? (
+                <a
+                  href={dataSource}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='hover:underline break-all text-orange-800'
+                >
+                  {dataSource}
+                </a>
+              ) : (
+                <p className='font-medium break-all'>{dataSource}</p>
+              )}
             </div>
           )}
         </div>
@@ -181,6 +190,36 @@ const ExpandableSubscribers = ({
   );
 };
 
+// Notes column component with 3-line clamp
+const ExpandableNotes = ({ content }: { content: string | null }) => {
+  if (!content) {
+    return <span></span>
+  }
+
+  const needsPopover = content.length > 60; // Approximate check for 3 lines
+
+  if (!needsPopover) {
+    return <span className="font-medium">{content}</span>
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
+          <div className="line-clamp-3">
+            {content}
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 max-h-[400px] overflow-y-scroll" side="right">
+        <div className="text-sm">
+          <p className="font-medium whitespace-pre-wrap">{content}</p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+};
+
 /* ───────────────────── Columns ───────────────────── */
 
 export function getColumns(
@@ -197,7 +236,7 @@ export function getColumns(
       userRoles = [roleIdPassIn];
     }
   }
-  
+
   // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
   // Show Actions for admins, super admins, or users with multiple roles
   const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
@@ -229,12 +268,12 @@ export function getColumns(
     },
     ...(shouldShowActions
       ? [{
-          id: "actions",
-          header: "Actions",
-          cell: ({ row }: { row: any }) => (
-            <DataTableRowActions row={row} year={year} basePath='ejournal' userRoles={userRoles} />
-          ),
-        } as ColumnDef<EJournalRow>]
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }: { row: any }) => (
+          <DataTableRowActions row={row} year={year} basePath='ejournal' userRoles={userRoles} />
+        ),
+      } as ColumnDef<EJournalRow>]
       : []),
 
     /** Journals & Databases (per-year) */
@@ -273,7 +312,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='min-w-[100px] max-w-[500px] font-medium'>
+          <span className='min-w-[100px] max-w-[200px] font-medium'>
             {row.getValue("cjk_title")}
           </span>
         </div>
@@ -286,7 +325,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='min-w-[200px] max-w-[500px] font-medium'>
+          <span className='min-w-[180px] max-w-[200px] font-medium'>
             {row.getValue("title")}
           </span>
         </div>
@@ -299,7 +338,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("romanized_title")}
           </span>
         </div>
@@ -312,7 +351,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("series")}
           </span>
         </div>
@@ -326,7 +365,7 @@ export function getColumns(
       cell: ({ row }) => (
         <div className='flex space-x-2'>
           <span
-            className='max-w-[500px] font-medium'
+            className='max-w-[200px] font-medium'
             // matches your existing usage
             dangerouslySetInnerHTML={{
               __html: (row.getValue("subtitle") as string) || "",
@@ -359,19 +398,20 @@ export function getColumns(
       },
     },
 
-    {
-      accessorKey: "sub_series_number",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={<>Sub-Series<br />Number</>} />
-      ),
-      cell: ({ row }) => (
-        <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
-            {row.getValue("sub_series_number")}
-          </span>
-        </div>
-      ),
-    },
+    // {
+    //   accessorKey: "sub_series_number",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title={<>Sub-Series<br />Number</>} />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className='flex space-x-2'>
+    //       <span className='max-w-[500px] font-medium'>
+    //         {row.getValue("sub_series_number")}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
+
     {
       accessorKey: "publisher",
       header: ({ column }) => (
@@ -379,7 +419,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("publisher")}
           </span>
         </div>
@@ -393,7 +433,7 @@ export function getColumns(
       ),
       cell: ({ row }) => (
         <div className='flex space-x-2'>
-          <span className='max-w-[500px] font-medium'>
+          <span className='max-w-[200px] font-medium'>
             {row.getValue("vendor")}
           </span>
         </div>
@@ -427,42 +467,38 @@ export function getColumns(
         <DataTableColumnHeader column={column} title='Notes' />
       ),
       cell: ({ row }) => (
-        <ExpandableText content={row.getValue("notes") as string | null} />
+        <ExpandableNotes content={row.getValue("notes") as string | null} />
       ),
     },
 
 
 
-    ...(roleIdPassIn?.trim() !== "2"
+    ...(!(userRoles.length === 1 && userRoles[0] === "2")
       ? ([
-          {
-            accessorKey: "subscribers",
-            header: ({ column }: { column: any }) => (
-              <DataTableColumnHeader column={column} title='Subscribers' />
-            ),
-            cell: ({ row }: { row: any }) => {
-              const subscribers = row.getValue("subscribers") as
-                | string[]
-                | string
-                | null
-                | undefined;
-              if (
-                !subscribers ||
-                (Array.isArray(subscribers) && subscribers.length === 0)
-              ) {
-                return (
-                  <span className='text-muted-foreground italic'>
-                    null
-                  </span>
-                );
-              }
-              const list = Array.isArray(subscribers)
-                ? subscribers
-                : [String(subscribers)];
-              return <ExpandableSubscribers subscribers={list} />;
-            },
-          } as ColumnDef<EJournalRow>,
-        ] as ColumnDef<EJournalRow>[])
+        {
+          accessorKey: "subscribers",
+          header: ({ column }: { column: any }) => (
+            <DataTableColumnHeader column={column} title='Subscribers' />
+          ),
+          cell: ({ row }: { row: any }) => {
+            const subscribers = row.getValue("subscribers") as
+              | string[]
+              | string
+              | null
+              | undefined;
+            if (
+              !subscribers ||
+              (Array.isArray(subscribers) && subscribers.length === 0)
+            ) {
+              return <span></span>;
+            }
+            const list = Array.isArray(subscribers)
+              ? subscribers
+              : [String(subscribers)];
+            return <ExpandableSubscribers subscribers={list} />;
+          },
+        } as ColumnDef<EJournalRow>,
+      ] as ColumnDef<EJournalRow>[])
       : []),
   ];
 }

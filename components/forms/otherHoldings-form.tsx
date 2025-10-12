@@ -2,10 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
+import { Download, Loader2 } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
@@ -91,10 +91,11 @@ export default function OtherHoldingsForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/otherHoldings/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/otherHoldings/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -143,6 +144,17 @@ export default function OtherHoldingsForm() {
       ohnotes: "",
     },
   })
+
+  // Pre-populate form with existing data
+  useEffect(() => {
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
+        }
+      })
+    }
+  }, [existingData, form])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -211,48 +223,76 @@ export default function OtherHoldingsForm() {
   const grandTotal = microformSubtotal + graphicSubtotal + audioSubtotal + videoSubtotal + dvdSubtotal + customSubtotal + onlineMapSubtotal + onlineImageSubtotal + streamingAudioSubtotal + streamingVideoSubtotal
 
   // Import AV data function
+  const [isImporting, setIsImporting] = useState(false);
+
   const importAVData = async () => {
     try {
+      setIsImporting(true);
+
       const libraryId = Number(params.libid);
       const currentYear = new Date().getFullYear();
 
       const response = await fetch(`/api/otherHoldings/import-av/${libraryId}/${currentYear}`);
+      
       if (response.ok) {
         const result = await response.json();
         const data = result.data;
 
+        // Calculate total counts
+        let totalImported = 0;
+
         // Set online map fields
+        const onlineMapTotal = (data['online map'].chinese || 0) + (data['online map'].japanese || 0) + 
+                               (data['online map'].korean || 0) + (data['online map'].noncjk || 0);
         form.setValue('ohonlinemapchinese', data['online map'].chinese || 0, { shouldValidate: false });
         form.setValue('ohonlinemapjapanese', data['online map'].japanese || 0, { shouldValidate: false });
         form.setValue('ohonlinemapkorean', data['online map'].korean || 0, { shouldValidate: false });
         form.setValue('ohonlinemapnoncjk', data['online map'].noncjk || 0, { shouldValidate: false });
+        totalImported += onlineMapTotal;
 
         // Set online image fields
+        const onlineImageTotal = (data['online image/photograph'].chinese || 0) + (data['online image/photograph'].japanese || 0) + 
+                                 (data['online image/photograph'].korean || 0) + (data['online image/photograph'].noncjk || 0);
         form.setValue('ohonlineimagechinese', data['online image/photograph'].chinese || 0, { shouldValidate: false });
         form.setValue('ohonlineimagejapanese', data['online image/photograph'].japanese || 0, { shouldValidate: false });
         form.setValue('ohonlineimagekorean', data['online image/photograph'].korean || 0, { shouldValidate: false });
         form.setValue('ohonlineimagenoncjk', data['online image/photograph'].noncjk || 0, { shouldValidate: false });
+        totalImported += onlineImageTotal;
 
         // Set streaming audio fields
+        const streamingAudioTotal = (data['streaming audio/music'].chinese || 0) + (data['streaming audio/music'].japanese || 0) + 
+                                    (data['streaming audio/music'].korean || 0) + (data['streaming audio/music'].noncjk || 0);
         form.setValue('ohstreamingchinese', data['streaming audio/music'].chinese || 0, { shouldValidate: false });
         form.setValue('ohstreamingjapanese', data['streaming audio/music'].japanese || 0, { shouldValidate: false });
         form.setValue('ohstreamingkorean', data['streaming audio/music'].korean || 0, { shouldValidate: false });
         form.setValue('ohstreamingnoncjk', data['streaming audio/music'].noncjk || 0, { shouldValidate: false });
+        totalImported += streamingAudioTotal;
 
         // Set streaming video fields
+        const streamingVideoTotal = (data['streaming film/video'].chinese || 0) + (data['streaming film/video'].japanese || 0) + 
+                                    (data['streaming film/video'].korean || 0) + (data['streaming film/video'].noncjk || 0);
         form.setValue('ohstreamingvideochinese', data['streaming film/video'].chinese || 0, { shouldValidate: false });
         form.setValue('ohstreamingvideojapanese', data['streaming film/video'].japanese || 0, { shouldValidate: false });
         form.setValue('ohstreamingvideokorean', data['streaming film/video'].korean || 0, { shouldValidate: false });
         form.setValue('ohstreamingvideononcjk', data['streaming film/video'].noncjk || 0, { shouldValidate: false });
+        totalImported += streamingVideoTotal;
 
-        toast.success('Audio/Visual subscription data imported successfully!');
+        // Show detailed success message
+        toast.success(
+          `✓ Import successful! ${totalImported} total items imported.`,
+          { duration: 6000 }
+        );
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to import AV data');
+        const errorMessage = errorData.error || 'Failed to import AV data';
+        console.error('Import error:', errorData);
+        toast.error(`❌ Import failed: ${errorMessage}`, { duration: 5000 });
       }
     } catch (error: any) {
       console.error('Import AV data error:', error);
-      toast.error('Failed to import AV subscription data');
+      toast.error(`❌ Import failed: ${error.message || 'Network error or server unavailable'}`, { duration: 5000 });
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -293,7 +333,6 @@ export default function OtherHoldingsForm() {
       const result = await response.json()
       toast.success('Other holdings record created successfully!')
       setSuccessMessage(result.message || 'Other holdings record submitted successfully!')
-      form.reset()
 
     } catch (error: any) {
       console.error('Form submission error:', error)
@@ -302,6 +341,53 @@ export default function OtherHoldingsForm() {
       toast.error(message)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        ohmicroform_subtotal: microformSubtotal,
+        ohcarto_graphic_subtotal: graphicSubtotal,
+        ohaudio_subtotal: audioSubtotal,
+        ohfilm_video_subtotal: videoSubtotal,
+        ohdvd_subtotal: dvdSubtotal,
+        ohcustom1subtotal: customSubtotal,
+        ohonlinemapsubtotal: onlineMapSubtotal,
+        ohonlineimagesubtotal: onlineImageSubtotal,
+        ohstreamingsubtotal: streamingAudioSubtotal,
+        ohstreamingvideosubtotal: streamingVideoSubtotal,
+        ohgrandtotal: grandTotal,
+        libid: Number(params.libid),
+      }
+
+      const response = await fetch('/api/otherHoldings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -429,7 +515,7 @@ export default function OtherHoldingsForm() {
         <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800 mb-2">
             <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;Audio-Visual Database by Subscription - List of&quot; in order for the
+            &quot;Audio-Visual Database by Subscription&quot; in order for the
             system to provide the corresponding numbers automatically.
           </p>
           <Button
@@ -437,9 +523,19 @@ export default function OtherHoldingsForm() {
             onClick={importAVData}
             className="flex items-center gap-2"
             variant="default"
+            disabled={isImporting}
           >
-            <Download className="h-4 w-4" />
-            Import from Audio/Video Database by Subscription
+            {isImporting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Importing...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Import from Audio/Video Database by Subscription
+              </>
+            )}
           </Button>
         </div>
 
@@ -573,9 +669,11 @@ export default function OtherHoldingsForm() {
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Other Holdings Data"
+        submitButtonText="Save Other Holdings Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )

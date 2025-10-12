@@ -137,10 +137,10 @@ export default function CreateAVForm({
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             {/* Basic Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Basic Information
               </h3>
 
@@ -178,7 +178,7 @@ export default function CreateAVForm({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>English Title</FormLabel>
+                      <FormLabel>English Title*</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter the title" {...field} />
                       </FormControl>
@@ -205,7 +205,7 @@ export default function CreateAVForm({
 
             {/* Publication Details Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Publication Details
               </h3>
 
@@ -245,7 +245,7 @@ export default function CreateAVForm({
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Type</FormLabel>
+                      <FormLabel>Type*</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -289,7 +289,7 @@ export default function CreateAVForm({
 
             {/* Additional Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Additional Information
               </h3>
 
@@ -332,7 +332,7 @@ export default function CreateAVForm({
 
             {/* Languages Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              <h3 className="text-lg font-semibold border-b pb-2">
                 Languages *
               </h3>
 

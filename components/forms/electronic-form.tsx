@@ -84,6 +84,7 @@ export default function ElectronicForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
   const params = useParams()
 
   const form = useForm<FormData>({
@@ -135,32 +136,18 @@ export default function ElectronicForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading } = useFormStatusChecker('/api/electronic/status')
+  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/electronic/status')
 
-  // Load existing data
+  // Pre-populate form with existing data
   useEffect(() => {
-    const loadExistingData = async () => {
-      try {
-        const response = await fetch(`/api/electronic/status/${params.libid}`)
-        if (response.ok) {
-          const data = await response.json()
-          if (data.existingData) {
-            Object.keys(data.existingData).forEach(key => {
-              if (key !== 'id' && key !== 'entryid' && key !== 'libid' && key !== 'year' && key !== 'libraryyear') {
-                form.setValue(key as keyof FormData, data.existingData[key] || 0)
-              }
-            })
-          }
+    if (existingData) {
+      Object.keys(existingData).forEach((key) => {
+        if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
+          form.setValue(key as keyof FormData, existingData[key])
         }
-      } catch (error) {
-        console.log('No existing data found:', error)
-      }
+      })
     }
-
-    if (params.libid) {
-      loadExistingData()
-    }
-  }, [params.libid, form])
+  }, [existingData, form])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -342,6 +329,65 @@ export default function ElectronicForm() {
       setErrorMessage(error.message || 'An error occurred while submitting the form');
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleSaveDraft() {
+    try {
+      setIsSavingDraft(true)
+      setSuccessMessage(null)
+      setErrorMessage(null)
+
+      const values = form.getValues()
+      const submissionData = {
+        ...values,
+        eonetime_computer_title_subtotal: oneTimeComputerTitlesSubtotal,
+        eonetime_computer_cd_subtotal: oneTimeComputerCdSubtotal,
+        eaccompanied_computer_title_subtotal: accompaniedComputerTitlesSubtotal,
+        eaccompanied_computer_cd_subtotal: accompaniedComputerCdSubtotal,
+        egift_computer_title_subtotal: giftComputerTitlesSubtotal,
+        egift_computer_cd_subtotal: giftComputerCdSubtotal,
+        etotal_computer_title_chinese: totalComputerTitlesChinese,
+        etotal_computer_title_japanese: totalComputerTitlesJapanese,
+        etotal_computer_title_korean: totalComputerTitlesKorean,
+        etotal_computer_title_noncjk: totalComputerTitlesNoncjk,
+        etotal_computer_title_subtotal: totalComputerTitlesSubtotal,
+        etotal_computer_cd_chinese: totalComputerCdChinese,
+        etotal_computer_cd_japanese: totalComputerCdJapanese,
+        etotal_computer_cd_korean: totalComputerCdKorean,
+        etotal_computer_cd_noncjk: totalComputerCdNoncjk,
+        etotal_computer_cd_subtotal: totalComputerCdSubtotal,
+        eindex_electronic_title_subtotal: indexElectronicSubtotal,
+        efulltext_electronic_title_subtotal: fulltextElectronicSubtotal,
+        etotal_electronic_title_chinese: totalElectronicChinese,
+        etotal_electronic_title_japanese: totalElectronicJapanese,
+        etotal_electronic_title_korean: totalElectronicKorean,
+        etotal_electronic_title_noncjk: totalElectronicNoncjk,
+        etotal_electronic_title_subtotal: totalElectronicSubtotal,
+        libid: Number(params.libid),
+      }
+
+      const response = await fetch('/api/electronic/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save draft')
+      }
+
+      toast.success('Draft saved successfully!')
+      setSuccessMessage('Draft saved successfully! You can continue editing or submit when ready.')
+      
+    } catch (error: any) {
+      console.error('Draft save error:', error)
+      toast.error(error.message || 'Failed to save draft')
+      setSuccessMessage(null)
+      setErrorMessage(error.message || 'An error occurred while saving the draft')
+    } finally {
+      setIsSavingDraft(false)
     }
   }
 
@@ -797,7 +843,7 @@ export default function ElectronicForm() {
         <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800 mb-2">
             <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;E-Book Database by Subscription&quot;, &quot;E-Journal Database by Subscription&quot;,
+            &quot;E-Book Databases by Subscription&quot;, &quot;E-Journal Databases by Subscription&quot;,
             and &quot;Audio-Visual Database by Subscription&quot; in order for the system to provide
             the corresponding numbers automatically.
           </p>
@@ -919,9 +965,11 @@ export default function ElectronicForm() {
 
       <FormSubmitSection
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
         submitButtonText="Submit Electronic Resources Data"
+        onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
   )
