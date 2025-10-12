@@ -212,7 +212,7 @@ export default async function Page({ params, searchParams }: PageProps) {
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
-                    {libraryName} - E-Book Subscription Management
+                    {libraryName} - E-Book Access Management
                   </h2>
                   <p className='text-lg text-gray-600'>
                     Year: {year}
@@ -252,7 +252,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
-                {libraryName} - E-Book Subscription Management
+                {libraryName} - E-Book Access Management
               </h1>
               <p className='text-lg text-gray-600'>
                 Year: {year} • {filteredEBooks.length} subscription{filteredEBooks.length === 1 ? '' : 's'}
