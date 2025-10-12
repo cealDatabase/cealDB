@@ -214,7 +214,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                     href={`/admin/forms/${libid}/avdbedit`}
                                     className="block text-orange-900 hover:text-orange-700 font-semibold transition-colors"
                                 >
-                                    🎵 Audio/Visual Database for {libraryName} in {currentYear}
+                                    🎵 Audio/Visual Databases for {libraryName} in {currentYear}
                                 </Link>
                             </div>
                             <div className="p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all">
