@@ -75,8 +75,6 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   
   // Initialize sorting state as empty (hydration-safe)
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   // Restore sorting state from sessionStorage after hydration
   React.useEffect(() => {
@@ -98,8 +96,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         }
       }
     }
-    return [];
-  });
+  }, [tableKey, columns]);
   
   // Restore pagination state from sessionStorage or use initialPaginationState
   const [pagination, setPagination] = React.useState(() => {
