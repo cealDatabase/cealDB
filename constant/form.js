@@ -152,23 +152,7 @@ export const instructionGroup = {
   ],
 };
 
-export const actions = [
-    {
-      title: 'Survey Dates Management',
-      href: '/admin/survey-dates',
-      icon: Calendar,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-100',
-      description: 'Set opening and closing dates for surveys. Changes take effect immediately and appear on the Forms Management page.',
-    },
-    {
-      title: 'Open/Close Annual Surveys',
-      href: '/admin/broadcast',
-      icon: Mail,
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-100',
-      description: 'Open or close forms for editing and send broadcast notifications to CEAL members via email.',
-    },
+export const eResourceActions = [
     {
       title: 'Audio/Visual Databases',
       href: `/admin/survey/avdb/${currentYear}`,
@@ -192,6 +176,25 @@ export const actions = [
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
       description: 'Create, update, or remove database records and their associated data.',
+    },
+  ]
+
+export const superAdminActions = [
+    {
+      title: 'Survey Dates Management',
+      href: '/admin/survey-dates',
+      icon: Calendar,
+      iconColor: 'text-blue-600',
+      iconBg: 'bg-blue-100',
+      description: 'Set opening and closing dates for surveys. Changes take effect immediately and appear on the Forms Management page.',
+    },
+    {
+      title: 'Open/Close Annual Surveys',
+      href: '/admin/broadcast',
+      icon: Mail,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      description: 'Open or close forms for editing and send broadcast notifications to CEAL members via email.',
     },
     {
       title: 'Edit Users​',
