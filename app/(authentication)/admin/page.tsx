@@ -12,7 +12,7 @@ import {
   FileText,
 } from "lucide-react";
 
-import { actions } from "@/constant/form";
+import { eResourceActions, superAdminActions } from "@/constant/form";
 import { UserProfile } from "@/components/UserProfile";
 
 
@@ -122,8 +122,8 @@ async function UserLoggedInPage() {
   );
 
   // Check if user has ONLY role ID 2 (regular member institution user)
-  const isRegularUserOnly = Array.isArray(userRoleIds) && 
-    userRoleIds.length === 1 && 
+  const isRegularUserOnly = Array.isArray(userRoleIds) &&
+    userRoleIds.length === 1 &&
     userRoleIds.includes("2");
 
   if (!userData) {
@@ -185,6 +185,40 @@ async function UserLoggedInPage() {
               </CardContent>
             </Card>
 
+            {/* Editor Role Section, see AV, E-Book, and E-Journal */}
+            <div>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-2">E-Resource Editor Section</h2>
+                <p className="text-muted-foreground">Access forms for managing E-Resources</p>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                {eResourceActions.map((action, index) => {
+                  const IconComponent = action.icon;
+                  return (
+                    <Card key={index} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                            <IconComponent className={`w-5 h-5 ${action.iconColor}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-primary mb-1">{action.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {action.description}
+                            </p>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={action.href}>Access</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Super Admin Toolkit */}
             {showSuperAdminTools && (
               <div>
@@ -215,7 +249,7 @@ async function UserLoggedInPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {actions.map((action, index) => {
+                  {superAdminActions.map((action, index) => {
                     const IconComponent = action.icon;
                     return (
                       <Card key={index} className="hover:shadow-md transition-shadow">
