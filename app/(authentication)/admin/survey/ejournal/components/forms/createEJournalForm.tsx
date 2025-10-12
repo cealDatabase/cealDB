@@ -105,7 +105,10 @@ export default function CreateEJournalForm({
 
       if (response.ok) {
         toast.success("E-Journal entry created successfully!");
-        router.push(`/admin/survey/ejournal/${selectedYear}`);
+        
+        // Get the new record ID and redirect with it
+        const newRecordId = data.data?.id || data.newEJournal?.id;
+        router.push(`/admin/survey/ejournal/${selectedYear}?newRecord=${newRecordId}`);
       } else {
         toast.error(`Failed to create E-Journal entry: ${data.detail || data.error}`);
       }

@@ -41,6 +41,22 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * User roles for permission checking (e.g., for copy functionality)
    */
   userRoles?: string[] | null;
+  /**
+   * Initial value for global filter (e.g., from URL search params)
+   */
+  initialGlobalFilter?: string;
+  /**
+   * Initial pagination state (pageIndex and pageSize)
+   */
+  initialPaginationState?: { pageIndex: number; pageSize: number };
+  /**
+   * ID of row to highlight (e.g., newly created record)
+   */
+  highlightRowId?: number;
+  /**
+   * Unique key for this table (to isolate sessionStorage between different tables)
+   */
+  tableKey?: string;
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
@@ -48,6 +64,10 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   data,
   Toolbar,
   userRoles,
+  initialGlobalFilter,
+  initialPaginationState,
+  highlightRowId,
+  tableKey = 'default',
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -55,13 +75,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   
   // Initialize sorting state as empty (hydration-safe)
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   // Restore sorting state from sessionStorage after hydration
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('table-sorting');
+      const saved = sessionStorage.getItem(`table-sorting-${tableKey}`);
       if (saved) {
         try {
           const parsedSorting = JSON.parse(saved) as SortingState;
@@ -78,14 +96,52 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         }
       }
     }
-  }, []); // Run once on mount
+  }, [tableKey, columns]);
+  
+  // Restore pagination state from sessionStorage or use initialPaginationState
+  const [pagination, setPagination] = React.useState(() => {
+    // If initialPaginationState is provided (new record), use it
+    if (initialPaginationState) {
+      console.log(`📄 Using initialPaginationState for ${tableKey}:`, initialPaginationState);
+      return initialPaginationState;
+    }
+    
+    // Otherwise, restore from sessionStorage
+    if (typeof window !== 'undefined') {
+      const key = `table-pagination-${tableKey}`;
+      const saved = sessionStorage.getItem(key);
+      console.log(`📄 Restoring pagination for ${tableKey} from sessionStorage:`, saved);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          console.log(`📄 Restored pagination state:`, parsed);
+          return parsed;
+        } catch {
+          return { pageIndex: 0, pageSize: 10 };
+        }
+      }
+    }
+    console.log(`📄 No saved pagination for ${tableKey}, using default`);
+    return { pageIndex: 0, pageSize: 10 };
+  });
+  
+  const [globalFilter, setGlobalFilter] = React.useState<string>(initialGlobalFilter || "");
 
   // Save sorting state to sessionStorage whenever it changes
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('table-sorting', JSON.stringify(sorting));
+      sessionStorage.setItem(`table-sorting-${tableKey}`, JSON.stringify(sorting));
     }
-  }, [sorting]);
+  }, [sorting, tableKey]);
+
+  // Save pagination state to sessionStorage whenever it changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const key = `table-pagination-${tableKey}`;
+      console.log(`💾 Saving pagination for ${tableKey}:`, pagination);
+      sessionStorage.setItem(key, JSON.stringify(pagination));
+    }
+  }, [pagination, tableKey]);
 
   const table = useReactTable({
     data,
@@ -96,6 +152,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       rowSelection,
       columnFilters,
       globalFilter,
+      pagination,
     },
     enableRowSelection: true,
     enableGlobalFilter: true,
@@ -121,6 +178,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -152,15 +210,22 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const isHighlighted = highlightRowId && row.original.id === highlightRowId;
+                return (
+                  <TableRow 
+                    key={row.id} 
+                    data-state={row.getIsSelected() && "selected"}
+                    className={isHighlighted ? "bg-yellow-50 animate-pulse" : ""}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">

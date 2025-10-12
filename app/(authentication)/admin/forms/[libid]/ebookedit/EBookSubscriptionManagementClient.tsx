@@ -330,6 +330,7 @@ export default function EBookSubscriptionManagementClient({
           data={data} 
           columns={getColumns()} 
           Toolbar={ManagementToolbar}
+          tableKey={`ebook-subscription-${libid}-${year}`}
         />
       </div>
 

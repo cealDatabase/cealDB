@@ -16,7 +16,9 @@ async function AVSinglePage(
   yearPassIn: number,
   roleIdPassIn: string | undefined,
   libid?: number,
-  userRoles?: string[] | null
+  userRoles?: string[] | null,
+  initialSearch?: string,
+  newRecordId?: number
 ) {
   const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
   return (
@@ -26,13 +28,15 @@ async function AVSinglePage(
       roleIdPassIn={roleIdPassIn}
       libid={libid}
       userRoles={userRoles}
+      initialSearch={initialSearch}
+      newRecordId={newRecordId}
     />
   );
 }
 
 export default async function AVListPage(props: {
   params: Promise<{ year: string }>;
-  searchParams?: Promise<{ libid?: string }>; // 👈 add searchParams
+  searchParams?: Promise<{ libid?: string; search?: string; newRecord?: string }>; // 👈 add newRecord parameter
 }) {
   const params = await props.params;
   const sp = (await props.searchParams) ?? {};
@@ -58,6 +62,12 @@ export default async function AVListPage(props: {
     : undefined;
 
   const libid = libidFromQuery ?? libidFromCookie;
+  
+  // Get search parameter from URL (for highlighting newly created/edited records)
+  const initialSearch = sp.search ? decodeURIComponent(sp.search) : undefined;
+  
+  // Get newRecord ID for pagination calculation
+  const newRecordId = sp.newRecord ? Number(sp.newRecord) : undefined;
 
   return (
     <main>
@@ -79,7 +89,7 @@ export default async function AVListPage(props: {
           <SelectYear yearCurrent={params.year} />
 
           <Suspense fallback={<SkeletonTableCard />}>
-            {await AVSinglePage(Number(params.year), roleId, libid, userRoles)}
+            {await AVSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch, newRecordId)}
           </Suspense>
         </div>
       </Container>

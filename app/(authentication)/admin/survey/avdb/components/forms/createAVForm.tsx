@@ -107,7 +107,13 @@ export default function CreateAVForm({
 
       if (response.ok) {
         toast.success("AV entry created successfully!");
-        router.push(`/admin/survey/avdb/${selectedYear}`);
+        
+        // Get the new record ID and redirect with it
+        // The client component will calculate pagination based on its loaded data
+        const newRecordId = data.data?.id || data.newAV?.id;
+        
+        // Redirect with the new record ID for highlighting and pagination calculation
+        router.push(`/admin/survey/avdb/${selectedYear}?newRecord=${newRecordId}`);
       } else {
         toast.error(`Failed to create AV entry: ${data.detail || data.error}`);
       }

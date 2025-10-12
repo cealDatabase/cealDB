@@ -324,6 +324,7 @@ export default function EJournalSubscriptionManagementClient({
           data={data} 
           columns={getColumns()} 
           Toolbar={ManagementToolbar}
+          tableKey={`ejournal-subscription-${libid}-${year}`}
         />
       </div>
 

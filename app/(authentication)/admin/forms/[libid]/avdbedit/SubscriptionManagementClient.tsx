@@ -322,6 +322,7 @@ export default function SubscriptionManagementClient({
         data={data} 
         columns={getColumns()} 
         Toolbar={ManagementToolbar}
+        tableKey={`avdb-subscription-${libid}-${year}`}
       />
       
       {editingRecord && (
