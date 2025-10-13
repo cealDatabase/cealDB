@@ -255,7 +255,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - E-Book Access Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {filteredEBooks.length} subscription{filteredEBooks.length === 1 ? '' : 's'}
+                Year: {year} • {filteredEBooks.length} access
               </p>
             </div>
 
@@ -314,7 +314,7 @@ export default async function Page({ params, searchParams }: PageProps) {
               Add E-Book Subscriptions - {libraryName}
             </h1>
             <p className='text-lg text-gray-600'>
-              Year: {year} • Adding {data.length} new subscription{data.length === 1 ? '' : 's'}
+              Year: {year} • Adding {data.length} new access
             </p>
           </div>
           <EBookEditClient 
