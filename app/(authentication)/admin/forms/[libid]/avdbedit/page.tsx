@@ -150,11 +150,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     const subscribedAVs = subscriptions.map((s) => s.List_AV);
     
     // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + type) to find duplicates
+    // Group by unique identifier (title + type + subtitle) to find duplicates
     const recordsByIdentifier = new Map<string, typeof subscribedAVs[0][]>();
     
     subscribedAVs.forEach((av) => {
-      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}`;
+      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}_${av.subtitle?.toLowerCase() || ''}`;
       if (!recordsByIdentifier.has(identifier)) {
         recordsByIdentifier.set(identifier, []);
       }

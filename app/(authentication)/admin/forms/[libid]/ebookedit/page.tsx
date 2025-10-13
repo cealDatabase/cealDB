@@ -172,11 +172,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
     
     // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + publisher) to find duplicates
+    // Group by unique identifier (title + publisher + subtitle) to find duplicates
     const recordsByIdentifier = new Map<string, typeof subscribedEBooks[0][]>();
     
     subscribedEBooks.forEach((ebook) => {
-      const identifier = `${ebook.title?.toLowerCase() || ''}_${ebook.publisher?.toLowerCase() || ''}`;
+      const identifier = `${ebook.title?.toLowerCase() || ''}_${ebook.publisher?.toLowerCase() || ''}_${ebook.subtitle?.toLowerCase() || ''}`;
       if (!recordsByIdentifier.has(identifier)) {
         recordsByIdentifier.set(identifier, []);
       }
