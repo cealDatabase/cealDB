@@ -17,7 +17,14 @@ interface PageProps {
 export default async function AvdbViewPage({ params, searchParams }: PageProps) {
   const cookieStore = await cookies();
   const roleId = cookieStore.get("role")?.value;
-  const isSuperAdmin = roleId === "1";
+  // Role ID is a stringified array, parse it and check if it contains role id 1 (super admin)
+  let isSuperAdmin = false;
+  try {
+    const roleIds = roleId ? JSON.parse(roleId) : [];
+    isSuperAdmin = Array.isArray(roleIds) && roleIds.includes('1');
+  } catch {
+    isSuperAdmin = false;
+  }
 
   // Get library ID from params or cookie
   let libid: number;

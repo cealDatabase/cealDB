@@ -39,11 +39,22 @@ export function filterPreferLibrarySpecific<T extends RecordWithIdentifier>(
     recordsByIdentifier.get(identifier)!.push(record);
   });
   
-  // For each group, prefer library-specific over global
-  const filtered = Array.from(recordsByIdentifier.values()).map((group) => {
-    // If there's a library-specific record (is_global = false), use that
-    const librarySpecific = group.find(record => !record.is_global);
-    return librarySpecific || group[0]; // fallback to first if all are global
+  // For each group, only dedupe if there's both global and library-specific
+  const filtered: T[] = [];
+  
+  Array.from(recordsByIdentifier.values()).forEach((group) => {
+    // Check if there are both global and library-specific versions
+    const hasGlobal = group.some(record => record.is_global);
+    const hasLibrarySpecific = group.some(record => !record.is_global);
+    
+    if (hasGlobal && hasLibrarySpecific) {
+      // Only in this case, prefer library-specific (user customized override)
+      const librarySpecific = group.filter(record => !record.is_global);
+      filtered.push(...librarySpecific);
+    } else {
+      // Otherwise, keep all records (even if they have the same title)
+      filtered.push(...group);
+    }
   });
   
   return filtered;

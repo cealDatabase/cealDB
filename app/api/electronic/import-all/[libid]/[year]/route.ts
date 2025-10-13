@@ -69,26 +69,45 @@ export async function GET(
 
     // Process E-Books (only from subscriptions - no global items unless subscribed)
     const allEBooks = ebookSubscriptions.map(sub => sub.List_EBook).filter(Boolean);
+    console.log(`[Import All] E-Books before filter: ${allEBooks.length}`);
 
     // Filter to prefer library-specific records over global (prevents duplicate counting)
     const filteredEBooks = filterEBookSubscriptions(allEBooks);
+    console.log(`[Import All] E-Books after filter: ${filteredEBooks.length}`);
 
+    // Count number of access records (subscriptions) by language
     for (const ebook of filteredEBooks) {
       if (!ebook) continue;
-      const count = ebook.List_EBook_Counts?.[0]?.titles || 0;
-
-      for (const langEntry of ebook.List_EBook_Language) {
+      
+      // Each access record should be counted once for its primary language
+      // If it has multiple languages, count for each (user requirement)
+      const languages = ebook.List_EBook_Language || [];
+      console.log(`[Import All] E-Book ID ${ebook.id}:`, languages.map(l => l.Language.short).join(', '));
+      
+      // Track if this record was counted to ensure at least one increment
+      let counted = false;
+      
+      for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
         if (langShort === "CHN") {
-          countsByLanguage.chinese += count;
+          countsByLanguage.chinese += 1;
+          counted = true;
         } else if (langShort === "JPN") {
-          countsByLanguage.japanese += count;
+          countsByLanguage.japanese += 1;
+          counted = true;
         } else if (langShort === "KOR") {
-          countsByLanguage.korean += count;
-        } else if (langShort === "NON") {
-          countsByLanguage.noncjk += count;
+          countsByLanguage.korean += 1;
+          counted = true;
+        } else if (langShort === "NON" || langShort === "NONCJK" || langShort === "NON-CJK") {
+          countsByLanguage.noncjk += 1;
+          counted = true;
         }
+      }
+      
+      // If no language matched, log warning
+      if (!counted && languages.length > 0) {
+        console.warn(`[Import All] E-Book ID ${ebook.id} has unmatched languages:`, languages.map(l => l.Language.short));
       }
     }
 
@@ -117,26 +136,41 @@ export async function GET(
 
     // Process E-Journals (only from subscriptions - no global items unless subscribed)
     const allEJournals = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
+    console.log(`[Import All] E-Journals before filter: ${allEJournals.length}`);
 
     // Filter to prefer library-specific records over global (prevents duplicate counting)
     const filteredEJournals = filterEJournalSubscriptions(allEJournals);
+    console.log(`[Import All] E-Journals after filter: ${filteredEJournals.length}`);
 
+    // Count number of access records (subscriptions) by language
     for (const ejournal of filteredEJournals) {
       if (!ejournal) continue;
-      const count = ejournal.List_EJournal_Counts?.[0]?.journals || 0;
-
-      for (const langEntry of ejournal.List_EJournal_Language) {
+      
+      const languages = ejournal.List_EJournal_Language || [];
+      console.log(`[Import All] E-Journal ID ${ejournal.id}:`, languages.map(l => l.Language.short).join(', '));
+      
+      let counted = false;
+      
+      for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
         if (langShort === "CHN") {
-          countsByLanguage.chinese += count;
+          countsByLanguage.chinese += 1;
+          counted = true;
         } else if (langShort === "JPN") {
-          countsByLanguage.japanese += count;
+          countsByLanguage.japanese += 1;
+          counted = true;
         } else if (langShort === "KOR") {
-          countsByLanguage.korean += count;
-        } else if (langShort === "NON") {
-          countsByLanguage.noncjk += count;
+          countsByLanguage.korean += 1;
+          counted = true;
+        } else if (langShort === "NON" || langShort === "NONCJK" || langShort === "NON-CJK") {
+          countsByLanguage.noncjk += 1;
+          counted = true;
         }
+      }
+      
+      if (!counted && languages.length > 0) {
+        console.warn(`[Import All] E-Journal ID ${ejournal.id} has unmatched languages:`, languages.map(l => l.Language.short));
       }
     }
 
@@ -165,28 +199,51 @@ export async function GET(
 
     // Process AVs (only from subscriptions - no global items unless subscribed)
     const allAVs = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
+    console.log(`[Import All] AVs before filter: ${allAVs.length}`);
 
     // Filter to prefer library-specific records over global (prevents duplicate counting)
     const filteredAVs = filterAVSubscriptions(allAVs);
+    console.log(`[Import All] AVs after filter: ${filteredAVs.length}`);
 
+    // Count number of access records (subscriptions) by language
     for (const av of filteredAVs) {
       if (!av) continue;
-      const count = av.List_AV_Counts?.[0]?.titles || 0;
-
-      for (const langEntry of av.List_AV_Language) {
+      
+      const languages = av.List_AV_Language || [];
+      console.log(`[Import All] AV ID ${av.id}:`, languages.map(l => l.Language.short).join(', '));
+      
+      let counted = false;
+      
+      for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
         if (langShort === "CHN") {
-          countsByLanguage.chinese += count;
+          countsByLanguage.chinese += 1;
+          counted = true;
         } else if (langShort === "JPN") {
-          countsByLanguage.japanese += count;
+          countsByLanguage.japanese += 1;
+          counted = true;
         } else if (langShort === "KOR") {
-          countsByLanguage.korean += count;
-        } else if (langShort === "NON") {
-          countsByLanguage.noncjk += count;
+          countsByLanguage.korean += 1;
+          counted = true;
+        } else if (langShort === "NON" || langShort === "NONCJK" || langShort === "NON-CJK") {
+          countsByLanguage.noncjk += 1;
+          counted = true;
         }
       }
+      
+      if (!counted && languages.length > 0) {
+        console.warn(`[Import All] AV ID ${av.id} has unmatched languages:`, languages.map(l => l.Language.short));
+      }
     }
+
+    console.log(`[Import All] Library ${libraryId}, Year ${currentYear}`);
+    console.log(`[Import All] Access counts:`, {
+      ebooks: filteredEBooks.length,
+      ejournals: filteredEJournals.length,
+      avs: filteredAVs.length,
+    });
+    console.log(`[Import All] Counts by language:`, countsByLanguage);
 
     return NextResponse.json({
       success: true,
