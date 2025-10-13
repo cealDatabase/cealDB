@@ -138,7 +138,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                 <Container>
                     <AdminBreadcrumb libraryName={libraryName} />
                     <div className="pt-12">
-                        <h1 className="text-4xl font-bold text-stone-900 mb-3">Forms Management</h1>
+                        <h1>Forms Management</h1>
                         <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium">
                             <div className="w-2 h-2 bg-emerald-800 rounded-full mr-2"></div>
                             Active Survey Period: {surveyDates.shortDateRange}

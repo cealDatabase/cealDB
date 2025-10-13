@@ -56,13 +56,13 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
 
-  // Initialize selected roles when user changes
+  // Initialize selected roles when user changes or modal opens
   useEffect(() => {
-    if (user) {
+    if (user && isOpen) {
       const currentRoleIds = user.User_Roles.map(ur => ur.role_id);
       setSelectedRoleIds(currentRoleIds);
     }
-  }, [user]);
+  }, [user, isOpen]);
 
   // Fetch available roles when modal opens
   useEffect(() => {

@@ -116,34 +116,10 @@ const openNewYearForm = async () => {
 }
 
 export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
-    const currentYear = new Date().getFullYear();
-
     return (
         <>
             <h1>Admin Guide</h1>
             <Container>
-                <div className="mb-6 space-y-4">
-                    <div className="flex flex-wrap gap-4">
-                        <Button className='w-[200px]' onClick={() => openNewYearForm()}>Open for Year of {currentYear}</Button>
-                        <Button className='w-[200px]'><Link href="/signup" className='text-white'>Sign Up New User</Link></Button>
-                        <Button className='w-[200px]'><Link href="/admin/users" className='text-white'>Manage User Roles</Link></Button>
-                        <Button className='w-[200px]'><Link href="/create" className='text-white'>Create New Library</Link></Button>
-
-                        {/* Automated Survey Schedule Button - Only show for super admins */}
-                        {userInfo && userInfo.userRoles.includes('1') && (
-                            <Link href="/admin/survey-schedule">
-                                <Button className='w-[280px] bg-blue-600 hover:bg-blue-700'>
-                                    📅 Open/Close Annual Surveys
-                                </Button>
-                            </Link>
-                        )}
-                    </div>
-
-                    {/* Debug info */}
-                    <div className="bg-yellow-50 p-2 rounded text-xs">
-                        <strong>🔍 Debug:</strong> UserInfo: {userInfo ? `Roles: [${userInfo.userRoles.join(', ')}], Super Admin: ${userInfo.userRoles.includes('1') ? 'YES' : 'NO'}` : 'NULL'}
-                    </div>
-                </div>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>

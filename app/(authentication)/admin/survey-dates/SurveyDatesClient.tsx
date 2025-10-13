@@ -188,7 +188,7 @@ export default function SurveyDatesClient({ userRoles }: SurveyDatesClientProps)
               
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/admin/superguide" className="no-underline">Super Admin Tools</Link>
+                  <Link href="/admin" className="no-underline">Super Admin Tools</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator>

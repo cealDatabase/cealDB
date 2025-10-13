@@ -213,7 +213,7 @@ export function EnhancedCreateLibraryForm({ data }: MyChildComponentProps) {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2 text-balance">Create a New Library</h1>
+        <h1>Create a New Library</h1>
         <p className="text-muted-foreground text-pretty">
           Set up your library profile with all the essential information and services
         </p>

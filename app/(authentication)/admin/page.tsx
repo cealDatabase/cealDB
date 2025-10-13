@@ -245,43 +245,22 @@ async function UserLoggedInPage() {
               <div>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Super Admin Toolkit</h2>
-                  <p className="text-muted-foreground">Comprehensive administrative tools and resources</p>
+                  <p className="text-muted-foreground">Comprehensive administrative tools and resources for managing the CEAL Statistics system</p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 mb-6">
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className={`w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center`}>
-                          <BookOpen className={`w-5 h-5 text-green-600`} />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-primary mb-1">Admin Guide</h3>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Provides an overview of the Super Admin’s responsibilities, along with instructions for performing key operations such as creating, editing, and deleting library and user information.
-                          </p>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href="/admin/superguide">Access</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {superAdminActions.map((action, index) => {
                     const IconComponent = action.icon;
                     return (
                       <Card key={index} className="hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                            <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                               <IconComponent className={`w-5 h-5 ${action.iconColor}`} />
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                               <h3 className="font-semibold text-primary mb-1">{action.title}</h3>
-                              <p className="text-sm text-muted-foreground mb-3">
+                              <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
                                 {action.description}
                               </p>
                               <Button variant="outline" size="sm" asChild>
@@ -293,6 +272,19 @@ async function UserLoggedInPage() {
                       </Card>
                     );
                   })}
+                </div>
+
+                {/* Admin Guide Reference */}
+                <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Need help?</p>
+                      <p className="text-sm text-muted-foreground">
+                        View the <Link href="/admin/superguide" className="text-primary hover:underline">Admin Guide</Link> for detailed instructions on performing key operations.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
