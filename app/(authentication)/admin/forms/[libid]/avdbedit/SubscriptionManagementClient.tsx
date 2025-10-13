@@ -79,7 +79,7 @@ export default function SubscriptionManagementClient({
 
   const handleEditSuccess = () => {
     router.refresh();
-    toast.success("Subscription updated successfully!");
+    toast.success("Access updated successfully!");
   };
 
   // Define columns for the management view
@@ -206,7 +206,7 @@ export default function SubscriptionManagementClient({
       // Update local state to remove the item
       setRemovedIds(prev => new Set([...prev, avId]));
       
-      toast.success(`Successfully removed subscription for AV record ${avId}.`);
+      toast.success(`Successfully removed access for AV record ${avId}.`);
       
       // Refresh the page after a short delay
       setTimeout(() => {
@@ -215,7 +215,7 @@ export default function SubscriptionManagementClient({
 
     } catch (error) {
       console.error("Remove subscription error:", error);
-      toast.error("There was an error removing the subscription. Please try again.");
+      toast.error("There was an error removing the access. Please try again.");
     } finally {
       setIsRemoving(false);
     }
@@ -231,9 +231,9 @@ export default function SubscriptionManagementClient({
         {/* Header with Add More to My Access button */}
         <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 shadow-sm">
           <div>
-            <h3 className="text-xl font-semibold text-blue-900">Current Subscriptions</h3>
+            <h3 className="text-xl font-semibold text-blue-900">Current Access</h3>
             <p className="text-sm text-blue-700 mt-1">
-              {data.length} subscription{data.length === 1 ? '' : 's'} for {year}
+              {data.length} access for {year}
             </p>
           </div>
           <Button
@@ -249,7 +249,7 @@ export default function SubscriptionManagementClient({
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center space-x-2">
             <Badge variant="outline">
-              {data.length} subscription{data.length === 1 ? '' : 's'}
+              {data.length} access
             </Badge>
             {selectedRows.length > 0 && (
               <Badge variant="secondary">
@@ -301,7 +301,7 @@ export default function SubscriptionManagementClient({
       // Update local state to remove the items
       setRemovedIds(prev => new Set([...prev, ...avIds]));
       
-      toast.success(`Successfully removed ${avIds.length} subscription${avIds.length === 1 ? '' : 's'}.`);
+      toast.success(`Successfully removed ${avIds.length} access.`);
       
       // Refresh the page after a short delay
       setTimeout(() => {
@@ -310,7 +310,7 @@ export default function SubscriptionManagementClient({
 
     } catch (error) {
       console.error("Bulk remove subscription error:", error);
-      toast.error("There was an error removing the subscriptions. Please try again.");
+      toast.error("There was an error removing the access. Please try again.");
     } finally {
       setIsRemoving(false);
     }
