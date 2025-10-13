@@ -117,14 +117,20 @@ async function UserLoggedInPage() {
   }
 
   const userData = await getUserDetailByEmail({ cookieStore: userCookie });
-  const showSuperAdminTools = Array.isArray(userRoleIds) && userRoleIds.length > 0 && (
-    userRoleIds.length > 1 || !userRoleIds.includes("2") || userRoleIds.includes("1")
-  );
-
-  // Check if user has ONLY role ID 2 (regular member institution user)
-  const isRegularUserOnly = Array.isArray(userRoleIds) &&
-    userRoleIds.length === 1 &&
-    userRoleIds.includes("2");
+  
+  // Role checks based on role IDs
+  const hasSuperAdmin = Array.isArray(userRoleIds) && userRoleIds.includes("1"); // Role ID 1: Super Admin
+  const hasMemberInstitution = Array.isArray(userRoleIds) && userRoleIds.includes("2"); // Role ID 2: Member Institution
+  const hasEResourceEditor = Array.isArray(userRoleIds) && userRoleIds.includes("3"); // Role ID 3: E-Resource Editor
+  const hasAssistantAdmin = Array.isArray(userRoleIds) && userRoleIds.includes("4"); // Role ID 4: Assistant Admin
+  
+  // Permission logic
+  const canViewFormsManagement = hasSuperAdmin || hasAssistantAdmin || hasEResourceEditor || hasMemberInstitution;
+  const canViewEResourceEditor = hasSuperAdmin || hasAssistantAdmin || hasEResourceEditor;
+  const canViewSuperAdminTools = hasSuperAdmin || hasAssistantAdmin;
+  
+  // Layout check: if user only has access to forms but not super admin tools
+  const isRegularUserOnly = canViewFormsManagement && !canViewSuperAdminTools;
 
   if (!userData) {
     return (
@@ -154,7 +160,19 @@ async function UserLoggedInPage() {
 
           {/* Main Content Area - Right Columns */}
           <div className={`space-y-8 ${isRegularUserOnly ? '' : 'lg:col-span-2'}`}>
-            {/* Forms Management Section */}
+            {/* No permissions message */}
+            {!canViewFormsManagement && !canViewEResourceEditor && !canViewSuperAdminTools && (
+              <Card className="border-2 border-muted">
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">
+                    You don't have permission to access administrative features. Please contact your administrator if you believe this is an error.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Forms Management Section - Visible to all authenticated users (Role 1, 2, 3, 4) */}
+            {canViewFormsManagement && (
             <Card className="border-2 border-primary/20">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -184,8 +202,10 @@ async function UserLoggedInPage() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
-            {/* Editor Role Section, see AV, E-Book, and E-Journal */}
+            {/* E-Resource Editor Section - Visible to E-Resource Editors, Super Admins, and Assistant Admins */}
+            {canViewEResourceEditor && (
             <div>
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground mb-2">E-Resource Editor Section</h2>
@@ -218,9 +238,10 @@ async function UserLoggedInPage() {
                 })}
               </div>
             </div>
+            )}
 
-            {/* Super Admin Toolkit */}
-            {showSuperAdminTools && (
+            {/* Super Admin Toolkit - Visible only to Super Admins and Assistant Admins */}
+            {canViewSuperAdminTools && (
               <div>
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Super Admin Toolkit</h2>
