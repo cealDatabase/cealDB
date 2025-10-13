@@ -18,17 +18,7 @@ export function DataTableRowActions({ row, year, userRoles }: { row: Row<any>, y
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
 
-  // Debug: Log what data is in the row
   const handleEditClick = () => {
-    console.log("🎯 Edit clicked for row:", {
-      id: row.original.id,
-      title: row.original.title,
-      counts: row.original.counts,
-      countsType: typeof row.original.counts,
-      is_global: row.original.is_global,
-      libraryyear: row.original.libraryyear,
-      fullRow: row.original
-    });
     setOpenEdit(true);
   };
 

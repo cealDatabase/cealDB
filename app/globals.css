@@ -296,3 +296,27 @@
 .float-animation {
   animation: float 6s ease-in-out infinite;
 }
+
+/* app/globals.css */
+html, body { font-synthesis-weight: none; font-synthesis-style: none; }
+
+/* 简体中文 */
+:lang(zh-CN) {
+  font-family: var(--font-noto-sc), "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+/* 繁体中文（台湾/香港） */
+:lang(zh-TW), :lang(zh-HK) {
+  font-family: var(--font-noto-tc), "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
+}
+/* 日文 */
+:lang(ja) {
+  font-family: var(--font-noto-jp), "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans CJK JP", sans-serif;
+}
+/* 韩文 */
+:lang(ko) {
+  font-family: var(--font-noto-kr), "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", "Noto Sans CJK KR", sans-serif;
+}
+
+:lang(zh-CN), :lang(zh-TW), :lang(ja), :lang(ko) {
+  font-variant-east-asian: proportional-width;
+}

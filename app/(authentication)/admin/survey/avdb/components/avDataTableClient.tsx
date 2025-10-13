@@ -54,8 +54,6 @@ export default function AVDataTableClient({
     const pageSize = 10;
     const pageIndex = Math.floor(position / pageSize);
     
-    console.log(`📍 New record #${newRecordId} found at position ${position}, navigating to page ${pageIndex}`);
-    
     return { pageIndex, pageSize };
   }, [data, newRecordId]);
 

@@ -25,8 +25,6 @@ const getAVListByYear = async (userSelectedYear: number) => {
     }
   });
 
-  console.log('\n📋 Map built with', countsMap.size, 'entries');
-
   if (ListAVIdArray.length === 0) return [];
 
   await Promise.all(
@@ -62,8 +60,6 @@ const getAVListByYear = async (userSelectedYear: number) => {
         new Set(subscriberLibraryNames.filter(Boolean))
       ).sort();
 
-      // console.log("getAVList type:", listAVItem.type);
-
       // Get counts from Map - guaranteed correct mapping
       const countsValue = countsMap.get(listAVId) ?? 0;
 
@@ -87,12 +83,6 @@ const getAVListByYear = async (userSelectedYear: number) => {
       });
     })
   );
-
-  // Running all the output in website console
-  // outputArray.forEach((item) => {
-  //   console.log("id: ", item.id);
-  //   console.log("language: ", item.language);
-  // });
 
   // Group records by ID after all processing is complete
   const groupedRecords = Array.from(

@@ -65,13 +65,6 @@ export default function EditAVModal({
   // Reset form data when modal opens with new rowData
   useEffect(() => {
     if (open) {
-      console.log("🔄 Modal opened with rowData:", {
-        id: rowData.id,
-        title: rowData.title,
-        counts: rowData.counts,
-        countsType: typeof rowData.counts
-      });
-      
       setFormData({
         title: rowData.title,
         cjk_title: rowData.cjk_title || "",
@@ -113,15 +106,6 @@ export default function EditAVModal({
       
       const payload = { id: rowData.id, year, ...formData };
       
-      // Debug logging
-      console.log("📤 Sending update request:", {
-        id: rowData.id,
-        year,
-        counts: formData.counts,
-        countsType: typeof formData.counts,
-        fullPayload: payload
-      });
-      
       const res = await fetch("/api/av/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -130,7 +114,7 @@ export default function EditAVModal({
 
       const data = await res.json();
       
-      console.log("📥 API Response:", { ok: res.ok, status: res.status, data });
+      console.log("📥 API Response:", { ok: res.ok, status: res.status });
       
       if (!res.ok) {
         console.error("Update failed:", data?.error || data);
