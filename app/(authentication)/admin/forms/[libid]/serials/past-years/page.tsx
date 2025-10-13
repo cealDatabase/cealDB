@@ -67,12 +67,12 @@ export default function PastYearsPage() {
     return value !== null && value !== undefined ? value : 0
   }
 
-  // Calculate Print and Other Formats (Total - Electronic)
+  // Calculate Print and Other Formats (A + B = Purchased + Not Purchased)
   const calculatePrintFormats = (data: SerialsData | null, language: 'chinese' | 'japanese' | 'korean' | 'noncjk') => {
     if (!data) return 0
-    const total = formatNumber(data[`stotal_${language}` as keyof SerialsData] as number | null)
-    const electronic = formatNumber(data[`s_etotal_${language}` as keyof SerialsData] as number | null)
-    return total - electronic
+    const purchased = formatNumber(data[`spurchased_${language}` as keyof SerialsData] as number | null)
+    const nonPurchased = formatNumber(data[`snonpurchased_${language}` as keyof SerialsData] as number | null)
+    return purchased + nonPurchased
   }
 
   // Calculate total for print formats
@@ -97,15 +97,18 @@ export default function PastYearsPage() {
     )
   }
 
-  // Calculate total for current serials
+  // Calculate current serials for each language (C + D = Print + Electronic)
+  const calculateCurrentSerials = (data: SerialsData | null, language: 'chinese' | 'japanese' | 'korean' | 'noncjk') => {
+    if (!data) return 0
+    const printFormats = calculatePrintFormats(data, language)
+    const electronic = formatNumber(data[`s_etotal_${language}` as keyof SerialsData] as number | null)
+    return printFormats + electronic
+  }
+
+  // Calculate total for current serials (C + D = Print + Electronic)
   const calculateCurrentSerialsTotal = (data: SerialsData | null) => {
     if (!data) return 0
-    return (
-      formatNumber(data.stotal_chinese) +
-      formatNumber(data.stotal_japanese) +
-      formatNumber(data.stotal_korean) +
-      formatNumber(data.stotal_noncjk)
-    )
+    return calculatePrintFormatsTotal(data) + calculateElectronicTotal(data)
   }
 
   return (
@@ -258,18 +261,18 @@ export default function PastYearsPage() {
                       {calculateElectronicTotal(data)}
                     </td>
                     
-                    {/* Total Number of Current Serials */}
+                    {/* Total Number of Current Serials (Calculated: C + D) */}
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
-                      {formatNumber(data?.stotal_chinese)}
+                      {calculateCurrentSerials(data, 'chinese')}
                     </td>
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
-                      {formatNumber(data?.stotal_japanese)}
+                      {calculateCurrentSerials(data, 'japanese')}
                     </td>
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
-                      {formatNumber(data?.stotal_korean)}
+                      {calculateCurrentSerials(data, 'korean')}
                     </td>
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
-                      {formatNumber(data?.stotal_noncjk)}
+                      {calculateCurrentSerials(data, 'noncjk')}
                     </td>
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-100">
                       {calculateCurrentSerialsTotal(data)}
