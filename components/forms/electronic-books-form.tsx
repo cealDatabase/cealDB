@@ -855,46 +855,60 @@ export default function ElectronicBooksForm() {
         />
       </FormSection>
 
-      {/* Physical Volumes Total - Blue Section */}
-      <FormSection
+      {/* Physical Volumes Total */}
+      {/* <FormSection
         title="Physical Volumes Total"
         description=""
       >
-        <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between bg-blue-100 p-4 rounded-lg">
-              <span className="text-lg font-semibold text-blue-900">16. Grand Total (Physical Vols)</span>
-              <span className="text-lg font-bold text-blue-900">{physicalVolumesTotal.toLocaleString()}</span>
-            </div>
-            <div className="text-sm text-blue-700 italic px-2">
-              (05 + 10 - 15)
-            </div>
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-base font-medium text-blue-900">16. Grand Total (Physical Vols)</span>
+            <span className="text-base font-semibold text-blue-900">{physicalVolumesTotal.toLocaleString()}</span>
+          </div>
+          <div className="text-sm text-blue-600 italic">
+            (05 + 10 - 15)
           </div>
         </div>
         <div className="mt-3 text-sm text-gray-600 italic">
           From Physical Volume Holdings Form
         </div>
-      </FormSection>
+      </FormSection> */}
 
-      {/* Grand Total Volume Holdings - Green Section */}
+      {/* Grand Total Volume Holdings */}
       <FormSection
-        title="Grand Total Volume Holdings"
+        title="Grand Total"
         description=""
       >
-        <div className="bg-green-50 p-6 rounded-lg border-2 border-green-300">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between bg-green-200 p-4 rounded-lg">
-              <span className="text-lg font-semibold text-green-900">Grand Total Volume Holdings</span>
-              <span className="text-lg font-bold text-green-900">{grandTotalVolumeHoldings.toLocaleString()}</span>
+        {/* Physical Volumes Total */}
+        <div className="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between rounded-lg">
+            <div>
+              <div className="text-base font-semibold text-gray-900">Physical Volumes Total</div>
+              <div className="text-sm text-blue-600 italic">(Imported from Physical Volume Holdings Form)</div>
             </div>
-            <div className="text-sm text-green-700 italic px-2">
-              (Physical {physicalVolumesTotal.toLocaleString()} + E-Books {totalVolumes.toLocaleString()})
+            <div className="bg-blue-100 px-4 py-2 rounded-md">
+              <span className="text-base font-semibold text-blue-900">{physicalVolumesTotal.toLocaleString()}</span>
             </div>
           </div>
         </div>
-        <div className="mt-3 text-sm text-gray-600 italic">
-          Automatically calculated; including E-Books
+
+        {/* Grand Total Volume Holdings - Green */}
+        <div className="p-4 bg-green-50 rounded-lg border-2 border-green-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-base font-semibold text-gray-900">Grand Total Volume Holdings</div>
+              <div className="mt-2 text-sm text-blue-600 italic">(Physical ({physicalVolumesTotal.toLocaleString()}) + E-Books ({totalVolumes.toLocaleString()}))</div>
+            </div>
+            <div className="bg-green-200 px-4 py-2 rounded-md">
+              <span className="text-base font-semibold text-green-900">{grandTotalVolumeHoldings.toLocaleString()}</span>
+            </div>
+          </div>
+          <div className="text-sm text-gray-600 italic">
+            Automatically calculated; including E-Books
+          </div>
         </div>
+
+
       </FormSection>
 
       {/* Notes */}
