@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { Resend } from 'resend';
 import { logUserAction } from '@/lib/auditLogger';
 import { getSurveyDates } from '@/lib/surveyDates';
+import { convertToEasternTime, formatAsEasternTime } from '@/lib/timezoneUtils';
 
 const prisma = new PrismaClient();
 
@@ -26,9 +27,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate that closing date is after opening date
-    const openDate = new Date(openingDate);
-    const closeDate = new Date(closingDate);
+    // Convert dates to Pacific Time (PT) at midnight, then to UTC
+    // When admin selects "Oct 14", they mean Oct 14 00:00 AM Pacific Time
+    // When admin selects "Dec 16", closing means Dec 16 11:59 PM Pacific Time
+    // The utility automatically handles PDT/PST based on the date
+    
+    const openDate = convertToEasternTime(openingDate, false); // Midnight PT
+    const closeDate = convertToEasternTime(closingDate, true);  // 11:59:59 PM PT
+    
+    console.log('📅 Date Conversion Summary (Pacific Time):');
+    console.log('  Opening:', openingDate, '→', formatAsEasternTime(openDate));
+    console.log('  Opening UTC:', openDate.toISOString());
+    console.log('  Closing:', closingDate, '→', formatAsEasternTime(closeDate));
+    console.log('  Closing UTC:', closeDate.toISOString());
     
     if (closeDate <= openDate) {
       return NextResponse.json(
@@ -37,6 +48,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for existing scheduled sessions
+    // Prevent creating new sessions if there are already scheduled ones
+    const now = new Date();
+    const existingSessions = await prisma.library_Year.findMany({
+      where: {
+        OR: [
+          { opening_date: { not: null } },
+          { closing_date: { not: null } }
+        ]
+      },
+      select: {
+        year: true,
+        opening_date: true,
+        closing_date: true,
+        is_open_for_editing: true
+      },
+      distinct: ['year']
+    });
+
+    // Filter to find scheduled (future) or active sessions
+    const activeOrScheduledSessions = existingSessions.filter(session => {
+      if (!session.opening_date || !session.closing_date) return false;
+      
+      const openingDate = new Date(session.opening_date);
+      const closingDate = new Date(session.closing_date);
+      
+      // Session is scheduled (not yet open) or active (currently open)
+      return now < closingDate;
+    });
+
+    if (activeOrScheduledSessions.length > 0) {
+      const sessionYears = activeOrScheduledSessions.map(s => s.year).join(', ');
+      return NextResponse.json(
+        { 
+          error: 'Cannot create new session: existing sessions found',
+          detail: `There ${activeOrScheduledSessions.length === 1 ? 'is' : 'are'} ${activeOrScheduledSessions.length} existing scheduled or active session${activeOrScheduledSessions.length === 1 ? '' : 's'} (Year${activeOrScheduledSessions.length === 1 ? '' : 's'}: ${sessionYears}). Please delete the existing session${activeOrScheduledSessions.length === 1 ? '' : 's'} before creating a new one.`,
+          existingSessions: activeOrScheduledSessions.map(s => ({
+            year: s.year,
+            opening_date: s.opening_date,
+            closing_date: s.closing_date,
+            is_active: s.is_open_for_editing
+          }))
+        },
+        { status: 409 } // 409 Conflict
+      );
+    }
 
     // Check if RESEND_API_KEY is available
     if (!process.env.RESEND_API_KEY) {
@@ -110,7 +167,7 @@ export async function POST(request: NextRequest) {
         <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://cealstats.org/admin/forms" 
+          <a href="https://cealstats.org/" 
              style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
             Access Forms
           </a>
@@ -233,8 +290,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const openDate = new Date(openingDate);
-    const closeDate = new Date(closingDate);
+    // Convert dates to Pacific Time - same logic as POST
+    const openDate = convertToEasternTime(openingDate, false); // Midnight PT
+    const closeDate = convertToEasternTime(closingDate, true);  // 11:59:59 PM PT
     const totalDays = Math.ceil((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // Generate preview template
@@ -268,7 +326,7 @@ export async function GET(request: NextRequest) {
         <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="https://cealstats.org/admin/forms" 
+          <a href="https://cealstats.org" 
              style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
             Access Forms
           </a>
