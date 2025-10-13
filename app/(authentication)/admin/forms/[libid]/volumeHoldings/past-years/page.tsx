@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react"
 import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import { useRouter, useParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { toast } from "sonner"
 
 interface VolumeHoldingsData {
@@ -34,7 +32,6 @@ interface YearData {
 }
 
 export default function PastYearsPage() {
-  const router = useRouter()
   const params = useParams()
   const [pastYearsData, setPastYearsData] = useState<YearData[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -100,18 +97,10 @@ export default function PastYearsPage() {
     <Container>
       <AdminBreadcrumb libraryName="Library" />
       
-      <div className="flex items-center justify-between mb-6 mt-6">
+      <div className="mb-6 mt-6">
         <h1 className="text-3xl font-bold text-gray-900">
           Physical Volume Holdings - Past 5 Years
         </h1>
-        <Button
-          variant="outline"
-          onClick={() => router.back()}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Form
-        </Button>
       </div>
 
       {isLoading ? (
