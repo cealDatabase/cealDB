@@ -98,56 +98,64 @@ export default function PastYearsPage() {
         </div>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-teal-700 text-white">
-                <th className="border border-gray-300 px-4 py-3 text-left font-semibold" rowSpan={2}>Year</th>
-                <th className="border border-gray-300 px-4 py-3 text-center font-semibold" colSpan={5}>Purchased</th>
-                <th className="border border-gray-300 px-4 py-3 text-center font-semibold" colSpan={5}>Rec'd but not Purchased</th>
-                <th className="border border-gray-300 px-4 py-3 text-center font-semibold" colSpan={2}>Total Number of Additions</th>
+                <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={3}>Year</th>
+                <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={20}>Monographs Additions</th>
+                <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={2} rowSpan={2}>Total Number of Additions</th>
+              </tr>
+              <tr className="bg-teal-700 text-white">
+                <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={10}>Purchased</th>
+                <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={10}>Rec'd but not Purchased</th>
               </tr>
               <tr className="bg-teal-600 text-white">
-                {/* Purchased sub-headers */}
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Titles<br/>CHN
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  JPN
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  KOR
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Non-CJK
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Total
-                </th>
+                {/* Purchased - Titles */}
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Titles</th>
+                {/* Purchased - Volumes */}
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Volumes</th>
                 
-                {/* Non-Purchased sub-headers */}
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Titles<br/>CHN
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  JPN
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  KOR
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Non-CJK
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Total
-                </th>
+                {/* Non-Purchased - Titles */}
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Titles</th>
+                {/* Non-Purchased - Volumes */}
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Volumes</th>
                 
                 {/* Grand Totals */}
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Titles<br/>Grand Total
-                </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">
-                  Volumes<br/>Grand Total
-                </th>
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium">Titles<br/>Grand Total</th>
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium">Volumes<br/>Grand Total</th>
+              </tr>
+              <tr className="bg-teal-500 text-white text-xs">
+                {/* Purchased Titles: CHN, JPN, KOR, Non-CJK, Total */}
+                <th className="border border-gray-300 px-2 py-1">CHN</th>
+                <th className="border border-gray-300 px-2 py-1">JPN</th>
+                <th className="border border-gray-300 px-2 py-1">KOR</th>
+                <th className="border border-gray-300 px-2 py-1">Non-CJK</th>
+                <th className="border border-gray-300 px-2 py-1">Total</th>
+                
+                {/* Purchased Volumes: CHN, JPN, KOR, Non-CJK, Total */}
+                <th className="border border-gray-300 px-2 py-1">CHN</th>
+                <th className="border border-gray-300 px-2 py-1">JPN</th>
+                <th className="border border-gray-300 px-2 py-1">KOR</th>
+                <th className="border border-gray-300 px-2 py-1">Non-CJK</th>
+                <th className="border border-gray-300 px-2 py-1">Total</th>
+                
+                {/* Non-Purchased Titles: CHN, JPN, KOR, Non-CJK, Total */}
+                <th className="border border-gray-300 px-2 py-1">CHN</th>
+                <th className="border border-gray-300 px-2 py-1">JPN</th>
+                <th className="border border-gray-300 px-2 py-1">KOR</th>
+                <th className="border border-gray-300 px-2 py-1">Non-CJK</th>
+                <th className="border border-gray-300 px-2 py-1">Total</th>
+                
+                {/* Non-Purchased Volumes: CHN, JPN, KOR, Non-CJK, Total */}
+                <th className="border border-gray-300 px-2 py-1">CHN</th>
+                <th className="border border-gray-300 px-2 py-1">JPN</th>
+                <th className="border border-gray-300 px-2 py-1">KOR</th>
+                <th className="border border-gray-300 px-2 py-1">Non-CJK</th>
+                <th className="border border-gray-300 px-2 py-1">Total</th>
+                
+                {/* Grand Totals (empty cells to align) */}
+                <th className="border border-gray-300 px-2 py-1"></th>
+                <th className="border border-gray-300 px-2 py-1"></th>
               </tr>
             </thead>
             <tbody>
@@ -165,49 +173,83 @@ export default function PastYearsPage() {
                       cursor-default
                     `}
                   >
-                    <td className="border border-gray-300 px-4 py-3 font-semibold text-center bg-yellow-50">
+                    <td className="border border-gray-300 px-3 py-2 font-semibold text-center bg-yellow-50">
                       {yearData.year}
                     </td>
                     
-                    {/* Purchased Titles */}
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    {/* Purchased Titles: CHN, JPN, KOR, Non-CJK, Total */}
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.mapurchased_titles_chinese)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.mapurchased_titles_japanese)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.mapurchased_titles_korean)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.mapurchased_titles_noncjk)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center font-semibold bg-blue-50">
+                    <td className="border border-gray-300 px-2 py-2 text-center font-semibold bg-blue-50">
                       {formatNumber(data?.mapurchased_titles_subtotal)}
                     </td>
                     
-                    {/* Non-Purchased Titles */}
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    {/* Purchased Volumes: CHN, JPN, KOR, Non-CJK, Total */}
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.mapurchased_volumes_chinese)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.mapurchased_volumes_japanese)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.mapurchased_volumes_korean)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.mapurchased_volumes_noncjk)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center font-semibold bg-blue-50">
+                      {formatNumber(data?.mapurchased_volumes_subtotal)}
+                    </td>
+                    
+                    {/* Non-Purchased Titles: CHN, JPN, KOR, Non-CJK, Total */}
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.manonpurchased_titles_chinese)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.manonpurchased_titles_japanese)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.manonpurchased_titles_korean)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.manonpurchased_titles_noncjk)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center font-semibold bg-blue-50">
+                    <td className="border border-gray-300 px-2 py-2 text-center font-semibold bg-blue-50">
                       {formatNumber(data?.manonpurchased_titles_subtotal)}
                     </td>
                     
+                    {/* Non-Purchased Volumes: CHN, JPN, KOR, Non-CJK, Total */}
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.manonpurchased_volumes_chinese)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.manonpurchased_volumes_japanese)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.manonpurchased_volumes_korean)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      {formatNumber(data?.manonpurchased_volumes_noncjk)}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center font-semibold bg-blue-50">
+                      {formatNumber(data?.manonpurchased_volumes_subtotal)}
+                    </td>
+                    
                     {/* Grand Totals */}
-                    <td className="border border-gray-300 px-3 py-3 text-center font-bold bg-green-50">
+                    <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
                       {formatNumber(data?.matotal_titles)}
                     </td>
-                    <td className="border border-gray-300 px-3 py-3 text-center font-bold bg-green-50">
+                    <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
                       {formatNumber(data?.matotal_volumes)}
                     </td>
                   </tr>
