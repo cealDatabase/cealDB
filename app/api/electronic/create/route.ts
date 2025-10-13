@@ -61,6 +61,31 @@ export async function POST(req: Request) {
       efulltext_electronic_expenditure_japanese,
       efulltext_electronic_expenditure_korean,
       efulltext_electronic_expenditure_noncjk,
+      etotal_computer_title_chinese,
+      etotal_computer_title_japanese,
+      etotal_computer_title_korean,
+      etotal_computer_title_noncjk,
+      etotal_computer_title_subtotal,
+      etotal_computer_cd_chinese,
+      etotal_computer_cd_japanese,
+      etotal_computer_cd_korean,
+      etotal_computer_cd_noncjk,
+      etotal_computer_cd_subtotal,
+      etotal_electronic_title_chinese,
+      etotal_electronic_title_japanese,
+      etotal_electronic_title_korean,
+      etotal_electronic_title_noncjk,
+      etotal_electronic_title_subtotal,
+      etotal_expenditure_grandtotal,
+      eonetime_computer_memo,
+      eaccompanied_computer_memo,
+      egift_computer_memo,
+      etotal_computer_memo,
+      eindex_electronic_memo,
+      efulltext_electronic_memo,
+      etotal_electronic_memo,
+      etotal_expenditure_memo,
+      eprevious_memo,
       enotes,
     } = body;
 
@@ -95,6 +120,65 @@ export async function POST(req: Request) {
         { error: "Form is not avilable at this time" },
         { status: 403 }
       );
+    }
+
+    // Fetch previous year's data to populate eprevious_* fields
+    const previousYear = currentYear - 1;
+    const previousLibraryYear = await db.library_Year.findFirst({
+      where: {
+        library: libraryId,
+        year: previousYear,
+      },
+    });
+
+    let previousYearTotals = null;
+    if (previousLibraryYear) {
+      const previousElectronicData = await db.electronic.findFirst({
+        where: {
+          libraryyear: previousLibraryYear.id,
+        },
+        select: {
+          // Fetch previous year's GRAND TOTAL (their section 1.6)
+          egrand_total_title_chinese: true,
+          egrand_total_title_japanese: true,
+          egrand_total_title_korean: true,
+          egrand_total_title_noncjk: true,
+          egrand_total_title_subtotal: true,
+          egrand_total_cd_chinese: true,
+          egrand_total_cd_japanese: true,
+          egrand_total_cd_korean: true,
+          egrand_total_cd_noncjk: true,
+          egrand_total_cd_subtotal: true,
+          // Fallback to etotal_computer_* if grand totals don't exist
+          etotal_computer_title_chinese: true,
+          etotal_computer_title_japanese: true,
+          etotal_computer_title_korean: true,
+          etotal_computer_title_noncjk: true,
+          etotal_computer_title_subtotal: true,
+          etotal_computer_cd_chinese: true,
+          etotal_computer_cd_japanese: true,
+          etotal_computer_cd_korean: true,
+          etotal_computer_cd_noncjk: true,
+          etotal_computer_cd_subtotal: true,
+        },
+      });
+
+      if (previousElectronicData) {
+        // Map previous year's GRAND TOTAL (prefer egrand_total_*, fallback to etotal_computer_*)
+        previousYearTotals = {
+          egrand_total_title_chinese: previousElectronicData.egrand_total_title_chinese ?? previousElectronicData.etotal_computer_title_chinese,
+          egrand_total_title_japanese: previousElectronicData.egrand_total_title_japanese ?? previousElectronicData.etotal_computer_title_japanese,
+          egrand_total_title_korean: previousElectronicData.egrand_total_title_korean ?? previousElectronicData.etotal_computer_title_korean,
+          egrand_total_title_noncjk: previousElectronicData.egrand_total_title_noncjk ?? previousElectronicData.etotal_computer_title_noncjk,
+          egrand_total_title_subtotal: previousElectronicData.egrand_total_title_subtotal ?? previousElectronicData.etotal_computer_title_subtotal,
+          egrand_total_cd_chinese: previousElectronicData.egrand_total_cd_chinese ?? previousElectronicData.etotal_computer_cd_chinese,
+          egrand_total_cd_japanese: previousElectronicData.egrand_total_cd_japanese ?? previousElectronicData.etotal_computer_cd_japanese,
+          egrand_total_cd_korean: previousElectronicData.egrand_total_cd_korean ?? previousElectronicData.etotal_computer_cd_korean,
+          egrand_total_cd_noncjk: previousElectronicData.egrand_total_cd_noncjk ?? previousElectronicData.etotal_computer_cd_noncjk,
+          egrand_total_cd_subtotal: previousElectronicData.egrand_total_cd_subtotal ?? previousElectronicData.etotal_computer_cd_subtotal,
+        };
+        console.log('[Electronic Create] Previous year GRAND TOTAL fetched:', previousYearTotals);
+      }
     }
 
     // Check if record already exists
@@ -159,8 +243,76 @@ export async function POST(req: Request) {
       efulltext_electronic_expenditure_japanese: efulltext_electronic_expenditure_japanese || 0,
       efulltext_electronic_expenditure_korean: efulltext_electronic_expenditure_korean || 0,
       efulltext_electronic_expenditure_noncjk: efulltext_electronic_expenditure_noncjk || 0,
+      // Section 1.4 totals
+      etotal_computer_title_chinese: etotal_computer_title_chinese || 0,
+      etotal_computer_title_japanese: etotal_computer_title_japanese || 0,
+      etotal_computer_title_korean: etotal_computer_title_korean || 0,
+      etotal_computer_title_noncjk: etotal_computer_title_noncjk || 0,
+      etotal_computer_title_subtotal: etotal_computer_title_subtotal || 0,
+      etotal_computer_cd_chinese: etotal_computer_cd_chinese || 0,
+      etotal_computer_cd_japanese: etotal_computer_cd_japanese || 0,
+      etotal_computer_cd_korean: etotal_computer_cd_korean || 0,
+      etotal_computer_cd_noncjk: etotal_computer_cd_noncjk || 0,
+      etotal_computer_cd_subtotal: etotal_computer_cd_subtotal || 0,
+      // Section 2.3 totals
+      etotal_electronic_title_chinese: etotal_electronic_title_chinese || 0,
+      etotal_electronic_title_japanese: etotal_electronic_title_japanese || 0,
+      etotal_electronic_title_korean: etotal_electronic_title_korean || 0,
+      etotal_electronic_title_noncjk: etotal_electronic_title_noncjk || 0,
+      etotal_electronic_title_subtotal: etotal_electronic_title_subtotal || 0,
+      // Expenditure grand total
+      etotal_expenditure_grandtotal: etotal_expenditure_grandtotal || 0,
+      // Memos/comments for each section
+      eonetime_computer_memo: eonetime_computer_memo || null,
+      eaccompanied_computer_memo: eaccompanied_computer_memo || null,
+      egift_computer_memo: egift_computer_memo || null,
+      etotal_computer_memo: etotal_computer_memo || null,
+      eindex_electronic_memo: eindex_electronic_memo || null,
+      efulltext_electronic_memo: efulltext_electronic_memo || null,
+      etotal_electronic_memo: etotal_electronic_memo || null,
+      etotal_expenditure_memo: etotal_expenditure_memo || null,
+      eprevious_memo: eprevious_memo || null,
       enotes: enotes || "",
+      // Auto-populate previous year fields from previous year's GRAND TOTAL (section 1.6)
+      eprevious_total_title_chinese: previousYearTotals?.egrand_total_title_chinese ?? (existingRecord?.eprevious_total_title_chinese || null),
+      eprevious_total_title_japanese: previousYearTotals?.egrand_total_title_japanese ?? (existingRecord?.eprevious_total_title_japanese || null),
+      eprevious_total_title_korean: previousYearTotals?.egrand_total_title_korean ?? (existingRecord?.eprevious_total_title_korean || null),
+      eprevious_total_title_noncjk: previousYearTotals?.egrand_total_title_noncjk ?? (existingRecord?.eprevious_total_title_noncjk || null),
+      eprevious_total_title_subtotal: previousYearTotals?.egrand_total_title_subtotal ?? (existingRecord?.eprevious_total_title_subtotal || null),
+      eprevious_total_cd_chinese: previousYearTotals?.egrand_total_cd_chinese ?? (existingRecord?.eprevious_total_cd_chinese || null),
+      eprevious_total_cd_japanese: previousYearTotals?.egrand_total_cd_japanese ?? (existingRecord?.eprevious_total_cd_japanese || null),
+      eprevious_total_cd_korean: previousYearTotals?.egrand_total_cd_korean ?? (existingRecord?.eprevious_total_cd_korean || null),
+      eprevious_total_cd_noncjk: previousYearTotals?.egrand_total_cd_noncjk ?? (existingRecord?.eprevious_total_cd_noncjk || null),
+      eprevious_total_cd_subtotal: previousYearTotals?.egrand_total_cd_subtotal ?? (existingRecord?.eprevious_total_cd_subtotal || null),
+      // Calculate Section 1.6 Grand Totals (Section 1.4 + Section 1.5)
+      egrand_total_title_chinese: (etotal_computer_title_chinese || 0) + (previousYearTotals?.egrand_total_title_chinese ?? (existingRecord?.eprevious_total_title_chinese || 0)),
+      egrand_total_title_japanese: (etotal_computer_title_japanese || 0) + (previousYearTotals?.egrand_total_title_japanese ?? (existingRecord?.eprevious_total_title_japanese || 0)),
+      egrand_total_title_korean: (etotal_computer_title_korean || 0) + (previousYearTotals?.egrand_total_title_korean ?? (existingRecord?.eprevious_total_title_korean || 0)),
+      egrand_total_title_noncjk: (etotal_computer_title_noncjk || 0) + (previousYearTotals?.egrand_total_title_noncjk ?? (existingRecord?.eprevious_total_title_noncjk || 0)),
+      egrand_total_title_subtotal: (etotal_computer_title_subtotal || 0) + (previousYearTotals?.egrand_total_title_subtotal ?? (existingRecord?.eprevious_total_title_subtotal || 0)),
+      egrand_total_cd_chinese: (etotal_computer_cd_chinese || 0) + (previousYearTotals?.egrand_total_cd_chinese ?? (existingRecord?.eprevious_total_cd_chinese || 0)),
+      egrand_total_cd_japanese: (etotal_computer_cd_japanese || 0) + (previousYearTotals?.egrand_total_cd_japanese ?? (existingRecord?.eprevious_total_cd_japanese || 0)),
+      egrand_total_cd_korean: (etotal_computer_cd_korean || 0) + (previousYearTotals?.egrand_total_cd_korean ?? (existingRecord?.eprevious_total_cd_korean || 0)),
+      egrand_total_cd_noncjk: (etotal_computer_cd_noncjk || 0) + (previousYearTotals?.egrand_total_cd_noncjk ?? (existingRecord?.eprevious_total_cd_noncjk || 0)),
+      egrand_total_cd_subtotal: (etotal_computer_cd_subtotal || 0) + (previousYearTotals?.egrand_total_cd_subtotal ?? (existingRecord?.eprevious_total_cd_subtotal || 0)),
     };
+
+    console.log('[Electronic Create] Library ID:', libraryId, 'Year:', currentYear);
+    console.log('[Electronic Create] Previous year GRAND TOTAL found:', !!previousYearTotals);
+    console.log('[Electronic Create] Section 1.4 (Current year new additions):', {
+      title_chinese: etotal_computer_title_chinese,
+      cd_chinese: etotal_computer_cd_chinese,
+    });
+    console.log('[Electronic Create] Section 1.5 (Previous year GRAND TOTAL):', {
+      title_chinese: previousYearTotals?.egrand_total_title_chinese || 0,
+      cd_chinese: previousYearTotals?.egrand_total_cd_chinese || 0,
+    });
+    console.log('[Electronic Create] Section 1.6 (Grand Total = 1.4 + 1.5):', {
+      title_chinese: electronicData.egrand_total_title_chinese,
+      cd_chinese: electronicData.egrand_total_cd_chinese,
+      title_subtotal: electronicData.egrand_total_title_subtotal,
+      cd_subtotal: electronicData.egrand_total_cd_subtotal,
+    });
 
     let result;
     if (existingRecord) {

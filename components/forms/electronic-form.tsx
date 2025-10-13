@@ -85,6 +85,7 @@ export default function ElectronicForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [previousYearData, setPreviousYearData] = useState<any>(null)
   const params = useParams()
 
   const form = useForm<FormData>({
@@ -138,7 +139,7 @@ export default function ElectronicForm() {
 
   const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/electronic/status')
 
-  // Pre-populate form with existing data
+  // Pre-populate form with existing data and extract previous year data
   useEffect(() => {
     if (existingData) {
       Object.keys(existingData).forEach((key) => {
@@ -148,6 +149,13 @@ export default function ElectronicForm() {
       })
     }
   }, [existingData, form])
+
+  // Extract previous year data from libraryYearStatus
+  useEffect(() => {
+    if (libraryYearStatus && (libraryYearStatus as any).previousYearData) {
+      setPreviousYearData((libraryYearStatus as any).previousYearData)
+    }
+  }, [libraryYearStatus])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -235,6 +243,34 @@ export default function ElectronicForm() {
     (watchedValues.efulltext_electronic_title_noncjk || 0)
   const totalElectronicSubtotal = totalElectronicChinese + totalElectronicJapanese + 
     totalElectronicKorean + totalElectronicNoncjk
+
+  // Previous year data values (section 1.5) - from eprevious_* fields
+  const prevTitleChinese = previousYearData?.eprevious_total_title_chinese || 0
+  const prevTitleJapanese = previousYearData?.eprevious_total_title_japanese || 0
+  const prevTitleKorean = previousYearData?.eprevious_total_title_korean || 0
+  const prevTitleNoncjk = previousYearData?.eprevious_total_title_noncjk || 0
+  const prevTitleSubtotal = previousYearData?.eprevious_total_title_subtotal || 
+    (prevTitleChinese + prevTitleJapanese + prevTitleKorean + prevTitleNoncjk)
+  
+  const prevCdChinese = previousYearData?.eprevious_total_cd_chinese || 0
+  const prevCdJapanese = previousYearData?.eprevious_total_cd_japanese || 0
+  const prevCdKorean = previousYearData?.eprevious_total_cd_korean || 0
+  const prevCdNoncjk = previousYearData?.eprevious_total_cd_noncjk || 0
+  const prevCdSubtotal = previousYearData?.eprevious_total_cd_subtotal || 
+    (prevCdChinese + prevCdJapanese + prevCdKorean + prevCdNoncjk)
+
+  // Calculate 1.6 Grand Total Computer Files (sum of 1.4 + 1.5)
+  const grandTotalTitlesChinese = totalComputerTitlesChinese + prevTitleChinese
+  const grandTotalTitlesJapanese = totalComputerTitlesJapanese + prevTitleJapanese
+  const grandTotalTitlesKorean = totalComputerTitlesKorean + prevTitleKorean
+  const grandTotalTitlesNoncjk = totalComputerTitlesNoncjk + prevTitleNoncjk
+  const grandTotalTitlesSubtotal = totalComputerTitlesSubtotal + prevTitleSubtotal
+
+  const grandTotalCdChinese = totalComputerCdChinese + prevCdChinese
+  const grandTotalCdJapanese = totalComputerCdJapanese + prevCdJapanese
+  const grandTotalCdKorean = totalComputerCdKorean + prevCdKorean
+  const grandTotalCdNoncjk = totalComputerCdNoncjk + prevCdNoncjk
+  const grandTotalCdSubtotal = totalComputerCdSubtotal + prevCdSubtotal
 
   // Import data from all databases function
   const importAllData = async () => {
@@ -702,28 +738,48 @@ export default function ElectronicForm() {
             <tbody>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">16. Chinese</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevTitleChinese : '--'}
+                </td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevCdChinese : '--'}
+                </td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">17. Japanese</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevTitleJapanese : '--'}
+                </td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevCdJapanese : '--'}
+                </td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">18. Korean</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevTitleKorean : '--'}
+                </td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevCdKorean : '--'}
+                </td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">19. Non-CJK</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-500">--</td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevTitleNoncjk : '--'}
+                </td>
+                <td className="border border-gray-300 p-2 text-center text-gray-700">
+                  {previousYearData ? prevCdNoncjk : '--'}
+                </td>
               </tr>
               <tr className="bg-amber-50">
                 <td className="border border-gray-300 p-2 font-bold">19.1 Subtotal</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">--</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">--</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">
+                  {previousYearData ? prevTitleSubtotal : '--'}
+                </td>
+                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">
+                  {previousYearData ? prevCdSubtotal : '--'}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -762,28 +818,28 @@ export default function ElectronicForm() {
             <tbody>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">20. Chinese</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesChinese}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdChinese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesChinese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdChinese}</td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">21. Japanese</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesJapanese}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdJapanese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesJapanese}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdJapanese}</td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">22. Korean</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesKorean}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdKorean}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesKorean}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdKorean}</td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-medium">23. Non-CJK</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerTitlesNoncjk}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{totalComputerCdNoncjk}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesNoncjk}</td>
+                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdNoncjk}</td>
               </tr>
               <tr className="bg-blue-50">
                 <td className="border border-gray-300 p-2 font-bold">23.1 Subtotal</td>
-                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{totalComputerTitlesSubtotal}</td>
-                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{totalComputerCdSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{grandTotalTitlesSubtotal}</td>
+                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{grandTotalCdSubtotal}</td>
               </tr>
             </tbody>
           </table>
