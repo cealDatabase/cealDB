@@ -125,6 +125,9 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium">Volumes<br/>Grand Total</th>
               </tr>
               <tr className="bg-teal-500 text-white text-xs">
+                {/* Empty cell under Year to align properly */}
+                <th className="border border-gray-300 px-2 py-1"></th>
+                
                 {/* Purchased Titles: CHN, JPN, KOR, Non-CJK, Total */}
                 <th className="border border-gray-300 px-2 py-1">CHN</th>
                 <th className="border border-gray-300 px-2 py-1">JPN</th>
