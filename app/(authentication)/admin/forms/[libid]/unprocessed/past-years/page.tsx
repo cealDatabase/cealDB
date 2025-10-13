@@ -115,9 +115,9 @@ export default function PastYearsPage() {
     )
   }
 
-  // Calculate Grand Total Materials Held without E-Books
-  const calculateGrandTotalWithoutEBooks = (volumeHoldings: VolumeHoldingsData | null, otherHoldings: OtherHoldingsData | null) => {
-    return calculateFinalPhysicalTotal(volumeHoldings) + calculateTotalOtherMaterials(otherHoldings)
+  // Calculate Grand Total Materials Held without E-Books (same as Total Physical Volumes)
+  const calculateGrandTotalWithoutEBooks = (volumeHoldings: VolumeHoldingsData | null) => {
+    return calculateFinalPhysicalTotal(volumeHoldings)
   }
 
   // Calculate Grand Total Materials Held with E-Books
@@ -213,9 +213,9 @@ export default function PastYearsPage() {
                       {calculateTotalOtherMaterials(yearData.otherHoldings)}
                     </td>
                     
-                    {/* Grand Total Materials Held without E-Books (Calculated) */}
+                    {/* Grand Total Materials Held without E-Books (same as Total Physical Volumes) */}
                     <td className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">
-                      {calculateGrandTotalWithoutEBooks(yearData.volumeHoldings, yearData.otherHoldings)}
+                      {calculateGrandTotalWithoutEBooks(yearData.volumeHoldings)}
                     </td>
                     
                     {/* Grand Total Materials Held with E-Books (Calculated) */}
