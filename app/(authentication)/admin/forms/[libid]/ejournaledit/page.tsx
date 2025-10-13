@@ -204,11 +204,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
     
     // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + publisher) to find duplicates
+    // Group by unique identifier (title + publisher + subtitle + series) to find duplicates
     const recordsByIdentifier = new Map<string, typeof subscribedEJournals[0][]>();
     
     subscribedEJournals.forEach((ejournal) => {
-      const identifier = `${ejournal.title?.toLowerCase() || ''}_${ejournal.publisher?.toLowerCase() || ''}`;
+      const identifier = `${ejournal.title?.toLowerCase() || ''}_${ejournal.publisher?.toLowerCase() || ''}_${ejournal.subtitle?.toLowerCase() || ''}_${ejournal.series?.toLowerCase() || ''}`;
       if (!recordsByIdentifier.has(identifier)) {
         recordsByIdentifier.set(identifier, []);
       }
