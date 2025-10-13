@@ -120,7 +120,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
             eprevious_total_cd_noncjk: previousElectronicData.egrand_total_cd_noncjk ?? previousElectronicData.etotal_computer_cd_noncjk,
             eprevious_total_cd_subtotal: previousElectronicData.egrand_total_cd_subtotal ?? previousElectronicData.etotal_computer_cd_subtotal,
           };
-          console.log('[Electronic Status] Previous year GRAND TOTAL retrieved:', previousYearData);
         } else {
           console.log('[Electronic Status] No Electronic data found for previous year');
         }

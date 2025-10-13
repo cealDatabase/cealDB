@@ -75,7 +75,7 @@ export const ElectronicInstructions = () => {
                     </div>
 
                     <div className="border-l-4 border-blue-300 pl-4">
-                        <h4 className="font-semibold text-gray-900 mb-2">2.2 Electronic Full Text Database and Periodicals</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">2.2 Electronic Full Text Database</h4>
                         <p className="text-gray-700">Before using the "Import" feature, update your AV/E-book/E-journal lists so the system can generate numbers automatically.</p>
                     </div>
 

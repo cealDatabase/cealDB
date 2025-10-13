@@ -76,6 +76,7 @@ export default function ElectronicBooksForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [physicalVolumesTotal, setPhysicalVolumesTotal] = useState(0)
   const params = useParams()
 
   const form = useForm<FormData>({
@@ -165,6 +166,49 @@ export default function ElectronicBooksForm() {
     }
   }, [existingData, previousYearData, form])
 
+  // Load Physical Volumes Total from Volume Holdings form (field #16)
+  useEffect(() => {
+    const loadPhysicalVolumes = async () => {
+      try {
+        const libraryId = Number(params.libid);
+        const response = await fetch(`/api/volumeHoldings/status/${libraryId}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            // Calculate field #16: Grand Total (Physical Vols) = Previous + Added - Withdrawn
+            const previousSubtotal = (result.data.vhprevious_year_chinese || 0) +
+              (result.data.vhprevious_year_japanese || 0) +
+              (result.data.vhprevious_year_korean || 0) +
+              (result.data.vhprevious_year_noncjk || 0);
+            const addedSubtotal = (result.data.vhadded_gross_chinese || 0) +
+              (result.data.vhadded_gross_japanese || 0) +
+              (result.data.vhadded_gross_korean || 0) +
+              (result.data.vhadded_gross_noncjk || 0);
+            const withdrawnSubtotal = (result.data.vhwithdrawn_chinese || 0) +
+              (result.data.vhwithdrawn_japanese || 0) +
+              (result.data.vhwithdrawn_korean || 0) +
+              (result.data.vhwithdrawn_noncjk || 0);
+            const physicalGrandTotal = previousSubtotal + addedSubtotal - withdrawnSubtotal;
+            setPhysicalVolumesTotal(physicalGrandTotal);
+            console.log('Physical Volumes Total loaded:', physicalGrandTotal);
+          } else {
+            setPhysicalVolumesTotal(0);
+          }
+        } else {
+          console.log('No Physical Volume Holdings data found');
+          setPhysicalVolumesTotal(0);
+        }
+      } catch (error) {
+        console.log('Error loading Physical Volumes Total:', error);
+        setPhysicalVolumesTotal(0);
+      }
+    };
+
+    if (params.libid) {
+      loadPhysicalVolumes();
+    }
+  }, [params.libid])
+
   // Watch form values for calculations
   const watchedValues = form.watch()
 
@@ -223,6 +267,7 @@ export default function ElectronicBooksForm() {
 
   const totalTitles = purchasedTotalTitlesSubtotal + nonPurchasedTitlesSubtotal
   const totalVolumes = purchasedTotalVolumesSubtotal + nonPurchasedVolumesSubtotal
+  const grandTotalVolumeHoldings = physicalVolumesTotal + totalVolumes
 
   // Import subscription titles function
   const importSubscriptionTitles = async () => {
@@ -808,37 +853,47 @@ export default function ElectronicBooksForm() {
           type="textarea"
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
+      </FormSection>
 
-        <div className="space-y-6">
-          <div>
-            <label className="block text-base font-semibold text-gray-900 mb-2">
-              Physical Volumes Total
-            </label>
-            <input
-              type="number"
-              value={0}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed mb-2"
-            />
-            <div className="text-sm text-gray-600 italic">
-              (From Physical Volume Holdings Form)
+      {/* Physical Volumes Total - Blue Section */}
+      <FormSection
+        title="Physical Volumes Total"
+        description=""
+      >
+        <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-blue-100 p-4 rounded-lg">
+              <span className="text-lg font-semibold text-blue-900">16. Grand Total (Physical Vols)</span>
+              <span className="text-lg font-bold text-blue-900">{physicalVolumesTotal.toLocaleString()}</span>
+            </div>
+            <div className="text-sm text-blue-700 italic px-2">
+              (05 + 10 - 15)
             </div>
           </div>
+        </div>
+        <div className="mt-3 text-sm text-gray-600 italic">
+          From Physical Volume Holdings Form
+        </div>
+      </FormSection>
 
-          <div>
-            <label className="block text-base font-semibold text-gray-900 mb-2">
-              Grand Total Volume Holdings
-            </label>
-            <input
-              type="number"
-              value={0}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed mb-2"
-            />
-            <div className="text-sm text-gray-600 italic">
-              (Automatically calculated; including E-Books)
+      {/* Grand Total Volume Holdings - Green Section */}
+      <FormSection
+        title="Grand Total Volume Holdings"
+        description=""
+      >
+        <div className="bg-green-50 p-6 rounded-lg border-2 border-green-300">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between bg-green-200 p-4 rounded-lg">
+              <span className="text-lg font-semibold text-green-900">Grand Total Volume Holdings</span>
+              <span className="text-lg font-bold text-green-900">{grandTotalVolumeHoldings.toLocaleString()}</span>
+            </div>
+            <div className="text-sm text-green-700 italic px-2">
+              (Physical {physicalVolumesTotal.toLocaleString()} + E-Books {totalVolumes.toLocaleString()})
             </div>
           </div>
+        </div>
+        <div className="mt-3 text-sm text-gray-600 italic">
+          Automatically calculated; including E-Books
         </div>
       </FormSection>
 
