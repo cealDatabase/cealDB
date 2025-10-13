@@ -129,10 +129,10 @@ export function DataTableToolbar<TData>({
           title={
             selectedIds.length === 0
               ? "Select at least one row"
-              : "Add to My Subscription"
+              : "Add to My Access"
           }
         >
-          {isSubscribing ? "Subscribing..." : `Add to My Subscription (${selectedIds.length})`}
+          {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
         </Button>
       )}
 
