@@ -81,8 +81,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
         console.log(`[E-Books Status] Previous year E-Books data exists: ${previousLibraryYear.id}, ${previousLibraryYear.year}`, !!previousEBooksData);
 
         if (previousEBooksData) {
-          // Log ALL fields to see what's actually populated
-          console.log('[E-Books Status] Full previous year data:', JSON.stringify(previousEBooksData, null, 2));
           
           // Calculate previous year's TOTAL (if ebooks_purchased_titles_* is null, calculate from prev + add)
           const prevTitlesChinese = previousEBooksData.ebooks_purchased_titles_chinese ?? 
@@ -114,7 +112,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
             ebooks_purchased_prev_volumes_korean: prevVolumesKorean,
             ebooks_purchased_prev_volumes_noncjk: prevVolumesNoncjk,
           };
-          console.log('[E-Books Status] Previous year TOTAL retrieved:', previousYearData);
         } else {
           console.log('[E-Books Status] No E-Books data found for previous year');
         }
