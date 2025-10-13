@@ -287,7 +287,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - E-Journal Access Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {filteredEJournals.length} subscription{filteredEJournals.length === 1 ? '' : 's'}
+                Year: {year} • {filteredEJournals.length} access
               </p>
             </div>
 

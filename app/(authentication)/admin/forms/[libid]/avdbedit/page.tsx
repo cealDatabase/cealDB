@@ -234,7 +234,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 {libraryName} - AV Access Management
               </h1>
               <p className='text-lg text-gray-600'>
-                Year: {year} • {filteredAVs.length} subscription{filteredAVs.length === 1 ? '' : 's'}
+                Year: {year} • {filteredAVs.length} access
               </p>
             </div>
 
@@ -314,7 +314,7 @@ export default async function Page({ params, searchParams }: PageProps) {
               Add AV Subscriptions - {libraryName}
             </h1>
             <p className='text-lg text-gray-600'>
-              Year: {year} • Adding {data.length} new subscription{data.length === 1 ? '' : 's'}
+              Year: {year} • Adding {data.length} new access
             </p>
           </div>
           <AvdbEditClient rows={data} libid={libid} year={year} />
