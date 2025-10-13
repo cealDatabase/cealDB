@@ -5,49 +5,7 @@ import db from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      id, // Extract id but don't use it
-      libid,
-      ebpurchased_title_chinese,
-      ebpurchased_title_japanese,
-      ebpurchased_title_korean,
-      ebpurchased_title_noncjk,
-      ebpurchased_title_subtotal,
-      ebpurchased_volume_chinese,
-      ebpurchased_volume_japanese,
-      ebpurchased_volume_korean,
-      ebpurchased_volume_noncjk,
-      ebpurchased_volume_subtotal,
-      ebnonpurchased_title_chinese,
-      ebnonpurchased_title_japanese,
-      ebnonpurchased_title_korean,
-      ebnonpurchased_title_noncjk,
-      ebnonpurchased_title_subtotal,
-      ebnonpurchased_volume_chinese,
-      ebnonpurchased_volume_japanese,
-      ebnonpurchased_volume_korean,
-      ebnonpurchased_volume_noncjk,
-      ebnonpurchased_volume_subtotal,
-      ebsubscription_title_chinese,
-      ebsubscription_title_japanese,
-      ebsubscription_title_korean,
-      ebsubscription_title_noncjk,
-      ebsubscription_title_subtotal,
-      ebsubscription_volume_chinese,
-      ebsubscription_volume_japanese,
-      ebsubscription_volume_korean,
-      ebsubscription_volume_noncjk,
-      ebsubscription_volume_subtotal,
-      ebpurchased_expenditure_chinese,
-      ebpurchased_expenditure_japanese,
-      ebpurchased_expenditure_korean,
-      ebpurchased_expenditure_noncjk,
-      ebsubscription_expenditure_chinese,
-      ebsubscription_expenditure_japanese,
-      ebsubscription_expenditure_korean,
-      ebsubscription_expenditure_noncjk,
-      ebnotes,
-    } = body;
+    const { libid, ...formData } = body;
 
     // Validate required fields
     if (!libid || isNaN(Number(libid))) {
@@ -89,48 +47,19 @@ export async function POST(req: Request) {
       },
     });
 
-    const electronicBooksData = {
+    // Build data object with all fields from the form
+    const electronicBooksData: any = {
       libraryyear: libraryYear.id,
-      ebpurchased_title_chinese: ebpurchased_title_chinese || 0,
-      ebpurchased_title_japanese: ebpurchased_title_japanese || 0,
-      ebpurchased_title_korean: ebpurchased_title_korean || 0,
-      ebpurchased_title_noncjk: ebpurchased_title_noncjk || 0,
-      ebpurchased_title_subtotal: ebpurchased_title_subtotal || 0,
-      ebpurchased_volume_chinese: ebpurchased_volume_chinese || 0,
-      ebpurchased_volume_japanese: ebpurchased_volume_japanese || 0,
-      ebpurchased_volume_korean: ebpurchased_volume_korean || 0,
-      ebpurchased_volume_noncjk: ebpurchased_volume_noncjk || 0,
-      ebpurchased_volume_subtotal: ebpurchased_volume_subtotal || 0,
-      ebnonpurchased_title_chinese: ebnonpurchased_title_chinese || 0,
-      ebnonpurchased_title_japanese: ebnonpurchased_title_japanese || 0,
-      ebnonpurchased_title_korean: ebnonpurchased_title_korean || 0,
-      ebnonpurchased_title_noncjk: ebnonpurchased_title_noncjk || 0,
-      ebnonpurchased_title_subtotal: ebnonpurchased_title_subtotal || 0,
-      ebnonpurchased_volume_chinese: ebnonpurchased_volume_chinese || 0,
-      ebnonpurchased_volume_japanese: ebnonpurchased_volume_japanese || 0,
-      ebnonpurchased_volume_korean: ebnonpurchased_volume_korean || 0,
-      ebnonpurchased_volume_noncjk: ebnonpurchased_volume_noncjk || 0,
-      ebnonpurchased_volume_subtotal: ebnonpurchased_volume_subtotal || 0,
-      ebsubscription_title_chinese: ebsubscription_title_chinese || 0,
-      ebsubscription_title_japanese: ebsubscription_title_japanese || 0,
-      ebsubscription_title_korean: ebsubscription_title_korean || 0,
-      ebsubscription_title_noncjk: ebsubscription_title_noncjk || 0,
-      ebsubscription_title_subtotal: ebsubscription_title_subtotal || 0,
-      ebsubscription_volume_chinese: ebsubscription_volume_chinese || 0,
-      ebsubscription_volume_japanese: ebsubscription_volume_japanese || 0,
-      ebsubscription_volume_korean: ebsubscription_volume_korean || 0,
-      ebsubscription_volume_noncjk: ebsubscription_volume_noncjk || 0,
-      ebsubscription_volume_subtotal: ebsubscription_volume_subtotal || 0,
-      ebpurchased_expenditure_chinese: ebpurchased_expenditure_chinese || 0,
-      ebpurchased_expenditure_japanese: ebpurchased_expenditure_japanese || 0,
-      ebpurchased_expenditure_korean: ebpurchased_expenditure_korean || 0,
-      ebpurchased_expenditure_noncjk: ebpurchased_expenditure_noncjk || 0,
-      ebsubscription_expenditure_chinese: ebsubscription_expenditure_chinese || 0,
-      ebsubscription_expenditure_japanese: ebsubscription_expenditure_japanese || 0,
-      ebsubscription_expenditure_korean: ebsubscription_expenditure_korean || 0,
-      ebsubscription_expenditure_noncjk: ebsubscription_expenditure_noncjk || 0,
-      ebnotes: ebnotes || "",
     };
+
+    // Map all form fields to database fields (excluding libid)
+    Object.keys(formData).forEach((key) => {
+      if (key !== 'libid') {
+        electronicBooksData[key] = formData[key] ?? 0;
+      }
+    });
+
+    console.log('[E-Books Create] Saving data:', JSON.stringify(electronicBooksData, null, 2));
 
     let result;
     if (existingRecord) {

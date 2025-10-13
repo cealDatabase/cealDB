@@ -11,6 +11,7 @@ interface LibraryYearStatus {
   library_id?: number
   data?: any
   existingData?: any
+  previousYearData?: any
 }
 
 export function useFormStatusChecker(apiEndpoint: string) {
@@ -41,6 +42,7 @@ export function useFormStatusChecker(apiEndpoint: string) {
     libraryYearStatus,
     isLoading,
     isFormAvailable: libraryYearStatus?.exists && libraryYearStatus?.is_open_for_editing,
-    existingData: libraryYearStatus?.data || libraryYearStatus?.existingData
+    existingData: libraryYearStatus?.data || libraryYearStatus?.existingData,
+    previousYearData: libraryYearStatus?.previousYearData
   }
 }

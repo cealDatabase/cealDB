@@ -118,9 +118,9 @@ export default function ElectronicBooksForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/electronic-books/status')
+  const { libraryYearStatus, isLoading, existingData, previousYearData } = useFormStatusChecker('/api/electronic-books/status')
 
-  // Pre-populate form with existing data
+  // Pre-populate form with existing data and previous year data
   useEffect(() => {
     if (existingData) {
       Object.keys(existingData).forEach((key) => {
@@ -129,7 +129,41 @@ export default function ElectronicBooksForm() {
         }
       })
     }
-  }, [existingData, form])
+
+    // Auto-fill previous year data if not already populated
+    if (previousYearData && !existingData) {
+      // Only populate if this is a new form (existingData is null/undefined)
+      console.log('[E-Books Form] Auto-filling previous year data:', previousYearData);
+      
+      // Purchased Titles Previous
+      if (previousYearData.ebooks_purchased_prev_titles_chinese !== null && previousYearData.ebooks_purchased_prev_titles_chinese !== undefined) {
+        form.setValue('ebooks_purchased_prev_titles_chinese', previousYearData.ebooks_purchased_prev_titles_chinese);
+      }
+      if (previousYearData.ebooks_purchased_prev_titles_japanese !== null && previousYearData.ebooks_purchased_prev_titles_japanese !== undefined) {
+        form.setValue('ebooks_purchased_prev_titles_japanese', previousYearData.ebooks_purchased_prev_titles_japanese);
+      }
+      if (previousYearData.ebooks_purchased_prev_titles_korean !== null && previousYearData.ebooks_purchased_prev_titles_korean !== undefined) {
+        form.setValue('ebooks_purchased_prev_titles_korean', previousYearData.ebooks_purchased_prev_titles_korean);
+      }
+      if (previousYearData.ebooks_purchased_prev_titles_noncjk !== null && previousYearData.ebooks_purchased_prev_titles_noncjk !== undefined) {
+        form.setValue('ebooks_purchased_prev_titles_noncjk', previousYearData.ebooks_purchased_prev_titles_noncjk);
+      }
+
+      // Purchased Volumes Previous
+      if (previousYearData.ebooks_purchased_prev_volumes_chinese !== null && previousYearData.ebooks_purchased_prev_volumes_chinese !== undefined) {
+        form.setValue('ebooks_purchased_prev_volumes_chinese', previousYearData.ebooks_purchased_prev_volumes_chinese);
+      }
+      if (previousYearData.ebooks_purchased_prev_volumes_japanese !== null && previousYearData.ebooks_purchased_prev_volumes_japanese !== undefined) {
+        form.setValue('ebooks_purchased_prev_volumes_japanese', previousYearData.ebooks_purchased_prev_volumes_japanese);
+      }
+      if (previousYearData.ebooks_purchased_prev_volumes_korean !== null && previousYearData.ebooks_purchased_prev_volumes_korean !== undefined) {
+        form.setValue('ebooks_purchased_prev_volumes_korean', previousYearData.ebooks_purchased_prev_volumes_korean);
+      }
+      if (previousYearData.ebooks_purchased_prev_volumes_noncjk !== null && previousYearData.ebooks_purchased_prev_volumes_noncjk !== undefined) {
+        form.setValue('ebooks_purchased_prev_volumes_noncjk', previousYearData.ebooks_purchased_prev_volumes_noncjk);
+      }
+    }
+  }, [existingData, previousYearData, form])
 
   // Watch form values for calculations
   const watchedValues = form.watch()
