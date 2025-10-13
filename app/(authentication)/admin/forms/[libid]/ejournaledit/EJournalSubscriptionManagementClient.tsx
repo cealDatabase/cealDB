@@ -224,7 +224,7 @@ export default function EJournalSubscriptionManagementClient({
     
     return (
       <div className="space-y-4">
-        {/* Header with Add More Subscriptions button */}
+        {/* Header with Add More to My Access button */}
         <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200 shadow-sm">
           <div>
             <h3 className="text-xl font-semibold text-blue-900">Current Subscriptions</h3>
@@ -237,7 +237,7 @@ export default function EJournalSubscriptionManagementClient({
             className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
             onClick={() => router.push(`/admin/survey/ejournal/${year}`)}
           >
-            ➕ Add More Subscriptions
+            ➕ Add More to My Access
           </Button>
         </div>
 

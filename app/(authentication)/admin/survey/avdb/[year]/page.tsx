@@ -80,14 +80,12 @@ export default async function AVListPage(props: {
             </h1>
             <p className='text-muted-foreground text-sm'>
               Please check the boxes for each entry your institution holds under each language category Chinese, Japanese, Korean, and Non-CJK.
-              Data in this list are linked to “My Forms.”
+              Data in this list are linked to "My Forms."
               If your institution holds a customized collection or a subset of certain resources,
-              edit the relevant data after clicking &quot;Add to My Subscription&quot;.
+              edit the relevant data after clicking &quot;Add to My Access&quot;.
             </p>
           </div>
-
           <SelectYear yearCurrent={params.year} />
-
           <Suspense fallback={<SkeletonTableCard />}>
             {await AVSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch, newRecordId)}
           </Suspense>
