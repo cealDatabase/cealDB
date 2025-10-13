@@ -21,9 +21,9 @@ interface SubscriptionBreadcrumbProps {
 export function SubscriptionBreadcrumb({ surveyType, year, libraryName, mode }: SubscriptionBreadcrumbProps) {
   // Survey type display names
   const surveyNames = {
-    avdb: "AV Database Subscriptions",
-    ebook: "E-Book Subscriptions", 
-    ejournal: "E-Journal Subscriptions"
+    avdb: "AV Database Access",
+    ebook: "E-Book Access", 
+    ejournal: "E-Journal Access"
   }
   
   const shortNames = {
@@ -79,7 +79,7 @@ export function SubscriptionBreadcrumb({ surveyType, year, libraryName, mode }: 
           </BreadcrumbSeparator>
           <BreadcrumbItem>
             <BreadcrumbPage>
-              {year} - {mode === "view" ? "Manage Subscriptions" : `Add ${shortNames[surveyType]}`}
+              {year} - {mode === "view" ? "Manage Access" : `Add ${shortNames[surveyType]}`}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
