@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
-import { cookies } from "next/headers";
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const libraryIdCookie = cookieStore.get("library_id");
+    // Get library ID from query parameters
+    const searchParams = request.nextUrl.searchParams;
+    const libidParam = searchParams.get("libid");
     
-    if (!libraryIdCookie) {
+    if (!libidParam) {
       return NextResponse.json(
-        { error: "Library ID not found in cookies" },
-        { status: 401 }
+        { error: "Library ID not provided" },
+        { status: 400 }
       );
     }
 
-    const libraryId = parseInt(libraryIdCookie.value);
+    const libraryId = parseInt(libidParam);
     const currentYear = new Date().getFullYear();
     
     // Calculate past 5 years (excluding current year)

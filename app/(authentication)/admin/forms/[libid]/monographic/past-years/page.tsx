@@ -5,7 +5,7 @@ import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { toast } from "sonner"
 
 interface MonographicData {
@@ -40,13 +40,16 @@ interface YearData {
 
 export default function PastYearsPage() {
   const router = useRouter()
+  const params = useParams()
   const [pastYearsData, setPastYearsData] = useState<YearData[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  
+  const libid = params.libid as string
 
   useEffect(() => {
     async function fetchPastYearsData() {
       try {
-        const response = await fetch("/api/monographic/past-years")
+        const response = await fetch(`/api/monographic/past-years?libid=${libid}`)
         
         if (!response.ok) {
           throw new Error("Failed to fetch past years data")
@@ -62,8 +65,10 @@ export default function PastYearsPage() {
       }
     }
 
-    fetchPastYearsData()
-  }, [])
+    if (libid) {
+      fetchPastYearsData()
+    }
+  }, [libid])
 
   const formatNumber = (value: number | null | undefined) => {
     return value !== null && value !== undefined ? value : 0
