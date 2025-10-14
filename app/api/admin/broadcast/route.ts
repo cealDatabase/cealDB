@@ -207,6 +207,7 @@ export async function POST(request: NextRequest) {
 
       // Send broadcast via Resend
       try {
+        // Step 1: Create the broadcast (saves as draft)
         broadcast = await resend.broadcasts.create({
           audienceId: audienceId,
           from: "CEAL Database <noreply@cealstats.org>",
@@ -214,7 +215,15 @@ export async function POST(request: NextRequest) {
           html: emailTemplate,
         })
 
-        console.log("✅ Broadcast sent immediately:", broadcast.data?.id)
+        console.log("✅ Broadcast created with ID:", broadcast.data?.id)
+
+        // Step 2: Send the broadcast immediately
+        if (broadcast.data?.id) {
+          await resend.broadcasts.send(broadcast.data.id)
+          console.log("✅ Broadcast sent immediately:", broadcast.data.id)
+        } else {
+          throw new Error("No broadcast ID returned from Resend")
+        }
       } catch (emailError) {
         console.error("❌ Failed to send broadcast email:", emailError)
         throw new Error(
@@ -300,9 +309,31 @@ export async function POST(request: NextRequest) {
     // BRANCH 2: SCHEDULE BROADCAST FOR LATER
     // ========================================
     else {
-      console.log("📅 SCHEDULED MODE: Creating separate scheduled events for later execution")
+      console.log("📅 SCHEDULED MODE: Creating scheduled broadcast via Resend")
 
-      // Do NOT open forms or send broadcast - keep forms CLOSED
+      // Schedule broadcast via Resend with scheduledAt parameter
+      try {
+        // Create broadcast with schedule time (TypeScript workaround)
+        const broadcastOptions: any = {
+          audienceId: audienceId,
+          from: "CEAL Database <noreply@cealstats.org>",
+          subject: `CEAL Statistics Online Surveys Are Now Open`,
+          html: emailTemplate,
+          scheduledAt: openDate.toISOString(), // Resend will automatically send at this time
+        }
+        
+        broadcast = await resend.broadcasts.create(broadcastOptions)
+
+        console.log("✅ Broadcast scheduled with ID:", broadcast.data?.id)
+        console.log("✅ Will be sent automatically on:", openDate.toISOString())
+      } catch (emailError) {
+        console.error("❌ Failed to schedule broadcast email:", emailError)
+        throw new Error(
+          "Failed to schedule broadcast email: " + (emailError instanceof Error ? emailError.message : "Unknown error"),
+        )
+      }
+
+      // Do NOT open forms yet - keep forms CLOSED until opening date
       updateResult = await prisma.library_Year.updateMany({
         where: { year: year },
         data: {
@@ -372,13 +403,11 @@ export async function POST(request: NextRequest) {
         ],
       })
 
-      broadcast = { data: { id: "scheduled", status: "pending" } }
-
       console.log("📅 Created SurveySession for year", year, "(scheduled, not yet open)")
-      console.log("📅 Created 3 separate scheduled events:")
-      console.log("   1. BROADCAST on", openDate.toISOString())
-      console.log("   2. FORM_OPENING on", openDate.toISOString())
-      console.log("   3. FORM_CLOSING on", closeDate.toISOString())
+      console.log("📅 Created 3 separate scheduled events for form automation:")
+      console.log("   1. BROADCAST on", openDate.toISOString(), "(handled by Resend)")
+      console.log("   2. FORM_OPENING on", openDate.toISOString(), "(needs cron job)")
+      console.log("   3. FORM_CLOSING on", closeDate.toISOString(), "(needs cron job)")
     }
 
     // Log the action
