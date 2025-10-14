@@ -2,9 +2,9 @@
 
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { CheckCircle, AlertTriangle, Calendar, SlashIcon } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Calendar, SlashIcon, Info } from 'lucide-react'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +22,13 @@ export default function OpenYearPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+    const [currentDates, setCurrentDates] = useState<{
+        opening_date: string | null;
+        closing_date: string | null;
+        year: number;
+        isStoredInDatabase: boolean;
+    } | null>(null);
+    const [isLoadingDates, setIsLoadingDates] = useState(true);
 
     const openNewYearForm = async () => {
         // Validate dates
@@ -87,6 +94,47 @@ export default function OpenYearPage() {
         }
     };
 
+    // Fetch current dates from database on component mount and when year changes
+    useEffect(() => {
+        const fetchCurrentDates = async () => {
+            setIsLoadingDates(true);
+            try {
+                const response = await fetch(`/api/admin/survey-dates?year=${year}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📅 Fetched current dates:', data);
+                    
+                    // Extract and format dates
+                    if (data.success && data.dates) {
+                        const openDate = data.dates.openingDate 
+                            ? new Date(data.dates.openingDate).toISOString().split('T')[0]
+                            : `${year}-10-01`;
+                        const closeDate = data.dates.closingDate
+                            ? new Date(data.dates.closingDate).toISOString().split('T')[0]
+                            : `${year}-12-02`;
+                        
+                        setCurrentDates({
+                            opening_date: openDate,
+                            closing_date: closeDate,
+                            year: year,
+                            isStoredInDatabase: data.hasCustomDates || false
+                        });
+                        
+                        // Pre-populate form fields with database values
+                        setOpeningDate(openDate);
+                        setClosingDate(closeDate);
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching current dates:', err);
+            } finally {
+                setIsLoadingDates(false);
+            }
+        };
+
+        fetchCurrentDates();
+    }, [year]);
+
     return (
         <Container>
             <div className="max-w-5xl mx-auto">
@@ -127,6 +175,60 @@ export default function OpenYearPage() {
                     </p>
                 </div>
 
+                {/* Current Active Dates Display */}
+                {!isLoadingDates && currentDates && currentDates.isStoredInDatabase && (
+                    <div className="mb-6 max-w-2xl mx-auto">
+                        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border-2 border-emerald-300 rounded-lg p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <Info className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-emerald-900 mb-3">
+                                        📅 Currently Active Survey Dates for {currentDates.year}
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-white/70 rounded-lg p-4 border border-emerald-200">
+                                            <p className="text-xs text-emerald-700 font-semibold mb-1">OPENING DATE</p>
+                                            <p className="text-2xl font-bold text-emerald-900">
+                                                {new Date(currentDates.opening_date + 'T00:00:00').toLocaleDateString('en-US', { 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </p>
+                                            <p className="text-xs text-emerald-600 mt-1">12:00 AM Pacific Time</p>
+                                        </div>
+                                        <div className="bg-white/70 rounded-lg p-4 border border-blue-200">
+                                            <p className="text-xs text-blue-700 font-semibold mb-1">CLOSING DATE</p>
+                                            <p className="text-2xl font-bold text-blue-900">
+                                                {new Date(currentDates.closing_date + 'T00:00:00').toLocaleDateString('en-US', { 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </p>
+                                            <p className="text-xs text-blue-600 mt-1">11:59 PM Pacific Time</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-emerald-700 mt-3">
+                                        💡 These dates are currently stored in the database and displayed on the Forms Management page.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {isLoadingDates && (
+                    <div className="mb-6 max-w-2xl mx-auto">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                            <p className="text-gray-600">Loading current dates...</p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="max-w-2xl mx-auto">
                     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                         <div className="flex items-start gap-4 mb-6">
@@ -135,10 +237,13 @@ export default function OpenYearPage() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 mb-2">
-                                    Open Forms for New Year
+                                    {currentDates?.isStoredInDatabase ? 'Update Survey Dates' : 'Set Survey Dates for New Year'}
                                 </h2>
                                 <p className="text-gray-600">
-                                    Create Library_Year records for all libraries with scheduled opening and closing dates.
+                                    {currentDates?.isStoredInDatabase 
+                                        ? 'Modify the opening and closing dates for the survey period.'
+                                        : 'Create Library_Year records for all libraries with scheduled opening and closing dates.'
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -169,6 +274,11 @@ export default function OpenYearPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Opening Date *
+                                        {currentDates?.isStoredInDatabase && (
+                                            <span className="ml-2 text-xs text-emerald-600 font-normal">
+                                                (Current: {new Date(currentDates.opening_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                            </span>
+                                        )}
                                     </label>
                                     <input
                                         type="date"
@@ -182,6 +292,11 @@ export default function OpenYearPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Closing Date *
+                                        {currentDates?.isStoredInDatabase && (
+                                            <span className="ml-2 text-xs text-blue-600 font-normal">
+                                                (Current: {new Date(currentDates.closing_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                            </span>
+                                        )}
                                     </label>
                                     <input
                                         type="date"
@@ -217,7 +332,12 @@ export default function OpenYearPage() {
                             disabled={isProcessing || !openingDate || !closingDate}
                             className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
                         >
-                            {isProcessing ? 'Setting Dates...' : `Set Dates for ${year}`}
+                            {isProcessing 
+                                ? 'Setting Dates...' 
+                                : currentDates?.isStoredInDatabase 
+                                    ? `Update Dates for ${year}` 
+                                    : `Set Dates for ${year}`
+                            }
                         </Button>
                     </div>
 

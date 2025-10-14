@@ -6,8 +6,8 @@ const prisma = new PrismaClient();
 
 /**
  * DELETE endpoint to remove a scheduled form session
- * This clears the schedule dates (opening_date, closing_date) but does NOT change
- * the current open/closed status of forms. Forms remain in their current state.
+ * This clears the schedule dates from Library_Year records
+ * Also deletes the SurveySession record for the year
  */
 export async function DELETE(request: NextRequest) {
   try {
@@ -38,6 +38,7 @@ export async function DELETE(request: NextRequest) {
         ]
       },
       select: {
+        id: true,
         is_open_for_editing: true
       }
     });
@@ -53,11 +54,10 @@ export async function DELETE(request: NextRequest) {
     const openLibraries = libraryYears.filter(ly => ly.is_open_for_editing).length;
     const closedLibraries = libraryYears.length - openLibraries;
 
-    console.log(`📋 Deleting session for year ${year}: ${openLibraries} forms open, ${closedLibraries} forms closed`);
-    console.log(`⚠️  Note: Form open/closed status will NOT be changed, only schedule dates will be cleared`);
+    console.log(`📋 Deleting session for year ${year}: ${libraryYears.length} Library_Year records`);
+    console.log(`   ${openLibraries} forms open, ${closedLibraries} forms closed`);
 
-    // Clear the schedule dates ONLY - do NOT touch is_open_for_editing
-    // Forms will remain in their current state (open or closed)
+    // Clear the schedule dates from Library_Year records
     const updateResult = await prisma.library_Year.updateMany({
       where: { year: year },
       data: {
@@ -67,18 +67,32 @@ export async function DELETE(request: NextRequest) {
         fiscal_year_end: null,
         publication_date: null,
         updated_at: new Date()
-        // IMPORTANT: is_open_for_editing is NOT modified - forms keep current status
       }
     });
+
+    // Delete the SurveySession record for this year
+    let surveySessionDeleted = false;
+    try {
+      const deletedSession = await prisma.surveySession.deleteMany({
+        where: { academicYear: year }
+      });
+      surveySessionDeleted = deletedSession.count > 0;
+      if (surveySessionDeleted) {
+        console.log(`✅ Deleted SurveySession for year ${year}`);
+      }
+    } catch (sessionErr) {
+      console.log(`⚠️  No SurveySession found for year ${year}`);
+    }
 
     // Log the action
     await logUserAction(
       'DELETE',
-      'Library_Year_Schedule',
+      'Survey_Session',
       `year_${year}`,
       {
         year: year,
-        records_cleared: updateResult.count
+        library_year_records_updated: updateResult.count,
+        survey_session_deleted: surveySessionDeleted
       },
       null,
       true,
@@ -86,19 +100,14 @@ export async function DELETE(request: NextRequest) {
       request
     );
 
-    console.log(`✅ Deleted scheduled session for year ${year}, cleared ${updateResult.count} records`);
-    console.log(`✅ Forms retained their status: ${openLibraries} remain open, ${closedLibraries} remain closed`);
+    console.log(`✅ Cleared scheduled dates for ${updateResult.count} Library_Year records`);
 
     return NextResponse.json({
       success: true,
       year: year,
-      recordsCleared: updateResult.count,
-      formsStatus: {
-        open: openLibraries,
-        closed: closedLibraries,
-        note: 'Form status unchanged - only schedule dates cleared'
-      },
-      message: `Scheduled session for year ${year} has been deleted. Forms remain in their current state.`
+      deletedCount: updateResult.count,
+      surveySessionDeleted: surveySessionDeleted,
+      message: `Survey session for year ${year} has been deleted. Schedule dates cleared from ${updateResult.count} libraries.`
     });
 
   } catch (error) {

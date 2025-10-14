@@ -57,8 +57,6 @@ export function convertToPacificTime(dateString: string, endOfDay: boolean = fal
   const isoString = `${dateString}T${timeString}${offset}`;
   const result = new Date(isoString);
   
-  console.log(`🕐 Timezone Conversion: ${dateString} ${timeString} ${timezone} → ${result.toISOString()}`);
-  
   return result;
 }
 

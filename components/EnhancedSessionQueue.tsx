@@ -31,6 +31,18 @@ interface ScheduledEvent {
   is_overdue?: boolean;
 }
 
+interface LibraryYearSession {
+  year: number;
+  opening_date: Date | null;
+  closing_date: Date | null;
+  status: 'scheduled' | 'active' | 'closed';
+  total_libraries: number;
+  open_libraries: number;
+  closed_libraries: number;
+  days_until_open?: number | null;
+  days_until_close?: number | null;
+}
+
 interface EnhancedSessionQueueProps {
   userRoles?: string[] | null;
   onEventDeleted?: () => void;
@@ -38,35 +50,50 @@ interface EnhancedSessionQueueProps {
 
 export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: EnhancedSessionQueueProps) {
   const [events, setEvents] = useState<ScheduledEvent[]>([]);
+  const [librarySessions, setLibrarySessions] = useState<LibraryYearSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const [deletingEventId, setDeletingEventId] = useState<number | null>(null);
+  const [deletingSessionYear, setDeletingSessionYear] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<'pending' | 'all'>('pending');
 
   // Check if user is super admin
   const isSuperAdmin = userRoles && userRoles.includes('1');
 
   useEffect(() => {
-    fetchEvents();
+    fetchAllData();
     // Refresh every 5 minutes
-    const interval = setInterval(fetchEvents, 5 * 60 * 1000);
+    const interval = setInterval(fetchAllData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [statusFilter]);
 
-  const fetchEvents = async () => {
+  const fetchAllData = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`/api/admin/scheduled-events?status=${statusFilter}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setEvents(data.events);
-      } else {
-        setError(data.error || 'Failed to fetch events');
+      // Fetch both scheduled events and library year sessions in parallel
+      const [eventsResponse, sessionsResponse] = await Promise.all([
+        fetch(`/api/admin/scheduled-events?status=${statusFilter}`),
+        fetch('/api/admin/pending-sessions')
+      ]);
+
+      const eventsData = await eventsResponse.json();
+      const sessionsData = await sessionsResponse.json();
+
+      if (eventsData.success) {
+        setEvents(eventsData.events || []);
+      }
+
+      if (sessionsData.success) {
+        setLibrarySessions(sessionsData.sessions || []);
+      }
+
+      if (!eventsData.success && !sessionsData.success) {
+        setError('Failed to fetch session data');
       }
     } catch (err) {
-      setError('Failed to load scheduled events');
-      console.error('Scheduled events error:', err);
+      setError('Failed to load session queue');
+      console.error('Session queue error:', err);
     } finally {
       setLoading(false);
     }
@@ -101,8 +128,8 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
 
       console.log('✅ Event cancelled:', data);
       
-      // Refresh events list
-      await fetchEvents();
+      // Refresh all data
+      await fetchAllData();
       
       // Call callback if provided
       if (onEventDeleted) {
@@ -115,6 +142,53 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
       alert(err instanceof Error ? err.message : 'Failed to cancel event');
     } finally {
       setDeletingEventId(null);
+    }
+  };
+
+  const handleDeleteSession = async (year: number, totalLibraries: number) => {
+    const confirmed = window.confirm(
+      `⚠️ WARNING: Delete Survey Session for ${year}?\n\n` +
+      `This will DELETE survey dates for ${totalLibraries} libraries.\n\n` +
+      `This action cannot be undone. Are you absolutely sure?`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingSessionYear(year);
+    try {
+      const response = await fetch('/api/admin/delete-session', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          year,
+          userRoles
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || data.error || 'Failed to delete session');
+      }
+
+      console.log('✅ Session deleted:', data);
+      
+      // Refresh all data
+      await fetchAllData();
+      
+      // Call callback if provided
+      if (onEventDeleted) {
+        onEventDeleted();
+      }
+
+      alert(`Survey session for year ${year} has been deleted. Schedule dates cleared from ${data.deletedCount || totalLibraries} libraries.`);
+    } catch (err) {
+      console.error('Delete session error:', err);
+      alert(err instanceof Error ? err.message : 'Failed to delete session');
+    } finally {
+      setDeletingSessionYear(null);
     }
   };
 
@@ -207,10 +281,12 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
     );
   }
 
-  const pendingCount = events.filter(e => e.status === 'pending').length;
+  const pendingCount = events.filter(e => e.status === 'pending').length + 
+                        librarySessions.filter(s => s.status === 'scheduled' || s.status === 'active').length;
   const completedCount = events.filter(e => e.status === 'completed').length;
+  const totalCount = events.length + librarySessions.length;
 
-  if (events.length === 0) {
+  if (totalCount === 0) {
     return (
       <div className="mb-6 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
@@ -278,11 +354,102 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
             </button>
           </div>
 
-          {/* Events grouped by year */}
-          <div className="space-y-6">
-            {Object.entries(eventsByYear)
-              .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-              .map(([year, yearEvents]) => (
+          {/* Library Year Sessions */}
+          {librarySessions.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Survey Sessions (via Survey Dates Management)</h3>
+              {librarySessions.map((session) => (
+                <div
+                  key={`session-${session.year}`}
+                  className={`border rounded-lg p-4 ${
+                    session.status === 'active' 
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : session.status === 'scheduled'
+                      ? 'bg-blue-50 border-blue-200 text-blue-700'
+                      : 'bg-gray-50 border-gray-200 text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-5 h-5" />
+                      <div>
+                        <div className="font-bold text-lg">
+                          Academic Year {session.year}
+                        </div>
+                        <div className="text-sm opacity-75 mt-1">
+                          {session.total_libraries} libraries • {session.open_libraries} open • {session.closed_libraries} closed
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      {/* Status badge */}
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        session.status === 'active'
+                          ? 'bg-green-600 text-white'
+                          : session.status === 'scheduled'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-400 text-white'
+                      }`}>
+                        {session.status === 'active' ? 'Active' : session.status === 'scheduled' ? 'Scheduled' : 'Closed'}
+                      </span>
+
+                      {/* Countdown for scheduled sessions */}
+                      {session.status === 'scheduled' && session.days_until_open !== null && session.days_until_open !== undefined && (
+                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                          Opens in {session.days_until_open} day{session.days_until_open !== 1 ? 's' : ''}
+                        </span>
+                      )}
+
+                      {/* Delete button for super admins */}
+                      {isSuperAdmin && (
+                        <button
+                          onClick={() => handleDeleteSession(session.year, session.total_libraries)}
+                          disabled={deletingSessionYear === session.year}
+                          className="p-2 rounded-lg hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Delete this survey session"
+                        >
+                          {deletingSessionYear === session.year ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-5 h-5" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Date details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-current opacity-30">
+                    {session.opening_date && (
+                      <div className="text-sm">
+                        <div className="font-medium opacity-75 mb-1">Opening Date</div>
+                        <div className="font-semibold">
+                          <LocalDateTime dateString={session.opening_date.toString()} />
+                        </div>
+                      </div>
+                    )}
+                    {session.closing_date && (
+                      <div className="text-sm">
+                        <div className="font-medium opacity-75 mb-1">Closing Date</div>
+                        <div className="font-semibold">
+                          <LocalDateTime dateString={session.closing_date.toString()} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Scheduled Events (from broadcast) */}
+          {events.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-6">Broadcast Events</h3>
+              {Object.entries(eventsByYear)
+                .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+                .map(([year, yearEvents]) => (
               <div key={year}>
                 <h3 className="text-lg font-bold mb-3 text-gray-700">
                   Academic Year {year}
@@ -374,9 +541,10 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
                     </div>
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

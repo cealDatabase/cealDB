@@ -14,8 +14,6 @@ async function getUserRolesFromCookies(): Promise<string[] | null> {
   const userEmailCookie = cookieStore.get('uinf')?.value;
   const roleCookie = cookieStore.get('role')?.value;
 
-  console.log('🍪 Broadcast page - checking cookies');
-
   if (!userEmailCookie) {
     console.log('❌ No user cookie found - user not signed in');
     return null;
