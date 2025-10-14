@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           </div>
           
           <p style="margin-bottom: 12px;">For a quick guide to using the new survey forms, please refer to:</p>
-          <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
+          <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/docs/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
           
           <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
         </div>
@@ -438,12 +438,12 @@ export async function GET(request: NextRequest) {
         
         <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
           <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}-${year}–</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}-${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
           <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Data Collection Period:</h3>
-          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Central Time)</strong>.</p>
+          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
         </div>
         
         <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
@@ -455,7 +455,7 @@ export async function GET(request: NextRequest) {
           </div>
           
           <p style="margin-bottom: 12px;">For a quick guide to using the new survey forms, please refer to:</p>
-          <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
+          <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/docs/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
           
           <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
         </div>
