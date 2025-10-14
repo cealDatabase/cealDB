@@ -180,8 +180,10 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_noncjk)}</td>
                     <td className="border px-1 text-right bg-blue-50">{f(d?.etotal_electronic_title_subtotal)}</td>
-                    {/* 2.4 Total Electronic Expenditure */}
-                    <td className="border px-1 text-right bg-green-100 font-bold">{f(d?.etotal_electronic_expenditure_subtotal)}</td>
+                    {/* 2.4 Grand Total (1.6 + 2.3) */}
+                    <td className="border px-1 text-right bg-green-100 font-bold">
+                      {f(d?.egrand_total_title_subtotal) + f(d?.egrand_total_cd_subtotal) + f(d?.etotal_electronic_title_subtotal)}
+                    </td>
                   </tr>
                 )
               })}
