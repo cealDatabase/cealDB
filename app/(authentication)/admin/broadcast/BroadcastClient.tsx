@@ -276,15 +276,6 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               </BreadcrumbSeparator>
               
               <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/admin" className="no-underline">Super Admin Tools</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator>
-                <SlashIcon />
-              </BreadcrumbSeparator>
-              
-              <BreadcrumbItem>
                 <BreadcrumbPage>Open/Close Annual Surveys</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -311,9 +302,9 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 <div className="text-sm text-gray-600">Year</div>
                 <div className="text-2xl font-bold">{currentSession.year}</div>
               </div>
-              <div className="p-3 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Total Libraries</div>
-                <div className="text-2xl font-bold">{currentSession.totalLibraries}</div>
+              <div className="p-3 bg-blue-50 rounded">
+                <div className="text-sm text-blue-600">Total Libraries</div>
+                <div className="text-2xl font-bold text-blue-800">{currentSession.totalLibraries}</div>
               </div>
               <div className="p-3 bg-green-50 rounded">
                 <div className="text-sm text-green-600">Open for Editing</div>
@@ -336,7 +327,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 <Button 
                   onClick={closeSession}
                   disabled={loading}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-red-700 hover:bg-red-800"
                 >
                   {loading ? (
                     <>
@@ -344,7 +335,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       Closing...
                     </>
                   ) : (
-                    'Close All Forms'
+                    'Manually Close All Forms'
                   )}
                 </Button>
                 <p className="text-xs text-red-600 mt-2">
@@ -381,11 +372,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               {!scheduledSession ? (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                   <h3 className="font-semibold text-yellow-900 mb-2">No Scheduled Session Found</h3>
-                  <p className="text-sm text-yellow-800 mb-4">
-                    Please create Library_Year records first via the "Survey Dates Management" page.
+                  <p className="text-sm text-yellow-800">
+                    Please create a scheduled session first via the "Survey Dates Management" page.
                   </p>
-                  <Link href="/admin/open-year">
-                    <Button className="bg-green-600 hover:bg-green-700">
+                  <p className="text-sm text-yellow-800 mb-4">Once a scheduled session is created, you can preview the email and send it to all members in your CEAL broadcast audience when you click "Send Broadcast".</p>
+                  <Link href="/admin/survey-dates">
+                    <Button className="bg-green-700 hover:bg-green-800">
                       Go to Survey Dates Management
                     </Button>
                   </Link>
@@ -450,14 +442,14 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
           {/* Step 3: Final Confirmation */}
           {step === 'confirm' && scheduledSession && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Send Broadcast</h2>
+              <h2 className="text-xl font-semibold mb-4">Schedule Broadcast</h2>
               
-              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-5 mb-6">
-                <h3 className="font-bold text-yellow-900 mb-3 flex items-center gap-2">
+              <div className="bg-blue-50 border border-blue-300 rounded-lg p-5 mb-6">
+                <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  ⚠️ Confirm Broadcast Details
+                  📅 Scheduled Automation Summary
                 </h3>
-                <ul className="text-sm text-yellow-800 space-y-2">
+                <ul className="text-sm text-blue-800 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
@@ -467,7 +459,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} />
+                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> at <strong>12:00 AM PT</strong>
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -476,17 +468,31 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       <strong>Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at <strong>11:59 PM PT</strong>
                     </span>
                   </li>
+                </ul>
+              </div>
+
+              <div className="bg-green-50 border border-green-300 rounded-lg p-5 mb-6">
+                <h3 className="font-bold text-green-900 mb-3">✅ What Happens Automatically:</h3>
+                <ul className="text-sm text-green-800 space-y-2">
                   <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>Forms will <strong>automatically open</strong> on the opening date and broadcast email will be sent to all CEAL members</span>
+                    <span className="font-bold mt-1">1.</span>
+                    <span><strong>On Opening Date:</strong> Forms automatically open at 12:00 AM PT</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>Forms will <strong>automatically close</strong> at 11:59 PM PT on closing date - no manual action required</span>
+                    <span className="font-bold mt-1">2.</span>
+                    <span><strong>Broadcast Email:</strong> Sent to all CEAL members when forms open</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>Super admins will receive VERIFIED confirmation email after all forms are closed</span>
+                    <span className="font-bold mt-1">3.</span>
+                    <span><strong>On Closing Date:</strong> Forms automatically close at 11:59 PM PT</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">4.</span>
+                    <span><strong>Confirmation Email:</strong> Super admins receive confirmation after forms close</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">⚡</span>
+                    <span><strong>No manual action required</strong> - everything is automated!</span>
                   </li>
                 </ul>
               </div>
@@ -500,12 +506,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending Broadcast...
+                      Scheduling...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
-                      Send Broadcast Now
+                      Confirm & Schedule Broadcast
                     </>
                   )}
                 </Button>
@@ -529,23 +535,31 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-green-800 mb-3">
-                  Broadcast Scheduled Successfully!
+                  ✅ Broadcast Scheduled Successfully!
                 </h2>
                 <p className="text-gray-700 text-lg mb-2">
-                  Broadcast for <strong>{scheduledSession.year}</strong> has been scheduled.
+                  Automated session for <strong>{scheduledSession.year}</strong> has been scheduled.
                 </p>
                 <p className="text-gray-600">
-                  Forms will automatically open on the scheduled date, and members will receive notification emails at that time.
+                  Everything will happen automatically on the scheduled dates. No further action required.
                 </p>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-left">
-                <h3 className="font-semibold text-green-900 mb-2">What Happens Next:</h3>
-                <ul className="text-sm text-green-800 space-y-1">
-                  <li>• Forms will automatically open on <LocalDateTime dateString={scheduledSession.opening_date} /></li>
-                  <li>• Broadcast email sent to all CEAL members when forms open</li>
-                  <li>• Forms will automatically close on <LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT</li>
-                  <li>• You will receive VERIFIED confirmation email after all forms are closed</li>
+                <h3 className="font-semibold text-green-900 mb-2">📅 Scheduled Events:</h3>
+                <ul className="text-sm text-green-800 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">⏰</span>
+                    <span><strong><LocalDateTime dateString={scheduledSession.opening_date} /> at 12:00 AM PT:</strong> Forms automatically open + Broadcast email sent to all CEAL members</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">⏰</span>
+                    <span><strong><LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT:</strong> Forms automatically close</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">📧</span>
+                    <span>You will receive a confirmation email after forms are closed (verifying all forms are closed)</span>
+                  </li>
                 </ul>
               </div>
 

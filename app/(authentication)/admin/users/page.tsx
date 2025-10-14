@@ -1,6 +1,17 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { UserRoleManager } from "@/components/UserRoleManager";
+import { Container } from "@/components/Container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import { SlashIcon } from 'lucide-react';
 
 async function UserManagementPage() {
   // Check if user is super admin
@@ -22,6 +33,39 @@ async function UserManagementPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Container>
+        <div className="max-w-5xl mx-auto">
+          {/* Breadcrumb */}
+          <div className="my-6">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/" className="no-underline">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/admin" className="no-underline">Admin</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Manage User Roles</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+      </Container>
+      
       <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <h1>User Management</h1>

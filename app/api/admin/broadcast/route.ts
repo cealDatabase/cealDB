@@ -185,25 +185,41 @@ export async function POST(request: NextRequest) {
       </div>
     `;
 
-    // Create broadcast via Resend Broadcast API
-    // Reference: https://resend.com/docs/api-reference/broadcasts/create-broadcast
-    const broadcast = await resend.broadcasts.create({
-      audienceId: audienceId,
-      from: 'CEAL Database <notifications@cealstats.org>',
-      subject: `CEAL Database Forms Open for ${year} - Action Required`,
-      html: emailTemplate
-    });
-
-    console.log('✅ Broadcast created successfully:', broadcast.data?.id);
+    // ⚠️ IMPORTANT CHANGE: Do NOT send broadcast immediately
+    // The CRON job will handle BOTH opening forms AND sending broadcast emails
+    // This endpoint now only SCHEDULES the session by setting dates in database
+    // 
+    // Previous behavior: Sent broadcast immediately when clicking "Send Broadcast"
+    // New behavior: CRON sends broadcast when opening_date is reached
+    // 
+    // Reference: The CRON job at /api/cron/open-forms will:
+    // 1. Check for sessions where opening_date <= now
+    // 2. Open forms (set is_open_for_editing = true)
+    // 3. Send broadcast email to all members
+    
+    console.log('📅 Session scheduled successfully');
+    console.log('   Opening date:', openDate.toISOString());
+    console.log('   Closing date:', closeDate.toISOString());
+    console.log('⏰ CRON will open forms and send broadcast at opening date');
+    
+    // Skip creating broadcast here - let CRON handle it
+    const broadcast = {
+      data: {
+        id: 'scheduled-by-cron',
+        status: 'scheduled'
+      }
+    };
 
     // Calculate all survey dates (fiscal year and publication date are automatic)
     const surveyDates = getSurveyDates(year, openDate, closeDate);
 
-    // Update all Library_Year records to open for editing with all date fields
+    // ⚠️ IMPORTANT: Do NOT open forms immediately
+    // Forms will be opened by CRON job at the scheduled opening_date
+    // We only set the dates here - forms remain CLOSED until CRON runs
     const updateResult = await prisma.library_Year.updateMany({
       where: { year: year },
       data: { 
-        is_open_for_editing: true,
+        is_open_for_editing: false, // ✅ Keep CLOSED until CRON opens them
         opening_date: surveyDates.openingDate,
         closing_date: surveyDates.closingDate,
         fiscal_year_start: surveyDates.fiscalYearStart,
@@ -237,11 +253,11 @@ export async function POST(request: NextRequest) {
       opening_date: openDate.toISOString(),
       closing_date: closeDate.toISOString(),
       broadcast: {
-        id: broadcast.data?.id || 'sent',
-        status: 'sent'
+        id: broadcast.data?.id || 'scheduled',
+        status: 'scheduled'
       },
-      librariesOpened: updateResult.count,
-      message: `Forms opened for year ${year}. Notification sent to all CEAL members. ${updateResult.count} libraries opened for editing.`
+      librariesScheduled: updateResult.count,
+      message: `Session scheduled for year ${year}. Forms will automatically open and broadcast will be sent on ${openDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at 12:00 AM Pacific Time. ${updateResult.count} libraries scheduled.`
     });
 
   } catch (error) {
