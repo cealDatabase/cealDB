@@ -4,7 +4,7 @@ import { useState } from "react"
 import { PersonnelInstructions } from "@/components/instructions/personnel"
 import PersonnelForm from "@/components/forms/personnel-form"
 import { Button } from "@/components/ui/button"
-import { BookOpen, X } from "lucide-react"
+import { BookOpen, X, History } from "lucide-react"
 import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 
@@ -36,6 +36,16 @@ const PersonnelPage = () => {
                                 View Instructions
                             </>
                         )}
+                    </Button>
+                    
+                    <Button
+                        variant="default"
+                        className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+                        size="lg"
+                        onClick={() => window.open(window.location.pathname + '/past-years', '_blank')}
+                    >
+                        <History className="h-4 w-4" />
+                        View data from past 5 years
                     </Button>
                 </div>
 
