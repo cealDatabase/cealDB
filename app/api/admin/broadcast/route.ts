@@ -62,13 +62,20 @@ export async function POST(request: NextRequest) {
       return now < closingDate
     })
 
-    if (activeOrScheduledSessions.length > 0) {
-      const sessionYears = activeOrScheduledSessions.map((s) => s.year).join(", ")
+    // Check if there's an existing session for THIS year
+    const existingSessionForThisYear = activeOrScheduledSessions.find(s => s.year === Number.parseInt(year))
+    
+    // Check if there are sessions for OTHER years
+    const sessionsForOtherYears = activeOrScheduledSessions.filter(s => s.year !== Number.parseInt(year))
+
+    // Only block if trying to create a session when OTHER years have active sessions
+    if (sessionsForOtherYears.length > 0) {
+      const sessionYears = sessionsForOtherYears.map((s) => s.year).join(", ")
       return NextResponse.json(
         {
           error: "Cannot create new session: existing sessions found",
-          detail: `There ${activeOrScheduledSessions.length === 1 ? "is" : "are"} ${activeOrScheduledSessions.length} existing scheduled or active session${activeOrScheduledSessions.length === 1 ? "" : "s"} (Year${activeOrScheduledSessions.length === 1 ? "" : "s"}: ${sessionYears}). Please delete the existing session${activeOrScheduledSessions.length === 1 ? "" : "s"} before creating a new one.`,
-          existingSessions: activeOrScheduledSessions.map((s) => ({
+          detail: `There ${sessionsForOtherYears.length === 1 ? "is" : "are"} ${sessionsForOtherYears.length} existing scheduled or active session${sessionsForOtherYears.length === 1 ? "" : "s"} for year${sessionsForOtherYears.length === 1 ? "" : "s"}: ${sessionYears}. Please delete the existing session${sessionsForOtherYears.length === 1 ? "" : "s"} before creating a new one.`,
+          existingSessions: sessionsForOtherYears.map((s) => ({
             year: s.year,
             opening_date: s.opening_date,
             closing_date: s.closing_date,
@@ -78,6 +85,10 @@ export async function POST(request: NextRequest) {
         { status: 409 },
       )
     }
+    
+    // Flag to track if this is for an existing session
+    const isExistingSession = existingSessionForThisYear !== undefined
+    console.log(`📋 Session check: Year ${year} ${isExistingSession ? 'HAS existing session' : 'is NEW session'}`)
 
     // Check if RESEND_API_KEY is available
     if (!process.env.RESEND_API_KEY) {
@@ -226,16 +237,31 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      // Create SurveySession record
-      await prisma.surveySession.create({
-        data: {
-          academicYear: Number.parseInt(year),
-          openingDate: openDate,
-          closingDate: closeDate,
-          isOpen: true,
-          notifiedOnOpen: true,
-        },
-      })
+      // Create or update SurveySession record
+      if (isExistingSession) {
+        // Update existing session
+        await prisma.surveySession.updateMany({
+          where: { academicYear: Number.parseInt(year) },
+          data: {
+            isOpen: true,
+            notifiedOnOpen: true,
+            updatedAt: new Date(),
+          },
+        })
+        console.log(`✅ Updated existing SurveySession for year ${year}`)
+      } else {
+        // Create new session
+        await prisma.surveySession.create({
+          data: {
+            academicYear: Number.parseInt(year),
+            openingDate: openDate,
+            closingDate: closeDate,
+            isOpen: true,
+            notifiedOnOpen: true,
+          },
+        })
+        console.log(`✅ Created new SurveySession for year ${year}`)
+      }
 
       // Create COMPLETED scheduled events for record keeping
       await prisma.scheduledEvent.createMany({
@@ -291,16 +317,33 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      // Create SurveySession record (scheduled, not yet open)
-      await prisma.surveySession.create({
-        data: {
-          academicYear: Number.parseInt(year),
-          openingDate: openDate,
-          closingDate: closeDate,
-          isOpen: false,
-          notifiedOnOpen: false,
-        },
-      })
+      // Create or update SurveySession record (scheduled, not yet open)
+      if (isExistingSession) {
+        // Update existing session
+        await prisma.surveySession.updateMany({
+          where: { academicYear: Number.parseInt(year) },
+          data: {
+            openingDate: openDate,
+            closingDate: closeDate,
+            isOpen: false,
+            notifiedOnOpen: false,
+            updatedAt: new Date(),
+          },
+        })
+        console.log(`✅ Updated existing SurveySession for year ${year} (scheduled)`)
+      } else {
+        // Create new session
+        await prisma.surveySession.create({
+          data: {
+            academicYear: Number.parseInt(year),
+            openingDate: openDate,
+            closingDate: closeDate,
+            isOpen: false,
+            notifiedOnOpen: false,
+          },
+        })
+        console.log(`✅ Created new SurveySession for year ${year} (scheduled)`)
+      }
 
       // Create three SEPARATE pending scheduled events
       await prisma.scheduledEvent.createMany({
