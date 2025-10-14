@@ -4,13 +4,15 @@ import { useState } from "react"
 import { MonographicInstructions } from "@/components/instructions/monographic"
 import MonographicForm from "@/components/forms/monographic-form"
 import { Button } from "@/components/ui/button"
-import { BookOpen, X } from "lucide-react"
+import { BookOpen, X, History } from "lucide-react"
 import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
+import { useRouter } from "next/navigation"
 
 
 const MonographicPage = () => {
   const [showInstructions, setShowInstructions] = useState(false)
+  const router = useRouter()
 
   return (
     <>
@@ -37,6 +39,16 @@ const MonographicPage = () => {
                 View Instructions
               </>
             )}
+          </Button>
+          
+          <Button
+            variant="default"
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+            size="lg"
+            onClick={() => window.open(window.location.pathname + '/past-years', '_blank')}
+          >
+            <History className="h-4 w-4" />
+            View data from past 5 years
           </Button>
         </div>
 
