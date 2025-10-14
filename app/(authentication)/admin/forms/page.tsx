@@ -181,15 +181,29 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                                 using the registered contact's email and follow the password setup process if necessary.
                             </p>
 
-                            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 rounded-lg p-6">
+                            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 rounded-lg p-6 space-y-3">
                                 <p className="text-emerald-900 font-semibold">
-                                    📖 For detailed instructions, visit:{" "}
+                                    📖 For website use instructions, visit{" "}
+                                    <a
+                                        href="https://cealstats.org/docs/user-guide.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-emerald-600 hover:text-emerald-800 underline decoration-2 underline-offset-2 transition-colors"
+                                    >
+                                        https://cealstats.org/docs/user-guide.pdf
+                                    </a>
+                                </p>
+                                <p className="text-emerald-900 font-semibold">
+                                    📖 For survey form instructions, visit{" "}
                                     <a
                                         href="https://guides.lib.ku.edu/CEAL_Stats"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="text-emerald-600 hover:text-emerald-800 underline decoration-2 underline-offset-2 transition-colors"
                                     >
                                         https://guides.lib.ku.edu/CEAL_Stats
                                     </a>
+                                    {" "}(網址另開網頁)
                                 </p>
                             </div>
                         </div>
@@ -200,12 +214,12 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                         <div className="mb-8 relative">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-                                <h2 className="text-2xl font-bold text-gray-900">Complete These First</h2>
+                                <h2 className="text-2xl font-bold text-gray-900">Recommended: Complete These Database Lists First</h2>
                                 <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-semibold rounded-full">
                                     Priority
                                 </span>
                             </div>
-                            <p className="text-gray-600">Priority forms that need immediate attention</p>
+                            <p className="text-gray-600">These are priority lists that require immediate attention. The data from these lists will be imported into other survey forms.</p>
                         </div>
 
                         <div className="space-y-4">

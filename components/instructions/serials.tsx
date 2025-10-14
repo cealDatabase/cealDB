@@ -92,7 +92,7 @@ export function SerialsInstructions() {
                     <div className="space-y-2 text-sm text-blue-800">
                         <div className="flex items-start gap-3">
                             <Database className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                            <p>Before using the "Import from E-Journal Databases by Subscription" feature, update your "E-Journals Database by Subscription – List" so the system can calculate numbers automatically.</p>
+                            <p>Before using the "Import from E-Journal Databases" feature, update your "E-Journal Databases" so the system can calculate numbers automatically.</p>
                         </div>
                         <div className="flex items-start gap-3">
                             <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />

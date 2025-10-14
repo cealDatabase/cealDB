@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import EditEBookSubscriptionDialog from "./EditEBookSubscriptionDialog";
+import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 
 interface EBookSubscriptionManagementClientProps {
   subscriptions: Array<{
@@ -155,6 +156,10 @@ export default function EBookSubscriptionManagementClient({
           </div>
         );
       },
+      filterFn: (row: any, id: string, value: string[]) => {
+        const rowLanguages = row.getValue(id) as string[];
+        return value.some((filterLang: string) => rowLanguages.includes(filterLang));
+      },
     },
     {
       accessorKey: "titles",
@@ -249,8 +254,22 @@ export default function EBookSubscriptionManagementClient({
         {/* Table controls */}
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center space-x-2">
+            {/* Language Filter */}
+            {table.getColumn("language") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("language")}
+                title="Language"
+                options={[
+                  { label: "CHN", value: "CHN" },
+                  { label: "JPN", value: "JPN" },
+                  { label: "KOR", value: "KOR" },
+                  { label: "NON-CJK", value: "NON" },
+                ]}
+              />
+            )}
+            
             <Badge variant="outline">
-              {data.length} access
+              {table.getFilteredRowModel().rows.length} access
             </Badge>
             {selectedRows.length > 0 && (
               <Badge variant="secondary">
@@ -319,9 +338,9 @@ export default function EBookSubscriptionManagementClient({
   return (
     <div className='space-y-4'>
       <div className="rounded-md border bg-card p-4">
-        <h2 className="text-lg font-medium mb-2">Current E-Book Subscriptions</h2>
+        <h2 className="text-lg font-medium mb-2">Current E-Book Access</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Manage your library's E-Book subscriptions for {year}. You can remove individual subscriptions or select multiple to remove at once.
+          Manage your library's E-Book access for {year}. You can remove individual access or select multiple to remove at once.
         </p>
         
         <DataTable 

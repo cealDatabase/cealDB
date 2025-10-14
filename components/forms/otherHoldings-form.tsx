@@ -404,50 +404,74 @@ export default function OtherHoldingsForm() {
     >
       {/* Microforms Section */}
       <FormSection
-        title="Microforms"
-        description="Microfilm reels, microcards, microprint, and microfiche sheets"
+        title='Microforms'
+        description='Microfilm reels, microcards, microprint, and microfiche sheets'
       >
         <LanguageFieldGroup
           control={form.control as any}
           fields={{
-            chinese: { name: "ohmicroform_chinese", label: "01. Microform Chinese" },
-            japanese: { name: "ohmicroform_japanese", label: "02. Microform Japanese" },
-            korean: { name: "ohmicroform_korean", label: "03. Microform Korean" },
-            noncjk: { name: "ohmicroform_noncjk", label: "04. Microform Non-CJK" }
+            chinese: {
+              name: "ohmicroform_chinese",
+              label: "01. Microform Chinese",
+            },
+            japanese: {
+              name: "ohmicroform_japanese",
+              label: "02. Microform Japanese",
+            },
+            korean: {
+              name: "ohmicroform_korean",
+              label: "03. Microform Korean",
+            },
+            noncjk: {
+              name: "ohmicroform_noncjk",
+              label: "04. Microform Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="05. Microforms Subtotal"
+          label='05. Microforms Subtotal'
           value={microformSubtotal}
-          formula="01 + 02 + 03 + 04"
+          formula='01 + 02 + 03 + 04'
         />
       </FormSection>
 
       {/* Cartographic and Graphic Materials Section */}
       <FormSection
-        title="Cartographic and Graphic Materials"
-        description="Maps, globes, photographs, prints, slides, and visual materials"
+        title='Cartographic and Graphic Materials'
+        description='Maps, globes, photographs, prints, slides, and visual materials'
       >
         <LanguageFieldGroup
           control={form.control as any}
           fields={{
-            chinese: { name: "ohcarto_graphic_chinese", label: "06. Graphic Chinese" },
-            japanese: { name: "ohcarto_graphic_japanese", label: "07. Graphic Japanese" },
-            korean: { name: "ohcarto_graphic_korean", label: "08. Graphic Korean" },
-            noncjk: { name: "ohcarto_graphic_noncjk", label: "09. Graphic Non-CJK" }
+            chinese: {
+              name: "ohcarto_graphic_chinese",
+              label: "06. Graphic Chinese",
+            },
+            japanese: {
+              name: "ohcarto_graphic_japanese",
+              label: "07. Graphic Japanese",
+            },
+            korean: {
+              name: "ohcarto_graphic_korean",
+              label: "08. Graphic Korean",
+            },
+            noncjk: {
+              name: "ohcarto_graphic_noncjk",
+              label: "09. Graphic Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="10. Graphics Subtotal"
+          label='10. Graphics Subtotal'
           value={graphicSubtotal}
-          formula="06 + 07 + 08 + 09"
+          formula='06 + 07 + 08 + 09'
         />
       </FormSection>
 
       {/* Audio Materials Section */}
       <FormSection
-        title="Audio Materials"
-        description="Audiocassettes, CDs, phonodiscs, and sound recordings"
+        title='Audio Materials'
+        description='Audiocassettes, CDs, phonodiscs, and sound recordings'
       >
         <LanguageFieldGroup
           control={form.control as any}
@@ -455,41 +479,47 @@ export default function OtherHoldingsForm() {
             chinese: { name: "ohaudio_chinese", label: "11. Audio Chinese" },
             japanese: { name: "ohaudio_japanese", label: "12. Audio Japanese" },
             korean: { name: "ohaudio_korean", label: "13. Audio Korean" },
-            noncjk: { name: "ohaudio_noncjk", label: "14. Audio Non-CJK" }
+            noncjk: { name: "ohaudio_noncjk", label: "14. Audio Non-CJK" },
           }}
         />
         <SubtotalDisplay
-          label="15. Audio Subtotal"
+          label='15. Audio Subtotal'
           value={audioSubtotal}
-          formula="11 + 12 + 13 + 14"
+          formula='11 + 12 + 13 + 14'
         />
       </FormSection>
 
       {/* Video Materials Section */}
       <FormSection
-        title="Video Materials"
-        description="Motion pictures, videocassettes, and laserdiscs"
+        title='Video Materials'
+        description='Motion pictures, videocassettes, and laserdiscs'
       >
         <LanguageFieldGroup
           control={form.control as any}
           fields={{
-            chinese: { name: "ohfilm_video_chinese", label: "16. Video Chinese" },
-            japanese: { name: "ohfilm_video_japanese", label: "17. Video Japanese" },
+            chinese: {
+              name: "ohfilm_video_chinese",
+              label: "16. Video Chinese",
+            },
+            japanese: {
+              name: "ohfilm_video_japanese",
+              label: "17. Video Japanese",
+            },
             korean: { name: "ohfilm_video_korean", label: "18. Video Korean" },
-            noncjk: { name: "ohfilm_video_noncjk", label: "19. Video Non-CJK" }
+            noncjk: { name: "ohfilm_video_noncjk", label: "19. Video Non-CJK" },
           }}
         />
         <SubtotalDisplay
-          label="20. Video Subtotal"
+          label='20. Video Subtotal'
           value={videoSubtotal}
-          formula="16 + 17 + 18 + 19"
+          formula='16 + 17 + 18 + 19'
         />
       </FormSection>
 
       {/* DVD Materials Section */}
       <FormSection
-        title="DVD Materials"
-        description="Digital video discs and related media"
+        title='DVD Materials'
+        description='Digital video discs and related media'
       >
         <LanguageFieldGroup
           control={form.control as any}
@@ -497,174 +527,233 @@ export default function OtherHoldingsForm() {
             chinese: { name: "ohdvd_chinese", label: "21. DVD Chinese" },
             japanese: { name: "ohdvd_japanese", label: "22. DVD Japanese" },
             korean: { name: "ohdvd_korean", label: "23. DVD Korean" },
-            noncjk: { name: "ohdvd_noncjk", label: "24. DVD Non-CJK" }
+            noncjk: { name: "ohdvd_noncjk", label: "24. DVD Non-CJK" },
           }}
         />
         <SubtotalDisplay
-          label="25. DVD Subtotal"
+          label='25. DVD Subtotal'
           value={dvdSubtotal}
-          formula="21 + 22 + 23 + 24"
+          formula='21 + 22 + 23 + 24'
         />
       </FormSection>
 
       {/* Online Materials Section */}
       <FormSection
-        title="Online Materials"
-        description="Subscription-based digital materials (auto-calculated from database)"
+        title='Online Materials'
+        description='Digital materials from electronic resources (auto-calculated from database lists)'
       >
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;Audio-Visual Database by Subscription&quot; in order for the
+        <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <p className='text-sm text-yellow-800 mb-2'>
+            <strong>BEFORE using the import feature</strong>, please fill out or
+            update the &quot;Audio-Visual Databases&quot; in order for the
             system to provide the corresponding numbers automatically.
           </p>
           <Button
-            type="button"
+            type='button'
             onClick={importAVData}
-            className="flex items-center gap-2"
-            variant="default"
+            className='flex items-center gap-2'
+            variant='default'
             disabled={isImporting}
           >
             {isImporting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className='h-4 w-4 animate-spin' />
                 Importing...
               </>
             ) : (
               <>
-                <Download className="h-4 w-4" />
-                Import from Audio/Video Database by Subscription
+                <Download className='h-4 w-4' />
+                Import from &quot;Audio/Video Databases&quot;
               </>
             )}
           </Button>
         </div>
 
         {/* Online Map */}
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3 text-cyan-700">Online Map</h4>
+        <div className='mb-6'>
+          <h4 className='font-semibold mb-3 text-cyan-700'>Online Map</h4>
           <LanguageFieldGroup
             control={form.control as any}
             fields={{
-              chinese: { name: "ohonlinemapchinese", label: "26. Online Map Chinese" },
-              japanese: { name: "ohonlinemapjapanese", label: "27. Online Map Japanese" },
-              korean: { name: "ohonlinemapkorean", label: "28. Online Map Korean" },
-              noncjk: { name: "ohonlinemapnoncjk", label: "29. Online Map Non-CJK" }
+              chinese: {
+                name: "ohonlinemapchinese",
+                label: "26. Online Map Chinese",
+              },
+              japanese: {
+                name: "ohonlinemapjapanese",
+                label: "27. Online Map Japanese",
+              },
+              korean: {
+                name: "ohonlinemapkorean",
+                label: "28. Online Map Korean",
+              },
+              noncjk: {
+                name: "ohonlinemapnoncjk",
+                label: "29. Online Map Non-CJK",
+              },
             }}
           />
-          <div className="mt-4"></div>
+          <div className='mt-4'></div>
           <SubtotalDisplay
-            label="30. Online Map Subtotal"
+            label='30. Online Map Subtotal'
             value={onlineMapSubtotal}
-            formula="26 + 27 + 28 + 29"
+            formula='26 + 27 + 28 + 29'
           />
         </div>
 
         {/* Online Image/Photograph */}
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3 text-cyan-700">Online Image/Photograph</h4>
+        <div className='mb-6'>
+          <h4 className='font-semibold mb-3 text-cyan-700'>
+            Online Image/Photograph
+          </h4>
           <LanguageFieldGroup
             control={form.control as any}
             fields={{
-              chinese: { name: "ohonlineimagechinese", label: "31. Online Image/Photograph Chinese" },
-              japanese: { name: "ohonlineimagejapanese", label: "32. Online Image/Photograph Japanese" },
-              korean: { name: "ohonlineimagekorean", label: "33. Online Image/Photograph Korean" },
-              noncjk: { name: "ohonlineimagenoncjk", label: "34. Online Image/Photograph Non-CJK" }
+              chinese: {
+                name: "ohonlineimagechinese",
+                label: "31. Online Image/Photograph Chinese",
+              },
+              japanese: {
+                name: "ohonlineimagejapanese",
+                label: "32. Online Image/Photograph Japanese",
+              },
+              korean: {
+                name: "ohonlineimagekorean",
+                label: "33. Online Image/Photograph Korean",
+              },
+              noncjk: {
+                name: "ohonlineimagenoncjk",
+                label: "34. Online Image/Photograph Non-CJK",
+              },
             }}
           />
-          <div className="mt-4"></div>
+          <div className='mt-4'></div>
           <SubtotalDisplay
-            label="35. Online Image/Photograph Subtotal"
+            label='35. Online Image/Photograph Subtotal'
             value={onlineImageSubtotal}
-            formula="31 + 32 + 33 + 34"
+            formula='31 + 32 + 33 + 34'
           />
         </div>
 
         {/* Streaming Audio/Music */}
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3 text-cyan-700">Streaming Audio/Music</h4>
+        <div className='mb-6'>
+          <h4 className='font-semibold mb-3 text-cyan-700'>
+            Streaming Audio/Music
+          </h4>
           <LanguageFieldGroup
             control={form.control as any}
             fields={{
-              chinese: { name: "ohstreamingchinese", label: "36. Streaming Audio Chinese" },
-              japanese: { name: "ohstreamingjapanese", label: "37. Streaming Audio Japanese" },
-              korean: { name: "ohstreamingkorean", label: "38. Streaming Audio Korean" },
-              noncjk: { name: "ohstreamingnoncjk", label: "39. Streaming Audio Non-CJK" }
+              chinese: {
+                name: "ohstreamingchinese",
+                label: "36. Streaming Audio Chinese",
+              },
+              japanese: {
+                name: "ohstreamingjapanese",
+                label: "37. Streaming Audio Japanese",
+              },
+              korean: {
+                name: "ohstreamingkorean",
+                label: "38. Streaming Audio Korean",
+              },
+              noncjk: {
+                name: "ohstreamingnoncjk",
+                label: "39. Streaming Audio Non-CJK",
+              },
             }}
           />
-          <div className="mt-4"></div>
+          <div className='mt-4'></div>
           <SubtotalDisplay
-            label="40. Streaming Audio/Music Subtotal"
+            label='40. Streaming Audio/Music Subtotal'
             value={streamingAudioSubtotal}
-            formula="36 + 37 + 38 + 39"
+            formula='36 + 37 + 38 + 39'
           />
         </div>
 
         {/* Streaming Film/Video */}
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3 text-cyan-700">Streaming Film/Video</h4>
+        <div className='mb-6'>
+          <h4 className='font-semibold mb-3 text-cyan-700'>
+            Streaming Film/Video
+          </h4>
           <LanguageFieldGroup
             control={form.control as any}
             fields={{
-              chinese: { name: "ohstreamingvideochinese", label: "41. Streaming Film/Video Chinese" },
-              japanese: { name: "ohstreamingvideojapanese", label: "42. Streaming Film/Video Japanese" },
-              korean: { name: "ohstreamingvideokorean", label: "43. Streaming Film/Video Korean" },
-              noncjk: { name: "ohstreamingvideononcjk", label: "44. Streaming Film/Video Non-CJK" }
+              chinese: {
+                name: "ohstreamingvideochinese",
+                label: "41. Streaming Film/Video Chinese",
+              },
+              japanese: {
+                name: "ohstreamingvideojapanese",
+                label: "42. Streaming Film/Video Japanese",
+              },
+              korean: {
+                name: "ohstreamingvideokorean",
+                label: "43. Streaming Film/Video Korean",
+              },
+              noncjk: {
+                name: "ohstreamingvideononcjk",
+                label: "44. Streaming Film/Video Non-CJK",
+              },
             }}
           />
-          <div className="mt-4"></div>
+          <div className='mt-4'></div>
           <SubtotalDisplay
-            label="45. Streaming Film/Video Subtotal"
+            label='45. Streaming Film/Video Subtotal'
             value={streamingVideoSubtotal}
-            formula="41 + 42 + 43 + 44"
+            formula='41 + 42 + 43 + 44'
           />
         </div>
       </FormSection>
 
       {/* Custom Materials Section */}
       <FormSection
-        title="Custom Materials"
-        description="Additional material types specific to your library"
+        title='Custom Materials'
+        description='Additional material types specific to your library'
       >
         <LanguageFieldGroup
           control={form.control as any}
           fields={{
             chinese: { name: "ohcustom1chinese", label: "46. Custom Chinese" },
-            japanese: { name: "ohcustom1japanese", label: "47. Custom Japanese" },
+            japanese: {
+              name: "ohcustom1japanese",
+              label: "47. Custom Japanese",
+            },
             korean: { name: "ohcustom1korean", label: "48. Custom Korean" },
-            noncjk: { name: "ohcustom1noncjk", label: "49. Custom Non-CJK" }
+            noncjk: { name: "ohcustom1noncjk", label: "49. Custom Non-CJK" },
           }}
         />
         <SubtotalDisplay
-          label="50. Custom Subtotal"
+          label='50. Custom Subtotal'
           value={customSubtotal}
-          formula="46 + 47 + 48 + 49"
+          formula='46 + 47 + 48 + 49'
         />
       </FormSection>
 
       {/* Grand Total */}
       <FormSection
-        title="Total Other Holdings"
-        description="Final total of all other materials"
+        title='Total Other Holdings'
+        description='Final total of all other materials'
       >
         <SubtotalDisplay
-          label="51. GRAND TOTAL (Other Materials)"
+          label='51. GRAND TOTAL (Other Materials)'
           value={grandTotal}
-          formula="05 + 10 + 15 + 20 + 25 + 30 + 35 + 40 + 45 + 50"
-          className="bg-blue-50 p-4 rounded-lg"
-          valueClassName="bg-blue-200 px-3 py-1 rounded"
+          formula='05 + 10 + 15 + 20 + 25 + 30 + 35 + 40 + 45 + 50'
+          className='bg-blue-50 p-4 rounded-lg'
+          valueClassName='bg-blue-200 px-3 py-1 rounded'
         />
       </FormSection>
 
       {/* Notes Section */}
       <FormSection
-        title="Notes"
-        description="Additional comments or clarifications"
+        title='Notes'
+        description='Additional comments or clarifications'
       >
         <ReusableFormField
           control={form.control as any}
-          name="ohnotes"
-          type="textarea"
-          placeholder="Enter any additional notes or comments..." label={""} />
+          name='ohnotes'
+          type='textarea'
+          placeholder='Enter any additional notes or comments...'
+          label={""}
+        />
       </FormSection>
 
       <FormSubmitSection
@@ -672,9 +761,9 @@ export default function OtherHoldingsForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Save Other Holdings Data"
+        submitButtonText='Save Other Holdings Data'
         onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
-  )
+  );
 }
