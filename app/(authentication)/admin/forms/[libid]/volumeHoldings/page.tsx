@@ -42,13 +42,13 @@ const VolumeHoldingsPage = () => {
           </Button>
           
           <Button
-            variant="default"
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+            variant="outline"
+            className="flex items-center gap-2 text-md font-bold"
             size="lg"
             onClick={() => window.open(window.location.pathname + '/past-years', '_blank')}
           >
             <History className="h-4 w-4" />
-            View data from past 5 years
+            View Data From Past 5 Years
           </Button>
         </div>
 

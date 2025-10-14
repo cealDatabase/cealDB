@@ -56,6 +56,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
   const [hasActiveSession, setHasActiveSession] = useState(false);
 
+  // Test broadcast state
+  const [testLoading, setTestLoading] = useState(false);
+  const [testResult, setTestResult] = useState<any>(null);
+  const [testError, setTestError] = useState<string | null>(null);
+
   // Check current session and scheduled sessions on mount
   useEffect(() => {
     checkCurrentSession();
