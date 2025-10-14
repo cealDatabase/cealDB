@@ -1,13 +1,22 @@
 'use client'
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, FileCheck } from "lucide-react";
+import { Building2, FileCheck, SlashIcon } from "lucide-react";
 import LibList from "@/components/LibList";
 import ParticipationStatus from "@/components/ParticipationStatus";
 import { SingleLibraryType } from "@/types/types";
 import { Container } from "@/components/Container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 function SkeletonCard() {
   return (
@@ -49,6 +58,39 @@ export default function LibrariesHomePage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
+      <Container>
+        <div className="max-w-5xl mx-auto">
+          {/* Breadcrumb */}
+          <div className="my-6">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/" className="no-underline">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/admin" className="no-underline">Admin</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Edit Institutions</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+      </Container>
+      
       <h1>Institution Information</h1>
 
       <Container className="py-8">

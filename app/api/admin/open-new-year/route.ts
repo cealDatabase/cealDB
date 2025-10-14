@@ -1,14 +1,42 @@
 // /app/api/admin/open-new-year/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { convertToPacificTime } from "@/lib/timezoneUtils";
 
 export async function POST(req: Request) {
   try {
-    console.log("Opening new year forms for all libraries...");
+    console.log("Creating new year form records...");
 
-    // Step 1: Get the current year
-    const currentYear = new Date().getFullYear();
-    console.log(`Current year: ${currentYear}`);
+    // Step 1: Parse request body
+    const body = await req.json();
+    const { year, openingDate, closingDate } = body;
+
+    // Use provided year or default to current year
+    const targetYear = year || new Date().getFullYear();
+    console.log(`Target year: ${targetYear}`);
+
+    // Validate dates if provided
+    if (!openingDate || !closingDate) {
+      return NextResponse.json(
+        { error: "Missing required fields: openingDate and closingDate" },
+        { status: 400 }
+      );
+    }
+
+    // Convert dates to Pacific Time
+    const openDate = convertToPacificTime(openingDate, false); // Midnight PT
+    const closeDate = convertToPacificTime(closingDate, true);  // 11:59:59 PM PT
+
+    console.log('📅 Date Conversion (Pacific Time):');
+    console.log('  Opening:', openingDate, '→', openDate.toISOString());
+    console.log('  Closing:', closingDate, '→', closeDate.toISOString());
+
+    if (closeDate <= openDate) {
+      return NextResponse.json(
+        { error: "Closing date must be after opening date" },
+        { status: 400 }
+      );
+    }
 
     // Step 2: Get all libraries and their IDs
     const libraries = await db.library.findMany({
@@ -38,7 +66,7 @@ export async function POST(req: Request) {
         const existingRecord = await db.library_Year.findFirst({
           where: {
             library: library.id,
-            year: currentYear,
+            year: targetYear,
           },
         });
 
@@ -54,14 +82,16 @@ export async function POST(req: Request) {
           });
           skippedCount++;
         } else {
-          // Create new Library_Year record only if it doesn't exist
+          // Create new Library_Year record with scheduled opening/closing dates
           const newRecord = await db.library_Year.create({
             data: {
               library: library.id,
-              year: currentYear,
-              is_open_for_editing: true, // Enable editing for the new year
-              updated_at: new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})),
-              is_active: false, // ======================NOTE: only when library submitted forms then is_active would turn true ==========================
+              year: targetYear,
+              is_open_for_editing: false, // Forms remain CLOSED until scheduled opening
+              opening_date: openDate,      // Set opening date
+              closing_date: closeDate,     // Set closing date
+              updated_at: new Date(),
+              is_active: false, // Only becomes true when library submits forms
               admin_notes: ``,
             },
           });
@@ -89,24 +119,27 @@ export async function POST(req: Request) {
     // Step 4: Confirm Library_Year table has been updated and return results
     const totalLibraryYearRecords = await db.library_Year.count({
       where: {
-        year: currentYear,
-        is_open_for_editing: true,
+        year: targetYear,
       },
     });
 
-    console.log(`Successfully created ${successCount} new records for year ${currentYear}`);
-    console.log(`Skipped ${skippedCount} existing records`);
-    console.log(`Total active Library_Year records for ${currentYear}: ${totalLibraryYearRecords}`);
+    console.log(`✅ Successfully created ${successCount} new records for year ${targetYear}`);
+    console.log(`⏭️  Skipped ${skippedCount} existing records`);
+    console.log(`📊 Total Library_Year records for ${targetYear}: ${totalLibraryYearRecords}`);
+    console.log(`📅 Opening Date: ${openDate.toISOString()}`);
+    console.log(`📅 Closing Date: ${closeDate.toISOString()}`);
 
     // Step 5: Return success response with details
     return NextResponse.json({
       success: true,
-      message: `Successfully opened ${currentYear} forms for libraries`,
-      year: currentYear,
+      message: `Successfully created form records for year ${targetYear}. Forms will open on scheduled date.`,
+      year: targetYear,
       count: successCount,
       skipped: skippedCount,
       totalLibraries: libraries.length,
       totalActiveRecords: totalLibraryYearRecords,
+      openingDate: openDate.toISOString(),
+      closingDate: closeDate.toISOString(),
       details: createdRecords,
       summary: {
         created: createdRecords.filter(r => r.action === 'created').length,

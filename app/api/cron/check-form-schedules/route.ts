@@ -165,7 +165,22 @@ export async function GET(request: NextRequest) {
           data: { is_open_for_editing: false }
         });
 
-        console.log(`✅ Closed ${updateResult.count} libraries for year ${session.academicYear}`);
+        console.log(`✅ Updated ${updateResult.count} libraries for year ${session.academicYear}`);
+
+        // VERIFY all forms are actually closed before sending confirmation
+        const stillOpenForms = await prisma.library_Year.findMany({
+          where: {
+            year: session.academicYear,
+            is_open_for_editing: true
+          }
+        });
+
+        if (stillOpenForms.length > 0) {
+          console.error(`⚠️ WARNING: ${stillOpenForms.length} forms are still open after closure attempt!`);
+          throw new Error(`Failed to close all forms. ${stillOpenForms.length} forms remain open.`);
+        }
+
+        console.log(`✅ VERIFIED: All ${updateResult.count} forms are closed for year ${session.academicYear}`);
 
         // Get email recipients
         const userEmails = await getAllActiveUserEmails();
@@ -182,7 +197,8 @@ export async function GET(request: NextRequest) {
           recipientEmails: userEmails
         });
 
-        // Send admin notification
+        // Send admin notification AFTER verification that all forms are closed
+        console.log(`📧 Sending VERIFIED closure confirmation to ${adminEmails.length} super admins...`);
         await sendAdminFormsClosedNotification(
           adminEmails,
           session.academicYear,
@@ -191,6 +207,7 @@ export async function GET(request: NextRequest) {
             totalLibraries: totalLibraries
           }
         );
+        console.log(`✅ Super admin confirmation email sent successfully`);
 
         // Mark session as closed and notified
         await prisma.surveySession.update({

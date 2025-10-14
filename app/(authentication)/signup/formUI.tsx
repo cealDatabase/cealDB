@@ -2,10 +2,20 @@
 
 import { useState } from "react";
 import React from "react";
-import { XCircle, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { XCircle, CheckCircle, SlashIcon } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
+import { Container } from "@/components/Container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
@@ -43,6 +53,39 @@ export default function SignUpForm({
 
   return (
     <>
+      <Container>
+        <div className="max-w-5xl mx-auto">
+          {/* Breadcrumb */}
+          <div className="my-6">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/" className="no-underline">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/admin" className="no-underline">Admin</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Sign Up New User</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+      </Container>
+      
       <AuthLayout
         title="Sign Up New Account by Email"
         subtitle={

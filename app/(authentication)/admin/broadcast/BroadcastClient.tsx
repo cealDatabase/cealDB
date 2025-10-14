@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon
 import Link from 'next/link'
 import { LocalDateTime } from '@/components/LocalDateTime'
 import { getSurveyDates, formatSurveyDate } from '@/lib/surveyDates'
+import SessionQueue from '@/components/SessionQueue'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -42,50 +43,42 @@ interface BroadcastClientProps {
  * Reference: https://resend.com/blog/broadcast-api
  */
 export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
-  const [step, setStep] = useState<'form' | 'preview' | 'confirm' | 'success'>('form');
+  const [step, setStep] = useState<'preview' | 'confirm' | 'success'>('preview');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Form data
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [openingDate, setOpeningDate] = useState('');
-  const [closingDate, setClosingDate] = useState('');
+  // Email and session data
   const [emailTemplate, setEmailTemplate] = useState('');
+  const [scheduledSession, setScheduledSession] = useState<any>(null);
   
   // Current session data
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
   const [hasActiveSession, setHasActiveSession] = useState(false);
 
-  // Fetch saved dates when component mounts or year changes
-  useEffect(() => {
-    fetchSavedDates();
-  }, [year]);
-
-  // Check current session on mount
+  // Check current session and scheduled sessions on mount
   useEffect(() => {
     checkCurrentSession();
+    loadScheduledSession();
   }, []);
 
-  const fetchSavedDates = async () => {
+  const loadScheduledSession = async () => {
     try {
-      // Fetch dates from database (uses saved dates or defaults)
-      const response = await fetch(`/api/admin/survey-dates?year=${year}`);
+      // Load scheduled session from Session Queue (reads from Library_Year)
+      const response = await fetch('/api/admin/pending-sessions');
       const data = await response.json();
       
-      if (data.success) {
-        setOpeningDate(data.dates.openingDate.split('T')[0]);
-        setClosingDate(data.dates.closingDate.split('T')[0]);
-      } else {
-        // Fallback to defaults if fetch fails
-        const defaultDates = getSurveyDates(year);
-        setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
-        setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+      if (data.success && data.sessions && data.sessions.length > 0) {
+        // Get the first scheduled or active session
+        const session = data.sessions[0];
+        setScheduledSession(session);
+        
+        // Auto-preview email for this session
+        if (session.opening_date && session.closing_date) {
+          await previewEmailForSession(session);
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch saved dates, using defaults:', error);
-      const defaultDates = getSurveyDates(year);
-      setOpeningDate(defaultDates.openingDate.toISOString().split('T')[0]);
-      setClosingDate(defaultDates.closingDate.toISOString().split('T')[0]);
+      console.error('Failed to load scheduled session:', error);
     }
   };
 
@@ -103,28 +96,16 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     }
   };
 
-  const previewEmail = async () => {
-    if (!openingDate) {
-      setError('Please select an opening date');
-      return;
-    }
-
-    if (!closingDate) {
-      setError('Please select a closing date');
-      return;
-    }
-
-    if (new Date(closingDate) <= new Date(openingDate)) {
-      setError('Closing date must be after opening date');
-      return;
-    }
-
+  const previewEmailForSession = async (session: any) => {
     setLoading(true);
     setError(null);
 
     try {
+      const openingDate = new Date(session.opening_date).toISOString().split('T')[0];
+      const closingDate = new Date(session.closing_date).toISOString().split('T')[0];
+      
       const response = await fetch(
-        `/api/admin/broadcast?year=${year}&openingDate=${openingDate}&closingDate=${closingDate}`,
+        `/api/admin/broadcast?year=${session.year}&openingDate=${openingDate}&closingDate=${closingDate}`,
         { method: 'GET' }
       );
 
@@ -134,11 +115,16 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
 
       const data = await response.json();
       setEmailTemplate(data.template);
-      setStep('preview');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to preview email');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshEmailPreview = () => {
+    if (scheduledSession) {
+      previewEmailForSession(scheduledSession);
     }
   };
 
@@ -148,36 +134,44 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
       return;
     }
 
+    if (!scheduledSession) {
+      setError('No scheduled session found. Please create a session first via "Survey Dates Management" page.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Send broadcast using Resend Broadcast API - no userId needed!
-      // Reference: https://resend.com/blog/broadcast-api
+      const openingDate = new Date(scheduledSession.opening_date).toISOString().split('T')[0];
+      const closingDate = new Date(scheduledSession.closing_date).toISOString().split('T')[0];
+
+      // Send broadcast using Resend Broadcast API
       const response = await fetch('/api/admin/broadcast', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          year,
+          year: scheduledSession.year,
           openingDate,
           closingDate,
-          userRoles // Only need roles for authorization check
+          userRoles
         })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send broadcast');
+        throw new Error(data.detail || data.error || 'Failed to send broadcast');
       }
 
-      const data = await response.json();
       console.log('✅ Broadcast sent successfully:', data);
       setStep('success');
       
       // Refresh session data
       await checkCurrentSession();
+      await loadScheduledSession();
       
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to send broadcast');
@@ -223,12 +217,10 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   };
 
   const resetForm = () => {
-    setStep('form');
-    setYear(new Date().getFullYear());
-    setOpeningDate('');
-    setClosingDate('');
+    setStep('preview');
     setEmailTemplate('');
     setError(null);
+    loadScheduledSession(); // Reload session data
   };
 
   // Check if user is super admin (role ID 1)
@@ -284,15 +276,6 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               </BreadcrumbSeparator>
               
               <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/admin" className="no-underline">Super Admin Tools</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator>
-                <SlashIcon />
-              </BreadcrumbSeparator>
-              
-              <BreadcrumbItem>
                 <BreadcrumbPage>Open/Close Annual Surveys</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -319,9 +302,9 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 <div className="text-sm text-gray-600">Year</div>
                 <div className="text-2xl font-bold">{currentSession.year}</div>
               </div>
-              <div className="p-3 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">Total Libraries</div>
-                <div className="text-2xl font-bold">{currentSession.totalLibraries}</div>
+              <div className="p-3 bg-blue-50 rounded">
+                <div className="text-sm text-blue-600">Total Libraries</div>
+                <div className="text-2xl font-bold text-blue-800">{currentSession.totalLibraries}</div>
               </div>
               <div className="p-3 bg-green-50 rounded">
                 <div className="text-sm text-green-600">Open for Editing</div>
@@ -344,7 +327,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 <Button 
                   onClick={closeSession}
                   disabled={loading}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-red-700 hover:bg-red-800"
                 >
                   {loading ? (
                     <>
@@ -352,7 +335,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       Closing...
                     </>
                   ) : (
-                    'Close All Forms'
+                    'Manually Close All Forms'
                   )}
                 </Button>
                 <p className="text-xs text-red-600 mt-2">
@@ -371,180 +354,145 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
           </div>
         )}
 
+
+        {/* Session Queue */}
+        <SessionQueue 
+          userRoles={userRoles} 
+          onSessionDeleted={() => {
+            // Refresh current session status when a session is deleted
+            checkCurrentSession();
+          }}
+        />
+
         {/* Main Content */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-          {/* Step 1: Form */}
-          {step === 'form' && (
-            <div>
-              <h2 className="text-xl font-semibold mb-6">Create New Form Session</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
-                    Academic Year *
-                  </label>
-                  <input
-                    type="number"
-                    value={year}
-                    onChange={(e) => setYear(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min="2020"
-                    max="2030"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
-                    Opening Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={openingDate}
-                    onChange={(e) => setOpeningDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
-                    Closing Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={closingDate}
-                    onChange={(e) => setClosingDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    min={openingDate || undefined}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5" />
-                  Automated Schedule Process:
-                </h3>
-                <ul className="text-sm text-blue-800 space-y-2">
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Opening Date:</strong> Forms will automatically open on the selected date. Members will receive broadcast email when forms open.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Closing Date:</strong> Forms will automatically close at 11:59 PM Pacific Time on the selected date.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>Super Admin Notification:</strong> You will receive an email notification 30 seconds after forms automatically close, confirming all forms are closed.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span><strong>No Manual Action Required:</strong> Everything happens automatically based on your schedule.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex gap-4">
-                <Button 
-                  onClick={previewEmail}
-                  disabled={loading || !openingDate || !closingDate}
-                  className="flex-1"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      Preview Email & Continue
-                      <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
-                    </>
-                  )}
-                </Button>
-                <Link href="/admin/superguide">
-                  <Button className="bg-gray-500 hover:bg-gray-600">
-                    Cancel
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Email Preview */}
+          {/* Email Preview */}
           {step === 'preview' && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Email Preview</h2>
-              
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                <p className="text-sm text-blue-800">
-                  This email is preview only. You can not edit it. It will be sent to all members in your CEAL broadcast audience.
-                </p>
-              </div>
+              {!scheduledSession ? (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-yellow-900 mb-2">No Scheduled Session Found</h3>
+                  <p className="text-sm text-yellow-800">
+                    Please create a scheduled session first via the "Survey Dates Management" page.
+                  </p>
+                  <p className="text-sm text-yellow-800 mb-4">Once a scheduled session is created, you can preview the email and send it to all members in your CEAL broadcast audience when you click "Send Broadcast".</p>
+                  <Link href="/admin/survey-dates">
+                    <Button className="bg-green-700 hover:bg-green-800">
+                      Go to Survey Dates Management
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold mb-4">Broadcast Email Preview</h2>
+                  
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="font-semibold text-blue-900 mb-2">Scheduled Session Details:</h3>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      <p><strong>Year:</strong> {scheduledSession.year}</p>
+                      <p><strong>Opens:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /></p>
+                      <p><strong>Closes:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /></p>
+                      <p><strong>Status:</strong> {scheduledSession.status}</p>
+                    </div>
+                  </div>
 
-              <div className="border border-gray-300 rounded-lg p-6 max-h-96 overflow-y-auto mb-6 bg-gray-50">
-                <div dangerouslySetInnerHTML={{ __html: emailTemplate }} />
-              </div>
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                    <p className="text-sm text-yellow-800">
+                      This email preview is based on the scheduled session above. You cannot edit it. It will be sent to all members in your CEAL broadcast audience when you click "Send Broadcast".
+                    </p>
+                  </div>
 
-              <div className="flex gap-4">
-                <Button 
-                  onClick={() => setStep('confirm')}
-                  className="flex-1"
-                >
-                  Approve & Continue
-                  <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
-                </Button>
-                <Button 
-                  onClick={() => setStep('form')}
-                  className="bg-gray-500 hover:bg-gray-600"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Edit
-                </Button>
-              </div>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                      <span className="ml-3 text-gray-600">Loading email preview...</span>
+                    </div>
+                  ) : emailTemplate ? (
+                    <div className="border border-gray-300 rounded-lg p-6 max-h-96 overflow-y-auto mb-6 bg-gray-50">
+                      <div dangerouslySetInnerHTML={{ __html: emailTemplate }} />
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      No email template available
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <Button 
+                      onClick={() => setStep('confirm')}
+                      disabled={!emailTemplate}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      Continue to Send Broadcast
+                      <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                    </Button>
+                    <Button 
+                      onClick={refreshEmailPreview}
+                      disabled={loading}
+                      className="bg-gray-500 hover:bg-gray-600"
+                    >
+                      Refresh Preview
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
           {/* Step 3: Final Confirmation */}
-          {step === 'confirm' && (
+          {step === 'confirm' && scheduledSession && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Final Confirmation</h2>
+              <h2 className="text-xl font-semibold mb-4">Schedule Broadcast</h2>
               
-              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-5 mb-6">
-                <h3 className="font-bold text-yellow-900 mb-3 flex items-center gap-2">
+              <div className="bg-blue-50 border border-blue-300 rounded-lg p-5 mb-6">
+                <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  ⚠️ Review Schedule Details
+                  📅 Scheduled Automation Summary
                 </h3>
-                <ul className="text-sm text-yellow-800 space-y-2">
+                <ul className="text-sm text-blue-800 space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Opening:</strong> {
-                        new Date(openingDate)
-                          .toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-                      }
+                      <strong>Year:</strong> {scheduledSession.year}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Closing:</strong> {
-                        new Date(closingDate)
-                          .toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-                      } at <strong>11:59 PM Pacific Time</strong>
+                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> at <strong>12:00 AM PT</strong>
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
-                    <span>Forms will <strong>automatically open</strong> on the opening date and broadcast email will be sent to all CEAL members</span>
+                    <span>
+                      <strong>Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at <strong>11:59 PM PT</strong>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-green-50 border border-green-300 rounded-lg p-5 mb-6">
+                <h3 className="font-bold text-green-900 mb-3">✅ What Happens Automatically:</h3>
+                <ul className="text-sm text-green-800 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">1.</span>
+                    <span><strong>On Opening Date:</strong> Forms automatically open at 12:00 AM PT</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>Forms will <strong>automatically close</strong> at 11:59 PM PT on closing date - no manual action required</span>
+                    <span className="font-bold mt-1">2.</span>
+                    <span><strong>Broadcast Email:</strong> Sent to all CEAL members when forms open</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">•</span>
-                    <span>Super admins will receive confirmation email 30 seconds after automatic closure</span>
+                    <span className="font-bold mt-1">3.</span>
+                    <span><strong>On Closing Date:</strong> Forms automatically close at 11:59 PM PT</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">4.</span>
+                    <span><strong>Confirmation Email:</strong> Super admins receive confirmation after forms close</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold mt-1">⚡</span>
+                    <span><strong>No manual action required</strong> - everything is automated!</span>
                   </li>
                 </ul>
               </div>
@@ -558,12 +506,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating Schedule...
+                      Scheduling...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
-                      Confirm & Create Schedule
+                      Confirm & Schedule Broadcast
                     </>
                   )}
                 </Button>
@@ -580,30 +528,38 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
           )}
 
           {/* Step 4: Success */}
-          {step === 'success' && (
+          {step === 'success' && scheduledSession && (
             <div className="text-center py-8">
               <div className="mb-6">
                 <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
                   <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-green-800 mb-3">
-                  Schedule Created Successfully!
+                  ✅ Broadcast Scheduled Successfully!
                 </h2>
                 <p className="text-gray-700 text-lg mb-2">
-                  Form schedule for <strong>{year}</strong> has been created.
+                  Automated session for <strong>{scheduledSession.year}</strong> has been scheduled.
                 </p>
                 <p className="text-gray-600">
-                  Forms will automatically open on the scheduled date, and members will receive notification emails at that time.
+                  Everything will happen automatically on the scheduled dates. No further action required.
                 </p>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-left">
-                <h3 className="font-semibold text-green-900 mb-2">What Happens Next:</h3>
-                <ul className="text-sm text-green-800 space-y-1">
-                  <li>• Forms will automatically open on <strong>{new Date(openingDate).toLocaleDateString()}</strong></li>
-                  <li>• Broadcast email sent to members when forms open</li>
-                  <li>• Forms will automatically close on <strong>{new Date(closingDate).toLocaleDateString()}</strong> at 11:59 PM PT</li>
-                  <li>• You will receive confirmation email 30 seconds after automatic closure</li>
+                <h3 className="font-semibold text-green-900 mb-2">📅 Scheduled Events:</h3>
+                <ul className="text-sm text-green-800 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">⏰</span>
+                    <span><strong><LocalDateTime dateString={scheduledSession.opening_date} /> at 12:00 AM PT:</strong> Forms automatically open + Broadcast email sent to all CEAL members</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">⏰</span>
+                    <span><strong><LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT:</strong> Forms automatically close</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">📧</span>
+                    <span>You will receive a confirmation email after forms are closed (verifying all forms are closed)</span>
+                  </li>
                 </ul>
               </div>
 
