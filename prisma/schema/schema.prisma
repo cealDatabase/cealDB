@@ -45,6 +45,7 @@ model Library_Year {
   fiscal_year_start             DateTime?                      // Fiscal year start (July 1, past year)
   fiscal_year_end               DateTime?                      // Fiscal year end (June 30, current year)
   publication_date              DateTime?                      // Publication date (February, next year)
+  broadcast_sent                Boolean?                       @default(false) // Track if broadcast email has been sent
   Electronic                    Electronic?
   Electronic_Books              Electronic_Books?
   Entry_Status                  Entry_Status?
@@ -150,4 +151,23 @@ model Users_Roles {
   User    User @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, role_id])
+}
+
+// Scheduled events for granular queue management
+model ScheduledEvent {
+  id              Int       @id @default(autoincrement())
+  event_type      String    // 'BROADCAST', 'FORM_OPENING', 'FORM_CLOSING'
+  year            Int       // Academic year this event is for
+  scheduled_date  DateTime  // When this event should occur (date only, ignore time)
+  status          String    @default("pending") // 'pending', 'completed', 'cancelled'
+  created_by      Int?      // Super admin who created this
+  created_at      DateTime  @default(now())
+  completed_at    DateTime? // When the event was executed
+  cancelled_at    DateTime? // When the event was cancelled
+  notes           String?   // Optional notes from admin
+  
+  @@index([year])
+  @@index([event_type])
+  @@index([scheduled_date])
+  @@index([status])
 }

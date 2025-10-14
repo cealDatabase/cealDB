@@ -7,7 +7,7 @@ import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon
 import Link from 'next/link'
 import { LocalDateTime } from '@/components/LocalDateTime'
 import { getSurveyDates, formatSurveyDate } from '@/lib/surveyDates'
-import SessionQueue from '@/components/SessionQueue'
+import EnhancedSessionQueue from '@/components/EnhancedSessionQueue'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,6 +50,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   // Email and session data
   const [emailTemplate, setEmailTemplate] = useState('');
   const [scheduledSession, setScheduledSession] = useState<any>(null);
+  const [sendImmediately, setSendImmediately] = useState(false); // NEW: Immediate vs Scheduled choice
   
   // Current session data
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
@@ -156,7 +157,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
           year: scheduledSession.year,
           openingDate,
           closingDate,
-          userRoles
+          userRoles,
+          sendImmediately // NEW: Pass the send timing choice
         })
       });
 
@@ -355,12 +357,13 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
         )}
 
 
-        {/* Session Queue */}
-        <SessionQueue 
+        {/* Enhanced Session Queue */}
+        <EnhancedSessionQueue 
           userRoles={userRoles} 
-          onSessionDeleted={() => {
-            // Refresh current session status when a session is deleted
+          onEventDeleted={() => {
+            // Refresh current session status when an event is deleted
             checkCurrentSession();
+            loadScheduledSession();
           }}
         />
 
@@ -439,15 +442,73 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
             </div>
           )}
 
-          {/* Step 3: Final Confirmation */}
+          {/* Step 3: Final Confirmation with Send Timing Choice */}
           {step === 'confirm' && scheduledSession && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Schedule Broadcast</h2>
+              <h2 className="text-xl font-semibold mb-4">Choose When to Send Broadcast</h2>
               
+              {/* NEW: Send Timing Choice */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  When should the broadcast email be sent?
+                </label>
+                <div className="space-y-3">
+                  {/* Option 1: Send Immediately */}
+                  <div 
+                    onClick={() => setSendImmediately(true)}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      sendImmediately 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-300 hover:border-green-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        checked={sendImmediately}
+                        onChange={() => setSendImmediately(true)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-bold text-gray-900">🚀 Send Immediately</div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Broadcast email will be sent right now and forms will open immediately for all libraries.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Option 2: Schedule for Later */}
+                  <div 
+                    onClick={() => setSendImmediately(false)}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      !sendImmediately 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-300 hover:border-blue-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        checked={!sendImmediately}
+                        onChange={() => setSendImmediately(false)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-bold text-gray-900">📅 Schedule for Opening Date</div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Broadcast will be sent automatically on <strong><LocalDateTime dateString={scheduledSession.opening_date} /></strong> when forms open.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-blue-50 border border-blue-300 rounded-lg p-5 mb-6">
                 <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  📅 Scheduled Automation Summary
+                  {sendImmediately ? '🚀 Immediate Action Summary' : '📅 Scheduled Automation Summary'}
                 </h3>
                 <ul className="text-sm text-blue-800 space-y-2">
                   <li className="flex items-start gap-2">
@@ -471,47 +532,63 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 </ul>
               </div>
 
-              <div className="bg-green-50 border border-green-300 rounded-lg p-5 mb-6">
-                <h3 className="font-bold text-green-900 mb-3">✅ What Happens Automatically:</h3>
-                <ul className="text-sm text-green-800 space-y-2">
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">1.</span>
-                    <span><strong>On Opening Date:</strong> Forms automatically open at 12:00 AM PT</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">2.</span>
-                    <span><strong>Broadcast Email:</strong> Sent to all CEAL members when forms open</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">3.</span>
-                    <span><strong>On Closing Date:</strong> Forms automatically close at 11:59 PM PT</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">4.</span>
-                    <span><strong>Confirmation Email:</strong> Super admins receive confirmation after forms close</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold mt-1">⚡</span>
-                    <span><strong>No manual action required</strong> - everything is automated!</span>
-                  </li>
-                </ul>
-              </div>
+              {sendImmediately ? (
+                <div className="bg-green-50 border border-green-300 rounded-lg p-5 mb-6">
+                  <h3 className="font-bold text-green-900 mb-3">✅ What Happens Immediately:</h3>
+                  <ul className="text-sm text-green-800 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">1.</span>
+                      <span><strong>Right Now:</strong> Broadcast email sent to all CEAL members</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">2.</span>
+                      <span><strong>Right Now:</strong> All forms open immediately for editing</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">3.</span>
+                      <span><strong>On Closing Date:</strong> Forms will automatically close at 11:59 PM PT</span>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <div className="bg-green-50 border border-green-300 rounded-lg p-5 mb-6">
+                  <h3 className="font-bold text-green-900 mb-3">✅ What Gets Scheduled (3 Separate Events):</h3>
+                  <ul className="text-sm text-green-800 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">1.</span>
+                      <span><strong>Broadcast Email:</strong> Scheduled for opening date (can be cancelled separately)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">2.</span>
+                      <span><strong>Form Opening:</strong> Scheduled for opening date (can be cancelled separately)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">3.</span>
+                      <span><strong>Form Closing:</strong> Scheduled for closing date (can be cancelled separately)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-bold mt-1">📋</span>
+                      <span><strong>All events appear in Session Queue</strong> - you can cancel any individual event</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <Button 
                   onClick={sendBroadcast}
                   disabled={loading}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className={`flex-1 ${sendImmediately ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Scheduling...
+                      {sendImmediately ? 'Sending...' : 'Scheduling...'}
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
-                      Confirm & Schedule Broadcast
+                      {sendImmediately ? 'Send Broadcast Now & Open Forms' : 'Schedule All Events'}
                     </>
                   )}
                 </Button>
@@ -535,32 +612,63 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-green-800 mb-3">
-                  ✅ Broadcast Scheduled Successfully!
+                  {sendImmediately ? '✅ Broadcast Sent & Forms Opened!' : '✅ Events Scheduled Successfully!'}
                 </h2>
                 <p className="text-gray-700 text-lg mb-2">
-                  Automated session for <strong>{scheduledSession.year}</strong> has been scheduled.
+                  {sendImmediately 
+                    ? `Broadcast email has been sent to all CEAL members and forms are now open for year ${scheduledSession.year}.`
+                    : `Three separate events have been scheduled for year ${scheduledSession.year}.`
+                  }
                 </p>
                 <p className="text-gray-600">
-                  Everything will happen automatically on the scheduled dates. No further action required.
+                  {sendImmediately 
+                    ? 'Forms will automatically close on the scheduled closing date.'
+                    : 'All events will happen automatically on the scheduled dates. Each can be cancelled individually in the Session Queue.'}
                 </p>
               </div>
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-left">
-                <h3 className="font-semibold text-green-900 mb-2">📅 Scheduled Events:</h3>
-                <ul className="text-sm text-green-800 space-y-2">
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold">⏰</span>
-                    <span><strong><LocalDateTime dateString={scheduledSession.opening_date} /> at 12:00 AM PT:</strong> Forms automatically open + Broadcast email sent to all CEAL members</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold">⏰</span>
-                    <span><strong><LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT:</strong> Forms automatically close</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-bold">📧</span>
-                    <span>You will receive a confirmation email after forms are closed (verifying all forms are closed)</span>
-                  </li>
-                </ul>
+                {sendImmediately ? (
+                  <>
+                    <h3 className="font-semibold text-green-900 mb-2">✅ Completed Actions:</h3>
+                    <ul className="text-sm text-green-800 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">📧</span>
+                        <span><strong>Broadcast email sent</strong> to all CEAL members in your audience</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">📂</span>
+                        <span><strong>Forms opened</strong> for all libraries for year {scheduledSession.year}</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">📅</span>
+                        <span><strong>Scheduled closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT - Forms will automatically close</span>
+                      </li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-green-900 mb-2">📅 Scheduled Events (Can Cancel Individually):</h3>
+                    <ul className="text-sm text-green-800 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">1️⃣</span>
+                        <span><strong>Broadcast Email:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> - Email will be sent to all CEAL members</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">2️⃣</span>
+                        <span><strong>Form Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> at 12:00 AM PT - Forms will open automatically</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">3️⃣</span>
+                        <span><strong>Form Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT - Forms will close automatically</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">📋</span>
+                        <span>View and manage these events in the <strong>Session Queue</strong> above</span>
+                      </li>
+                    </ul>
+                  </>
+                )}
               </div>
 
               <div className="flex gap-4 justify-center">

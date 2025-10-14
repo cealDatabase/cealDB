@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { openingDate, closingDate, year, userRoles } = await request.json();
+    const { openingDate, closingDate, year, userRoles, sendImmediately = false } = await request.json();
 
     // Verify user is super admin (role contains 1)
     if (!userRoles || !userRoles.includes('1')) {
@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log(`📧 Broadcast mode: ${sendImmediately ? 'IMMEDIATE' : 'SCHEDULED'}`);
 
     // Convert dates to Pacific Time (PT) at midnight, then to UTC
     // When admin selects "Oct 14", they mean Oct 14 00:00 AM Pacific Time
@@ -185,49 +187,199 @@ export async function POST(request: NextRequest) {
       </div>
     `;
 
-    // ⚠️ IMPORTANT CHANGE: Do NOT send broadcast immediately
-    // The CRON job will handle BOTH opening forms AND sending broadcast emails
-    // This endpoint now only SCHEDULES the session by setting dates in database
-    // 
-    // Previous behavior: Sent broadcast immediately when clicking "Send Broadcast"
-    // New behavior: CRON sends broadcast when opening_date is reached
-    // 
-    // Reference: The CRON job at /api/cron/open-forms will:
-    // 1. Check for sessions where opening_date <= now
-    // 2. Open forms (set is_open_for_editing = true)
-    // 3. Send broadcast email to all members
-    
-    console.log('📅 Session scheduled successfully');
-    console.log('   Opening date:', openDate.toISOString());
-    console.log('   Closing date:', closeDate.toISOString());
-    console.log('⏰ CRON will open forms and send broadcast at opening date');
-    
-    // Skip creating broadcast here - let CRON handle it
-    const broadcast = {
-      data: {
-        id: 'scheduled-by-cron',
-        status: 'scheduled'
-      }
-    };
-
     // Calculate all survey dates (fiscal year and publication date are automatic)
     const surveyDates = getSurveyDates(year, openDate, closeDate);
+    
+    let broadcast: any = null;
+    let updateResult: any = null;
 
-    // ⚠️ IMPORTANT: Do NOT open forms immediately
-    // Forms will be opened by CRON job at the scheduled opening_date
-    // We only set the dates here - forms remain CLOSED until CRON runs
-    const updateResult = await prisma.library_Year.updateMany({
-      where: { year: year },
-      data: { 
-        is_open_for_editing: false, // ✅ Keep CLOSED until CRON opens them
-        opening_date: surveyDates.openingDate,
-        closing_date: surveyDates.closingDate,
-        fiscal_year_start: surveyDates.fiscalYearStart,
-        fiscal_year_end: surveyDates.fiscalYearEnd,
-        publication_date: surveyDates.publicationDate,
-        updated_at: new Date()
+    // ========================================
+    // BRANCH 1: SEND BROADCAST IMMEDIATELY
+    // ========================================
+    if (sendImmediately) {
+      console.log('🚀 IMMEDIATE MODE: Sending broadcast and opening forms NOW');
+      
+      // Initialize Resend
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const audienceId = process.env.RESEND_BROADCAST_LIST_ID;
+      
+      if (!audienceId) {
+        return NextResponse.json(
+          { error: 'Broadcast audience ID not configured. Please set RESEND_BROADCAST_LIST_ID in environment variables.' },
+          { status: 500 }
+        );
       }
-    });
+
+      // Create and send broadcast email immediately
+      const totalDays = Math.ceil((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const emailTemplate = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">CEAL Database Forms Now Open for ${year}</h2>
+          
+          <p>Dear CEAL Member,</p>
+          
+          <p>The annual data collection forms are now open for academic year <strong>${year}</strong>.</p>
+          
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #374151; margin-top: 0;">Important Dates</h3>
+            <ul>
+              <li><strong>Forms Open:</strong> ${openDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}</li>
+              <li><strong>Forms Close:</strong> ${closeDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}</li>
+              <li><strong>Time Period:</strong> ${totalDays} days</li>
+            </ul>
+          </div>
+          
+          <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="https://cealstats.org/" 
+               style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Access Forms
+            </a>
+          </div>
+          
+          <p>If you have any questions or need assistance, please contact the CEAL Database administrators.</p>
+          
+          <p>Best regards,<br>
+          CEAL Database Administration</p>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+          <p style="font-size: 12px; color: #6b7280;">
+            You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
+          </p>
+        </div>
+      `;
+
+      // Send broadcast via Resend
+      try {
+        broadcast = await resend.broadcasts.create({
+          audienceId: audienceId, // Fixed: camelCase for Resend API
+          from: 'CEAL Database <noreply@cealstats.org>',
+          subject: `CEAL Database Forms Now Open for ${year}`,
+          html: emailTemplate
+        });
+        
+        console.log('✅ Broadcast sent immediately:', broadcast.data?.id);
+      } catch (emailError) {
+        console.error('❌ Failed to send broadcast email:', emailError);
+        throw new Error('Failed to send broadcast email: ' + (emailError instanceof Error ? emailError.message : 'Unknown error'));
+      }
+
+      // Open all forms immediately AND mark broadcast as sent
+      updateResult = await prisma.library_Year.updateMany({
+        where: { year: year },
+        data: { 
+          is_open_for_editing: true, // ✅ Open immediately
+          broadcast_sent: true, // ✅ Mark broadcast as sent
+          opening_date: surveyDates.openingDate,
+          closing_date: surveyDates.closingDate,
+          fiscal_year_start: surveyDates.fiscalYearStart,
+          fiscal_year_end: surveyDates.fiscalYearEnd,
+          publication_date: surveyDates.publicationDate,
+          updated_at: new Date()
+        }
+      });
+
+      // Create COMPLETED scheduled events for record keeping
+      await prisma.scheduledEvent.createMany({
+        data: [
+          {
+            event_type: 'BROADCAST',
+            year,
+            scheduled_date: openDate,
+            status: 'completed',
+            completed_at: new Date(),
+            notes: 'Broadcast sent immediately'
+          },
+          {
+            event_type: 'FORM_OPENING',
+            year,
+            scheduled_date: openDate,
+            status: 'completed',
+            completed_at: new Date(),
+            notes: 'Forms opened immediately'
+          },
+          {
+            event_type: 'FORM_CLOSING',
+            year,
+            scheduled_date: closeDate,
+            status: 'pending',
+            notes: 'Scheduled to close automatically'
+          }
+        ]
+      });
+
+      console.log(`✅ Broadcast sent immediately to ${audienceId}`);
+      console.log(`✅ ${updateResult.count} libraries opened for year ${year}`);
+      
+    } 
+    // ========================================
+    // BRANCH 2: SCHEDULE BROADCAST FOR LATER
+    // ========================================
+    else {
+      console.log('📅 SCHEDULED MODE: Creating separate scheduled events for later execution');
+      
+      // Do NOT open forms or send broadcast - keep forms CLOSED
+      updateResult = await prisma.library_Year.updateMany({
+        where: { year: year },
+        data: { 
+          is_open_for_editing: false, // ✅ Keep CLOSED until scheduled date
+          broadcast_sent: false, // ✅ Not sent yet
+          opening_date: surveyDates.openingDate,
+          closing_date: surveyDates.closingDate,
+          fiscal_year_start: surveyDates.fiscalYearStart,
+          fiscal_year_end: surveyDates.fiscalYearEnd,
+          publication_date: surveyDates.publicationDate,
+          updated_at: new Date()
+        }
+      });
+
+      // Create three SEPARATE pending scheduled events
+      // This allows super admin to cancel any individual event
+      await prisma.scheduledEvent.createMany({
+        data: [
+          {
+            event_type: 'BROADCAST',
+            year,
+            scheduled_date: openDate,
+            status: 'pending',
+            notes: 'Broadcast email to be sent on this date'
+          },
+          {
+            event_type: 'FORM_OPENING',
+            year,
+            scheduled_date: openDate,
+            status: 'pending',
+            notes: 'Forms will open on this date'
+          },
+          {
+            event_type: 'FORM_CLOSING',
+            year,
+            scheduled_date: closeDate,
+            status: 'pending',
+            notes: 'Forms will close on this date'
+          }
+        ]
+      });
+
+      broadcast = { data: { id: 'scheduled', status: 'pending' } };
+      
+      console.log('📅 Created 3 separate scheduled events:');
+      console.log('   1. BROADCAST on', openDate.toISOString());
+      console.log('   2. FORM_OPENING on', openDate.toISOString());
+      console.log('   3. FORM_CLOSING on', closeDate.toISOString());
+    }
 
     // Log the action
     await logUserAction(
@@ -247,17 +399,22 @@ export async function POST(request: NextRequest) {
       request
     );
 
+    const responseMessage = sendImmediately
+      ? `Broadcast sent immediately and ${updateResult.count} libraries opened for year ${year}. Forms will automatically close on ${closeDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at 11:59 PM Pacific Time.`
+      : `Session scheduled for year ${year}. Three separate events created: 1) Broadcast email, 2) Form opening, 3) Form closing. All events can be managed individually in the Session Queue. ${updateResult.count} libraries scheduled.`;
+
     return NextResponse.json({
       success: true,
       year: year,
       opening_date: openDate.toISOString(),
       closing_date: closeDate.toISOString(),
       broadcast: {
-        id: broadcast.data?.id || 'scheduled',
-        status: 'scheduled'
+        id: broadcast?.data?.id || (sendImmediately ? 'sent' : 'scheduled'),
+        status: sendImmediately ? 'sent' : 'scheduled'
       },
-      librariesScheduled: updateResult.count,
-      message: `Session scheduled for year ${year}. Forms will automatically open and broadcast will be sent on ${openDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at 12:00 AM Pacific Time. ${updateResult.count} libraries scheduled.`
+      sendMode: sendImmediately ? 'immediate' : 'scheduled',
+      librariesAffected: updateResult.count,
+      message: responseMessage
     });
 
   } catch (error) {
