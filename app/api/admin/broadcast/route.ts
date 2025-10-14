@@ -91,9 +91,9 @@ export async function POST(request: NextRequest) {
     const surveyDates = getSurveyDates(year, openDate, closeDate)
 
     // Calculate fiscal year dates for the email
-    const fiscalYearStart = new Date(Number.parseInt(year), 6, 1) // July 1
-    const fiscalYearEnd = new Date(Number.parseInt(year) + 1, 5, 30) // June 30 of next year
-    const reportingYearEnd = new Date(Number.parseInt(year) + 1, 9, 1) // October 1 of next year
+    const fiscalYearStart = new Date(Number.parseInt(year) -1, 6, 1) // July 1
+    const fiscalYearEnd = new Date(Number.parseInt(year), 5, 30) // June 30 of next year
+    const reportingYearEnd = new Date(Number.parseInt(year), 9, 1) // October 1 of next year
 
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
@@ -101,16 +101,16 @@ export async function POST(request: NextRequest) {
         
         <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
         
-        <p style="margin-bottom: 16px;">You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</p>
+        <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
         
         <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
           <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${year}–${Number.parseInt(year) + 1}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
           <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Data Collection Period:</h3>
-          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Central Time)</strong>.</p>
+          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
         </div>
         
         <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
@@ -423,9 +423,9 @@ export async function GET(request: NextRequest) {
     const closeDate = convertToEasternTime(closingDate, true)
 
     // Calculate fiscal year dates
-    const fiscalYearStart = new Date(Number.parseInt(year), 6, 1) // July 1
-    const fiscalYearEnd = new Date(Number.parseInt(year) + 1, 5, 30) // June 30 of next year
-    const reportingYearEnd = new Date(Number.parseInt(year) + 1, 9, 1) // October 1 of next year
+    const fiscalYearStart = new Date(Number.parseInt(year) - 1, 6, 1) // July 1
+    const fiscalYearEnd = new Date(Number.parseInt(year), 5, 30) // June 30 of next year
+    const reportingYearEnd = new Date(Number.parseInt(year), 9, 1) // October 1 of next year
 
     // Generate preview template with new design
     const emailTemplate = `
@@ -434,11 +434,11 @@ export async function GET(request: NextRequest) {
         
         <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
         
-        <p style="margin-bottom: 16px;">You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</p>
+        <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
         
         <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
           <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${year}–${Number.parseInt(year) + 1}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}-${year}–</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
