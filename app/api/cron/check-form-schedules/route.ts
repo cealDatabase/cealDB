@@ -1,6 +1,7 @@
 // app/api/cron/check-form-schedules/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { Resend } from 'resend';
 import { 
   sendFormsOpenedNotification, 
   sendFormsClosedNotification,
@@ -14,14 +15,16 @@ const prisma = new PrismaClient();
 
 /**
  * Vercel Cron Job Handler
- * Runs every 15 minutes to check if forms should be opened or closed
+ * Runs twice daily (8:00 AM and 8:00 PM UTC) to manage scheduled events
  * 
  * How it works:
- * 1. Checks for sessions where opening date has passed but forms aren't open yet
- * 2. Checks for sessions where closing date has passed but forms haven't been closed
- * 3. Updates Library_Year records to open/close forms
- * 4. Sends email notifications to all users and super admins
- * 5. Marks sessions as notified to prevent duplicate notifications
+ * 1. BROADCASTS (Backup Safety Net): Checks for pending broadcast events in case Resend's scheduledAt fails
+ *    - Primary: Resend automatically sends broadcasts via scheduledAt parameter
+ *    - Backup: This cron sends any missed broadcasts that are still pending
+ * 2. FORM OPENING: Checks for sessions where opening date has passed but forms aren't open yet
+ * 3. FORM CLOSING: Checks for sessions where closing date has passed but forms haven't been closed
+ * 4. Updates Library_Year records and sends email notifications
+ * 5. Marks events as completed to prevent duplicate actions
  */
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -48,6 +51,7 @@ export async function GET(request: NextRequest) {
 
   const now = new Date();
   const results = {
+    broadcasts_sent: [] as number[],
     opened: [] as number[],
     closed: [] as number[],
     errors: [] as string[]
@@ -55,7 +59,186 @@ export async function GET(request: NextRequest) {
 
   try {
     // ========================================
-    // STEP 1: Check for sessions to OPEN
+    // STEP 1: Check for PENDING BROADCASTS (Backup Safety Net)
+    // ========================================
+    // This is a backup in case Resend's scheduledAt fails
+    // Primary method: Resend automatically sends via scheduledAt
+    // Backup method: This cron checks for missed broadcasts
+    const pendingBroadcasts = await prisma.scheduledEvent.findMany({
+      where: {
+        event_type: 'BROADCAST',
+        status: 'pending',
+        scheduled_date: {
+          lte: now // Scheduled date has passed
+        }
+      }
+    });
+
+    console.log(`📧 Found ${pendingBroadcasts.length} pending broadcasts to check (backup safety net)`);
+
+    for (const event of pendingBroadcasts) {
+      try {
+        console.log(`📧 BACKUP: Sending missed broadcast for year ${event.year}`);
+
+        // Initialize Resend
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const audienceId = process.env.RESEND_BROADCAST_LIST_ID;
+
+        if (!audienceId) {
+          throw new Error('RESEND_BROADCAST_LIST_ID not configured');
+        }
+
+        // Get Library_Year info for this year
+        const libraryYears = await prisma.library_Year.findMany({
+          where: { year: event.year },
+          take: 1
+        });
+
+        if (libraryYears.length === 0) {
+          throw new Error(`No Library_Year found for year ${event.year}`);
+        }
+
+        const session = libraryYears[0];
+        const openDate = session.opening_date || new Date();
+        const closeDate = session.closing_date || new Date();
+
+        // Calculate fiscal year dates
+        const fiscalYearStart = new Date(event.year - 1, 6, 1); // July 1
+        const fiscalYearEnd = new Date(event.year, 5, 30); // June 30
+        const reportingYearEnd = new Date(event.year, 9, 1); // October 1
+
+        // Create email template (matching the one in broadcast route)
+        const emailTemplate = `
+          <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
+            <h2 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h2>
+            
+            <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
+            
+            <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
+            
+            <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
+              <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
+              <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${event.year - 1}–${event.year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+            </div>
+            
+            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
+              <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Data Collection Period:</h3>
+              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
+            </div>
+            
+            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
+              <h3 style="color: #374151; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Accessing the Surveys:</h3>
+              <p style="margin-bottom: 16px;">Visit the CEAL Statistics Database at <a href="https://cealstats.org/" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://cealstats.org/</a> to access the online survey forms and instructions.</p>
+              
+              <div style="background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px; margin: 16px 0;">
+                <p style="margin: 0; font-size: 14px; color: #7f1d1d;"><strong>Please note:</strong> The CEAL Statistics Database has recently been <strong>migrated and rebuilt</strong>. This is our first year using the new platform, which is currently in a "beta" phase. <strong>Some functions from the old site are still under processing (e.g., database search)</strong>. You might experience slower loading times or other minor issues. We sincerely appreciate your patience and understanding as we continue improving the system.</p>
+              </div>
+              
+              <p style="margin-bottom: 12px;">For a quick guide to using the new survey forms, please refer to:</p>
+              <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/docs/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
+              
+              <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
+            </div>
+            
+            <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 24px 0;">
+              <h3 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h3>
+              <p style="margin-bottom: 12px;">For questions about specific language resources, please contact:</p>
+              <ul style="margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;"><strong>Chinese resources:</strong> Jian P. Lee – <a href="mailto:jlee37@uw.edu" style="color: #2563eb; text-decoration: none;">jlee37@uw.edu</a></li>
+                <li style="margin-bottom: 8px;"><strong>Japanese resources:</strong> Michiko Ito – <a href="mailto:mito@ku.edu" style="color: #2563eb; text-decoration: none;">mito@ku.edu</a></li>
+                <li style="margin-bottom: 8px;"><strong>Korean resources:</strong> Ellie Kim – <a href="mailto:eunahkim@hawaii.edu" style="color: #2563eb; text-decoration: none;">eunahkim@hawaii.edu</a></li>
+              </ul>
+              <p style="margin-top: 12px; margin-bottom: 0;">For general questions or technical issues, please contact: <strong>Anlin Yang</strong> – <a href="mailto:anlin.yang@wisc.edu" style="color: #2563eb; text-decoration: none;">anlin.yang@wisc.edu</a></p>
+            </div>
+            
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="https://cealstats.org/" 
+                 style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">
+                Access Survey Forms
+              </a>
+            </div>
+            
+            <p style="margin-bottom: 8px;">Thank you for your continued participation and support!</p>
+            
+            <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br>
+            Anlin Yang<br>
+            <em>(on behalf of the CEAL Statistics Committee)</em></p>
+            
+            <div style="background-color: #f9fafb; padding: 16px; border-radius: 6px; margin: 24px 0;">
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: #374151;">Committee Members:</p>
+              <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #6b7280;">
+                <li>Michiko Ito, Japanese Studies Librarian, University of Kansas</li>
+                <li>Ellie Kim, Korean Studies Librarian, University of Hawaiʻi at Mānoa</li>
+                <li>Jian P. Lee, Chinese Language Cataloging and Metadata Librarian, University of Washington</li>
+                <li>Vickie Fu Doll, Advisor, Librarian Emerita, University of Kansas</li>
+              </ul>
+            </div>
+            
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 12px; color: #6b7280; text-align: center;">
+              You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
+            </p>
+          </div>
+        `;
+
+        // Send broadcast immediately (Resend didn't send it)
+        const broadcast = await resend.broadcasts.create({
+          audienceId: audienceId,
+          from: 'CEAL Database <noreply@cealstats.org>',
+          subject: `CEAL Statistics Online Surveys Are Now Open`,
+          html: emailTemplate
+        });
+
+        // Send it immediately since it's already past scheduled time
+        if (broadcast.data?.id) {
+          await resend.broadcasts.send(broadcast.data.id);
+          console.log('✅ BACKUP broadcast sent immediately:', broadcast.data.id);
+        }
+
+        // Mark broadcast_sent in Library_Year
+        await prisma.library_Year.updateMany({
+          where: { year: event.year },
+          data: { broadcast_sent: true }
+        });
+
+        // Mark event as completed
+        await prisma.scheduledEvent.update({
+          where: { id: event.id },
+          data: {
+            status: 'completed',
+            completed_at: new Date(),
+            notes: 'Sent by backup cron (Resend scheduledAt may have failed)'
+          }
+        });
+
+        // Log the action
+        await logUserAction(
+          'CREATE',
+          'ScheduledEvent',
+          event.id.toString(),
+          null,
+          {
+            year: event.year,
+            action: 'BROADCAST_SENT',
+            broadcast_id: broadcast.data?.id,
+            scheduled_date: event.scheduled_date.toISOString(),
+            sent_via: 'backup_cron'
+          },
+          true,
+          undefined,
+          request
+        );
+
+        results.broadcasts_sent.push(event.year);
+      } catch (error) {
+        const errorMsg = `Failed to send backup broadcast for year ${event.year}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error('❌', errorMsg);
+        results.errors.push(errorMsg);
+      }
+    }
+
+    // ========================================
+    // STEP 2: Check for sessions to OPEN
     // ========================================
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
@@ -251,11 +434,12 @@ export async function GET(request: NextRequest) {
       timestamp: now.toISOString(),
       duration: `${duration}ms`,
       results: {
+        broadcasts_sent: results.broadcasts_sent,
         opened: results.opened,
         closed: results.closed,
         errors: results.errors
       },
-      message: `Opened ${results.opened.length} sessions, closed ${results.closed.length} sessions${results.errors.length > 0 ? `, ${results.errors.length} errors` : ''}`
+      message: `Sent ${results.broadcasts_sent.length} broadcasts (backup), opened ${results.opened.length} sessions, closed ${results.closed.length} sessions${results.errors.length > 0 ? `, ${results.errors.length} errors` : ''}`
     });
 
   } catch (error) {
