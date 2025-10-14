@@ -95,7 +95,7 @@ export default function PastYearsPage() {
                 const d = yearData.data
                 return (
                   <tr key={yearData.year} className={(index % 2 === 0 ? 'bg-white' : 'bg-gray-50') + ' hover:bg-yellow-100'}>
-                    <td className="border px-2 py-1 font-semibold text-center bg-yellow-50">{yearData.year}</td>
+                    <td className="border px-2 py-1 font-semibold text-center border-l-4 border-l-yellow-500">{yearData.year}</td>
                     {/* 1.1 One Time */}
                     <td className="border px-1 text-right">{f(d?.eonetime_computer_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.eonetime_computer_cd_chinese)}</td>
@@ -105,8 +105,8 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.eonetime_computer_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.eonetime_computer_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.eonetime_computer_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eonetime_computer_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eonetime_computer_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eonetime_computer_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eonetime_computer_cd_subtotal)}</td>
                     {/* 1.2 Accompanied */}
                     <td className="border px-1 text-right">{f(d?.eaccompanied_computer_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.eaccompanied_computer_cd_chinese)}</td>
@@ -116,8 +116,8 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.eaccompanied_computer_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.eaccompanied_computer_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.eaccompanied_computer_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eaccompanied_computer_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eaccompanied_computer_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eaccompanied_computer_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eaccompanied_computer_cd_subtotal)}</td>
                     {/* 1.3 Gift */}
                     <td className="border px-1 text-right">{f(d?.egift_computer_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.egift_computer_cd_chinese)}</td>
@@ -127,8 +127,8 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.egift_computer_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.egift_computer_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.egift_computer_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.egift_computer_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.egift_computer_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.egift_computer_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.egift_computer_cd_subtotal)}</td>
                     {/* 1.4 Total Computer */}
                     <td className="border px-1 text-right">{f(d?.etotal_computer_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_computer_cd_chinese)}</td>
@@ -138,8 +138,8 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.etotal_computer_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_computer_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_computer_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.etotal_computer_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.etotal_computer_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.etotal_computer_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.etotal_computer_cd_subtotal)}</td>
                     {/* 1.5 Previous */}
                     <td className="border px-1 text-right">{f(d?.eprevious_total_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.eprevious_total_cd_chinese)}</td>
@@ -149,8 +149,8 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.eprevious_total_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.eprevious_total_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.eprevious_total_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eprevious_total_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eprevious_total_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eprevious_total_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eprevious_total_cd_subtotal)}</td>
                     {/* 1.6 Grand Total */}
                     <td className="border px-1 text-right">{f(d?.egrand_total_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.egrand_total_cd_chinese)}</td>
@@ -160,28 +160,28 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.egrand_total_cd_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.egrand_total_title_noncjk)}</td>
                     <td className="border px-1 text-right">{f(d?.egrand_total_cd_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.egrand_total_title_subtotal)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.egrand_total_cd_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.egrand_total_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.egrand_total_cd_subtotal)}</td>
                     {/* 2.1 Index */}
                     <td className="border px-1 text-right">{f(d?.eindex_electronic_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.eindex_electronic_title_japanese)}</td>
                     <td className="border px-1 text-right">{f(d?.eindex_electronic_title_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.eindex_electronic_title_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.eindex_electronic_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.eindex_electronic_title_subtotal)}</td>
                     {/* 2.2 Fulltext */}
                     <td className="border px-1 text-right">{f(d?.efulltext_electronic_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.efulltext_electronic_title_japanese)}</td>
                     <td className="border px-1 text-right">{f(d?.efulltext_electronic_title_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.efulltext_electronic_title_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.efulltext_electronic_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.efulltext_electronic_title_subtotal)}</td>
                     {/* 2.3 Total Electronic */}
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_chinese)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_japanese)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_noncjk)}</td>
-                    <td className="border px-1 text-right bg-blue-50">{f(d?.etotal_electronic_title_subtotal)}</td>
+                    <td className="border px-1 text-right font-semibold border-r-2 border-r-blue-400">{f(d?.etotal_electronic_title_subtotal)}</td>
                     {/* 3. Total Electronic Resources Expenditure */}
-                    <td className="border px-1 text-right bg-green-100 font-bold">{f(d?.etotal_expenditure_grandtotal)}</td>
+                    <td className="border px-1 text-right font-bold border-r-4 border-r-green-600">{f(d?.etotal_expenditure_grandtotal)}</td>
                   </tr>
                 )
               })}
