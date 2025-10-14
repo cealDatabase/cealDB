@@ -50,16 +50,16 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-1 py-1 text-center" colSpan={16}>Electronic Resources</th>
               </tr>
               <tr className="bg-teal-600 text-white">
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.1 One Time</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.2 Accompanied</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.3 Gift</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.4 Total</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.5 Previous</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.6 Grand Total</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.1 Index</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.2 Fulltext</th>
-                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.3 Total</th>
-                <th className="border border-gray-300 px-1 py-1" rowSpan={3}>2.4</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.1 Computer Files<br/>(One-Time/Monographic)</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.2 Accompanied Computer Files</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.3 Computer Files<br/>(One Time Gift)</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.4 Total Computer Files</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.5 Previous Year<br/>Total Computer Files</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.6 Grand Total<br/>Computer Files</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.1 Electronic Indexes<br/>and Reference Tools</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.2 Electronic<br/>Full Text Database</th>
+                <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.3 Total Electronic</th>
+                <th className="border border-gray-300 px-1 py-1" rowSpan={3}>3. Total Electronic<br/>Resources Expenditure</th>
               </tr>
               <tr className="bg-teal-500 text-white">
                 {[...Array(6)].map((_, idx) => (
@@ -180,7 +180,7 @@ export default function PastYearsPage() {
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_korean)}</td>
                     <td className="border px-1 text-right">{f(d?.etotal_electronic_title_noncjk)}</td>
                     <td className="border px-1 text-right bg-blue-50">{f(d?.etotal_electronic_title_subtotal)}</td>
-                    {/* 2.4 Total Electronic Resources Expenditure */}
+                    {/* 3. Total Electronic Resources Expenditure */}
                     <td className="border px-1 text-right bg-green-100 font-bold">{f(d?.etotal_expenditure_grandtotal)}</td>
                   </tr>
                 )
