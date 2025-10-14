@@ -44,16 +44,17 @@ export async function POST(request: NextRequest) {
     const surveyDates = getSurveyDates(year, openDate, closeDate);
 
     // Get all users (READ ONLY - no modifications)
+    // Note: username field contains the email address
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        email: true,
+        username: true,
         firstname: true,
         lastname: true
       },
       where: {
-        email: {
-          not: null
+        username: {
+          contains: '@' // Only users with email-format usernames
         }
       }
     });
@@ -62,9 +63,9 @@ export async function POST(request: NextRequest) {
     const recipients: { email: string; firstName: string }[] = [];
     
     for (const user of users) {
-      if (user.email) {
+      if (user.username && user.username.includes('@')) {
         recipients.push({
-          email: user.email,
+          email: user.username,
           firstName: user.firstname || 'Colleague'
         });
       }
@@ -72,8 +73,17 @@ export async function POST(request: NextRequest) {
 
     console.log(`📧 TEST: Preparing to send to ${recipients.length} recipients`);
 
+    // Initialize Resend client
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: 'Email service not configured. Missing RESEND_API_KEY.' },
+        { status: 500 }
+      );
+    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     // Create email HTML (same as production broadcast)
-    const createEmailHtml = (firstName: string, libraryName: string) => `
+    const createEmailHtml = (firstName: string) => `
       <!DOCTYPE html>
       <html>
       <head>
@@ -115,10 +125,6 @@ export async function POST(request: NextRequest) {
                 <td style="padding: 8px 0; color: #666; font-weight: bold;">Test Closing Date:</td>
                 <td style="padding: 8px 0;">${formatAsEasternTime(closeDate)} at 11:59 PM PT</td>
               </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #666; font-weight: bold;">Your Library:</td>
-                <td style="padding: 8px 0;">${libraryName}</td>
-              </tr>
             </table>
           </div>
 
@@ -158,7 +164,7 @@ export async function POST(request: NextRequest) {
         from: 'CEAL Statistics <noreply@cealstats.org>',
         to: recipient.email,
         subject: `🧪 TEST: ${year - 1}-${year} CEAL Statistics Online Survey`,
-        html: createEmailHtml(recipient.firstName, recipient.library),
+        html: createEmailHtml(recipient.firstName),
       })
     );
 
