@@ -440,126 +440,160 @@ export default function ElectronicBooksForm() {
     >
       {/* Purchased Titles */}
       <FormSection
-        title="Purchased Titles"
-        description="Report the number of purchased electronic book titles."
+        title='Purchased Titles'
+        description='Report the number of purchased electronic book titles.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2 text-left w-1/4"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Previous</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Add</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Total</th>
+              <tr className='bg-gray-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/4'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Previous
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Add
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">01. Chinese</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  01. Chinese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_titles_chinese"
-                    type="number"
+                    name='ebooks_purchased_prev_titles_chinese'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_titles_chinese"
-                    type="number"
+                    name='ebooks_purchased_add_titles_chinese'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesChinese}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalTitlesChinese}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">02. Japanese</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  02. Japanese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_titles_japanese"
-                    type="number"
+                    name='ebooks_purchased_prev_titles_japanese'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_titles_japanese"
-                    type="number"
+                    name='ebooks_purchased_add_titles_japanese'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesJapanese}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalTitlesJapanese}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">03. Korean</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  03. Korean
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_titles_korean"
-                    type="number"
+                    name='ebooks_purchased_prev_titles_korean'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_titles_korean"
-                    type="number"
+                    name='ebooks_purchased_add_titles_korean'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesKorean}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalTitlesKorean}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">04. Non-CJK</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  04. Non-CJK
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_titles_noncjk"
-                    type="number"
+                    name='ebooks_purchased_prev_titles_noncjk'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_titles_noncjk"
-                    type="number"
+                    name='ebooks_purchased_add_titles_noncjk'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalTitlesNoncjk}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalTitlesNoncjk}
+                  </div>
                 </td>
               </tr>
-              <tr className="bg-gray-100">
-                <td className="border border-gray-300 p-2 font-bold">05. Subtotal<br /><span className="text-xs font-normal">(01 + 02 + 03 + 04)</span></td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedPrevTitlesSubtotal}</div>
+              <tr className='bg-gray-100'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  05. Subtotal
+                  <br />
+                  <span className='text-xs font-normal'>
+                    (01 + 02 + 03 + 04)
+                  </span>
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedAddTitlesSubtotal}</div>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedPrevTitlesSubtotal}
+                  </div>
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedTotalTitlesSubtotal}</div>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedAddTitlesSubtotal}
+                  </div>
+                </td>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedTotalTitlesSubtotal}
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -569,184 +603,251 @@ export default function ElectronicBooksForm() {
 
       {/* Non-Purchased Titles */}
       <FormSection
-        title="Non-Purchased Titles"
-        description="Report the number of non-purchased electronic book titles."
+        title='Non-Purchased Titles'
+        description='Report the number of non-purchased electronic book titles.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_nonpurchased_titles_chinese", label: "06. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_nonpurchased_titles_japanese", label: "07. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_nonpurchased_titles_korean", label: "08. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_nonpurchased_titles_noncjk", label: "09. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "ebooks_nonpurchased_titles_chinese",
+              label: "06. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "ebooks_nonpurchased_titles_japanese",
+              label: "07. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "ebooks_nonpurchased_titles_korean",
+              label: "08. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "ebooks_nonpurchased_titles_noncjk",
+              label: "09. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="10. Non-Purchased Titles Subtotal (06 + 07 + 08 + 09)"
+          label='10. Non-Purchased Titles Subtotal (06 + 07 + 08 + 09)'
           value={nonPurchasedTitlesSubtotal}
-          formula="06 + 07 + 08 + 09"
+          formula='06 + 07 + 08 + 09'
         />
       </FormSection>
 
       {/* Subscription Titles */}
       <FormSection
-        title="Subscription Titles"
-        description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
+        title='Titles from Electronic Resources'
+        description="Use the 'Import from E-Book Database lists' feature after updating your subscription list."
       >
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>Note:</strong> Title subscriptions do not count towards total titles. Please maintain
-            &quot;E-Book Databases by Subscription&quot; before using the import feature.
+        <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <p className='text-sm text-yellow-800 mb-2'>
+            <strong>Note:</strong> Title subscriptions do not count towards
+            total titles. Please maintain &quot;E-Book Databases&quot; before
+            using the import feature.
           </p>
           <Button
-            type="button"
+            type='button'
             onClick={importSubscriptionTitles}
-            className="flex items-center gap-2"
-            variant="default"
+            className='flex items-center gap-2'
+            variant='default'
             disabled={!libraryYearStatus?.is_open_for_editing}
           >
-            <Download className="h-4 w-4" />
-            Import from E-Book Databases by Subscription
+            <Download className='h-4 w-4' />
+            Import from &quot;E-Book Databases&quot;
           </Button>
         </div>
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_subscription_titles_chinese", label: "11. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_subscription_titles_japanese", label: "12. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_subscription_titles_korean", label: "13. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_subscription_titles_noncjk", label: "14. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "ebooks_subscription_titles_chinese",
+              label: "11. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "ebooks_subscription_titles_japanese",
+              label: "12. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "ebooks_subscription_titles_korean",
+              label: "13. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "ebooks_subscription_titles_noncjk",
+              label: "14. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="15. Subscription Titles Subtotal (11 + 12 + 13 + 14)"
+          label='15. Subscription Titles Subtotal (11 + 12 + 13 + 14)'
           value={subscriptionTitlesSubtotal}
-          formula="11 + 12 + 13 + 14"
+          formula='11 + 12 + 13 + 14'
         />
       </FormSection>
 
       {/* Purchased Volumes */}
       <FormSection
-        title="Purchased Volumes"
-        description="Report the number of purchased electronic book volumes."
+        title='Purchased Volumes'
+        description='Report the number of purchased electronic book volumes.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2 text-left w-1/4"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Previous</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Add</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Total</th>
+              <tr className='bg-gray-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/4'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Previous
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Add
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">16. Chinese</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  16. Chinese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_volumes_chinese"
-                    type="number"
+                    name='ebooks_purchased_prev_volumes_chinese'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_volumes_chinese"
-                    type="number"
+                    name='ebooks_purchased_add_volumes_chinese'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesChinese}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalVolumesChinese}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">17. Japanese</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  17. Japanese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_volumes_japanese"
-                    type="number"
+                    name='ebooks_purchased_prev_volumes_japanese'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_volumes_japanese"
-                    type="number"
+                    name='ebooks_purchased_add_volumes_japanese'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesJapanese}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalVolumesJapanese}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">18. Korean</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  18. Korean
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_volumes_korean"
-                    type="number"
+                    name='ebooks_purchased_prev_volumes_korean'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_volumes_korean"
-                    type="number"
+                    name='ebooks_purchased_add_volumes_korean'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesKorean}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalVolumesKorean}
+                  </div>
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">19. Non-CJK</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  19. Non-CJK
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_prev_volumes_noncjk"
-                    type="number"
+                    name='ebooks_purchased_prev_volumes_noncjk'
+                    type='number'
                     disabled={true}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="ebooks_purchased_add_volumes_noncjk"
-                    type="number"
+                    name='ebooks_purchased_add_volumes_noncjk'
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                     hideLabel
                   />
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-50">
-                  <div className="p-3 text-center font-semibold">{purchasedTotalVolumesNoncjk}</div>
+                <td className='border border-gray-300 p-2 bg-gray-50'>
+                  <div className='p-3 text-center font-semibold'>
+                    {purchasedTotalVolumesNoncjk}
+                  </div>
                 </td>
               </tr>
-              <tr className="bg-gray-100">
-                <td className="border border-gray-300 p-2 font-bold">20. Subtotal<br /><span className="text-xs font-normal">(16 + 17 + 18 + 19)</span></td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedPrevVolumesSubtotal}</div>
+              <tr className='bg-gray-100'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  20. Subtotal
+                  <br />
+                  <span className='text-xs font-normal'>
+                    (16 + 17 + 18 + 19)
+                  </span>
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedAddVolumesSubtotal}</div>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedPrevVolumesSubtotal}
+                  </div>
                 </td>
-                <td className="border border-gray-300 p-2 bg-gray-200">
-                  <div className="p-3 text-center font-bold">{purchasedTotalVolumesSubtotal}</div>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedAddVolumesSubtotal}
+                  </div>
+                </td>
+                <td className='border border-gray-300 p-2 bg-gray-200'>
+                  <div className='p-3 text-center font-bold'>
+                    {purchasedTotalVolumesSubtotal}
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -756,101 +857,134 @@ export default function ElectronicBooksForm() {
 
       {/* Non-Purchased Volumes */}
       <FormSection
-        title="Non-Purchased Volumes"
-        description="Report the number of non-purchased electronic book volumes."
+        title='Non-Purchased Volumes'
+        description='Report the number of non-purchased electronic book volumes.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_nonpurchased_volumes_chinese", label: "21. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_nonpurchased_volumes_japanese", label: "22. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_nonpurchased_volumes_korean", label: "23. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_nonpurchased_volumes_noncjk", label: "24. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "ebooks_nonpurchased_volumes_chinese",
+              label: "21. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "ebooks_nonpurchased_volumes_japanese",
+              label: "22. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "ebooks_nonpurchased_volumes_korean",
+              label: "23. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "ebooks_nonpurchased_volumes_noncjk",
+              label: "24. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="25. Non-Purchased Volumes Subtotal (21 + 22 + 23 + 24)"
+          label='25. Non-Purchased Volumes Subtotal (21 + 22 + 23 + 24)'
           value={nonPurchasedVolumesSubtotal}
-          formula="21 + 22 + 23 + 24"
+          formula='21 + 22 + 23 + 24'
         />
       </FormSection>
 
       {/* Subscription Volumes */}
       <FormSection
-        title="Subscription Volumes"
-        description="Use the 'Import from E-Book Databases by Subscription' feature after updating your subscription list."
+        title='Volumes from Electronic Resources'
+        description="Use the 'Import from E-Book Database lists' feature after updating your subscription list."
       >
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>Note:</strong> Volume subscriptions do not count towards total volumes. Please maintain
-            &quot;E-Book Databases by Subscription&quot; before using the import feature.
+        <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <p className='text-sm text-yellow-800 mb-2'>
+            <strong>Note:</strong> Volume subscriptions do not count towards
+            total volumes. Please maintain &quot;E-Book Databases&quot; before
+            using the import feature.
           </p>
           <Button
-            type="button"
+            type='button'
             onClick={importSubscriptionVolumes}
-            className="flex items-center gap-2"
-            variant="default"
+            className='flex items-center gap-2'
+            variant='default'
             disabled={!libraryYearStatus?.is_open_for_editing}
           >
-            <Download className="h-4 w-4" />
-            Import from E-Book Databases by Subscription
+            <Download className='h-4 w-4' />
+            Import from E-Book Databases
           </Button>
         </div>
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ebooks_subscription_volumes_chinese", label: "26. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ebooks_subscription_volumes_japanese", label: "27. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ebooks_subscription_volumes_korean", label: "28. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "ebooks_subscription_volumes_noncjk", label: "29. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "ebooks_subscription_volumes_chinese",
+              label: "26. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "ebooks_subscription_volumes_japanese",
+              label: "27. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "ebooks_subscription_volumes_korean",
+              label: "28. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "ebooks_subscription_volumes_noncjk",
+              label: "29. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="30. Subscription Volumes Subtotal (26 + 27 + 28 + 29)"
+          label='30. Subscription Volumes Subtotal (26 + 27 + 28 + 29)'
           value={subscriptionVolumesSubtotal}
-          formula="26 + 27 + 28 + 29"
+          formula='26 + 27 + 28 + 29'
         />
       </FormSection>
 
       {/* Totals */}
       <FormSection
-        title="Totals"
-        description="Auto-calculated totals for titles and volumes."
+        title='Totals'
+        description='Auto-calculated totals for titles and volumes.'
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <SubtotalDisplay
-            label="31. Title Total"
+            label='31. Title Total'
             value={totalTitles}
-            formula="05 + 10"
+            formula='05 + 10'
           />
           <SubtotalDisplay
-            label="32. Volume Total"
+            label='32. Volume Total'
             value={totalVolumes}
-            formula="20 + 25"
+            formula='20 + 25'
           />
         </div>
       </FormSection>
 
       {/* Expenditure */}
       <FormSection
-        title="Expenditure"
-        description="Field #41 (Grand Total Expenditures) in Electronic Form includes expenditures for Electronic Books. Please enter data there."
+        title='Expenditure'
+        description='Field #41 (Grand Total Expenditures) in Electronic Form includes expenditures for Electronic Books. Please enter data there.'
       >
         <ReusableFormField
           control={form.control}
-          name="ebooks_expenditure_grandtotal"
-          label="33. Expenditure Total"
-          placeholder=""
-          type="number"
+          name='ebooks_expenditure_grandtotal'
+          label='33. Expenditure Total'
+          placeholder=''
+          type='number'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
 
         <ReusableFormField
           control={form.control}
-          name="ebooks_notes"
-          label="34. Memo/Footnote for this form"
-          placeholder="Enter any notes, footnotes, or additional information..."
-          type="textarea"
+          name='ebooks_notes'
+          label='34. Memo/Footnote for this form'
+          placeholder='Enter any notes, footnotes, or additional information...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
@@ -875,57 +1009,71 @@ export default function ElectronicBooksForm() {
       </FormSection> */}
 
       {/* Grand Total Volume Holdings */}
-      <FormSection
-        title="Grand Total"
-        description=""
-      >
+      <FormSection title='Grand Total' description=''>
         {/* Physical Volumes Total */}
-        <div className="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="flex items-center justify-between rounded-lg">
+        <div className='mb-4 bg-blue-50 p-4 rounded-lg border border-blue-200'>
+          <div className='flex items-center justify-between rounded-lg'>
             <div>
-              <div className="text-base font-semibold text-gray-900">Physical Volumes Total</div>
-              <div className="text-sm text-blue-600 italic">(Imported from Physical Volume Holdings Form)</div>
+              <div className='text-base font-semibold text-gray-900'>
+                Physical Volumes Total
+              </div>
+              <div className='text-sm text-blue-600 italic'>
+                (Imported from Physical Volume Holdings Form)
+              </div>
             </div>
-            <div className="bg-blue-100 px-4 py-2 rounded-md">
-              <span className="text-base font-semibold text-blue-900">{physicalVolumesTotal.toLocaleString()}</span>
+            <div className='bg-blue-100 px-4 py-2 rounded-md'>
+              <span className='text-base font-semibold text-blue-900'>
+                {physicalVolumesTotal.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
 
         {/* Grand Total Volume Holdings - Green */}
-        <div className="p-4 bg-green-50 rounded-lg border-2 border-green-300">
-          <div className="flex items-center justify-between">
+        <div className='p-4 bg-green-50 rounded-lg border-2 border-green-300'>
+          <div className='flex items-center justify-between'>
             <div>
-              <div className="text-base font-semibold text-gray-900">Grand Total Volume Holdings</div>
-              <div className="mt-2 text-sm text-blue-600 italic">(Physical ({physicalVolumesTotal.toLocaleString()}) + E-Books ({totalVolumes.toLocaleString()}))</div>
+              <div className='text-base font-semibold text-gray-900'>
+                Grand Total Volume Holdings
+              </div>
+              <div className='mt-2 text-sm text-blue-600 italic'>
+                (Physical ({physicalVolumesTotal.toLocaleString()}) + E-Books (
+                {totalVolumes.toLocaleString()}))
+              </div>
             </div>
-            <div className="bg-green-200 px-4 py-2 rounded-md">
-              <span className="text-base font-semibold text-green-900">{grandTotalVolumeHoldings.toLocaleString()}</span>
+            <div className='bg-green-200 px-4 py-2 rounded-md'>
+              <span className='text-base font-semibold text-green-900'>
+                {grandTotalVolumeHoldings.toLocaleString()}
+              </span>
             </div>
           </div>
-          <div className="text-sm text-gray-600 italic">
+          <div className='text-sm text-gray-600 italic'>
             Automatically calculated; including E-Books
           </div>
         </div>
-
-
       </FormSection>
 
       {/* Notes */}
-      <FormSection
-        title="Notes"
-        description=""
-      >
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-          <ol className="list-decimal list-inside space-y-3 text-sm text-gray-700">
+      <FormSection title='Notes' description=''>
+        <div className='bg-blue-50 border-l-4 border-blue-400 p-4'>
+          <ol className='list-decimal list-inside space-y-3 text-sm text-gray-700'>
             <li>
-              The <span className="font-semibold">&quot;Calculate Totals&quot;</span> feature will overwrite any entered numbers in the Subtotal and Total fields! Do not click if you do not wish to have the subtotals automatically calculated.
+              The{" "}
+              <span className='font-semibold'>
+                &quot;Calculate Totals&quot;
+              </span>{" "}
+              feature will overwrite any entered numbers in the Subtotal and
+              Total fields! Do not click if you do not wish to have the
+              subtotals automatically calculated.
             </li>
             <li>
-              The E-Books Volume Total (item #32 on this Form) will be used together with item #16 on the Physical Volume Holdings Form to calculate the Grand Total Volume Holdings for your institution.
+              The E-Books Volume Total (item #32 on this Form) will be used
+              together with item #16 on the Physical Volume Holdings Form to
+              calculate the Grand Total Volume Holdings for your institution.
             </li>
             <li>
-              Both the Physical Volumes Total and the Grand Total Volume Holdings are for information only, and do not belong to this form.
+              Both the Physical Volumes Total and the Grand Total Volume
+              Holdings are for information only, and do not belong to this form.
             </li>
           </ol>
         </div>
@@ -936,9 +1084,9 @@ export default function ElectronicBooksForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Electronic Books Data"
+        submitButtonText='Submit Electronic Books Data'
         onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
-  )
+  );
 }

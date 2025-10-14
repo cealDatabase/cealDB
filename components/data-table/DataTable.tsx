@@ -69,12 +69,29 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   highlightRowId,
   tableKey = 'default',
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   
   // Initialize sorting state as empty (hydration-safe)
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+  // Initialize row selection as empty (hydration-safe)
+  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
+
+  // Restore row selection from sessionStorage after hydration
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem(`table-rowSelection-${tableKey}`);
+      if (saved) {
+        try {
+          const parsedSelection = JSON.parse(saved);
+          setRowSelection(parsedSelection);
+        } catch {
+          // Ignore invalid saved state
+        }
+      }
+    }
+  }, [tableKey]);
 
   // Restore sorting state from sessionStorage after hydration
   React.useEffect(() => {
@@ -126,6 +143,13 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   });
   
   const [globalFilter, setGlobalFilter] = React.useState<string>(initialGlobalFilter || "");
+
+  // Save row selection state to sessionStorage whenever it changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(`table-rowSelection-${tableKey}`, JSON.stringify(rowSelection));
+    }
+  }, [rowSelection, tableKey]);
 
   // Save sorting state to sessionStorage whenever it changes
   React.useEffect(() => {

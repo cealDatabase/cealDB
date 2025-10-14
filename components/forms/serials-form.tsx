@@ -302,172 +302,252 @@ export default function SerialsForm() {
     >
       {/* 1. Serial Titles: Purchased (including Subscriptions) - Electronic */}
       <FormSection
-        title="1. Serial Titles: Purchased (including Subscriptions) - Electronic"
-        description="Enter the number of purchased electronic serials by language."
+        title='1. Serial Titles: Purchased (including Subscriptions) - Electronic'
+        description='Enter the number of purchased electronic serials by language.'
       >
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;E-Journal Databases by Subscription - List of&quot; in order for the
-            system to provide the corresponding numbers automatically.
+        <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <p className='text-sm text-yellow-800 mb-2'>
+            <strong>BEFORE using the import feature</strong>, please fill out or
+            update the &quot;E-Journal Databases&quot; in order for the system
+            to provide the corresponding numbers automatically.
           </p>
           <Button
-            type="button"
+            type='button'
             onClick={importEJournalData}
-            className="flex items-center gap-2"
-            variant="default"
+            className='flex items-center gap-2'
+            variant='default'
           >
-            <Download className="h-4 w-4" />
-            Import from E-Journal Databases by Subscription
+            <Download className='h-4 w-4' />
+            Import from &quot;E-Journal Databases&quot;
           </Button>
         </div>
 
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "s_epurchased_chinese", label: "01. Purchased Chinese" },
-            japanese: { name: "s_epurchased_japanese", label: "02. Purchased Japanese" },
-            korean: { name: "s_epurchased_korean", label: "03. Purchased Korean" },
-            noncjk: { name: "s_epurchased_noncjk", label: "04. Purchased Non-CJK" }
+            chinese: {
+              name: "s_epurchased_chinese",
+              label: "01. Purchased Chinese",
+            },
+            japanese: {
+              name: "s_epurchased_japanese",
+              label: "02. Purchased Japanese",
+            },
+            korean: {
+              name: "s_epurchased_korean",
+              label: "03. Purchased Korean",
+            },
+            noncjk: {
+              name: "s_epurchased_noncjk",
+              label: "04. Purchased Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="05. Electronic Purchased Subtotal"
+          label='05. Electronic Purchased Subtotal'
           value={purchasedElectronicSubtotal}
-          formula="01 + 02 + 03 + 04"
+          formula='01 + 02 + 03 + 04'
         />
       </FormSection>
 
       {/* 2. Serial Titles: Purchased (including Subscriptions) - Print and other formats */}
       <FormSection
-        title="2. Serial Titles: Purchased (including Subscriptions) - Print and other formats"
-        description="Enter the number of purchased print serials by language."
+        title='2. Serial Titles: Purchased (including Subscriptions) - Print and other formats'
+        description='Enter the number of purchased print serials by language.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "spurchased_chinese", label: "06. Purchased Chinese" },
-            japanese: { name: "spurchased_japanese", label: "07. Purchased Japanese" },
-            korean: { name: "spurchased_korean", label: "08. Purchased Korean" },
-            noncjk: { name: "spurchased_noncjk", label: "09. Purchased Non-CJK" }
+            chinese: {
+              name: "spurchased_chinese",
+              label: "06. Purchased Chinese",
+            },
+            japanese: {
+              name: "spurchased_japanese",
+              label: "07. Purchased Japanese",
+            },
+            korean: {
+              name: "spurchased_korean",
+              label: "08. Purchased Korean",
+            },
+            noncjk: {
+              name: "spurchased_noncjk",
+              label: "09. Purchased Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="10. Print Purchased Subtotal"
+          label='10. Print Purchased Subtotal'
           value={purchasedPrintSubtotal}
-          formula="06 + 07 + 08 + 09"
+          formula='06 + 07 + 08 + 09'
         />
       </FormSection>
 
       {/* 3. Non-Purchased Serials - Electronic */}
       <FormSection
-        title="3. Non-Purchased Serials - Electronic"
-        description="Enter the number of non-purchased electronic serials by language."
+        title='3. Non-Purchased Serials - Electronic'
+        description='Enter the number of non-purchased electronic serials by language.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "s_enonpurchased_chinese", label: "11. Non-Purchased Chinese" },
-            japanese: { name: "s_enonpurchased_japanese", label: "12. Non-Purchased Japanese" },
-            korean: { name: "s_enonpurchased_korean", label: "13. Non-Purchased Korean" },
-            noncjk: { name: "s_enonpurchased_noncjk", label: "14. Non-Purchased Non-CJK" }
+            chinese: {
+              name: "s_enonpurchased_chinese",
+              label: "11. Non-Purchased Chinese",
+            },
+            japanese: {
+              name: "s_enonpurchased_japanese",
+              label: "12. Non-Purchased Japanese",
+            },
+            korean: {
+              name: "s_enonpurchased_korean",
+              label: "13. Non-Purchased Korean",
+            },
+            noncjk: {
+              name: "s_enonpurchased_noncjk",
+              label: "14. Non-Purchased Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="15. Electronic Non-Purchased Subtotal"
+          label='15. Electronic Non-Purchased Subtotal'
           value={nonPurchasedElectronicSubtotal}
-          formula="11 + 12 + 13 + 14"
+          formula='11 + 12 + 13 + 14'
         />
       </FormSection>
 
       {/* 4. Non-Purchased Serials - Print and other formats */}
       <FormSection
-        title="4. Non-Purchased Serials - Print and other formats"
-        description="Enter the number of non-purchased print serials by language."
+        title='4. Non-Purchased Serials - Print and other formats'
+        description='Enter the number of non-purchased print serials by language.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "snonpurchased_chinese", label: "16. Non-Purchased Chinese" },
-            japanese: { name: "snonpurchased_japanese", label: "17. Non-Purchased Japanese" },
-            korean: { name: "snonpurchased_korean", label: "18. Non-Purchased Korean" },
-            noncjk: { name: "snonpurchased_noncjk", label: "19. Non-Purchased Non-CJK" }
+            chinese: {
+              name: "snonpurchased_chinese",
+              label: "16. Non-Purchased Chinese",
+            },
+            japanese: {
+              name: "snonpurchased_japanese",
+              label: "17. Non-Purchased Japanese",
+            },
+            korean: {
+              name: "snonpurchased_korean",
+              label: "18. Non-Purchased Korean",
+            },
+            noncjk: {
+              name: "snonpurchased_noncjk",
+              label: "19. Non-Purchased Non-CJK",
+            },
           }}
         />
         <SubtotalDisplay
-          label="20. Print Non-Purchased Subtotal"
+          label='20. Print Non-Purchased Subtotal'
           value={nonPurchasedPrintSubtotal}
-          formula="16 + 17 + 18 + 19"
+          formula='16 + 17 + 18 + 19'
         />
       </FormSection>
 
       {/* 5. Totals - Electronic */}
       <FormSection
-        title="5. Totals - Electronic"
-        description="Calculated totals for electronic serials by language."
+        title='5. Totals - Electronic'
+        description='Calculated totals for electronic serials by language.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "s_etotal_chinese", label: "21. Total Chinese", disabled: true },
-            japanese: { name: "s_etotal_japanese", label: "22. Total Japanese", disabled: true },
-            korean: { name: "s_etotal_korean", label: "23. Total Korean", disabled: true },
-            noncjk: { name: "s_etotal_noncjk", label: "24. Total Non-CJK", disabled: true }
+            chinese: {
+              name: "s_etotal_chinese",
+              label: "21. Total Chinese",
+              disabled: true,
+            },
+            japanese: {
+              name: "s_etotal_japanese",
+              label: "22. Total Japanese",
+              disabled: true,
+            },
+            korean: {
+              name: "s_etotal_korean",
+              label: "23. Total Korean",
+              disabled: true,
+            },
+            noncjk: {
+              name: "s_etotal_noncjk",
+              label: "24. Total Non-CJK",
+              disabled: true,
+            },
           }}
         />
         <SubtotalDisplay
-          label="25. Electronic Grand Total"
+          label='25. Electronic Grand Total'
           value={electronicGrandTotal}
-          formula="21 + 22 + 23 + 24"
+          formula='21 + 22 + 23 + 24'
         />
       </FormSection>
 
       {/* 6. Totals - Print and other formats */}
       <FormSection
-        title="6. Totals - Print and other formats"
-        description="Calculated totals for print serials by language."
+        title='6. Totals - Print and other formats'
+        description='Calculated totals for print serials by language.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "stotal_chinese", label: "26. Total Chinese", disabled: true },
-            japanese: { name: "stotal_japanese", label: "27. Total Japanese", disabled: true },
-            korean: { name: "stotal_korean", label: "28. Total Korean", disabled: true },
-            noncjk: { name: "stotal_noncjk", label: "29. Total Non-CJK", disabled: true }
+            chinese: {
+              name: "stotal_chinese",
+              label: "26. Total Chinese",
+              disabled: true,
+            },
+            japanese: {
+              name: "stotal_japanese",
+              label: "27. Total Japanese",
+              disabled: true,
+            },
+            korean: {
+              name: "stotal_korean",
+              label: "28. Total Korean",
+              disabled: true,
+            },
+            noncjk: {
+              name: "stotal_noncjk",
+              label: "29. Total Non-CJK",
+              disabled: true,
+            },
           }}
         />
         <SubtotalDisplay
-          label="30. Print Grand Total"
+          label='30. Print Grand Total'
           value={printGrandTotal}
-          formula="26 + 27 + 28 + 29"
+          formula='26 + 27 + 28 + 29'
         />
       </FormSection>
 
       {/* 7. Grand Totals */}
       <FormSection
-        title="7. Grand Totals"
-        description="Overall grand totals for all serials."
+        title='7. Grand Totals'
+        description='Overall grand totals for all serials.'
       >
         <SubtotalDisplay
-          label="31. Overall Grand Total"
+          label='31. Overall Grand Total'
           value={overallGrandTotal}
-          formula="25 + 30"
-          className="bg-blue-50 p-4 rounded-lg"
-          valueClassName="bg-blue-200 px-3 py-1 rounded"
+          formula='25 + 30'
+          className='bg-blue-50 p-4 rounded-lg'
+          valueClassName='bg-blue-200 px-3 py-1 rounded'
         />
       </FormSection>
 
       {/* Notes */}
       <FormSection
-        title="Notes"
-        description="Additional notes or comments about the serials data."
+        title='Notes'
+        description='Additional notes or comments about the serials data.'
       >
         <ReusableFormField
           control={form.control}
-          name="snotes"
-          label=""
-          type="textarea"
-          placeholder="Enter any additional notes or comments..."
+          name='snotes'
+          label=''
+          type='textarea'
+          placeholder='Enter any additional notes or comments...'
         />
       </FormSection>
 
@@ -476,9 +556,9 @@ export default function SerialsForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Serials Data"
+        submitButtonText='Submit Serials Data'
         onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
-  )
+  );
 }

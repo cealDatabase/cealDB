@@ -436,118 +436,140 @@ export default function ElectronicForm() {
     >
       {/* One-time Computer Files */}
       <FormSection
-        title="1.1 Computer Files (One-Time/Monographic)"
-        description="Include the number of non-subscription, one-time files such as backfiles or literature collections."
+        title='1.1 Computer Files (One-Time/Monographic)'
+        description='Include the number of non-subscription, one-time files such as backfiles or literature collections.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              <tr className='bg-gray-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/3'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of Titles
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of CD-ROMs
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">01. Chinese</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  01. Chinese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_title_chinese"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_title_chinese'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_cd_chinese"
-                    label=""
-                    type="number"
-                    disabled={!libraryYearStatus?.is_open_for_editing}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2 font-medium">02. Japanese</td>
-                <td className="border border-gray-300 p-2">
-                  <ReusableFormField
-                    control={form.control}
-                    name="eonetime_computer_title_japanese"
-                    label=""
-                    type="number"
-                    disabled={!libraryYearStatus?.is_open_for_editing}
-                  />
-                </td>
-                <td className="border border-gray-300 p-2">
-                  <ReusableFormField
-                    control={form.control}
-                    name="eonetime_computer_cd_japanese"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_cd_chinese'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">03. Korean</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  02. Japanese
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_title_korean"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_title_japanese'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_cd_korean"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_cd_japanese'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">04. Non-CJK</td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2 font-medium'>
+                  03. Korean
+                </td>
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_title_noncjk"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_title_korean'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
-                <td className="border border-gray-300 p-2">
+                <td className='border border-gray-300 p-2'>
                   <ReusableFormField
                     control={form.control}
-                    name="eonetime_computer_cd_noncjk"
-                    label=""
-                    type="number"
+                    name='eonetime_computer_cd_korean'
+                    label=''
+                    type='number'
                     disabled={!libraryYearStatus?.is_open_for_editing}
                   />
                 </td>
               </tr>
-              <tr className="bg-gray-50">
-                <td className="border border-gray-300 p-2 font-bold">05. Subtotal<br/><span className="text-xs font-normal text-gray-600">(01 + 02 + 03 + 04)</span></td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{oneTimeComputerTitlesSubtotal}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{oneTimeComputerCdSubtotal}</td>
+              <tr>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  04. Non-CJK
+                </td>
+                <td className='border border-gray-300 p-2'>
+                  <ReusableFormField
+                    control={form.control}
+                    name='eonetime_computer_title_noncjk'
+                    label=''
+                    type='number'
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+                <td className='border border-gray-300 p-2'>
+                  <ReusableFormField
+                    control={form.control}
+                    name='eonetime_computer_cd_noncjk'
+                    label=''
+                    type='number'
+                    disabled={!libraryYearStatus?.is_open_for_editing}
+                  />
+                </td>
+              </tr>
+              <tr className='bg-gray-50'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  05. Subtotal
+                  <br />
+                  <span className='text-xs font-normal text-gray-600'>
+                    (01 + 02 + 03 + 04)
+                  </span>
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {oneTimeComputerTitlesSubtotal}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {oneTimeComputerCdSubtotal}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="mt-4">
+        <div className='mt-4'>
           <ReusableFormField
             control={form.control}
-            name="eonetime_computer_memo"
-            label="Comment for 1.1"
-            placeholder="Optional notes for this section..."
-            type="textarea"
+            name='eonetime_computer_memo'
+            label='Comment for 1.1'
+            placeholder='Optional notes for this section...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -555,50 +577,98 @@ export default function ElectronicForm() {
 
       {/* Accompanied Computer Files */}
       <FormSection
-        title="1.2 Accompanied Computer Files (Monographic Purchase or Serial Subscription)"
-        description="Include the number of CDs bundled with books or journals."
+        title='1.2 Accompanied Computer Files (Monographic Purchase or Serial Subscription)'
+        description='Include the number of CDs bundled with books or journals.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              <tr className='bg-gray-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/3'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of Titles
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of CD-ROMs
+                </th>
               </tr>
             </thead>
             <tbody>
-              {[  
-                { num: '06', lang: 'Chinese', title: 'eaccompanied_computer_title_chinese', cd: 'eaccompanied_computer_cd_chinese' },
-                { num: '07', lang: 'Japanese', title: 'eaccompanied_computer_title_japanese', cd: 'eaccompanied_computer_cd_japanese' },
-                { num: '08', lang: 'Korean', title: 'eaccompanied_computer_title_korean', cd: 'eaccompanied_computer_cd_korean' },
-                { num: '09', lang: 'Non-CJK', title: 'eaccompanied_computer_title_noncjk', cd: 'eaccompanied_computer_cd_noncjk' }
+              {[
+                {
+                  num: "06",
+                  lang: "Chinese",
+                  title: "eaccompanied_computer_title_chinese",
+                  cd: "eaccompanied_computer_cd_chinese",
+                },
+                {
+                  num: "07",
+                  lang: "Japanese",
+                  title: "eaccompanied_computer_title_japanese",
+                  cd: "eaccompanied_computer_cd_japanese",
+                },
+                {
+                  num: "08",
+                  lang: "Korean",
+                  title: "eaccompanied_computer_title_korean",
+                  cd: "eaccompanied_computer_cd_korean",
+                },
+                {
+                  num: "09",
+                  lang: "Non-CJK",
+                  title: "eaccompanied_computer_title_noncjk",
+                  cd: "eaccompanied_computer_cd_noncjk",
+                },
               ].map((row) => (
                 <tr key={row.num}>
-                  <td className="border border-gray-300 p-2 font-medium">{row.num}. {row.lang}</td>
-                  <td className="border border-gray-300 p-2">
-                    <ReusableFormField control={form.control} name={row.title as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  <td className='border border-gray-300 p-2 font-medium'>
+                    {row.num}. {row.lang}
                   </td>
-                  <td className="border border-gray-300 p-2">
-                    <ReusableFormField control={form.control} name={row.cd as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  <td className='border border-gray-300 p-2'>
+                    <ReusableFormField
+                      control={form.control}
+                      name={row.title as any}
+                      label=''
+                      type='number'
+                      disabled={!libraryYearStatus?.is_open_for_editing}
+                    />
+                  </td>
+                  <td className='border border-gray-300 p-2'>
+                    <ReusableFormField
+                      control={form.control}
+                      name={row.cd as any}
+                      label=''
+                      type='number'
+                      disabled={!libraryYearStatus?.is_open_for_editing}
+                    />
                   </td>
                 </tr>
               ))}
-              <tr className="bg-gray-50">
-                <td className="border border-gray-300 p-2 font-bold">10. Subtotal<br/><span className="text-xs font-normal text-gray-600">(06 + 07 + 08 + 09)</span></td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{accompaniedComputerTitlesSubtotal}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{accompaniedComputerCdSubtotal}</td>
+              <tr className='bg-gray-50'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  10. Subtotal
+                  <br />
+                  <span className='text-xs font-normal text-gray-600'>
+                    (06 + 07 + 08 + 09)
+                  </span>
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {accompaniedComputerTitlesSubtotal}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {accompaniedComputerCdSubtotal}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="mt-4">
+        <div className='mt-4'>
           <ReusableFormField
             control={form.control}
-            name="eaccompanied_computer_memo"
-            label="Comment for 1.2"
-            placeholder="Optional notes for this section..."
-            type="textarea"
+            name='eaccompanied_computer_memo'
+            label='Comment for 1.2'
+            placeholder='Optional notes for this section...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -606,50 +676,98 @@ export default function ElectronicForm() {
 
       {/* Gift Computer Files */}
       <FormSection
-        title="1.3 Computer Files (One Time Gift Item)"
-        description="Include the number of one-time gift items not covered in 1.1 or 1.2."
+        title='1.3 Computer Files (One Time Gift Item)'
+        description='Include the number of one-time gift items not covered in 1.1 or 1.2.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              <tr className='bg-gray-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/3'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of Titles
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of CD-ROMs
+                </th>
               </tr>
             </thead>
             <tbody>
-              {[  
-                { num: '11', lang: 'Chinese', title: 'egift_computer_title_chinese', cd: 'egift_computer_cd_chinese' },
-                { num: '12', lang: 'Japanese', title: 'egift_computer_title_japanese', cd: 'egift_computer_cd_japanese' },
-                { num: '13', lang: 'Korean', title: 'egift_computer_title_korean', cd: 'egift_computer_cd_korean' },
-                { num: '14', lang: 'Non-CJK', title: 'egift_computer_title_noncjk', cd: 'egift_computer_cd_noncjk' }
+              {[
+                {
+                  num: "11",
+                  lang: "Chinese",
+                  title: "egift_computer_title_chinese",
+                  cd: "egift_computer_cd_chinese",
+                },
+                {
+                  num: "12",
+                  lang: "Japanese",
+                  title: "egift_computer_title_japanese",
+                  cd: "egift_computer_cd_japanese",
+                },
+                {
+                  num: "13",
+                  lang: "Korean",
+                  title: "egift_computer_title_korean",
+                  cd: "egift_computer_cd_korean",
+                },
+                {
+                  num: "14",
+                  lang: "Non-CJK",
+                  title: "egift_computer_title_noncjk",
+                  cd: "egift_computer_cd_noncjk",
+                },
               ].map((row) => (
                 <tr key={row.num}>
-                  <td className="border border-gray-300 p-2 font-medium">{row.num}. {row.lang}</td>
-                  <td className="border border-gray-300 p-2">
-                    <ReusableFormField control={form.control} name={row.title as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  <td className='border border-gray-300 p-2 font-medium'>
+                    {row.num}. {row.lang}
                   </td>
-                  <td className="border border-gray-300 p-2">
-                    <ReusableFormField control={form.control} name={row.cd as any} label="" type="number" disabled={!libraryYearStatus?.is_open_for_editing} />
+                  <td className='border border-gray-300 p-2'>
+                    <ReusableFormField
+                      control={form.control}
+                      name={row.title as any}
+                      label=''
+                      type='number'
+                      disabled={!libraryYearStatus?.is_open_for_editing}
+                    />
+                  </td>
+                  <td className='border border-gray-300 p-2'>
+                    <ReusableFormField
+                      control={form.control}
+                      name={row.cd as any}
+                      label=''
+                      type='number'
+                      disabled={!libraryYearStatus?.is_open_for_editing}
+                    />
                   </td>
                 </tr>
               ))}
-              <tr className="bg-gray-50">
-                <td className="border border-gray-300 p-2 font-bold">15. Subtotal<br/><span className="text-xs font-normal text-gray-600">(11 + 12 + 13 + 14)</span></td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{giftComputerTitlesSubtotal}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-gray-100">{giftComputerCdSubtotal}</td>
+              <tr className='bg-gray-50'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  15. Subtotal
+                  <br />
+                  <span className='text-xs font-normal text-gray-600'>
+                    (11 + 12 + 13 + 14)
+                  </span>
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {giftComputerTitlesSubtotal}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-gray-100'>
+                  {giftComputerCdSubtotal}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="mt-4">
+        <div className='mt-4'>
           <ReusableFormField
             control={form.control}
-            name="egift_computer_memo"
-            label="Comment for 1.3"
-            placeholder="Optional notes for this section..."
-            type="textarea"
+            name='egift_computer_memo'
+            label='Comment for 1.3'
+            placeholder='Optional notes for this section...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -657,145 +775,176 @@ export default function ElectronicForm() {
 
       {/* Section 1.4: Total Computer Files */}
       <FormSection
-        title="1.4 Total Computer Files (sum of 1.1 + 1.2 + 1.3)"
-        description="Calculated totals for all computer files."
+        title='1.4 Total Computer Files (sum of 1.1 + 1.2 + 1.3)'
+        description='Calculated totals for all computer files.'
       >
-        <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium">Titles (Calculated)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Chinese</label>
-              <div className="p-2 bg-white border rounded">{totalComputerTitlesChinese}</div>
+        <div className='space-y-4 bg-gray-50 p-4 rounded-lg'>
+          <h4 className='font-medium'>Titles (Calculated)</h4>
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Chinese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerTitlesChinese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Japanese</label>
-              <div className="p-2 bg-white border rounded">{totalComputerTitlesJapanese}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Japanese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerTitlesJapanese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Korean</label>
-              <div className="p-2 bg-white border rounded">{totalComputerTitlesKorean}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Korean</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerTitlesKorean}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Non-CJK</label>
-              <div className="p-2 bg-white border rounded">{totalComputerTitlesNoncjk}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Non-CJK</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerTitlesNoncjk}
+              </div>
             </div>
           </div>
           <SubtotalDisplay
-            label="Titles Subtotal"
+            label='Titles Subtotal'
             value={totalComputerTitlesSubtotal}
-            formula="Sum of all language titles"
+            formula='Sum of all language titles'
           />
 
-          <h4 className="font-medium">Items (Calculated)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Chinese</label>
-              <div className="p-2 bg-white border rounded">{totalComputerCdChinese}</div>
+          <h4 className='font-medium'>Items (Calculated)</h4>
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Chinese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerCdChinese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Japanese</label>
-              <div className="p-2 bg-white border rounded">{totalComputerCdJapanese}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Japanese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerCdJapanese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Korean</label>
-              <div className="p-2 bg-white border rounded">{totalComputerCdKorean}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Korean</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerCdKorean}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Non-CJK</label>
-              <div className="p-2 bg-white border rounded">{totalComputerCdNoncjk}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Non-CJK</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalComputerCdNoncjk}
+              </div>
             </div>
           </div>
           <SubtotalDisplay
-            label="Items Subtotal"
+            label='Items Subtotal'
             value={totalComputerCdSubtotal}
-            formula="Sum of all language items"
+            formula='Sum of all language items'
           />
         </div>
         <ReusableFormField
           control={form.control}
-          name="etotal_computer_memo"
-          label="Comment for 1.4"
-          placeholder="Optional notes for total computer files..."
-          type="textarea"
+          name='etotal_computer_memo'
+          label='Comment for 1.4'
+          placeholder='Optional notes for total computer files...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
 
       {/* Section 1.5: Previous Year Total Computer Files */}
       <FormSection
-        title="1.5 Previous Year Total Computer Files"
-        description="Data from the end of the previous survey year. This section is informational only."
+        title='1.5 Previous Year Total Computer Files'
+        description='Data from the end of the previous survey year. This section is informational only.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-amber-100">
-                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              <tr className='bg-amber-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/3'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of Titles
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of CD-ROMs
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">16. Chinese</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevTitleChinese : '--'}
+                <td className='border border-gray-300 p-2 font-medium'>
+                  16. Chinese
                 </td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevCdChinese : '--'}
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevTitleChinese : "--"}
                 </td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2 font-medium">17. Japanese</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevTitleJapanese : '--'}
-                </td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevCdJapanese : '--'}
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevCdChinese : "--"}
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">18. Korean</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevTitleKorean : '--'}
+                <td className='border border-gray-300 p-2 font-medium'>
+                  17. Japanese
                 </td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevCdKorean : '--'}
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevTitleJapanese : "--"}
+                </td>
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevCdJapanese : "--"}
                 </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">19. Non-CJK</td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevTitleNoncjk : '--'}
+                <td className='border border-gray-300 p-2 font-medium'>
+                  18. Korean
                 </td>
-                <td className="border border-gray-300 p-2 text-center text-gray-700">
-                  {previousYearData ? prevCdNoncjk : '--'}
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevTitleKorean : "--"}
+                </td>
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevCdKorean : "--"}
                 </td>
               </tr>
-              <tr className="bg-amber-50">
-                <td className="border border-gray-300 p-2 font-bold">19.1 Subtotal</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">
-                  {previousYearData ? prevTitleSubtotal : '--'}
+              <tr>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  19. Non-CJK
                 </td>
-                <td className="border border-gray-300 p-2 text-center font-semibold bg-amber-100">
-                  {previousYearData ? prevCdSubtotal : '--'}
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevTitleNoncjk : "--"}
+                </td>
+                <td className='border border-gray-300 p-2 text-center text-gray-700'>
+                  {previousYearData ? prevCdNoncjk : "--"}
+                </td>
+              </tr>
+              <tr className='bg-amber-50'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  19.1 Subtotal
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-amber-100'>
+                  {previousYearData ? prevTitleSubtotal : "--"}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold bg-amber-100'>
+                  {previousYearData ? prevCdSubtotal : "--"}
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-sm text-amber-800">
-            <strong>Note:</strong> Previous year data will be automatically populated from last year's submission.
+        <div className='mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4'>
+          <p className='text-sm text-amber-800'>
+            <strong>Note:</strong> Previous year data will be automatically
+            populated from last year's submission.
           </p>
         </div>
-        <div className="mt-4">
+        <div className='mt-4'>
           <ReusableFormField
             control={form.control}
-            name="eprevious_memo"
-            label="Comment for 1.5"
-            placeholder="Optional notes about previous year data..."
-            type="textarea"
+            name='eprevious_memo'
+            label='Comment for 1.5'
+            placeholder='Optional notes about previous year data...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -803,60 +952,95 @@ export default function ElectronicForm() {
 
       {/* Section 1.6: Grand Total Computer Files */}
       <FormSection
-        title="1.6 Grand Total Computer Files (Sum 1.4 + 1.5)"
-        description="Grand total combining current year and previous year computer files."
+        title='1.6 Grand Total Computer Files (Sum 1.4 + 1.5)'
+        description='Grand total combining current year and previous year computer files.'
       >
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse'>
             <thead>
-              <tr className="bg-blue-100">
-                <th className="border border-gray-300 p-2 text-left w-1/3"></th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of Titles</th>
-                <th className="border border-gray-300 p-2 text-center font-normal text-sm">Number of CD-ROMs</th>
+              <tr className='bg-blue-100'>
+                <th className='border border-gray-300 p-2 text-left w-1/3'></th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of Titles
+                </th>
+                <th className='border border-gray-300 p-2 text-center font-normal text-sm'>
+                  Number of CD-ROMs
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">20. Chinese</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesChinese}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdChinese}</td>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  20. Chinese
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalTitlesChinese}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalCdChinese}
+                </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">21. Japanese</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesJapanese}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdJapanese}</td>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  21. Japanese
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalTitlesJapanese}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalCdJapanese}
+                </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">22. Korean</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesKorean}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdKorean}</td>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  22. Korean
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalTitlesKorean}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalCdKorean}
+                </td>
               </tr>
               <tr>
-                <td className="border border-gray-300 p-2 font-medium">23. Non-CJK</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalTitlesNoncjk}</td>
-                <td className="border border-gray-300 p-2 text-center font-semibold">{grandTotalCdNoncjk}</td>
+                <td className='border border-gray-300 p-2 font-medium'>
+                  23. Non-CJK
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalTitlesNoncjk}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-semibold'>
+                  {grandTotalCdNoncjk}
+                </td>
               </tr>
-              <tr className="bg-blue-50">
-                <td className="border border-gray-300 p-2 font-bold">23.1 Subtotal</td>
-                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{grandTotalTitlesSubtotal}</td>
-                <td className="border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100">{grandTotalCdSubtotal}</td>
+              <tr className='bg-blue-50'>
+                <td className='border border-gray-300 p-2 font-bold'>
+                  23.1 Subtotal
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100'>
+                  {grandTotalTitlesSubtotal}
+                </td>
+                <td className='border border-gray-300 p-2 text-center font-bold text-lg bg-blue-100'>
+                  {grandTotalCdSubtotal}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
-            <strong>Note:</strong> Electronic databases counted in 2.2 should NOT be reported here again.
-            Report the total count by language of computer files held as of June 30 of the current survey year.
+        <div className='mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4'>
+          <p className='text-sm text-blue-800'>
+            <strong>Note:</strong> Electronic databases counted in 2.2 should
+            NOT be reported here again. Report the total count by language of
+            computer files held as of June 30 of the current survey year.
           </p>
         </div>
-        <div className="mt-4">
+        <div className='mt-4'>
           <ReusableFormField
             control={form.control}
-            name="etotal_computer_memo"
-            label="Comment for 1.6"
-            placeholder="Optional notes for grand total computer files..."
-            type="textarea"
+            name='etotal_computer_memo'
+            label='Comment for 1.6'
+            placeholder='Optional notes for grand total computer files...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -864,141 +1048,182 @@ export default function ElectronicForm() {
 
       {/* Electronic Indexes */}
       <FormSection
-        title="2.1 Electronic Indexes and Reference Tools"
-        description="Examples: Bibliography of Asian Studies, MagazinePlus, EncyKorea."
+        title='2.1 Electronic Indexes and Reference Tools'
+        description='Examples: Bibliography of Asian Studies, MagazinePlus, EncyKorea.'
       >
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "eindex_electronic_title_chinese", label: "31. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "eindex_electronic_title_japanese", label: "32. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "eindex_electronic_title_korean", label: "33. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "eindex_electronic_title_noncjk", label: "34. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "eindex_electronic_title_chinese",
+              label: "31. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "eindex_electronic_title_japanese",
+              label: "32. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "eindex_electronic_title_korean",
+              label: "33. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "eindex_electronic_title_noncjk",
+              label: "34. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="35. Subtotal"
+          label='35. Subtotal'
           value={indexElectronicSubtotal}
-          formula="31 + 32 + 33 + 34"
+          formula='31 + 32 + 33 + 34'
         />
         <ReusableFormField
           control={form.control}
-          name="eindex_electronic_memo"
-          label="Comment for 2.1"
-          placeholder="Optional notes for this section..."
-          type="textarea"
+          name='eindex_electronic_memo'
+          label='Comment for 2.1'
+          placeholder='Optional notes for this section...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
 
       {/* Electronic Full Text */}
       <FormSection
-        title="2.2 Electronic Full Text Database"
-        description="Before using the 'Import' feature, update your AV/E-book/E-journal lists."
+        title='2.2 Electronic Full Text Database'
+        description="Before using the 'Import' feature, update your AV/E-book/E-journal Database lists."
       >
-        <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>BEFORE using the import feature</strong>, please fill out or update the
-            &quot;E-Book Databases by Subscription&quot;, &quot;E-Journal Databases by Subscription&quot;,
-            and &quot;Audio-Visual Database by Subscription&quot; in order for the system to provide
-            the corresponding numbers automatically.
+        <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <p className='text-sm text-yellow-800 mb-2'>
+            <strong>BEFORE using the import feature</strong>, please fill out or
+            update the &quot;Audio/Visual Databases&quot;, &quot;E-Book
+            Databases&quot;, and &quot;E-Journal Databases&quot; in order for
+            the system to provide the corresponding numbers automatically.
           </p>
           <Button
-            type="button"
+            type='button'
             onClick={importAllData}
-            className="flex items-center gap-2"
-            variant="default"
+            className='flex items-center gap-2'
+            variant='default'
           >
-            <Download className="h-4 w-4" />
-            Import from E-Book, E-Journal and Audio-Visual Databases
+            <Download className='h-4 w-4' />
+            Import from "Audio/Visual Databases", "E-Book Databases" and
+            "E-Journal Databases"
           </Button>
         </div>
 
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "efulltext_electronic_title_chinese", label: "36. Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "efulltext_electronic_title_japanese", label: "37. Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "efulltext_electronic_title_korean", label: "38. Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "efulltext_electronic_title_noncjk", label: "39. Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: {
+              name: "efulltext_electronic_title_chinese",
+              label: "36. Chinese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            japanese: {
+              name: "efulltext_electronic_title_japanese",
+              label: "37. Japanese",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            korean: {
+              name: "efulltext_electronic_title_korean",
+              label: "38. Korean",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
+            eastasian: {
+              name: "efulltext_electronic_title_noncjk",
+              label: "39. Non-CJK",
+              disabled: !libraryYearStatus?.is_open_for_editing,
+            },
           }}
         />
         <SubtotalDisplay
-          label="40. Subtotal"
+          label='40. Subtotal'
           value={fulltextElectronicSubtotal}
-          formula="36 + 37 + 38 + 39"
+          formula='36 + 37 + 38 + 39'
         />
         <ReusableFormField
           control={form.control}
-          name="efulltext_electronic_memo"
-          label="Comment for 2.2"
-          placeholder="Optional notes for this section..."
-          type="textarea"
+          name='efulltext_electronic_memo'
+          label='Comment for 2.2'
+          placeholder='Optional notes for this section...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
 
       {/* Section 2.3: Total Electronic */}
       <FormSection
-        title="2.3 Total Electronic (sum of 2.1 + 2.2)"
-        description="Calculated totals for all electronic resources."
+        title='2.3 Total Electronic (sum of 2.1 + 2.2)'
+        description='Calculated totals for all electronic resources.'
       >
-        <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium">Titles (Calculated)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Chinese</label>
-              <div className="p-2 bg-white border rounded">{totalElectronicChinese}</div>
+        <div className='space-y-4 bg-gray-50 p-4 rounded-lg'>
+          <h4 className='font-medium'>Titles (Calculated)</h4>
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Chinese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalElectronicChinese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Japanese</label>
-              <div className="p-2 bg-white border rounded">{totalElectronicJapanese}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Japanese</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalElectronicJapanese}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Korean</label>
-              <div className="p-2 bg-white border rounded">{totalElectronicKorean}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Korean</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalElectronicKorean}
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Non-CJK</label>
-              <div className="p-2 bg-white border rounded">{totalElectronicNoncjk}</div>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Non-CJK</label>
+              <div className='p-2 bg-white border rounded'>
+                {totalElectronicNoncjk}
+              </div>
             </div>
           </div>
           <SubtotalDisplay
-            label="Subtotal"
+            label='Subtotal'
             value={totalElectronicSubtotal}
-            formula="Sum of 2.1 + 2.2"
+            formula='Sum of 2.1 + 2.2'
           />
         </div>
         <ReusableFormField
           control={form.control}
-          name="etotal_electronic_memo"
-          label="Comment for 2.3"
-          placeholder="Optional notes for total electronic resources..."
-          type="textarea"
+          name='etotal_electronic_memo'
+          label='Comment for 2.3'
+          placeholder='Optional notes for total electronic resources...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
 
       {/* Expenditures */}
       <FormSection
-        title="3. Total Electronic Resources Expenditure"
-        description="Item #41 includes expenditures for the above resources and also expenditures for Electronic Books."
+        title='3. Total Electronic Resources Expenditure'
+        description='Item #41 includes expenditures for the above resources and also expenditures for Electronic Books.'
       >
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <ReusableFormField
             control={form.control}
-            name="etotal_expenditure_grandtotal"
-            label="41. Grand Total Expenditure"
-            placeholder="Enter total expenditure amount in USD"
-            type="number"
+            name='etotal_expenditure_grandtotal'
+            label='41. Grand Total Expenditure'
+            placeholder='Enter total expenditure amount in USD'
+            type='number'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
           <ReusableFormField
             control={form.control}
-            name="etotal_expenditure_memo"
-            label="Comment for 3"
-            placeholder="Optional notes for expenditures..."
-            type="textarea"
+            name='etotal_expenditure_memo'
+            label='Comment for 3'
+            placeholder='Optional notes for expenditures...'
+            type='textarea'
             disabled={!libraryYearStatus?.is_open_for_editing}
           />
         </div>
@@ -1006,15 +1231,15 @@ export default function ElectronicForm() {
 
       {/* Notes */}
       <FormSection
-        title="Notes"
-        description="Additional information or comments about electronic resources."
+        title='Notes'
+        description='Additional information or comments about electronic resources.'
       >
         <ReusableFormField
           control={form.control}
-          name="enotes"
-          label="Notes/Memo for this form"
-          placeholder="Enter any notes, footnotes, or additional information..."
-          type="textarea"
+          name='enotes'
+          label='Notes/Memo for this form'
+          placeholder='Enter any notes, footnotes, or additional information...'
+          type='textarea'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
       </FormSection>
@@ -1024,9 +1249,9 @@ export default function ElectronicForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Electronic Resources Data"
+        submitButtonText='Submit Electronic Resources Data'
         onSaveDraft={handleSaveDraft}
       />
     </FormWrapper>
-  )
+  );
 }
