@@ -121,8 +121,10 @@ export default function PastYearsPage() {
                       <td className="border px-1 text-right">{f(d?.ebooks_subscription_titles_korean)}</td>
                       <td className="border px-1 text-right">{f(d?.ebooks_subscription_titles_noncjk)}</td>
                       <td className="border px-1 text-right bg-blue-50">{f(d?.ebooks_subscription_titles_subtotal)}</td>
-                      {/* TITLES Total */}
-                      <td className="border px-1 text-right bg-green-100 font-bold">{f(d?.ebooks_total_titles)}</td>
+                      {/* TITLES Total (Purchased + Non-Purchased + Subscription) */}
+                      <td className="border px-1 text-right bg-green-100 font-bold">
+                        {f(d?.ebooks_purchased_titles_subtotal) + f(d?.ebooks_nonpurchased_titles_subtotal) + f(d?.ebooks_subscription_titles_subtotal)}
+                      </td>
                       {/* VOLUMES - Purchased - Held Previous Year */}
                       <td className="border px-1 text-right">{f(d?.ebooks_purchased_prev_volumes_chinese)}</td>
                       <td className="border px-1 text-right">{f(d?.ebooks_purchased_prev_volumes_japanese)}</td>
@@ -153,8 +155,10 @@ export default function PastYearsPage() {
                       <td className="border px-1 text-right">{f(d?.ebooks_subscription_volumes_korean)}</td>
                       <td className="border px-1 text-right">{f(d?.ebooks_subscription_volumes_noncjk)}</td>
                       <td className="border px-1 text-right bg-blue-50">{f(d?.ebooks_subscription_volumes_subtotal)}</td>
-                      {/* VOLUMES Total */}
-                      <td className="border px-1 text-right bg-green-100 font-bold">{f(d?.ebooks_total_volumes)}</td>
+                      {/* VOLUMES Total (Purchased + Non-Purchased + Subscription) */}
+                      <td className="border px-1 text-right bg-green-100 font-bold">
+                        {f(d?.ebooks_purchased_volumes_subtotal) + f(d?.ebooks_nonpurchased_volumes_subtotal) + f(d?.ebooks_subscription_volumes_subtotal)}
+                      </td>
                     </tr>
                   )
                 })}
