@@ -55,10 +55,10 @@ export async function POST(req: Request) {
 
     console.log(`Found ${libraries.length} libraries`);
 
-    // Step 3: Create new Library_Year records for each library for the current year
+    // Step 3: Create or update Library_Year records for each library for the current year
     const createdRecords = [];
     let successCount = 0;
-    let skippedCount = 0;
+    let updatedCount = 0;
 
     for (const library of libraries) {
       try {
@@ -71,16 +71,30 @@ export async function POST(req: Request) {
         });
 
         if (existingRecord) {
-          // Skip if record already exists - don't update existing records
-          console.log(`Skipped existing record for library: ${library.library_name}`);
+          // Update existing record with new dates
+          const updatedRecord = await db.library_Year.update({
+            where: {
+              id: existingRecord.id,
+            },
+            data: {
+              opening_date: openDate,      // Update opening date
+              closing_date: closeDate,     // Update closing date
+              updated_at: new Date(),
+            },
+          });
+
+          console.log(`Updated existing record for library: ${library.library_name}`);
           createdRecords.push({
             library_id: library.id,
             library_name: library.library_name,
-            action: 'skipped',
-            record_id: existingRecord.id,
-            reason: 'Record already exists for this year',
+            action: 'updated',
+            record_id: updatedRecord.id,
+            previous_opening: existingRecord.opening_date?.toISOString(),
+            previous_closing: existingRecord.closing_date?.toISOString(),
+            new_opening: openDate.toISOString(),
+            new_closing: closeDate.toISOString(),
           });
-          skippedCount++;
+          updatedCount++;
         } else {
           // Create new Library_Year record with scheduled opening/closing dates
           const newRecord = await db.library_Year.create({
@@ -116,7 +130,44 @@ export async function POST(req: Request) {
       }
     }
 
-    // Step 4: Confirm Library_Year table has been updated and return results
+    // Step 4: Create or update SurveySession for automatic form opening/closing
+    console.log('📋 Creating/updating SurveySession for automatic scheduling...');
+    
+    const existingSession = await db.surveySession.findUnique({
+      where: { academicYear: targetYear }
+    });
+
+    let sessionAction = 'created';
+    if (existingSession) {
+      // Update existing session with new dates
+      await db.surveySession.update({
+        where: { academicYear: targetYear },
+        data: {
+          openingDate: openDate,
+          closingDate: closeDate,
+          isOpen: false,
+          notifiedOnOpen: false,
+          notifiedOnClose: false,
+        }
+      });
+      sessionAction = 'updated';
+      console.log(`🔄 Updated existing SurveySession for year ${targetYear}`);
+    } else {
+      // Create new session
+      await db.surveySession.create({
+        data: {
+          academicYear: targetYear,
+          openingDate: openDate,
+          closingDate: closeDate,
+          isOpen: false,
+          notifiedOnOpen: false,
+          notifiedOnClose: false,
+        }
+      });
+      console.log(`✅ Created new SurveySession for year ${targetYear}`);
+    }
+
+    // Step 5: Confirm Library_Year table has been updated and return results
     const totalLibraryYearRecords = await db.library_Year.count({
       where: {
         year: targetYear,
@@ -124,26 +175,28 @@ export async function POST(req: Request) {
     });
 
     console.log(`✅ Successfully created ${successCount} new records for year ${targetYear}`);
-    console.log(`⏭️  Skipped ${skippedCount} existing records`);
+    console.log(`🔄 Updated ${updatedCount} existing records with new dates`);
     console.log(`📊 Total Library_Year records for ${targetYear}: ${totalLibraryYearRecords}`);
     console.log(`📅 Opening Date: ${openDate.toISOString()}`);
     console.log(`📅 Closing Date: ${closeDate.toISOString()}`);
+    console.log(`🤖 SurveySession ${sessionAction} - Cron job will auto-open/close forms`);
 
-    // Step 5: Return success response with details
+    // Step 6: Return success response with details
     return NextResponse.json({
       success: true,
-      message: `Successfully created form records for year ${targetYear}. Forms will open on scheduled date.`,
+      message: `Successfully processed form records for year ${targetYear}. Created ${successCount}, Updated ${updatedCount}. SurveySession ${sessionAction}. Forms will automatically open on scheduled date.`,
       year: targetYear,
       count: successCount,
-      skipped: skippedCount,
+      updated: updatedCount,
       totalLibraries: libraries.length,
       totalActiveRecords: totalLibraryYearRecords,
       openingDate: openDate.toISOString(),
       closingDate: closeDate.toISOString(),
+      sessionAction: sessionAction,
       details: createdRecords,
       summary: {
         created: createdRecords.filter(r => r.action === 'created').length,
-        skipped: createdRecords.filter(r => r.action === 'skipped').length,
+        updated: createdRecords.filter(r => r.action === 'updated').length,
         errors: createdRecords.filter(r => r.action === 'error').length,
       },
     });

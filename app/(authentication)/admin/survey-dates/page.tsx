@@ -203,8 +203,8 @@ export default function OpenYearPage() {
                                     <ul className="text-sm text-blue-800 space-y-1">
                                         <li>✅ Creates Library_Year records for ALL libraries ({year})</li>
                                         <li>✅ Sets opening_date and closing_date in database</li>
+                                        <li>🔄 Updates existing records for {year} with new dates</li>
                                         <li>✅ Forms remain CLOSED (is_open_for_editing = false)</li>
-                                        <li>✅ Existing records for {year} will be skipped (not overwritten)</li>
                                         <li>📧 Does NOT send broadcast emails (do that separately)</li>
                                         <li>🤖 Cron job will automatically open/close on scheduled dates</li>
                                     </ul>
@@ -230,6 +230,11 @@ export default function OpenYearPage() {
                                     <h3 className="font-bold text-green-900 mb-2">
                                         ✅ Successfully set dates for {result.year} forms!
                                     </h3>
+                                    {result.sessionAction && (
+                                        <p className="text-sm text-green-700">
+                                            🤖 Automatic scheduling {result.sessionAction === 'created' ? 'configured' : 'updated'}. Forms will open/close automatically on scheduled dates.
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
@@ -244,8 +249,8 @@ export default function OpenYearPage() {
                                         <p className="text-2xl font-bold text-green-900">{result.count}</p>
                                     </div>
                                     <div>
-                                        <p className="text-green-700 font-medium">Existing Records Skipped</p>
-                                        <p className="text-2xl font-bold text-green-900">{result.skipped || 0}</p>
+                                        <p className="text-green-700 font-medium">Records Updated</p>
+                                        <p className="text-2xl font-bold text-green-900">{result.updated || 0}</p>
                                     </div>
                                     <div>
                                         <p className="text-green-700 font-medium">Total Active Records</p>
@@ -258,7 +263,7 @@ export default function OpenYearPage() {
                                         <p className="font-medium text-green-900 mb-2">Breakdown:</p>
                                         <ul className="space-y-1 text-green-800">
                                             <li>• Created: {result.summary.created}</li>
-                                            <li>• Skipped: {result.summary.skipped}</li>
+                                            <li>• Updated: {result.summary.updated || 0}</li>
                                             {result.summary.errors > 0 && (
                                                 <li className="text-red-600">• Errors: {result.summary.errors}</li>
                                             )}
