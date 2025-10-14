@@ -40,9 +40,12 @@ export default function PastYearsPage() {
           <div className="text-lg text-gray-500">Loading...</div>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
-          <p className="text-sm text-gray-600 p-4 bg-yellow-50 border-b">Note: Very wide table. Scroll horizontally.</p>
-          <table className="w-full border-collapse" style={{fontSize: '10px'}}>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="text-sm text-gray-600 p-4 bg-yellow-50 border-b sticky top-0 z-10">
+            Note: Very wide table. Scroll horizontally.
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse" style={{fontSize: '10px'}}>
             <thead>
               <tr className="bg-teal-700 text-white">
                 <th className="border border-gray-300 px-1 py-1 text-center" rowSpan={4}>Year</th>
@@ -187,6 +190,7 @@ export default function PastYearsPage() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
       {!isLoading && pastYearsData.length === 0 && (
