@@ -525,13 +525,13 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> at <strong>12:00 AM PT</strong>
+                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} dateOnly={true} /> at <strong>12:00 AM PT</strong>
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at <strong>11:59 PM PT</strong>
+                      <strong>Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at <strong>11:59 PM PT</strong>
                     </span>
                   </li>
                 </ul>
@@ -647,7 +647,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">📅</span>
-                        <span><strong>Scheduled closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT - Forms will automatically close</span>
+                        <span><strong>Scheduled closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at 11:59 PM PT - Forms will automatically close</span>
                       </li>
                     </ul>
                   </>
@@ -661,11 +661,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">2️⃣</span>
-                        <span><strong>Form Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /> at 12:00 AM PT - Forms will open automatically</span>
+                        <span><strong>Form Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} dateOnly={true} /> at 12:00 AM PT - Forms will open automatically</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">3️⃣</span>
-                        <span><strong>Form Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /> at 11:59 PM PT - Forms will close automatically</span>
+                        <span><strong>Form Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at 11:59 PM PT - Forms will close automatically</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">📋</span>

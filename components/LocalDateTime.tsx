@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 interface LocalDateTimeProps {
   dateString: string;
   className?: string;
+  dateOnly?: boolean; // If true, shows only the date without time
 }
 
-export function LocalDateTime({ dateString, className }: LocalDateTimeProps) {
+export function LocalDateTime({ dateString, className, dateOnly = false }: LocalDateTimeProps) {
   const [localTime, setLocalTime] = useState<string>("");
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -23,17 +24,24 @@ export function LocalDateTime({ dateString, className }: LocalDateTimeProps) {
         return;
       }
       
-      // Format with user's local timezone - show timezone abbreviation
-      const formatted = date.toLocaleString(undefined, {
+      // Format with Pacific Time (America/Los_Angeles)
+      const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-        timeZoneName: 'short'
-      });
+        timeZone: 'America/Los_Angeles',
+      };
+      
+      // Add time components if not dateOnly
+      if (!dateOnly) {
+        options.hour = 'numeric';
+        options.minute = '2-digit';
+        options.second = '2-digit';
+        options.hour12 = true;
+        options.timeZoneName = 'short';
+      }
+      
+      const formatted = date.toLocaleString('en-US', options);
       
       setLocalTime(formatted);
       setIsLoaded(true);
@@ -42,7 +50,7 @@ export function LocalDateTime({ dateString, className }: LocalDateTimeProps) {
       setLocalTime('Invalid date');
       setIsLoaded(true);
     }
-  }, [dateString]);
+  }, [dateString, dateOnly]);
 
   // Show a placeholder during SSR/hydration to avoid mismatch
   if (!isLoaded) {
