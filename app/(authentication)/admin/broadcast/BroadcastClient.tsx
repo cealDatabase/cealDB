@@ -135,7 +135,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     }
 
     if (!scheduledSession) {
-      setError('No scheduled session found. Please create a session first via "Open Forms for New Year" page.');
+      setError('No scheduled session found. Please create a session first via "Survey Dates Management" page.');
       return;
     }
 
@@ -382,11 +382,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                   <h3 className="font-semibold text-yellow-900 mb-2">No Scheduled Session Found</h3>
                   <p className="text-sm text-yellow-800 mb-4">
-                    Please create Library_Year records first via the "Open Forms for New Year" page.
+                    Please create Library_Year records first via the "Survey Dates Management" page.
                   </p>
                   <Link href="/admin/open-year">
                     <Button className="bg-green-600 hover:bg-green-700">
-                      Go to Open Forms for New Year
+                      Go to Survey Dates Management
                     </Button>
                   </Link>
                 </div>

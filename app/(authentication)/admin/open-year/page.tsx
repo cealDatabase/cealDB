@@ -4,7 +4,15 @@ import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, AlertTriangle, Calendar } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Calendar, SlashIcon } from 'lucide-react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
 
 export default function OpenYearPage() {
     const currentYear = new Date().getFullYear();
@@ -80,17 +88,55 @@ export default function OpenYearPage() {
     };
 
     return (
-        <>
-            <h1>Open Forms for New Year</h1>
-            <Container>
-                <div className="mb-6">
-                    <Link href="/admin" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back to Admin Dashboard
-                    </Link>
+        <Container>
+            <div className="max-w-5xl mx-auto">
+                {/* Breadcrumb */}
+                <div className="my-6">
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink asChild>
+                                    <Link href="/" className="no-underline">Home</Link>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator>
+                                <SlashIcon />
+                            </BreadcrumbSeparator>
+                            
+                            <BreadcrumbItem>
+                                <BreadcrumbLink asChild>
+                                    <Link href="/admin" className="no-underline">Admin</Link>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator>
+                                <SlashIcon />
+                            </BreadcrumbSeparator>
+                            
+                            <BreadcrumbItem>
+                                <BreadcrumbLink asChild>
+                                    <Link href="/admin/superguide" className="no-underline">Super Admin Tools</Link>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator>
+                                <SlashIcon />
+                            </BreadcrumbSeparator>
+                            
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>Survey Dates Management</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </div>
 
-                <div className="max-w-2xl">
+                {/* Header */}
+                <div className="mb-6">
+                    <h1 className="mb-2">Survey Dates Management</h1>
+                    <p className="text-gray-600">
+                        Set opening and closing dates for annual surveys. Creates Library_Year records with scheduled dates for automatic form opening/closing.
+                    </p>
+                </div>
+
+                <div className="max-w-2xl mx-auto">
                     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                         <div className="flex items-start gap-4 mb-6">
                             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -245,7 +291,7 @@ export default function OpenYearPage() {
                         </div>
                     )}
                 </div>
-            </Container>
-        </>
+            </div>
+        </Container>
     );
 }

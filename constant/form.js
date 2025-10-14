@@ -181,20 +181,12 @@ export const eResourceActions = [
 
 export const superAdminActions = [
     {
-      title: 'Open Forms for New Year',
+      title: 'Survey Dates Management',
       href: '/admin/open-year',
       icon: CheckCircle,
       iconColor: 'text-green-600',
       iconBg: 'bg-green-100',
       description: `Open forms for year ${currentYear}. Creates new Library_Year records for all libraries, enabling them to submit survey data for the current year.`,
-    },
-    {
-      title: 'Survey Dates Management',
-      href: '/admin/survey-dates',
-      icon: Calendar,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-100',
-      description: 'Set opening and closing dates for surveys. Changes take effect immediately and appear on the Forms Management page.',
     },
     {
       title: 'Open/Close Annual Surveys',
