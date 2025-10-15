@@ -3,6 +3,8 @@
  * Handles automatic date calculations for the CEAL Statistics Database survey system
  */
 
+import { formatShortDate, formatDateWithWeekday, formatSimpleDate } from './dateFormatting';
+
 export interface SurveyDates {
   openingDate: Date;
   closingDate: Date;
@@ -56,21 +58,11 @@ export function getSurveyDates(
  * @returns Formatted date string
  */
 export function formatSurveyDate(date: Date, includeTime: boolean = false): string {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  };
-
   if (includeTime) {
-    options.hour = 'numeric';
-    options.minute = '2-digit';
-    options.timeZoneName = 'short';
+    // For dates with time, just show the date part with time text
+    return `${formatDateWithWeekday(date)} at 11:59 PM Pacific Time`;
   }
-
-  return date.toLocaleDateString('en-US', options);
+  return formatDateWithWeekday(date);
 }
 
 /**
@@ -80,21 +72,7 @@ export function formatSurveyDate(date: Date, includeTime: boolean = false): stri
  */
 export function formatFiscalYear(year: number): string {
   const dates = getSurveyDates(year);
-  
-  // Use UTC dates to avoid timezone conversion issues
-  const startMonth = dates.fiscalYearStart.toLocaleDateString('en-US', { 
-    month: 'long', 
-    day: 'numeric', 
-    year: 'numeric',
-    timeZone: 'UTC'
-  });
-  const endMonth = dates.fiscalYearEnd.toLocaleDateString('en-US', { 
-    month: 'long', 
-    day: 'numeric', 
-    year: 'numeric',
-    timeZone: 'UTC'
-  });
-  return `${startMonth} to ${endMonth}`;
+  return `${formatSimpleDate(dates.fiscalYearStart)} to ${formatSimpleDate(dates.fiscalYearEnd)}`;
 }
 
 /**
@@ -104,11 +82,13 @@ export function formatFiscalYear(year: number): string {
  */
 export function formatPublicationDate(year: number): string {
   const dates = getSurveyDates(year);
-  return dates.publicationDate.toLocaleDateString('en-US', { 
-    month: 'long', 
-    year: 'numeric',
+  const d = dates.publicationDate;
+  const month = d.toLocaleDateString('en-US', { 
+    month: 'long',
     timeZone: 'UTC'
   });
+  const pubYear = d.getUTCFullYear();
+  return `${month} ${pubYear}`;
 }
 
 /**
@@ -125,18 +105,10 @@ export function getShortDateRange(
 ): string {
   const dates = getSurveyDates(year, customOpeningDate, customClosingDate);
   
-  const openMonth = dates.openingDate.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
-    timeZone: 'UTC'
-  });
-  const closeMonth = dates.closingDate.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
-    timeZone: 'UTC'
-  });
+  const openMonth = formatShortDate(dates.openingDate).replace(/, \d{4}$/, ''); // Remove year
+  const closeMonth = formatShortDate(dates.closingDate);
   
-  return `${openMonth} - ${closeMonth}, ${year}`;
+  return `${openMonth} - ${closeMonth}`;
 }
 
 /**
