@@ -212,6 +212,43 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     }
   };
 
+  const openFormsManually = async () => {
+    if (!currentSession || !userRoles) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to open all forms for year ${currentSession.year}? This will allow all ${currentSession.totalLibraries} libraries to start editing their data immediately.`
+    );
+
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/manual-open-forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          year: currentSession.year,
+          userRoles
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to open forms');
+      }
+
+      const result = await response.json();
+      await checkCurrentSession();
+      alert(`✅ Successfully opened ${result.librariesOpened} libraries for year ${currentSession.year}!`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to open forms');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const closeSession = async () => {
     if (!currentSession || !userRoles) return;
 
@@ -354,27 +391,53 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
             <div className="text-sm text-gray-600">
               <strong>Last Updated:</strong> <LocalDateTime dateString={currentSession.lastUpdated} />
             </div>
-            {hasActiveSession && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <Button
-                  onClick={closeSession}
-                  disabled={loading}
-                  className="bg-red-700 hover:bg-red-800"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Closing...
-                    </>
-                  ) : (
-                    'Manually Close All Forms'
-                  )}
-                </Button>
-                <p className="text-xs text-red-600 mt-2">
-                  ⚠️ Warning: This will immediately prevent all libraries from editing their data.
-                </p>
-              </div>
-            )}
+            
+            {/* Manual Open/Close Buttons */}
+            <div className="mt-4 pt-4 border-t border-gray-200 flex gap-4">
+              {!hasActiveSession && currentSession.openLibraries === 0 && (
+                <div>
+                  <Button
+                    onClick={openFormsManually}
+                    disabled={loading}
+                    className="bg-green-700 hover:bg-green-800"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Opening...
+                      </>
+                    ) : (
+                      '🔓 Manually Open All Forms NOW'
+                    )}
+                  </Button>
+                  <p className="text-xs text-green-700 mt-2">
+                    ✅ Use this to open forms immediately without waiting for scheduled events
+                  </p>
+                </div>
+              )}
+              
+              {hasActiveSession && (
+                <div>
+                  <Button
+                    onClick={closeSession}
+                    disabled={loading}
+                    className="bg-red-700 hover:bg-red-800"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Closing...
+                      </>
+                    ) : (
+                      'Manually Close All Forms'
+                    )}
+                  </Button>
+                  <p className="text-xs text-red-600 mt-2">
+                    ⚠️ Warning: This will immediately prevent all libraries from editing their data.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
