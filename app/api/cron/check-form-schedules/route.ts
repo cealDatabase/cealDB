@@ -14,17 +14,44 @@ import { logUserAction } from '@/lib/auditLogger';
 const prisma = new PrismaClient();
 
 /**
- * Vercel Cron Job Handler
+ * Vercel Cron Job Handler - Automated Email & Form Status Management
  * Runs twice daily (8:00 AM and 8:00 PM UTC) to manage scheduled events
  * 
- * How it works:
- * 1. BROADCASTS (Backup Safety Net): Checks for pending broadcast events in case Resend's scheduledAt fails
- *    - Primary: Resend automatically sends broadcasts via scheduledAt parameter
- *    - Backup: This cron sends any missed broadcasts that are still pending
- * 2. FORM OPENING: Checks for sessions where opening date has passed but forms aren't open yet
- * 3. FORM CLOSING: Checks for sessions where closing date has passed but forms haven't been closed
- * 4. Updates Library_Year records and sends email notifications
- * 5. Marks events as completed to prevent duplicate actions
+ * ═══════════════════════════════════════════════════════════════
+ * EMAIL TYPES & DUPLICATE PREVENTION
+ * ═══════════════════════════════════════════════════════════════
+ * 
+ * 1. BROADCAST EMAILS (Sent ONCE per year when scheduled):
+ *    - Announces survey opening to all users via Resend audience list
+ *    - Primary method: Resend's scheduledAt sends automatically
+ *    - Backup method: This cron sends if Resend fails
+ *    - DUPLICATE PREVENTION:
+ *      • Only processes events with status='pending'
+ *      • Checks Library_Year.broadcast_sent=false before sending
+ *      • After sending: status='completed' AND broadcast_sent=true
+ *      • Will NEVER be sent again once marked complete
+ * 
+ * 2. ADMIN NOTIFICATION EMAILS (Sent ONCE per event):
+ *    - Forms Opened: Notifies super admins when forms open
+ *    - Forms Closed: Notifies super admins when forms close
+ *    - DUPLICATE PREVENTION:
+ *      • Only processes sessions with notifiedOnOpen=false or notifiedOnClose=false
+ *      • After sending: notifiedOnOpen=true or notifiedOnClose=true
+ *      • Will NEVER be sent again once marked
+ * 
+ * 3. USER NOTIFICATION EMAILS (Sent ONCE per event):
+ *    - Notifies users when forms open or close
+ *    - Same duplicate prevention as admin notifications
+ * 
+ * ═══════════════════════════════════════════════════════════════
+ * EXECUTION FLOW
+ * ═══════════════════════════════════════════════════════════════
+ * 
+ * STEP 1: Check for pending broadcasts (backup safety net)
+ * STEP 2: Check for sessions to open (send opening notifications)
+ * STEP 3: Check for sessions to close (send closing notifications)
+ * 
+ * All actions include audit logging and comprehensive error handling.
  */
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -61,13 +88,15 @@ export async function GET(request: NextRequest) {
     // ========================================
     // STEP 1: Check for PENDING BROADCASTS (Backup Safety Net)
     // ========================================
-    // This is a backup in case Resend's scheduledAt fails
-    // Primary method: Resend automatically sends via scheduledAt
-    // Backup method: This cron checks for missed broadcasts
+    // CRITICAL: This is a backup in case Resend's scheduledAt fails
+    // - Primary method: Resend automatically sends via scheduledAt parameter
+    // - Backup method: This cron sends any missed broadcasts
+    // - DUPLICATE PREVENTION: Only processes broadcasts with status='pending'
+    // - Once sent, status changes to 'completed' and will NEVER be sent again
     const pendingBroadcasts = await prisma.scheduledEvent.findMany({
       where: {
         event_type: 'BROADCAST',
-        status: 'pending',
+        status: 'pending', // CRITICAL: Only pending broadcasts
         scheduled_date: {
           lte: now // Scheduled date has passed
         }
@@ -75,8 +104,36 @@ export async function GET(request: NextRequest) {
     });
 
     console.log(`📧 Found ${pendingBroadcasts.length} pending broadcasts to check (backup safety net)`);
-
+    
+    // Additional safety check: Filter out broadcasts that were already sent
+    // This prevents duplicate sends if there's a database sync issue
+    const broadcastsToProcess = [];
     for (const event of pendingBroadcasts) {
+      const libraryYearCheck = await prisma.library_Year.findFirst({
+        where: { 
+          year: event.year,
+          broadcast_sent: true // Already marked as sent
+        }
+      });
+      
+      if (libraryYearCheck) {
+        console.log(`⚠️ DUPLICATE PREVENTED: Broadcast for year ${event.year} is pending but Library_Year shows broadcast_sent=true. Marking as completed without sending.`);
+        await prisma.scheduledEvent.update({
+          where: { id: event.id },
+          data: {
+            status: 'completed',
+            completed_at: new Date(),
+            notes: 'Marked completed - broadcast_sent was already true in Library_Year (duplicate prevented)'
+          }
+        });
+      } else {
+        broadcastsToProcess.push(event);
+      }
+    }
+
+    console.log(`📧 Processing ${broadcastsToProcess.length} broadcasts after duplicate check (prevented ${pendingBroadcasts.length - broadcastsToProcess.length} duplicates)`);
+
+    for (const event of broadcastsToProcess) {
       try {
         console.log(`📧 BACKUP: Sending missed broadcast for year ${event.year}`);
 
@@ -190,13 +247,13 @@ export async function GET(request: NextRequest) {
           console.log('✅ BACKUP broadcast sent immediately:', broadcast.data.id);
         }
 
-        // Mark broadcast_sent in Library_Year
+        // CRITICAL: Mark broadcast as sent - this prevents duplicate sends
         await prisma.library_Year.updateMany({
           where: { year: event.year },
           data: { broadcast_sent: true }
         });
 
-        // Mark event as completed
+        // CRITICAL: Mark event as completed - this ensures it will NEVER be sent again
         await prisma.scheduledEvent.update({
           where: { id: event.id },
           data: {
@@ -205,6 +262,8 @@ export async function GET(request: NextRequest) {
             notes: 'Sent by backup cron (Resend scheduledAt may have failed)'
           }
         });
+        
+        console.log(`✅ DUPLICATE PREVENTION: Broadcast for year ${event.year} marked as completed. It will NEVER be sent again.`);
 
         // Log the action
         await logUserAction(
@@ -217,7 +276,8 @@ export async function GET(request: NextRequest) {
             action: 'BROADCAST_SENT',
             broadcast_id: broadcast.data?.id,
             scheduled_date: event.scheduled_date.toISOString(),
-            sent_via: 'backup_cron'
+            sent_via: 'backup_cron',
+            duplicate_prevention: 'status=completed, broadcast_sent=true'
           },
           true,
           undefined,
@@ -235,13 +295,17 @@ export async function GET(request: NextRequest) {
     // ========================================
     // STEP 2: Check for sessions to OPEN
     // ========================================
+    // NOTE: These are FORM STATUS NOTIFICATIONS (not broadcasts)
+    // - User emails: Notify when forms are opened
+    // - Admin emails: Notify super admins of form opening
+    // - DUPLICATE PREVENTION: Only processes where notifiedOnOpen=false
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
         openingDate: {
           lte: now // Opening date has passed
         },
         isOpen: false, // Not currently open
-        notifiedOnOpen: false // Haven't sent notification yet
+        notifiedOnOpen: false // Haven't sent notification yet (DUPLICATE PREVENTION)
       }
     });
 
@@ -273,8 +337,10 @@ export async function GET(request: NextRequest) {
           closingDate: session.closingDate,
           recipientEmails: userEmails
         });
+        console.log(`✅ Sent form opening notification to ${userEmails.length} users`);
 
-        // Send admin notification
+        // IMPORTANT: Send super admin notification (SEPARATE from broadcast emails)
+        console.log(`📧 Sending form opening confirmation to ${adminEmails.length} super admins...`);
         await sendAdminFormsOpenedNotification(
           adminEmails,
           session.academicYear,
@@ -283,15 +349,17 @@ export async function GET(request: NextRequest) {
             totalLibraries: totalLibraries
           }
         );
+        console.log(`✅ Super admin notification sent successfully (ONE-TIME notification)`);
 
-        // Mark session as open and notified
+        // CRITICAL: Mark session as notified - prevents duplicate notifications
         await prisma.surveySession.update({
           where: { id: session.id },
           data: {
             isOpen: true,
-            notifiedOnOpen: true
+            notifiedOnOpen: true // DUPLICATE PREVENTION: Will never send again
           }
         });
+        console.log(`✅ DUPLICATE PREVENTION: Session ${session.academicYear} marked as notifiedOnOpen=true. Notification will NEVER be sent again.`);
 
         // Log the action
         await logUserAction(
@@ -319,15 +387,20 @@ export async function GET(request: NextRequest) {
     }
 
     // ========================================
-    // STEP 2: Check for sessions to CLOSE
+    // STEP 3: Check for sessions to CLOSE
     // ========================================
+    // NOTE: These are FORM CLOSURE NOTIFICATIONS (not broadcasts)
+    // - User emails: Notify when forms are closed
+    // - Admin emails: Notify super admins that forms are successfully closed
+    // - DUPLICATE PREVENTION: Only processes where notifiedOnClose=false
+    // - IMPORTANT: Super admin notifications SHOULD be sent when forms close
     const sessionsToClose = await prisma.surveySession.findMany({
       where: {
         closingDate: {
           lte: now // Closing date has passed
         },
         isOpen: true, // Currently open
-        notifiedOnClose: false // Haven't sent notification yet
+        notifiedOnClose: false // Haven't sent notification yet (DUPLICATE PREVENTION)
       }
     });
 
@@ -374,8 +447,10 @@ export async function GET(request: NextRequest) {
           closingDate: session.closingDate,
           recipientEmails: userEmails
         });
+        console.log(`✅ Sent form closure notification to ${userEmails.length} users`);
 
-        // Send admin notification AFTER verification that all forms are closed
+        // IMPORTANT: Send super admin notification AFTER verification that all forms are closed
+        // This is SEPARATE from broadcast emails and SHOULD be sent when forms close
         console.log(`📧 Sending VERIFIED closure confirmation to ${adminEmails.length} super admins...`);
         await sendAdminFormsClosedNotification(
           adminEmails,
@@ -385,16 +460,17 @@ export async function GET(request: NextRequest) {
             totalLibraries: totalLibraries
           }
         );
-        console.log(`✅ Super admin confirmation email sent successfully`);
+        console.log(`✅ Super admin confirmation email sent successfully (ONE-TIME notification)`);
 
-        // Mark session as closed and notified
+        // CRITICAL: Mark session as notified - prevents duplicate notifications
         await prisma.surveySession.update({
           where: { id: session.id },
           data: {
             isOpen: false,
-            notifiedOnClose: true
+            notifiedOnClose: true // DUPLICATE PREVENTION: Will never send again
           }
         });
+        console.log(`✅ DUPLICATE PREVENTION: Session ${session.academicYear} marked as notifiedOnClose=true. Notification will NEVER be sent again.`);
 
         // Log the action
         await logUserAction(
