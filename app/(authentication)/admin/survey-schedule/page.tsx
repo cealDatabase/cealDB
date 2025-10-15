@@ -83,10 +83,13 @@ export default function SurveySchedulePage() {
     setShowPreview(false)
 
     try {
-      // Create dates in UTC to preserve the exact calendar date selected
-      // Opening: 00:00:00 UTC, Closing: 23:59:59 UTC
-      const openDateTime = new Date(openingDate + 'T00:00:00Z').toISOString()
-      const closeDateTime = new Date(closingDate + 'T23:59:59Z').toISOString()
+      // Parse the date components and create UTC dates to preserve exact calendar date
+      const [openYear, openMonth, openDay] = openingDate.split('-').map(Number)
+      const [closeYear, closeMonth, closeDay] = closingDate.split('-').map(Number)
+      
+      // Create dates in UTC (months are 0-indexed)
+      const openDateTime = new Date(Date.UTC(openYear, openMonth - 1, openDay, 0, 0, 0)).toISOString()
+      const closeDateTime = new Date(Date.UTC(closeYear, closeMonth - 1, closeDay, 23, 59, 59)).toISOString()
 
       const response = await fetch('/api/admin/survey-sessions', {
         method: 'POST',
