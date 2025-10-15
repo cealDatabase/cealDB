@@ -108,24 +108,24 @@ export async function POST(request: NextRequest) {
 
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
-        <h2 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h2>
+        <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
         
         <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
         
         <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
         
-        <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
+        <div style="margin: 24px 0;">
+          <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
           <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Data Collection Period:</h3>
+          <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
           <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
         </div>
         
-        <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
-          <h3 style="color: #374151; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Accessing the Surveys:</h3>
+        <div style="margin: 24px 0;">
+          <h4 style="color: #374151; margin-top: 0; margin-bottom: 12px;">Accessing the Surveys:</h4>
           <p style="margin-bottom: 16px;">Visit the CEAL Statistics Database at <a href="https://cealstats.org/" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://cealstats.org/</a> to access the online survey forms and instructions.</p>
           
           <div style="background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px; margin: 16px 0;">
@@ -138,8 +138,8 @@ export async function POST(request: NextRequest) {
           <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
         </div>
         
-        <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h3>
+        <div style="margin: 24px 0;">
+          <h4 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h4>
           <p style="margin-bottom: 12px;">For questions about specific language resources, please contact:</p>
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 8px;"><strong>Chinese resources:</strong> Jian P. Lee – <a href="mailto:jlee37@uw.edu" style="color: #2563eb; text-decoration: none;">jlee37@uw.edu</a></li>
@@ -150,17 +150,12 @@ export async function POST(request: NextRequest) {
         </div>
         
         <div style="text-align: center; margin: 32px 0;">
-          <a href="https://cealstats.org/" 
-             style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">
-            Access Survey Forms
-          </a>
+          <a href="https://cealstats.org/" style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">Access Survey Forms</a>
         </div>
         
         <p style="margin-bottom: 8px;">Thank you for your continued participation and support!</p>
         
-        <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br>
-        Anlin Yang<br>
-        <em>(on behalf of the CEAL Statistics Committee)</em></p>
+        <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br/>Anlin Yang<br/><em>(on behalf of the CEAL Statistics Committee)</em></p>
         
         <div style="background-color: #f9fafb; padding: 16px; border-radius: 6px; margin: 24px 0;">
           <p style="margin: 0 0 8px 0; font-weight: 600; color: #374151;">Committee Members:</p>
@@ -172,7 +167,7 @@ export async function POST(request: NextRequest) {
           </ul>
         </div>
         
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
         <p style="font-size: 12px; color: #6b7280; text-align: center;">
           You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
         </p>
@@ -502,24 +497,24 @@ export async function GET(request: NextRequest) {
     // Generate preview template with new design
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
-        <h2 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h2>
+        <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
         
         <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
         
         <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
         
-        <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Reporting Period:</h3>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}-${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+        <div style="margin: 24px 0;">
+          <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Data Collection Period:</h3>
+          <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
           <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
         </div>
         
-        <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 24px 0;">
-          <h3 style="color: #374151; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Accessing the Surveys:</h3>
+        <div style="margin: 24px 0;">
+          <h4 style="color: #374151; margin-top: 0; margin-bottom: 12px;">Accessing the Surveys:</h4>
           <p style="margin-bottom: 16px;">Visit the CEAL Statistics Database at <a href="https://cealstats.org/" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://cealstats.org/</a> to access the online survey forms and instructions.</p>
           
           <div style="background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px; margin: 16px 0;">
@@ -532,8 +527,8 @@ export async function GET(request: NextRequest) {
           <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
         </div>
         
-        <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 24px 0;">
-          <h3 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h3>
+        <div style="margin: 24px 0;">
+          <h4 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h4>
           <p style="margin-bottom: 12px;">For questions about specific language resources, please contact:</p>
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 8px;"><strong>Chinese resources:</strong> Jian P. Lee – <a href="mailto:jlee37@uw.edu" style="color: #2563eb; text-decoration: none;">jlee37@uw.edu</a></li>
@@ -544,17 +539,12 @@ export async function GET(request: NextRequest) {
         </div>
         
         <div style="text-align: center; margin: 32px 0;">
-          <a href="https://cealstats.org/" 
-             style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">
-            Access Survey Forms
-          </a>
+          <a href="https://cealstats.org/" style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">Access Survey Forms</a>
         </div>
         
         <p style="margin-bottom: 8px;">Thank you for your continued participation and support!</p>
         
-        <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br>
-        Anlin Yang<br>
-        <em>(on behalf of the CEAL Statistics Committee)</em></p>
+        <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br/>Anlin Yang<br/><em>(on behalf of the CEAL Statistics Committee)</em></p>
         
         <div style="background-color: #f9fafb; padding: 16px; border-radius: 6px; margin: 24px 0;">
           <p style="margin: 0 0 8px 0; font-weight: 600; color: #374151;">Committee Members:</p>
@@ -566,7 +556,7 @@ export async function GET(request: NextRequest) {
           </ul>
         </div>
         
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
         <p style="font-size: 12px; color: #6b7280; text-align: center;">
           You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
         </p>
