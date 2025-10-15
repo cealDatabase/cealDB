@@ -1,13 +1,13 @@
-// {
-//   "$schema": "https://openapi.vercel.sh/vercel.json",
-//   "crons": [
-//     {
-//       "path": "/api/cron/check-form-schedules",
-//       "schedule": "0 8 * * *"
-//     },
-//     {
-//       "path": "/api/cron/check-form-schedules",
-//       "schedule": "0 20 * * *"
-//     }
-//   ]
-// }
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/check-form-schedules",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/check-form-schedules",
+      "schedule": "0 20 * * *"
+    }
+  ]
+}
