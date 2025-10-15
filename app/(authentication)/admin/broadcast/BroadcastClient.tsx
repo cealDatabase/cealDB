@@ -46,12 +46,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   const [step, setStep] = useState<'preview' | 'confirm' | 'success'>('preview');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Email and session data
   const [emailTemplate, setEmailTemplate] = useState('');
   const [scheduledSession, setScheduledSession] = useState<any>(null);
   const [sendImmediately, setSendImmediately] = useState(false); // NEW: Immediate vs Scheduled choice
-  
+
   // Current session data
   const [currentSession, setCurrentSession] = useState<FormSession | null>(null);
   const [hasActiveSession, setHasActiveSession] = useState(false);
@@ -72,12 +72,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
       // Load scheduled session from Session Queue (reads from Library_Year)
       const response = await fetch('/api/admin/pending-sessions');
       const data = await response.json();
-      
+
       if (data.success && data.sessions && data.sessions.length > 0) {
         // Get the first scheduled or active session
         const session = data.sessions[0];
         setScheduledSession(session);
-        
+
         // Auto-preview email for this session
         if (session.opening_date && session.closing_date) {
           await previewEmailForSession(session);
@@ -92,7 +92,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     try {
       const response = await fetch('/api/admin/form-session');
       const data = await response.json();
-      
+
       if (data.session) {
         setCurrentSession(data.session);
         setHasActiveSession(data.isOpen && data.session.openLibraries > 0);
@@ -107,9 +107,23 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     setError(null);
 
     try {
-      const openingDate = new Date(session.opening_date).toISOString().split('T')[0];
-      const closingDate = new Date(session.closing_date).toISOString().split('T')[0];
-      
+      // Extract UTC date to avoid timezone conversion issues
+      const extractUTCDate = (isoString: string): string => {
+        const date = new Date(isoString);
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const openingDate = extractUTCDate(session.opening_date);
+
+      // Subtract 1 day from closing date
+      const closingDateObj = new Date(session.closing_date);
+      closingDateObj.setUTCDate(closingDateObj.getUTCDate() - 1);
+      const closingDate = extractUTCDate(closingDateObj.toISOString());
+
+
       const response = await fetch(
         `/api/admin/broadcast?year=${session.year}&openingDate=${openingDate}&closingDate=${closingDate}`,
         { method: 'GET' }
@@ -149,8 +163,19 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     setError(null);
 
     try {
-      const openingDate = new Date(scheduledSession.opening_date).toISOString().split('T')[0];
-      const closingDate = new Date(scheduledSession.closing_date).toISOString().split('T')[0];
+      // Extract UTC date to avoid timezone conversion issues
+      const extractUTCDate = (isoString: string): string => {
+        const date = new Date(isoString);
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const openingDate = extractUTCDate(scheduledSession.opening_date);
+      const closingDateObj = new Date(scheduledSession.closing_date);
+      closingDateObj.setUTCDate(closingDateObj.getUTCDate() - 1);
+      const closingDate = extractUTCDate(closingDateObj.toISOString());
 
       // Send broadcast using Resend Broadcast API
       const response = await fetch('/api/admin/broadcast', {
@@ -175,11 +200,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
 
       console.log('✅ Broadcast sent successfully:', data);
       setStep('success');
-      
+
       // Refresh session data
       await checkCurrentSession();
       await loadScheduledSession();
-      
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to send broadcast');
     } finally {
@@ -272,7 +297,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               <BreadcrumbSeparator>
                 <SlashIcon />
               </BreadcrumbSeparator>
-              
+
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link href="/admin" className="no-underline">Admin</Link>
@@ -281,7 +306,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               <BreadcrumbSeparator>
                 <SlashIcon />
               </BreadcrumbSeparator>
-              
+
               <BreadcrumbItem>
                 <BreadcrumbPage>Open/Close Annual Surveys</BreadcrumbPage>
               </BreadcrumbItem>
@@ -331,7 +356,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
             </div>
             {hasActiveSession && (
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <Button 
+                <Button
                   onClick={closeSession}
                   disabled={loading}
                   className="bg-red-700 hover:bg-red-800"
@@ -363,8 +388,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
 
 
         {/* Enhanced Session Queue */}
-        <EnhancedSessionQueue 
-          userRoles={userRoles} 
+        <EnhancedSessionQueue
+          userRoles={userRoles}
           onEventDeleted={() => {
             // Refresh current session status when an event is deleted
             checkCurrentSession();
@@ -393,13 +418,17 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               ) : (
                 <>
                   <h2 className="text-xl font-semibold mb-4">Broadcast Email Preview</h2>
-                  
+
                   <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <h3 className="font-semibold text-blue-900 mb-2">Scheduled Session Details:</h3>
                     <div className="text-sm text-blue-800 space-y-1">
                       <p><strong>Year:</strong> {scheduledSession.year}</p>
-                      <p><strong>Opens:</strong> <LocalDateTime dateString={scheduledSession.opening_date} /></p>
-                      <p><strong>Closes:</strong> <LocalDateTime dateString={scheduledSession.closing_date} /></p>
+                      <p><strong>Opens:</strong> {new Date(scheduledSession.opening_date).toLocaleDateString('en-US', {
+                        timeZone: "America/New_York"
+                      })}</p>
+                      <p><strong>Closes:</strong> {new Date(scheduledSession.closing_date).toLocaleDateString('en-US', {
+                        timeZone: "America/Los_Angeles"
+                      })}</p>
                       <p><strong>Status:</strong> {scheduledSession.status}</p>
                     </div>
                   </div>
@@ -426,7 +455,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   )}
 
                   <div className="flex gap-4">
-                    <Button 
+                    <Button
                       onClick={() => setStep('confirm')}
                       disabled={!emailTemplate}
                       className="flex-1 bg-blue-600 hover:bg-blue-700"
@@ -434,7 +463,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       Continue to Send Broadcast
                       <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
                     </Button>
-                    <Button 
+                    <Button
                       onClick={refreshEmailPreview}
                       disabled={loading}
                       className="bg-gray-500 hover:bg-gray-600"
@@ -451,7 +480,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
           {step === 'confirm' && scheduledSession && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Choose When to Send Broadcast</h2>
-              
+
               {/* NEW: Send Timing Choice */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -459,13 +488,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 </label>
                 <div className="space-y-3">
                   {/* Option 1: Send Immediately */}
-                  <div 
+                  <div
                     onClick={() => setSendImmediately(true)}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      sendImmediately 
-                        ? 'border-green-500 bg-green-50' 
-                        : 'border-gray-300 hover:border-green-300 bg-white'
-                    }`}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${sendImmediately
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-300 hover:border-green-300 bg-white'
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <input
@@ -484,13 +512,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   </div>
 
                   {/* Option 2: Schedule for Later */}
-                  <div 
+                  <div
                     onClick={() => setSendImmediately(false)}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      !sendImmediately 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-300 hover:border-blue-300 bg-white'
-                    }`}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${!sendImmediately
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-300 hover:border-blue-300 bg-white'
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <input
@@ -502,7 +529,9 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       <div className="flex-1">
                         <div className="font-bold text-gray-900">📅 Schedule for Opening Date</div>
                         <div className="text-sm text-gray-600 mt-1">
-                          Broadcast will be sent automatically on <strong><LocalDateTime dateString={scheduledSession.opening_date} /></strong> when forms open.
+                          Broadcast will be sent automatically on <strong>{new Date(scheduledSession.opening_date).toLocaleDateString('en-US', {
+                            timeZone: "America/Los_Angeles"
+                          })}</strong> when forms open.
                         </div>
                       </div>
                     </div>
@@ -525,13 +554,17 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} dateOnly={true} /> at <strong>12:00 AM PT</strong>
+                      <strong>Opening:</strong> {new Date(scheduledSession.opening_date).toLocaleDateString('en-US', {
+                        timeZone: "America/Los_Angeles"
+                      })} at <strong>12:00 AM PT</strong>
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at <strong>11:59 PM PT</strong>
+                      <strong>Closing:</strong> {new Date(scheduledSession.closing_date).toLocaleDateString('en-US', {
+                        timeZone: "America/Los_Angeles"
+                      })} at <strong>11:59 PM PT</strong>
                     </span>
                   </li>
                 </ul>
@@ -580,7 +613,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               )}
 
               <div className="flex gap-4">
-                <Button 
+                <Button
                   onClick={sendBroadcast}
                   disabled={loading}
                   className={`flex-1 ${sendImmediately ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
@@ -597,7 +630,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                     </>
                   )}
                 </Button>
-                <Button 
+                <Button
                   onClick={() => setStep('preview')}
                   disabled={loading}
                   className="bg-gray-500 hover:bg-gray-600"
@@ -620,13 +653,13 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   {sendImmediately ? '✅ Broadcast Sent & Forms Opened!' : '✅ Events Scheduled Successfully!'}
                 </h2>
                 <p className="text-gray-700 text-lg mb-2">
-                  {sendImmediately 
+                  {sendImmediately
                     ? `Broadcast email has been sent to all CEAL members and forms are now open for year ${scheduledSession.year}.`
                     : `Three separate events have been scheduled for year ${scheduledSession.year}.`
                   }
                 </p>
                 <p className="text-gray-600">
-                  {sendImmediately 
+                  {sendImmediately
                     ? 'Forms will automatically close on the scheduled closing date.'
                     : 'All events will happen automatically on the scheduled dates. Each can be cancelled individually in the Session Queue.'}
                 </p>
@@ -682,7 +715,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                     Return to Admin Guide
                   </Button>
                 </Link>
-                <Button 
+                <Button
                   onClick={resetForm}
                   className="bg-gray-500 hover:bg-gray-600"
                 >

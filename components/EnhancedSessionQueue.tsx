@@ -1,21 +1,20 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  Clock, 
-  Calendar, 
-  CheckCircle, 
-  AlertCircle, 
-  Loader2, 
-  ChevronDown, 
-  ChevronUp, 
+import {
+  Clock,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
   Trash2,
   Mail,
   FolderOpen,
   FolderClosed,
   XCircle
 } from 'lucide-react'
-import { LocalDateTime } from '@/components/LocalDateTime'
 
 interface ScheduledEvent {
   id: number;
@@ -127,10 +126,10 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
       }
 
       console.log('✅ Event cancelled:', data);
-      
+
       // Refresh all data
       await fetchAllData();
-      
+
       // Call callback if provided
       if (onEventDeleted) {
         onEventDeleted();
@@ -174,10 +173,10 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
       }
 
       console.log('✅ Session deleted:', data);
-      
+
       // Refresh all data
       await fetchAllData();
-      
+
       // Call callback if provided
       if (onEventDeleted) {
         onEventDeleted();
@@ -195,7 +194,7 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
   const getEventIcon = (eventType: string, status: string) => {
     if (status === 'completed') return <CheckCircle className="w-5 h-5 text-green-600" />;
     if (status === 'cancelled') return <XCircle className="w-5 h-5 text-gray-600" />;
-    
+
     switch (eventType) {
       case 'BROADCAST':
         return <Mail className="w-5 h-5 text-blue-600" />;
@@ -211,7 +210,7 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
   const getEventColor = (eventType: string, status: string) => {
     if (status === 'completed') return 'bg-green-50 border-green-200 text-green-700';
     if (status === 'cancelled') return 'bg-gray-50 border-gray-200 text-gray-500';
-    
+
     switch (eventType) {
       case 'BROADCAST':
         return 'bg-blue-50 border-blue-200 text-blue-700';
@@ -281,8 +280,8 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
     );
   }
 
-  const pendingCount = events.filter(e => e.status === 'pending').length + 
-                        librarySessions.filter(s => s.status === 'scheduled' || s.status === 'active').length;
+  const pendingCount = events.filter(e => e.status === 'pending').length +
+    librarySessions.filter(s => s.status === 'scheduled' || s.status === 'active').length;
   const completedCount = events.filter(e => e.status === 'completed').length;
   const totalCount = events.length + librarySessions.length;
 
@@ -302,7 +301,7 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
   return (
     <div className="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
       {/* Header with expand/collapse */}
-      <div 
+      <div
         className="p-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -334,21 +333,19 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
           <div className="mb-4 flex gap-2">
             <button
               onClick={() => setStatusFilter('pending')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                statusFilter === 'pending'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${statusFilter === 'pending'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
             >
               Pending Only
             </button>
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${statusFilter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
             >
               All Events
             </button>
@@ -357,17 +354,16 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
           {/* Library Year Sessions */}
           {librarySessions.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Survey Sessions (via Survey Dates Management)</h3>
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Survey Sessions</h3>
               {librarySessions.map((session) => (
                 <div
                   key={`session-${session.year}`}
-                  className={`border rounded-lg p-4 ${
-                    session.status === 'active' 
-                      ? 'bg-green-50 border-green-200 text-green-700'
-                      : session.status === 'scheduled'
+                  className={`border rounded-lg p-4 ${session.status === 'active'
+                    ? 'bg-green-50 border-green-200 text-green-700'
+                    : session.status === 'scheduled'
                       ? 'bg-blue-50 border-blue-200 text-blue-700'
                       : 'bg-gray-50 border-gray-200 text-gray-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -381,16 +377,15 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       {/* Status badge */}
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        session.status === 'active'
-                          ? 'bg-green-600 text-white'
-                          : session.status === 'scheduled'
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${session.status === 'active'
+                        ? 'bg-green-600 text-white'
+                        : session.status === 'scheduled'
                           ? 'bg-blue-600 text-white'
                           : 'bg-gray-400 text-white'
-                      }`}>
+                        }`}>
                         {session.status === 'active' ? 'Active' : session.status === 'scheduled' ? 'Scheduled' : 'Closed'}
                       </span>
 
@@ -420,12 +415,14 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
                   </div>
 
                   {/* Date details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-current opacity-30">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-current opacity-70">
                     {session.opening_date && (
                       <div className="text-sm">
                         <div className="font-medium opacity-75 mb-1">Opening Date</div>
                         <div className="font-semibold">
-                          <LocalDateTime dateString={session.opening_date.toString()} />
+                          {new Date(session.opening_date).toLocaleDateString('en-US', {
+                            timeZone: "America/New_York"
+                          })}
                         </div>
                       </div>
                     )}
@@ -433,7 +430,9 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
                       <div className="text-sm">
                         <div className="font-medium opacity-75 mb-1">Closing Date</div>
                         <div className="font-semibold">
-                          <LocalDateTime dateString={session.closing_date.toString()} />
+                          {new Date(session.closing_date).toLocaleDateString('en-US', {
+                            timeZone: "America/Los_Angeles"
+                          })}
                         </div>
                       </div>
                     )}
@@ -450,99 +449,102 @@ export default function EnhancedSessionQueue({ userRoles, onEventDeleted }: Enha
               {Object.entries(eventsByYear)
                 .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
                 .map(([year, yearEvents]) => (
-              <div key={year}>
-                <h3 className="text-lg font-bold mb-3 text-gray-700">
-                  Academic Year {year}
-                </h3>
-                <div className="space-y-2">
-                  {yearEvents
-                    .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
-                    .map((event) => (
-                    <div
-                      key={event.id}
-                      className={`border rounded-lg p-4 ${getEventColor(event.event_type, event.status)}`}
-                    >
-                      {/* Event header */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          {getEventIcon(event.event_type, event.status)}
-                          <div>
-                            <div className="font-bold">
-                              {getEventLabel(event.event_type)}
+                  <div key={year}>
+                    <h3 className="text-lg font-bold mb-3 text-gray-700">
+                      Academic Year {year}
+                    </h3>
+                    <div className="space-y-2">
+                      {yearEvents
+                        .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+                        .map((event) => (
+                          <div
+                            key={event.id}
+                            className={`border rounded-lg p-4 ${getEventColor(event.event_type, event.status)}`}
+                          >
+                            {/* Event header */}
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-3">
+                                {getEventIcon(event.event_type, event.status)}
+                                <div>
+                                  <div className="font-bold">
+                                    {getEventLabel(event.event_type)}
+                                  </div>
+                                  <div className="text-sm opacity-75">
+                                    Scheduled: {new Date(event.scheduled_date).toLocaleDateString('en-US', {
+                                      weekday: 'long',
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Status and actions */}
+                              <div className="flex items-center gap-2">
+                                {getStatusBadge(event.status)}
+
+                                {/* Countdown badge for pending events */}
+                                {event.status === 'pending' && event.days_until !== null && event.days_until !== undefined && (
+                                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${event.is_overdue
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-blue-600 text-white'
+                                    }`}>
+                                    {event.is_overdue
+                                      ? `${Math.abs(event.days_until || 0)} day${Math.abs(event.days_until || 0) !== 1 ? 's' : ''} overdue`
+                                      : `In ${event.days_until} day${event.days_until !== 1 ? 's' : ''}`
+                                    }
+                                  </div>
+                                )}
+
+                                {/* Cancel button - only for pending events */}
+                                {isSuperAdmin && event.status === 'pending' && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCancelEvent(event.id, event.event_type, event.year);
+                                    }}
+                                    disabled={deletingEventId === event.id}
+                                    className="p-2 rounded-lg hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="Cancel this scheduled event"
+                                  >
+                                    {deletingEventId === event.id ? (
+                                      <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="w-5 h-5" />
+                                    )}
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                            <div className="text-sm opacity-75">
-                              Scheduled: {new Date(event.scheduled_date).toLocaleDateString('en-US', { 
-                                weekday: 'long', 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
-                              })}
-                            </div>
+
+                            {/* Event notes */}
+                            {event.notes && (
+                              <div className="mt-2 text-sm opacity-75 italic">
+                                Note: {event.notes}
+                              </div>
+                            )}
+
+                            {/* Completion/Cancellation timestamps */}
+                            {event.completed_at && (
+                              <div className="mt-2 text-xs opacity-60">
+                                Completed:  {new Date(event.completed_at).toLocaleDateString('en-US', {
+                                  timeZone: "America/New_York"
+                                })}
+                              </div>
+                            )}
+                            {event.cancelled_at && (
+                              <div className="mt-2 text-xs opacity-60">
+                                Cancelled: {new Date(event.cancelled_at).toLocaleDateString('en-US', {
+                                  timeZone: "America/New_York"
+                                })}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                        
-                        {/* Status and actions */}
-                        <div className="flex items-center gap-2">
-                          {getStatusBadge(event.status)}
-                          
-                          {/* Countdown badge for pending events */}
-                          {event.status === 'pending' && event.days_until !== null && event.days_until !== undefined && (
-                            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              event.is_overdue 
-                                ? 'bg-red-600 text-white' 
-                                : 'bg-blue-600 text-white'
-                            }`}>
-                              {event.is_overdue 
-                                ? `${Math.abs(event.days_until || 0)} day${Math.abs(event.days_until || 0) !== 1 ? 's' : ''} overdue` 
-                                : `In ${event.days_until} day${event.days_until !== 1 ? 's' : ''}`
-                              }
-                            </div>
-                          )}
-                          
-                          {/* Cancel button - only for pending events */}
-                          {isSuperAdmin && event.status === 'pending' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCancelEvent(event.id, event.event_type, event.year);
-                              }}
-                              disabled={deletingEventId === event.id}
-                              className="p-2 rounded-lg hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Cancel this scheduled event"
-                            >
-                              {deletingEventId === event.id ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                              ) : (
-                                <Trash2 className="w-5 h-5" />
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Event notes */}
-                      {event.notes && (
-                        <div className="mt-2 text-sm opacity-75 italic">
-                          Note: {event.notes}
-                        </div>
-                      )}
-
-                      {/* Completion/Cancellation timestamps */}
-                      {event.completed_at && (
-                        <div className="mt-2 text-xs opacity-60">
-                          Completed: <LocalDateTime dateString={event.completed_at.toString()} />
-                        </div>
-                      )}
-                      {event.cancelled_at && (
-                        <div className="mt-2 text-xs opacity-60">
-                          Cancelled: <LocalDateTime dateString={event.cancelled_at.toString()} />
-                        </div>
-                      )}
+                        ))}
                     </div>
-                  ))}
-                </div>
-                </div>
-              ))}
+                  </div>
+                ))}
             </div>
           )}
         </div>

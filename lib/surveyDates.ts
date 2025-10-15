@@ -29,11 +29,29 @@ export function getSurveyDates(
   const pastYear = year - 1;
   const nextYear = year + 1;
 
-  // Default opening date: October 1, current year
+  // Helper function to convert date string to Pacific Time midnight
+  const toPacificMidnight = (dateInput: Date | string): Date => {
+    const dateStr = typeof dateInput === 'string' ? dateInput : dateInput.toISOString().split('T')[0];
+    const [y, m, d] = dateStr.split('-').map(Number);
+    // Create date at midnight Pacific Time by adding 7 or 8 hours to UTC
+    // Use 8 hours (PST) as default - this ensures the date stays correct year-round
+    return new Date(Date.UTC(y, m - 1, d, 8, 0, 0));
+  };
+
+  // Helper function to convert date string to Pacific Time 11:59 PM
+  const toPacificEndOfDay = (dateInput: Date | string): Date => {
+    const dateStr = typeof dateInput === 'string' ? dateInput : dateInput.toISOString().split('T')[0];
+    const [y, m, d] = dateStr.split('-').map(Number);
+    // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
+    // Example: 12/19 11:59 PM PST = 12/20 7:59 AM UTC
+    return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
+  };
+
+  // Default opening date: October 1, current year at 12:00 AM Pacific
   const defaultOpening = new Date(Date.UTC(currentYear, 9, 1, 7, 0, 0)); // Oct 1, 12:00 AM Pacific (UTC-7)
   
-  // Default closing date: December 1, current year at 11:59 PM Pacific
-  const defaultClosing = new Date(Date.UTC(currentYear, 11, 2, 6, 59, 0)); // Dec 1, 11:59 PM Pacific (UTC-8)
+  // Default closing date: December 2, current year at 11:59 PM Pacific
+  const defaultClosing = new Date(Date.UTC(currentYear, 11, 2, 6, 59, 0)); // Dec 2, 11:59 PM Pacific (UTC-8)
 
   // Fiscal year period (FIXED - not customizable)
   const fiscalStart = new Date(Date.UTC(pastYear, 6, 1, 0, 0, 0)); // July 1, past year
@@ -43,8 +61,8 @@ export function getSurveyDates(
   const publication = new Date(Date.UTC(nextYear, 1, 1, 0, 0, 0)); // February 1, next year
 
   return {
-    openingDate: customOpeningDate ? new Date(customOpeningDate) : defaultOpening,
-    closingDate: customClosingDate ? new Date(customClosingDate) : defaultClosing,
+    openingDate: customOpeningDate ? toPacificMidnight(customOpeningDate) : defaultOpening,
+    closingDate: customClosingDate ? toPacificEndOfDay(customClosingDate) : defaultClosing,
     fiscalYearStart: fiscalStart,
     fiscalYearEnd: fiscalEnd,
     publicationDate: publication,
@@ -52,15 +70,15 @@ export function getSurveyDates(
 }
 
 /**
- * Format date for display
+ * Format date for display in Pacific Time
  * @param date - Date to format
  * @param includeTime - Whether to include time
- * @returns Formatted date string
+ * @returns Formatted date string in Pacific Time
  */
 export function formatSurveyDate(date: Date, includeTime: boolean = false): string {
   if (includeTime) {
-    // For dates with time, just show the date part with time text
-    return `${formatDateWithWeekday(date)} at 11:59 PM Pacific Time`;
+    // For dates with time, show the date part with time text in Pacific Time
+    return `${formatDateWithWeekday(date)} at 11:59 PM Pacific`;
   }
   return formatDateWithWeekday(date);
 }
@@ -76,19 +94,18 @@ export function formatFiscalYear(year: number): string {
 }
 
 /**
- * Format publication date for display
+ * Format publication date for display in Pacific Time
  * @param year - Academic year
  * @returns Formatted publication date string (e.g., "February 2026")
  */
 export function formatPublicationDate(year: number): string {
   const dates = getSurveyDates(year);
   const d = dates.publicationDate;
-  const month = d.toLocaleDateString('en-US', { 
+  return d.toLocaleDateString('en-US', { 
     month: 'long',
-    timeZone: 'UTC'
+    year: 'numeric',
+    timeZone: 'America/Los_Angeles'
   });
-  const pubYear = d.getUTCFullYear();
-  return `${month} ${pubYear}`;
 }
 
 /**

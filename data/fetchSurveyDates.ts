@@ -56,6 +56,7 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
     
     // Return default calculated dates on error
     const surveyDates = getSurveyDates(currentYear);
+    
     return {
       year: currentYear,
       shortDateRange: getShortDateRange(currentYear),

@@ -23,9 +23,20 @@ export async function POST(request: NextRequest) {
 
     console.log(`📧 Broadcast mode: ${sendImmediately ? "IMMEDIATE" : "SCHEDULED"}`)
 
-    // Use dates directly as provided - they are already in correct UTC format
-    const openDate = new Date(openingDate)
-    const closeDate = new Date(closingDate)
+    // Convert dates to Pacific Time to prevent timezone issues
+    const toPacificMidnight = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
+    };
+    
+    const toPacificEndOfDay = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
+      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
+    };
+
+    const openDate = toPacificMidnight(openingDate)
+    const closeDate = toPacificEndOfDay(closingDate)
 
     console.log("📅 Date Summary:")
     console.log("  Opening:", openingDate, "→", openDate.toISOString())
@@ -102,6 +113,20 @@ export async function POST(request: NextRequest) {
     // Calculate fiscal year dates for the email
     const reportingYearEnd = new Date(Number.parseInt(year), 9, 1) // October 1 of next year
 
+    const formattedOpenDate = new Date(openDate).toLocaleDateString('en-US', {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+    const formattedCloseDate = new Date(closeDate).toLocaleDateString('en-US', {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
         <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
@@ -118,7 +143,7 @@ export async function POST(request: NextRequest) {
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
           <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formatDateRange(openDate, closeDate)} (11:59 p.m. Pacific Time)</strong>.</p>
+          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formattedOpenDate} through ${formattedCloseDate} (11:59 PM Pacific Time)</strong>.</p>
         </div>
         
         <div style="margin: 24px 0;">
@@ -421,7 +446,7 @@ export async function POST(request: NextRequest) {
     )
 
     const responseMessage = sendImmediately
-      ? `Broadcast sent immediately and ${updateResult.count} libraries opened for year ${year}. Forms will automatically close on ${formatDateWithWeekday(closeDate)} at 11:59 PM Pacific Time.`
+      ? `Broadcast sent immediately and ${updateResult.count} libraries opened for year ${year}. Forms will automatically close on ${formatDateWithWeekday(closeDate)} at 11:59 PM UTC.`
       : `Session scheduled for year ${year}. Three separate events created: 1) Broadcast email, 2) Form opening, 3) Form closing. All events can be managed individually in the Session Queue. ${updateResult.count} libraries scheduled.`
 
     return NextResponse.json({
@@ -482,14 +507,39 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Use dates directly as provided
-    const openDate = new Date(openingDate)
-    const closeDate = new Date(closingDate)
+    // Convert dates to Pacific Time to prevent timezone issues
+    const toPacificMidnight = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
+    };
+    
+    const toPacificEndOfDay = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
+      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
+    };
+
+    const openDate = toPacificMidnight(openingDate)
+    const closeDate = toPacificEndOfDay(closingDate)
 
     // Calculate fiscal year dates
     const fiscalYearStart = new Date(Number.parseInt(year) - 1, 6, 1) // July 1
     const fiscalYearEnd = new Date(Number.parseInt(year), 5, 30) // June 30 of next year
     const reportingYearEnd = new Date(Number.parseInt(year), 9, 1) // October 1 of next year
+
+    const formattedOpenDate = new Date(openDate).toLocaleDateString('en-US', {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+    const formattedCloseDate = new Date(closeDate).toLocaleDateString('en-US', {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
 
     // Generate preview template with new design
     const emailTemplate = `
@@ -509,7 +559,7 @@ export async function GET(request: NextRequest) {
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
           <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formatDateRange(openDate, closeDate)} (11:59 p.m. Pacific Time)</strong>.</p>
+          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formattedOpenDate} through ${formattedCloseDate} (11:59 PM Pacific Time)</strong>.</p>
         </div>
         
         <div style="margin: 24px 0;">

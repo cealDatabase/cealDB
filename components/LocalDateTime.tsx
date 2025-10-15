@@ -24,12 +24,12 @@ export function LocalDateTime({ dateString, className, dateOnly = false }: Local
         return;
       }
       
-      // Format with Pacific Time (America/Los_Angeles)
+      // Format with UTC timezone
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',
-        timeZone: 'America/Los_Angeles',
+        timeZone: 'UTC',
       };
       
       // Add time components if not dateOnly

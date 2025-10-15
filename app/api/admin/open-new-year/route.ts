@@ -1,7 +1,6 @@
 // /app/api/admin/open-new-year/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { convertToPacificTime } from "@/lib/timezoneUtils";
 
 export async function POST(req: Request) {
   try {
@@ -23,11 +22,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // Convert dates to Pacific Time
-    const openDate = convertToPacificTime(openingDate, false); // Midnight PT
-    const closeDate = convertToPacificTime(closingDate, true);  // 11:59:59 PM PT
+    // Convert dates to Pacific Time to prevent timezone issues
+    // Input "2025-10-15" should be Oct 15 at 12:00 AM Pacific, not UTC midnight
+    const toPacificMidnight = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
+    };
+    
+    const toPacificEndOfDay = (dateStr: string): Date => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
+      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
+    };
 
-    console.log('📅 Date Conversion (Pacific Time):');
+    const openDate = toPacificMidnight(openingDate);
+    const closeDate = toPacificEndOfDay(closingDate);
+
+    console.log('📅 Date Summary:');
     console.log('  Opening:', openingDate, '→', openDate.toISOString());
     console.log('  Closing:', closingDate, '→', closeDate.toISOString());
 

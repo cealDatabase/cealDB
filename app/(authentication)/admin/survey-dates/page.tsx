@@ -104,13 +104,23 @@ export default function OpenYearPage() {
                     const data = await response.json();
                     console.log('📅 Fetched current dates:', data);
                     
-                    // Extract and format dates
+                    // Extract and format dates - convert from UTC to Pacific date
                     if (data.success && data.dates) {
+                        // Helper to extract date portion from ISO string in UTC
+                        const extractUTCDate = (isoString: string): string => {
+                            const date = new Date(isoString);
+                            // Get UTC date components
+                            const year = date.getUTCFullYear();
+                            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+                            const day = String(date.getUTCDate()).padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        };
+                        
                         const openDate = data.dates.openingDate 
-                            ? new Date(data.dates.openingDate).toISOString().split('T')[0]
+                            ? extractUTCDate(data.dates.openingDate)
                             : `${year}-10-01`;
                         const closeDate = data.dates.closingDate
-                            ? new Date(data.dates.closingDate).toISOString().split('T')[0]
+                            ? extractUTCDate(data.dates.closingDate)
                             : `${year}-12-02`;
                         
                         setCurrentDates({
@@ -191,22 +201,32 @@ export default function OpenYearPage() {
                                         <div className="bg-white/70 rounded-lg p-4 border border-emerald-200">
                                             <p className="text-xs text-emerald-700 font-semibold mb-1">OPENING DATE</p>
                                             <p className="text-2xl font-bold text-emerald-900">
-                                                {new Date(currentDates.opening_date + 'T00:00:00').toLocaleDateString('en-US', { 
-                                                    month: 'short', 
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
+                                                {(() => {
+                                                    if (!currentDates.opening_date) return 'N/A';
+                                                    const [y, m, d] = currentDates.opening_date.split('-').map(Number);
+                                                    const date = new Date(y, m - 1, d);
+                                                    return date.toLocaleDateString('en-US', { 
+                                                        month: 'short', 
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    });
+                                                })()}
                                             </p>
                                             <p className="text-xs text-emerald-600 mt-1">12:00 AM Pacific Time</p>
                                         </div>
                                         <div className="bg-white/70 rounded-lg p-4 border border-blue-200">
                                             <p className="text-xs text-blue-700 font-semibold mb-1">CLOSING DATE</p>
                                             <p className="text-2xl font-bold text-blue-900">
-                                                {new Date(currentDates.closing_date + 'T00:00:00').toLocaleDateString('en-US', { 
-                                                    month: 'short', 
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
+                                                {(() => {
+                                                    if (!currentDates.closing_date) return 'N/A';
+                                                    const [y, m, d] = currentDates.closing_date.split('-').map(Number);
+                                                    const date = new Date(y, m - 1, d-2);
+                                                    return date.toLocaleDateString('en-US', { 
+                                                        month: 'short', 
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    });
+                                                })()}
                                             </p>
                                             <p className="text-xs text-blue-600 mt-1">11:59 PM Pacific Time</p>
                                         </div>
@@ -274,9 +294,13 @@ export default function OpenYearPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Opening Date *
-                                        {currentDates?.isStoredInDatabase && (
+                                        {currentDates?.isStoredInDatabase && currentDates.opening_date && (
                                             <span className="ml-2 text-xs text-emerald-600 font-normal">
-                                                (Current: {new Date(currentDates.opening_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                                (Current: {(() => {
+                                                    const [y, m, d] = currentDates.opening_date.split('-').map(Number);
+                                                    const date = new Date(y, m - 1, d);
+                                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                                })()})
                                             </span>
                                         )}
                                     </label>
@@ -292,9 +316,13 @@ export default function OpenYearPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Closing Date *
-                                        {currentDates?.isStoredInDatabase && (
+                                        {currentDates?.isStoredInDatabase && currentDates.closing_date && (
                                             <span className="ml-2 text-xs text-blue-600 font-normal">
-                                                (Current: {new Date(currentDates.closing_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                                (Current: {(() => {
+                                                    const [y, m, d] = currentDates.closing_date.split('-').map(Number);
+                                                    const date = new Date(y, m - 1, d);
+                                                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                                })()})
                                             </span>
                                         )}
                                     </label>
