@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
         </div>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
-        <p style="font-size: 12px; color: #6b7280; text-align: center;">
+        <p style="font-size: 12px; color: #6b7280; text-align: left;">
           You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
         </p>
       </div>
@@ -558,7 +558,7 @@ export async function GET(request: NextRequest) {
         </div>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
-        <p style="font-size: 12px; color: #6b7280; text-align: center;">
+        <p style="font-size: 12px; color: #6b7280; text-align: left;">
           You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
         </p>
       </div>
