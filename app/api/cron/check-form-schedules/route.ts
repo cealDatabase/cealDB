@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
             
             <div style="margin: 24px 0;">
               <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
-              <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${event.year - 1}–${event.year}</strong>, defined as the most recent 12-month period ending before Oct 1 ${event.year}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
+              <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${event.year - 1}–${event.year}</strong>, defined as the most recent 12-month period ending before October 1, ${event.year}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
               July 1, ${event.year - 1} through June 30, ${event.year}
               </strong>.</p>
             </div>
