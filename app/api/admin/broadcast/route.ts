@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
         // Step 1: Create the broadcast (saves as draft)
         broadcast = await resend.broadcasts.create({
           audienceId: audienceId,
-          from: "CEAL Database <noreply@cealstats.org>",
+          from: "CEAL Statistics Database <noreply@cealstats.org>",
           subject: `CEAL Statistics Online Surveys Are Now Open`,
           html: emailTemplate,
         })
@@ -311,7 +311,7 @@ export async function POST(request: NextRequest) {
         // Create broadcast with schedule time (TypeScript workaround)
         const broadcastOptions: any = {
           audienceId: audienceId,
-          from: "CEAL Database <noreply@cealstats.org>",
+          from: "CEAL Statistics Database <noreply@cealstats.org>",
           subject: `CEAL Statistics Online Surveys Are Now Open`,
           html: emailTemplate,
           scheduledAt: openDate.toISOString(), // Resend will automatically send at this time

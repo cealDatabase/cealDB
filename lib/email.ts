@@ -64,13 +64,13 @@ export async function sendPasswordResetEmail(
     const { data, error } = await resend.emails.send({
       from: "CEAL Statistics Database System <admin@cealstats.org>",
       to: email,
-      subject: isInitialSetup ? 'CEAL Database - Set Up Your Password' : 'CEAL Database - Password Reset Required',
+      subject: isInitialSetup ? 'CEAL Statistics Database - Set Up Your Password' : 'CEAL Statistics Database - Password Reset Required',
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
-          <title>CEAL Database - ${isInitialSetup ? 'Set Up Your Password' : 'Password Reset Required'}</title>
+          <title>CEAL Statistics Database - ${isInitialSetup ? 'Set Up Your Password' : 'Password Reset Required'}</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -100,8 +100,8 @@ export async function sendPasswordResetEmail(
               <p>Hello <strong>${username}</strong>,</p>
               
               <p>${isInitialSetup ? 
-                'Welcome to the CEAL Database! To complete your account setup, you need to create a secure password.' :
-                'As part of our security enhancement, you must create a new password to continue accessing your CEAL Database account.'
+                'Welcome to the CEAL Statistics Database! To complete your account setup, you need to create a secure password.' :
+                'As part of our security enhancement, you must create a new password to continue accessing your CEAL Statistics Database account.'
               }</p>
               
               <p><strong>What you need to do:</strong></p>
@@ -167,13 +167,13 @@ export async function sendWelcomeEmail(
     const { data, error } = await resend.emails.send({
       from: "CEAL Statistics Database System <admin@cealstats.org>",
       to: email,
-      subject: 'Welcome to CEAL Database - Set Your Password',
+      subject: 'Welcome to CEAL Statistics Database - Set Your Password',
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Welcome to CEAL Database</title>
+          <title>Welcome to CEAL Statistics Database</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -194,13 +194,13 @@ export async function sendWelcomeEmail(
         <body>
           <div class="container">
             <div class="header">
-              <h1>Welcome to CEAL Database</h1>
+              <h1>Welcome to CEAL Statistics Database</h1>
             </div>
             
             <div class="content">
               <p>Hello <strong>${username}</strong>,</p>
               
-              <p>Your CEAL Database account has been created successfully! To complete your account setup, you need to create a secure password.</p>
+              <p>Your CEAL Statistics Database account has been created successfully! To complete your account setup, you need to create a secure password.</p>
               
               <div style="text-align: center;">
                 <a href="${resetUrl}" class="button text-white">Create Your Password</a>
@@ -273,7 +273,7 @@ export async function sendFormsOpenedNotification(
       <html>
       <head>
         <meta charset="utf-8">
-        <title>CEAL Database Forms Now Open</title>
+        <title>CEAL Statistics Database Forms Now Open</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -298,7 +298,7 @@ export async function sendFormsOpenedNotification(
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">📊 CEAL Database Forms</h1>
+            <h1 style="margin: 0; font-size: 28px;">📊 CEAL Statistics Database Forms</h1>
             <h2 style="margin: 10px 0 0 0; font-size: 20px; font-weight: normal;">Forms Now Open for ${options.academicYear}</h2>
           </div>
           
@@ -336,7 +336,7 @@ export async function sendFormsOpenedNotification(
             
             <p><strong>What you need to do:</strong></p>
             <ol>
-              <li>Sign in to the CEAL Database system</li>
+              <li>Sign in to the CEAL Statistics Database system</li>
               <li>Navigate to the Forms section</li>
               <li>Complete all required forms for your library</li>
               <li>Submit before the closing date</li>
@@ -348,10 +348,10 @@ export async function sendFormsOpenedNotification(
             
             <p style="color: #dc2626; font-weight: bold;">⚠️ Important: Please ensure all forms are completed and submitted before the closing date.</p>
             
-            <p>If you have any questions or encounter any issues, please contact the CEAL Database administrators.</p>
+            <p>If you have any questions or encounter any issues, please contact the CEAL Statistics Database administrators.</p>
             
             <p style="margin-top: 30px;">Best regards,<br>
-            <strong>CEAL Database Administration</strong></p>
+            <strong>CEAL Statistics Database Administration</strong></p>
           </div>
           
           <div class="footer">
@@ -366,9 +366,9 @@ export async function sendFormsOpenedNotification(
     // Send to all recipients
     const emailPromises = options.recipientEmails.map(email => 
       resend.emails.send({
-        from: "CEAL Database <notifications@cealstats.org>",
+        from: "CEAL Statistics Database <notifications@cealstats.org>",
         to: email,
-        subject: `🔓 CEAL Database Forms Open for ${options.academicYear} - Action Required`,
+        subject: `🔓 CEAL Statistics Database Forms Open for ${options.academicYear} - Action Required`,
         html: emailTemplate
       })
     );
@@ -404,7 +404,7 @@ export async function sendFormsClosedNotification(
       <html>
       <head>
         <meta charset="utf-8">
-        <title>CEAL Database Forms Closed</title>
+        <title>CEAL Statistics Database Forms Closed</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -417,7 +417,7 @@ export async function sendFormsClosedNotification(
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">🔒 CEAL Database Forms</h1>
+            <h1 style="margin: 0; font-size: 28px;">🔒 CEAL Statistics Database Forms</h1>
             <h2 style="margin: 10px 0 0 0; font-size: 20px; font-weight: normal;">Forms Now Closed for ${options.academicYear}</h2>
           </div>
           
@@ -450,12 +450,12 @@ export async function sendFormsClosedNotification(
               <li>Forms will reopen for the next academic year according to the schedule</li>
             </ul>
             
-            <p>Thank you for your participation in the CEAL Database data collection for ${options.academicYear}.</p>
+            <p>Thank you for your participation in the CEAL Statistics Database data collection for ${options.academicYear}.</p>
             
-            <p>If you have any questions or concerns about your submission, please contact the CEAL Database administrators as soon as possible.</p>
+            <p>If you have any questions or concerns about your submission, please contact the CEAL Statistics Database administrators as soon as possible.</p>
             
             <p style="margin-top: 30px;">Best regards,<br>
-            <strong>CEAL Database Administration</strong></p>
+            <strong>CEAL Statistics Database Administration</strong></p>
           </div>
           
           <div class="footer">
@@ -470,9 +470,9 @@ export async function sendFormsClosedNotification(
     // Send to all recipients
     const emailPromises = options.recipientEmails.map(email => 
       resend.emails.send({
-        from: "CEAL Database <notifications@cealstats.org>",
+        from: "CEAL Statistics Database <notifications@cealstats.org>",
         to: email,
-        subject: `🔒 CEAL Database Forms Closed for ${options.academicYear}`,
+        subject: `🔒 CEAL Statistics Database Forms Closed for ${options.academicYear}`,
         html: emailTemplate
       })
     );
@@ -528,7 +528,7 @@ export async function sendAdminFormsOpenedNotification(
           </div>
           
           <div class="content">
-            <p><strong>Dear CEAL Database Administrator,</strong></p>
+            <p><strong>Dear CEAL Statistics Database Administrator,</strong></p>
             
             <p>The automated scheduling system has successfully opened the forms for academic year <strong>${academicYear}</strong>.</p>
             
@@ -565,7 +565,7 @@ export async function sendAdminFormsOpenedNotification(
             
             <p>You can view the <a href="${ROOT_URL}/admin/superguide">admin dashboard</a> to monitor form status and submissions.</p>
             
-            <p style="margin-top: 30px;">This is an automated notification from the CEAL Database scheduling system.</p>
+            <p style="margin-top: 30px;">This is an automated notification from the CEAL Statistics Database scheduling system.</p>
           </div>
           
           <div class="footer">
@@ -578,7 +578,7 @@ export async function sendAdminFormsOpenedNotification(
 
     const emailPromises = adminEmails.map(email => 
       resend.emails.send({
-        from: "CEAL Database System <system@cealstats.org>",
+        from: "CEAL Statistics Database System <system@cealstats.org>",
         to: email,
         subject: `✅ Admin Alert: Forms Automatically Opened for ${academicYear}`,
         html: emailTemplate
@@ -636,7 +636,7 @@ export async function sendAdminFormsClosedNotification(
           </div>
           
           <div class="content">
-            <p><strong>Dear CEAL Database Administrator,</strong></p>
+            <p><strong>Dear CEAL Statistics Database Administrator,</strong></p>
             
             <p>The automated scheduling system has successfully closed the forms for academic year <strong>${academicYear}</strong>.</p>
             
@@ -674,7 +674,7 @@ export async function sendAdminFormsClosedNotification(
             
             <p>You can view the <a href="${ROOT_URL}/admin/superguide">admin dashboard</a> to review submission status.</p>
             
-            <p style="margin-top: 30px;">This is an automated notification from the CEAL Database scheduling system.</p>
+            <p style="margin-top: 30px;">This is an automated notification from the CEAL Statistics Database scheduling system.</p>
           </div>
           
           <div class="footer">
@@ -687,7 +687,7 @@ export async function sendAdminFormsClosedNotification(
 
     const emailPromises = adminEmails.map(email => 
       resend.emails.send({
-        from: "CEAL Database System <system@cealstats.org>",
+        from: "CEAL Statistics Database System <system@cealstats.org>",
         to: email,
         subject: `🔒 Admin Alert: Forms Automatically Closed for ${academicYear}`,
         html: emailTemplate

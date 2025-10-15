@@ -1,6 +1,6 @@
 /**
  * Survey Date Utilities
- * Handles automatic date calculations for the CEAL Database survey system
+ * Handles automatic date calculations for the CEAL Statistics Database survey system
  */
 
 export interface SurveyDates {

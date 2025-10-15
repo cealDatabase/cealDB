@@ -127,7 +127,7 @@ export default function SignInPage() {
   const getTitle = () => {
     switch (step) {
       case 'EMAIL':
-        return 'Sign in to CEAL Database';
+        return 'Sign in to CEAL Statistics Database';
       case 'PASSWORD':
         return `Welcome back, ${userInfo?.name}`;
       case 'RESET_GUIDANCE':
@@ -152,7 +152,7 @@ export default function SignInPage() {
         return (
           <>
             <div className="text-sm">
-              Enter your password to access your CEAL Database account.
+              Enter your password to access your CEAL Statistics Database account.
             </div>
           </>
         );

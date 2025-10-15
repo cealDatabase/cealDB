@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     // Create email template
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">CEAL Database Forms Now Open for ${year}</h2>
+        <h2 style="color: #2563eb;">CEAL Statistics Database Forms Now Open for ${year}</h2>
         
         <p>Dear CEAL Member,</p>
         
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
           </ul>
         </div>
         
-        <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
+        <p>You can now access and submit your library's data through the CEAL Statistics Database system. Please ensure all forms are completed before the closing date.</p>
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="https://cealstats.org/" 
@@ -175,10 +175,10 @@ export async function POST(request: NextRequest) {
           </a>
         </div>
         
-        <p>If you have any questions or need assistance, please contact the CEAL Database administrators.</p>
+        <p>If you have any questions or need assistance, please contact the CEAL Statistics Database administrators.</p>
         
         <p>Best regards,<br>
-        CEAL Database Administration</p>
+        CEAL Statistics Database Administration</p>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="font-size: 12px; color: #6b7280;">
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
       
       const emailTemplate = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">CEAL Database Forms Now Open for ${year}</h2>
+          <h2 style="color: #2563eb;">CEAL Statistics Database Forms Now Open for ${year}</h2>
           
           <p>Dear CEAL Member,</p>
           
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
             </ul>
           </div>
           
-          <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
+          <p>You can now access and submit your library's data through the CEAL Statistics Database system. Please ensure all forms are completed before the closing date.</p>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="https://cealstats.org/" 
@@ -249,10 +249,10 @@ export async function POST(request: NextRequest) {
             </a>
           </div>
           
-          <p>If you have any questions or need assistance, please contact the CEAL Database administrators.</p>
+          <p>If you have any questions or need assistance, please contact the CEAL Statistics Database administrators.</p>
           
           <p>Best regards,<br>
-          CEAL Database Administration</p>
+          CEAL Statistics Database Administration</p>
           
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
           <p style="font-size: 12px; color: #6b7280;">
@@ -265,8 +265,8 @@ export async function POST(request: NextRequest) {
       try {
         broadcast = await resend.broadcasts.create({
           audienceId: audienceId, // Fixed: camelCase for Resend API
-          from: 'CEAL Database <noreply@cealstats.org>',
-          subject: `CEAL Database Forms Now Open for ${year}`,
+          from: 'CEAL Statistics Database <noreply@cealstats.org>',
+          subject: `CEAL Statistics Database Forms Now Open for ${year}`,
           html: emailTemplate
         });
         
@@ -471,7 +471,7 @@ export async function GET(request: NextRequest) {
     // Generate preview template
     const emailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">CEAL Database Forms Now Open for ${year}</h2>
+        <h2 style="color: #2563eb;">CEAL Statistics Database Forms Now Open for ${year}</h2>
         
         <p>Dear CEAL Member,</p>
         
@@ -496,7 +496,7 @@ export async function GET(request: NextRequest) {
           </ul>
         </div>
         
-        <p>You can now access and submit your library's data through the CEAL Database system. Please ensure all forms are completed before the closing date.</p>
+        <p>You can now access and submit your library's data through the CEAL Statistics Database system. Please ensure all forms are completed before the closing date.</p>
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="https://cealstats.org" 
@@ -505,10 +505,10 @@ export async function GET(request: NextRequest) {
           </a>
         </div>
         
-        <p>If you have any questions or need assistance, please contact the CEAL Database administrators.</p>
+        <p>If you have any questions or need assistance, please contact the CEAL Statistics Database administrators.</p>
         
         <p>Best regards,<br>
-        CEAL Database Administration</p>
+        CEAL Statistics Database Administration</p>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="font-size: 12px; color: #6b7280;">

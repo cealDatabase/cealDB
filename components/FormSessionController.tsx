@@ -54,7 +54,7 @@ export default function FormSessionController({ libraryId, children }: FormSessi
             <div>
               <h3 className="font-semibold text-yellow-800">Forms Currently Closed</h3>
               <p className="text-sm text-yellow-700">
-                Forms are not currently open for editing. Please contact the CEAL Database Administrator for assistance.
+                Forms are not currently open for editing. Please contact the CEAL Statistics Database Administrator for assistance.
               </p>
             </div>
           </div>

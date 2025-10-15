@@ -31,7 +31,7 @@ export function VolumeHoldingsInstructions() {
                     <div className="space-y-3">
                         <div className="flex items-start gap-3">
                             <Database className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
-                            <p className="text-sm">Previously reported holdings are pre-filled from the CEAL database (fields 01–05).</p>
+                            <p className="text-sm">Previously reported holdings are pre-filled from the CEAL Statistics Database (fields 01–05).</p>
                         </div>
                         <div className="flex items-start gap-3">
                             <CheckCircle className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />

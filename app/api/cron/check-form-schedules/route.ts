@@ -179,7 +179,7 @@ export async function GET(request: NextRequest) {
         // Send broadcast immediately (Resend didn't send it)
         const broadcast = await resend.broadcasts.create({
           audienceId: audienceId,
-          from: 'CEAL Database <noreply@cealstats.org>',
+          from: 'CEAL Statistics Database <noreply@cealstats.org>',
           subject: `CEAL Statistics Online Surveys Are Now Open`,
           html: emailTemplate
         });

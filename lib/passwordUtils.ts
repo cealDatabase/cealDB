@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 
 /**
- * Password utility functions for the CEAL database
+ * Password utility functions for the CEAL Statistics Database
  * Provides MD5-crypt hashing for new users and password verification
  */
 

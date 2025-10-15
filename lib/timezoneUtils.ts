@@ -1,5 +1,5 @@
 /**
- * Timezone Utilities for CEAL Database
+ * Timezone Utilities for CEAL Statistics Database
  * Handles conversion between Pacific Time and UTC
  */
 

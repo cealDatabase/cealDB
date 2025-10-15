@@ -33,7 +33,7 @@ const AccountConfirmedPage = () => {
         <div className="text-gray-600 mb-8">
           <p>
             Once you've set up your password, you'll be able to sign in and
-            access the CEAL Database forms.
+            access the CEAL Statistics Database forms.
           </p>
         </div>
         

@@ -378,7 +378,7 @@ export default function SurveySchedulePage() {
                   <h4 className="font-semibold text-lg mb-2">📧 Member Notification: Forms Opened</h4>
                   <div className="bg-gray-50 p-4 rounded">
                     <p className="text-sm text-gray-600 mb-2"><strong>To:</strong> All Active CEAL Members</p>
-                    <p className="text-sm text-gray-600 mb-4"><strong>Subject:</strong> 🔓 CEAL Database Forms Open for {academicYear} - Action Required</p>
+                    <p className="text-sm text-gray-600 mb-4"><strong>Subject:</strong> 🔓 CEAL Statistics Database Forms Open for {academicYear} - Action Required</p>
                     
                     <div className="bg-white p-4 rounded border border-gray-200">
                       <h5 className="font-bold text-lg mb-2">CEAL Statistics Database Forms Are Now Open</h5>

@@ -284,7 +284,7 @@ export default function VolumeHoldingsForm() {
       {/* Physical Volume Numbers from Last Year */}
       <FormSection
         title="Physical Volume Numbers from Last Year"
-        description="The value for 01-05 are obtained from CEAL database, if available. New joined libraries please contact CEAL admin at https://ceal-db.vercel.app/help"
+        description="The value for 01-05 are obtained from CEAL Statistics Database, if available. New joined libraries please contact CEAL admin at https://ceal-db.vercel.app/help"
       >
         <LanguageFieldGroup
           control={form.control}

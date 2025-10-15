@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Debug Logs - CEAL Database</title>
+      <title>Debug Logs - CEAL Statistics Database</title>
       <style>
         body { font-family: monospace; margin: 20px; background: #1a1a1a; color: #00ff00; }
         .log-entry { margin: 10px 0; padding: 10px; border-left: 3px solid #00ff00; background: #2a2a2a; }
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       </script>
     </head>
     <body>
-      <h1>🔧 CEAL Database Debug Logs</h1>
+      <h1>🔧 CEAL Statistics Database Debug Logs</h1>
       <div class="controls">
         <button class="btn" onclick="location.reload()">Refresh</button>
         <button class="btn" onclick="clearLogs()">Clear Logs</button>
