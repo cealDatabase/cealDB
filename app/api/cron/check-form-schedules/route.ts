@@ -41,7 +41,7 @@ const prisma = new PrismaClient();
  *      • Will NEVER be sent again once marked
  * 
  * 3. USER NOTIFICATION EMAILS (Sent ONCE per event):
- *    - Notifies users when forms open or close
+ *    - Notifies users when forms OPEN (not when forms close)
  *    - Same duplicate prevention as admin notifications
  * 
  * ═══════════════════════════════════════════════════════════════
@@ -157,8 +157,13 @@ export async function GET(request: NextRequest) {
         }
 
         const session = libraryYears[0];
-        const openDate = session.opening_date || new Date();
-        const closeDate = session.closing_date || new Date();
+        const currentYear = new Date().getFullYear();
+        const openDate =  new Date(session.opening_date || `10/1/${currentYear}`).toLocaleDateString('en-US', {
+          timeZone: "America/Los_Angeles"
+        });
+        const closeDate = new Date(session.closing_date || `12/2/${currentYear}`).toLocaleDateString('en-US', {
+          timeZone: "America/Los_Angeles"
+        });
 
         // Calculate fiscal year dates
         const reportingYearEnd = new Date(event.year, 9, 1); // October 1
@@ -181,7 +186,7 @@ export async function GET(request: NextRequest) {
             
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
               <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formatDateRange(openDate, closeDate)} (11:59 PM Pacific Time)</strong>.</p>
+              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate} to ${closeDate} (11:59 PM Pacific Time)</strong>.</p>
             </div>
             
             <div style="margin: 24px 0;">
@@ -391,10 +396,10 @@ export async function GET(request: NextRequest) {
     // STEP 3: Check for sessions to CLOSE
     // ========================================
     // NOTE: These are FORM CLOSURE NOTIFICATIONS (not broadcasts)
-    // - User emails: Notify when forms are closed
-    // - Admin emails: Notify super admins that forms are successfully closed
+    // - Verify forms are successfully closed
+    // - Admin emails ONLY: Notify super admins that forms are closed
+    // - User emails: NOT sent when forms close (only sent when forms open)
     // - DUPLICATE PREVENTION: Only processes where notifiedOnClose=false
-    // - IMPORTANT: Super admin notifications SHOULD be sent when forms close
     const sessionsToClose = await prisma.surveySession.findMany({
       where: {
         closingDate: {
@@ -434,24 +439,14 @@ export async function GET(request: NextRequest) {
 
         console.log(`✅ VERIFIED: All ${updateResult.count} forms are closed for year ${session.academicYear}`);
 
-        // Get email recipients
-        const userEmails = await getAllActiveUserEmails();
+        // Get email recipients (super admins only)
         const adminEmails = await getSuperAdminEmails();
         const totalLibraries = await getLibraryYearCount(session.academicYear);
 
-        console.log(`📧 Sending notifications to ${userEmails.length} users and ${adminEmails.length} admins`);
-
-        // Send notifications to all users
-        await sendFormsClosedNotification({
-          academicYear: session.academicYear,
-          openingDate: session.openingDate,
-          closingDate: session.closingDate,
-          recipientEmails: userEmails
-        });
-        console.log(`✅ Sent form closure notification to ${userEmails.length} users`);
+        console.log(`📧 Sending closure notification to ${adminEmails.length} super admins (users NOT notified)`);
 
         // IMPORTANT: Send super admin notification AFTER verification that all forms are closed
-        // This is SEPARATE from broadcast emails and SHOULD be sent when forms close
+        // Users are NOT notified when forms close (only when forms open)
         console.log(`📧 Sending VERIFIED closure confirmation to ${adminEmails.length} super admins...`);
         await sendAdminFormsClosedNotification(
           adminEmails,
@@ -483,7 +478,8 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesClosed: updateResult.count,
             closingDate: session.closingDate.toISOString(),
-            emailsSent: userEmails.length + adminEmails.length
+            emailsSent: adminEmails.length, // Only super admins notified on close
+            usersNotified: false
           },
           true,
           undefined,
