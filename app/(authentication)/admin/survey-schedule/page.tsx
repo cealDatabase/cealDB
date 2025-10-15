@@ -83,10 +83,10 @@ export default function SurveySchedulePage() {
     setShowPreview(false)
 
     try {
-      // Convert dates to Pacific timezone with specific times
-      // Opening: 00:00:00 Pacific, Closing: 23:59:59 Pacific
-      const openDateTime = new Date(openingDate + 'T00:00:00-08:00').toISOString()
-      const closeDateTime = new Date(closingDate + 'T23:59:59-08:00').toISOString()
+      // Create dates in UTC to preserve the exact calendar date selected
+      // Opening: 00:00:00 UTC, Closing: 23:59:59 UTC
+      const openDateTime = new Date(openingDate + 'T00:00:00Z').toISOString()
+      const closeDateTime = new Date(closingDate + 'T23:59:59Z').toISOString()
 
       const response = await fetch('/api/admin/survey-sessions', {
         method: 'POST',

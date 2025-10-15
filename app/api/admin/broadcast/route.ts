@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client"
 import { Resend } from "resend"
 import { logUserAction } from "@/lib/auditLogger"
 import { getSurveyDates } from "@/lib/surveyDates"
-import { convertToEasternTime, formatAsEasternTime } from "@/lib/timezoneUtils"
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 
 const prisma = new PrismaClient()
@@ -24,15 +23,13 @@ export async function POST(request: NextRequest) {
 
     console.log(`📧 Broadcast mode: ${sendImmediately ? "IMMEDIATE" : "SCHEDULED"}`)
 
-    // Convert dates to Pacific Time (PT) at midnight, then to UTC
-    const openDate = convertToEasternTime(openingDate, false) // Midnight PT
-    const closeDate = convertToEasternTime(closingDate, true) // 11:59:59 PM PT
+    // Use dates directly as provided - they are already in correct UTC format
+    const openDate = new Date(openingDate)
+    const closeDate = new Date(closingDate)
 
-    console.log("📅 Date Conversion Summary (Pacific Time):")
-    console.log("  Opening:", openingDate, "→", formatAsEasternTime(openDate))
-    console.log("  Opening UTC:", openDate.toISOString())
-    console.log("  Closing:", closingDate, "→", formatAsEasternTime(closeDate))
-    console.log("  Closing UTC:", closeDate.toISOString())
+    console.log("📅 Date Summary:")
+    console.log("  Opening:", openingDate, "→", openDate.toISOString())
+    console.log("  Closing:", closingDate, "→", closeDate.toISOString())
 
     if (closeDate <= openDate) {
       return NextResponse.json({ error: "Closing date must be after opening date" }, { status: 400 })
@@ -485,9 +482,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Convert dates to Pacific Time
-    const openDate = convertToEasternTime(openingDate, false)
-    const closeDate = convertToEasternTime(closingDate, true)
+    // Use dates directly as provided
+    const openDate = new Date(openingDate)
+    const closeDate = new Date(closingDate)
 
     // Calculate fiscal year dates
     const fiscalYearStart = new Date(Number.parseInt(year) - 1, 6, 1) // July 1
