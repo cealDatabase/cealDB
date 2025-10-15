@@ -5,7 +5,6 @@ import { Resend } from 'resend';
 import { 
   sendFormsOpenedNotification, 
   sendFormsClosedNotification,
-  sendAdminFormsOpenedNotification,
   sendAdminFormsClosedNotification
 } from '@/lib/email';
 import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from '@/lib/userUtils';
@@ -33,15 +32,16 @@ const prisma = new PrismaClient();
  *      • Will NEVER be sent again once marked complete
  * 
  * 2. ADMIN NOTIFICATION EMAILS (Sent ONCE per event):
- *    - Forms Opened: Notifies super admins when forms open
  *    - Forms Closed: Notifies super admins when forms close
+ *    - Forms Opened: NOT sent to admins (only users are notified)
  *    - DUPLICATE PREVENTION:
- *      • Only processes sessions with notifiedOnOpen=false or notifiedOnClose=false
- *      • After sending: notifiedOnOpen=true or notifiedOnClose=true
+ *      • Only processes sessions with notifiedOnClose=false
+ *      • After sending: notifiedOnClose=true
  *      • Will NEVER be sent again once marked
  * 
  * 3. USER NOTIFICATION EMAILS (Sent ONCE per event):
- *    - Notifies users when forms OPEN (not when forms close)
+ *    - Forms Opened: Notifies users when forms open
+ *    - Forms Closed: NOT sent to users (only admins are notified)
  *    - Same duplicate prevention as admin notifications
  * 
  * ═══════════════════════════════════════════════════════════════
@@ -49,8 +49,8 @@ const prisma = new PrismaClient();
  * ═══════════════════════════════════════════════════════════════
  * 
  * STEP 1: Check for pending broadcasts (backup safety net)
- * STEP 2: Check for sessions to open (send opening notifications)
- * STEP 3: Check for sessions to close (send closing notifications)
+ * STEP 2: Check for sessions to open (send user notifications only)
+ * STEP 3: Check for sessions to close (send admin notifications only)
  * 
  * All actions include audit logging and comprehensive error handling.
  */
@@ -303,7 +303,7 @@ export async function GET(request: NextRequest) {
     // ========================================
     // NOTE: These are FORM STATUS NOTIFICATIONS (not broadcasts)
     // - User emails: Notify when forms are opened
-    // - Admin emails: Notify super admins of form opening
+    // - Admin emails: NOT sent in this step (only sent in STEP 3 when forms close)
     // - DUPLICATE PREVENTION: Only processes where notifiedOnOpen=false
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
@@ -331,10 +331,8 @@ export async function GET(request: NextRequest) {
 
         // Get email recipients
         const userEmails = await getAllActiveUserEmails();
-        const adminEmails = await getSuperAdminEmails();
-        const totalLibraries = await getLibraryYearCount(session.academicYear);
 
-        console.log(`📧 Sending notifications to ${userEmails.length} users and ${adminEmails.length} admins`);
+        console.log(`📧 Sending notifications to ${userEmails.length} users`);
 
         // Send notifications to all users
         await sendFormsOpenedNotification({
@@ -344,18 +342,7 @@ export async function GET(request: NextRequest) {
           recipientEmails: userEmails
         });
         console.log(`✅ Sent form opening notification to ${userEmails.length} users`);
-
-        // IMPORTANT: Send super admin notification (SEPARATE from broadcast emails)
-        console.log(`📧 Sending form opening confirmation to ${adminEmails.length} super admins...`);
-        await sendAdminFormsOpenedNotification(
-          adminEmails,
-          session.academicYear,
-          {
-            librariesOpened: updateResult.count,
-            totalLibraries: totalLibraries
-          }
-        );
-        console.log(`✅ Super admin notification sent successfully (ONE-TIME notification)`);
+        console.log(`ℹ️  Super admin notifications NOT sent (only sent when forms close)`);
 
         // CRITICAL: Mark session as notified - prevents duplicate notifications
         await prisma.surveySession.update({
@@ -377,7 +364,8 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesOpened: updateResult.count,
             openingDate: session.openingDate.toISOString(),
-            emailsSent: userEmails.length + adminEmails.length
+            userEmailsSent: userEmails.length,
+            adminEmailsSent: 0
           },
           true,
           undefined,
