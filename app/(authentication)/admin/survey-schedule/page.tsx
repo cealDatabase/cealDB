@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Container } from '@/components/Container'
 import { Button } from '@/components/Button'
 import Link from 'next/link'
+import { formatSimpleDate, formatDateWithWeekday } from '@/lib/dateFormatting'
 
 interface SurveySession {
   id: number
@@ -142,12 +143,7 @@ export default function SurveySchedulePage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      timeZone: 'America/Los_Angeles'
-    })
+    return formatSimpleDate(dateString)
   }
 
   const getSessionStatus = (session: SurveySession) => {
@@ -386,8 +382,8 @@ export default function SurveySchedulePage() {
                       
                       <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mb-3">
                         <p className="text-sm"><strong>📅 Submission Period:</strong></p>
-                        <p className="text-sm"><strong>Opens:</strong> {openingDate ? `${new Date(openingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at 12:00 AM Pacific` : 'Not set'}</p>
-                        <p className="text-sm"><strong>Closes:</strong> {closingDate ? `${new Date(closingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at 11:59 PM Pacific` : 'Not set'}</p>
+                        <p className="text-sm"><strong>Opens:</strong> {openingDate ? `${formatSimpleDate(openingDate)} at 12:00 AM Pacific` : 'Not set'}</p>
+                        <p className="text-sm"><strong>Closes:</strong> {closingDate ? `${formatSimpleDate(closingDate)} at 11:59 PM Pacific` : 'Not set'}</p>
                       </div>
                       
                       <p className="mb-3 text-sm">Please submit your library's statistical data before the closing date. You can access the forms by signing in to your account.</p>
@@ -412,8 +408,8 @@ export default function SurveySchedulePage() {
                         <p className="text-sm"><strong>📊 Statistics:</strong></p>
                         <p className="text-sm">• Libraries Updated: {formStatus?.totalLibraries || 0}</p>
                         <p className="text-sm">• Notification Emails Sent: ~{formStatus?.totalLibraries || 0}</p>
-                        <p className="text-sm">• Opening Date: {openingDate ? `${new Date(openingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at 12:00 AM Pacific` : 'Not set'}</p>
-                        <p className="text-sm">• Closing Date: {closingDate ? `${new Date(closingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at 11:59 PM Pacific` : 'Not set'}</p>
+                        <p className="text-sm">• Opening Date: {openingDate ? `${formatSimpleDate(openingDate)} at 12:00 AM Pacific` : 'Not set'}</p>
+                        <p className="text-sm">• Closing Date: {closingDate ? `${formatSimpleDate(closingDate)} at 11:59 PM Pacific` : 'Not set'}</p>
                       </div>
                       
                       <p className="text-sm text-gray-600">No manual action required. The system will automatically close forms on the scheduled date.</p>

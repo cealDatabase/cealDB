@@ -10,6 +10,7 @@ import {
 } from '@/lib/email';
 import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from '@/lib/userUtils';
 import { logUserAction } from '@/lib/auditLogger';
+import { formatDateRange } from '@/lib/dateFormatting';
 
 const prisma = new PrismaClient();
 
@@ -180,7 +181,7 @@ export async function GET(request: NextRequest) {
             
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
               <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric" })} through ${closeDate.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} (11:59 p.m. Pacific Time)</strong>.</p>
+              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formatDateRange(openDate, closeDate)} (11:59 p.m. Pacific Time)</strong>.</p>
             </div>
             
             <div style="margin: 24px 0;">

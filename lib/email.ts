@@ -1,5 +1,6 @@
 // lib/email.ts (server-only)
 import { Resend } from 'resend';
+import { formatDateWithWeekday, formatSimpleDate } from './dateFormatting';
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -310,26 +311,8 @@ export async function sendFormsOpenedNotification(
             <div class="info-box">
               <h3 style="color: #374151; margin-top: 0; font-size: 18px;">📅 Important Dates</h3>
               <ul style="list-style: none; padding: 0;">
-                <li><strong>Forms Opened:</strong> ${options.openingDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })} at ${options.openingDate.toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  timeZoneName: 'short'
-                })}</li>
-                <li><strong>Forms Close:</strong> ${options.closingDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })} at ${options.closingDate.toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  timeZoneName: 'short'
-                })}</li>
+                <li><strong>Forms Opened:</strong> ${formatDateWithWeekday(options.openingDate)} at 12:00 AM Pacific Time</li>
+                <li><strong>Forms Close:</strong> ${formatDateWithWeekday(options.closingDate)} at 11:59 PM Pacific Time</li>
                 <li><strong>Submission Period:</strong> ${totalDays} days</li>
               </ul>
             </div>
@@ -429,16 +412,8 @@ export async function sendFormsClosedNotification(
             <div class="info-box">
               <h3 style="color: #991b1b; margin-top: 0; font-size: 18px;">📅 Session Summary</h3>
               <ul style="list-style: none; padding: 0;">
-                <li><strong>Forms Opened:</strong> ${options.openingDate.toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</li>
-                <li><strong>Forms Closed:</strong> ${options.closingDate.toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</li>
+                <li><strong>Forms Opened:</strong> ${formatSimpleDate(options.openingDate)}</li>
+                <li><strong>Forms Closed:</strong> ${formatSimpleDate(options.closingDate)}</li>
                 <li><strong>Status:</strong> Submissions are no longer accepted</li>
               </ul>
             </div>
