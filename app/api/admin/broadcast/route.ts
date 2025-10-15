@@ -102,8 +102,6 @@ export async function POST(request: NextRequest) {
     const surveyDates = getSurveyDates(year, openDate, closeDate)
 
     // Calculate fiscal year dates for the email
-    const fiscalYearStart = new Date(Number.parseInt(year) -1, 6, 1) // July 1
-    const fiscalYearEnd = new Date(Number.parseInt(year), 5, 30) // June 30 of next year
     const reportingYearEnd = new Date(Number.parseInt(year), 9, 1) // October 1 of next year
 
     const emailTemplate = `
@@ -116,7 +114,8 @@ export async function POST(request: NextRequest) {
         
         <div style="margin: 24px 0;">
           <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
+          July 1, ${Number.parseInt(year) - 1} through June 30, ${year}</strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
@@ -505,7 +504,9 @@ export async function GET(request: NextRequest) {
         
         <div style="margin: 24px 0;">
           <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>${fiscalYearStart.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })} – ${fiscalYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}</strong>.</p>
+          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before ${reportingYearEnd.toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", month: "long", day: "numeric", year: "numeric" })}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
+          July 1, ${Number.parseInt(year) - 1} through June 30, ${year}
+          </strong>.</p>
         </div>
         
         <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
