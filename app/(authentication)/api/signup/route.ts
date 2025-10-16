@@ -1,7 +1,7 @@
 import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
 import { generateResetToken } from "@/lib/auth";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail, addUserToResendContacts } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -106,6 +106,14 @@ export async function POST(request: Request) {
         user_agent: null
       }
     });
+
+    // Add user to Resend contacts for broadcast communications (silent operation)
+    // This runs in the background and won't affect the signup flow
+    addUserToResendContacts(username.toLowerCase(), newUser.firstname, newUser.lastname)
+      .catch(error => {
+        // Silent fail - just log the error, don't break signup
+        console.error('Background: Failed to add user to Resend contacts:', error);
+      });
 
     // ----------------- Send welcome email with password setup -----------------
     try {

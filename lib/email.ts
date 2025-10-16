@@ -680,3 +680,48 @@ export async function sendAdminFormsClosedNotification(
     return false;
   }
 }
+
+/**
+ * Add a new user to Resend contacts for broadcast communications
+ * This is a backend-only operation with no frontend feedback
+ */
+export async function addUserToResendContacts(
+  email: string,
+  firstName?: string | null,
+  lastName?: string | null
+): Promise<boolean> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Resend contact creation skipped: RESEND_API_KEY not configured');
+      return false;
+    }
+
+    if (!process.env.RESEND_BROADCAST_LIST_ID) {
+      console.error('Resend contact creation skipped: RESEND_BROADCAST_LIST_ID not configured');
+      return false;
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    // Create contact in Resend audience
+    const { data, error } = await resend.contacts.create({
+      email: email,
+      firstName: firstName || '',
+      lastName: lastName || '',
+      unsubscribed: false,
+      audienceId: process.env.RESEND_BROADCAST_LIST_ID,
+    });
+
+    if (error) {
+      console.error('Failed to add contact to Resend:', error);
+      return false;
+    }
+
+    console.log(`✅ Added user to Resend contacts: ${email} (Contact ID: ${data?.id})`);
+    return true;
+  } catch (error) {
+    // Silent fail - don't break user signup if Resend fails
+    console.error('Resend contact creation error:', error);
+    return false;
+  }
+}
