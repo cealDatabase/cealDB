@@ -9,6 +9,11 @@ import { Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import EditEBookSubscriptionDialog from "./EditEBookSubscriptionDialog";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface EBookSubscriptionManagementClientProps {
   subscriptions: Array<{
@@ -52,6 +57,39 @@ export default function EBookSubscriptionManagementClient({
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
   const [editingRecord, setEditingRecord] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Expandable text component for truncated cells
+  const ExpandableText = ({ content, maxWidth = "200px" }: { content: string; maxWidth?: string }) => {
+    if (!content || content.trim().length === 0) {
+      return <span className="text-gray-400">-</span>;
+    }
+
+    const needsPopover = content.length > 30;
+
+    if (!needsPopover) {
+      return <span className="font-medium">{content}</span>;
+    }
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <button 
+            className="text-left text-blue-700 font-medium hover:text-blue-900 hover:underline transition-colors cursor-pointer w-full"
+            style={{ maxWidth }}
+          >
+            <div className="truncate">
+              {content}
+            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-96 max-h-[400px] overflow-y-auto" side="right">
+          <div className="text-sm">
+            <p className="font-medium whitespace-pre-wrap break-words">{content}</p>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  };
 
   // Convert subscription data to table format
   const data = subscriptions
@@ -119,27 +157,47 @@ export default function EBookSubscriptionManagementClient({
     {
       accessorKey: "cjk_title",
       header: "CJK Title",
-      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("cjk_title")}</div>,
+      cell: ({ row }: any) => (
+        <div className="max-w-[200px]">
+          <ExpandableText content={row.getValue("cjk_title")} maxWidth="200px" />
+        </div>
+      ),
     },
     {
       accessorKey: "title",
       header: "English Title",
-      cell: ({ row }: any) => <div className="max-w-[200px] truncate">{row.getValue("title")}</div>,
+      cell: ({ row }: any) => (
+        <div className="max-w-[200px]">
+          <ExpandableText content={row.getValue("title")} maxWidth="200px" />
+        </div>
+      ),
     },
     {
       accessorKey: "publisher",
       header: "Publisher",
-      cell: ({ row }: any) => <div className="max-w-[150px] truncate">{row.getValue("publisher")}</div>,
+      cell: ({ row }: any) => (
+        <div className="max-w-[150px]">
+          <ExpandableText content={row.getValue("publisher")} maxWidth="150px" />
+        </div>
+      ),
     },
     {
       accessorKey: "subtitle",
       header: "Subtitle",
-      cell: ({ row }: any) => <div className="max-w-[150px] truncate">{row.getValue("subtitle")}</div>,
+      cell: ({ row }: any) => (
+        <div className="max-w-[150px]">
+          <ExpandableText content={row.getValue("subtitle")} maxWidth="150px" />
+        </div>
+      ),
     },
     {
       accessorKey: "sub_series_number",
       header: "Sub Series",
-      cell: ({ row }: any) => <div className="max-w-[120px] truncate">{row.getValue("sub_series_number")}</div>,
+      cell: ({ row }: any) => (
+        <div className="max-w-[120px]">
+          <ExpandableText content={row.getValue("sub_series_number")} maxWidth="120px" />
+        </div>
+      ),
     },
     {
       accessorKey: "language",
