@@ -14,7 +14,8 @@ import {
   Building, 
   Shield,
   Loader2,
-  AlertCircle 
+  AlertCircle,
+  Trash2 
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -47,6 +48,7 @@ export function UserRoleManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -102,6 +104,39 @@ export function UserRoleManager() {
         user.id === updatedUser.id ? updatedUser : user
       )
     );
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    const userName = getUserDisplayName(user);
+    const confirmMessage = `Are you sure you want to delete ${userName}?\n\nThis will permanently delete:\n• User account\n• All role assignments\n• All library associations\n• All active sessions\n\nAudit logs will be preserved for historical records.\n\nThis action CANNOT be undone.`;
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    setDeletingUserId(user.id);
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete user');
+      }
+
+      const data = await response.json();
+      
+      // Remove user from the list
+      setUsers(prevUsers => prevUsers.filter(u => u.id !== user.id));
+      
+      toast.success(`User ${userName} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete user');
+    } finally {
+      setDeletingUserId(null);
+    }
   };
 
   const getUserDisplayName = (user: User) => {
@@ -210,16 +245,30 @@ export function UserRoleManager() {
                       </div>
                     </div>
                     
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditRoles(user)}
-                      className="ml-4"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      <span className="inline md:hidden">Edit</span>
-                      <span className="hidden md:inline">Edit Roles</span>
-                    </Button>
+                    <div className="flex gap-2 ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditRoles(user)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        <span className="inline md:hidden">Edit</span>
+                        <span className="hidden md:inline">Edit Roles</span>
+                      </Button>
+                      
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={deletingUserId === user.id}
+                      >
+                        {deletingUserId === user.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
