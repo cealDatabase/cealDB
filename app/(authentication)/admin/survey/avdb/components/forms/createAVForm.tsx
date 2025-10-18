@@ -40,7 +40,7 @@ const formSchema = z.object({
   notes: z.string().optional(),
   publisher: z.string().optional(),
   data_source: z.string().optional(),
-  cjk_title: z.string().min(1, "CJK Title is required"),
+  cjk_title: z.string().optional(),
   romanized_title: z.string().optional(),
   type: z.string().min(1, "Type is required"),
   counts: z.number().min(0, "Counts must be 0 or greater"),

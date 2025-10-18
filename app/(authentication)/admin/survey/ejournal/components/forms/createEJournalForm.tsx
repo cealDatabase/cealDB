@@ -35,7 +35,7 @@ const formSchema = z.object({
   notes: z.string().optional(),
   publisher: z.string().optional(),
   data_source: z.string().optional(),
-  cjk_title: z.string().min(1, "CJK Title is required"),
+  cjk_title: z.string().optional(),
   romanized_title: z.string().optional(),
   journals: z.number().min(0, "Journals must be 0 or greater"),
   dbs: z.number().min(0, "Databases must be 0 or greater").optional(),
