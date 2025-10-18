@@ -145,7 +145,7 @@ export default function CreateEJournalForm({
                   name="cjk_title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CJK Title*</FormLabel>
+                      <FormLabel>CJK Title</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter CJK title" {...field} />
                       </FormControl>
