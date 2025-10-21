@@ -15,7 +15,8 @@ import {
   Shield,
   Loader2,
   AlertCircle,
-  Trash2 
+  Trash2,
+  Send
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +50,7 @@ export function UserRoleManager() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+  const [sendingUserId, setSendingUserId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -136,6 +138,26 @@ export function UserRoleManager() {
       toast.error(error instanceof Error ? error.message : 'Failed to delete user');
     } finally {
       setDeletingUserId(null);
+    }
+  };
+
+  const handleSendOpeningEmail = async (user: User) => {
+    setSendingUserId(user.id);
+    try {
+      const response = await fetch('/api/admin/send-individual-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.username })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send email');
+      }
+      toast.success(`Email sent to ${user.username}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to send email');
+    } finally {
+      setSendingUserId(null);
     }
   };
 
@@ -254,6 +276,19 @@ export function UserRoleManager() {
                         <Edit className="w-4 h-4 mr-2" />
                         <span className="inline md:hidden">Edit</span>
                         <span className="hidden md:inline">Edit Roles</span>
+                      </Button>
+                      
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleSendOpeningEmail(user)}
+                        disabled={sendingUserId === user.id}
+                      >
+                        {sendingUserId === user.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
                       </Button>
                       
                       <Button

@@ -58,7 +58,7 @@ async function UserManagementPage() {
                 </BreadcrumbSeparator>
                 
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Manage User Roles</BreadcrumbPage>
+                  <BreadcrumbPage>Manage Users</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

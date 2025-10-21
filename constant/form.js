@@ -205,7 +205,7 @@ export const superAdminActions = [
       description: 'Create new user accounts for librarians, e-resource editors, or administrators.',
     },
     {
-      title: 'Manage User Roles',
+      title: 'Manage Users',
       href: '/admin/users',
       icon: Shield,
       iconColor: 'text-purple-600',
