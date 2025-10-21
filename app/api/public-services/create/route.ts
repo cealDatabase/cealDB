@@ -6,41 +6,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const {
-      id, // Extract id but don't use it
       entryid,
       libid,
-      pspresentations_chinese,
-      pspresentations_japanese,
-      pspresentations_korean,
-      pspresentations_eastasian,
-      pspresentation_participants_chinese,
-      pspresentation_participants_japanese,
-      pspresentation_participants_korean,
-      pspresentation_participants_eastasian,
-      psreference_transactions_chinese,
-      psreference_transactions_japanese,
-      psreference_transactions_korean,
-      psreference_transactions_eastasian,
-      pstotal_circulations_chinese,
-      pstotal_circulations_japanese,
-      pstotal_circulations_korean,
-      pstotal_circulations_eastasian,
-      pslending_requests_filled_chinese,
-      pslending_requests_filled_japanese,
-      pslending_requests_filled_korean,
-      pslending_requests_filled_eastasian,
-      pslending_requests_unfilled_chinese,
-      pslending_requests_unfilled_japanese,
-      pslending_requests_unfilled_korean,
-      pslending_requests_unfilled_eastasian,
-      psborrowing_requests_filled_chinese,
-      psborrowing_requests_filled_japanese,
-      psborrowing_requests_filled_korean,
-      psborrowing_requests_filled_eastasian,
-      psborrowing_requests_unfilled_chinese,
-      psborrowing_requests_unfilled_japanese,
-      psborrowing_requests_unfilled_korean,
-      psborrowing_requests_unfilled_eastasian,
       pspresentations_subtotal,
       pspresentation_participants_subtotal,
       psreference_transactions_subtotal,
@@ -95,56 +62,22 @@ export async function POST(req: Request) {
     const publicServicesData = {
       entryid: entryid || null,
       libraryyear: libraryYear.id,
-      pspresentations_chinese: pspresentations_chinese || 0,
-      pspresentations_japanese: pspresentations_japanese || 0,
-      pspresentations_korean: pspresentations_korean || 0,
-      pspresentations_eastasian: pspresentations_eastasian || 0,
       pspresentations_subtotal: pspresentations_subtotal || 0,
-      pspresentation_participants_chinese: pspresentation_participants_chinese || 0,
-      pspresentation_participants_japanese: pspresentation_participants_japanese || 0,
-      pspresentation_participants_korean: pspresentation_participants_korean || 0,
-      pspresentation_participants_eastasian: pspresentation_participants_eastasian || 0,
       pspresentation_participants_subtotal: pspresentation_participants_subtotal || 0,
-      psreference_transactions_chinese: psreference_transactions_chinese || 0,
-      psreference_transactions_japanese: psreference_transactions_japanese || 0,
-      psreference_transactions_korean: psreference_transactions_korean || 0,
-      psreference_transactions_eastasian: psreference_transactions_eastasian || 0,
       psreference_transactions_subtotal: psreference_transactions_subtotal || 0,
-      pstotal_circulations_chinese: pstotal_circulations_chinese || 0,
-      pstotal_circulations_japanese: pstotal_circulations_japanese || 0,
-      pstotal_circulations_korean: pstotal_circulations_korean || 0,
-      pstotal_circulations_eastasian: pstotal_circulations_eastasian || 0,
       pstotal_circulations_subtotal: pstotal_circulations_subtotal || 0,
-      pslending_requests_filled_chinese: pslending_requests_filled_chinese || 0,
-      pslending_requests_filled_japanese: pslending_requests_filled_japanese || 0,
-      pslending_requests_filled_korean: pslending_requests_filled_korean || 0,
-      pslending_requests_filled_eastasian: pslending_requests_filled_eastasian || 0,
       pslending_requests_filled_subtotal: pslending_requests_filled_subtotal || 0,
-      pslending_requests_unfilled_chinese: pslending_requests_unfilled_chinese || 0,
-      pslending_requests_unfilled_japanese: pslending_requests_unfilled_japanese || 0,
-      pslending_requests_unfilled_korean: pslending_requests_unfilled_korean || 0,
-      pslending_requests_unfilled_eastasian: pslending_requests_unfilled_eastasian || 0,
       pslending_requests_unfilled_subtotal: pslending_requests_unfilled_subtotal || 0,
-      psborrowing_requests_filled_chinese: psborrowing_requests_filled_chinese || 0,
-      psborrowing_requests_filled_japanese: psborrowing_requests_filled_japanese || 0,
-      psborrowing_requests_filled_korean: psborrowing_requests_filled_korean || 0,
-      psborrowing_requests_filled_eastasian: psborrowing_requests_filled_eastasian || 0,
       psborrowing_requests_filled_subtotal: psborrowing_requests_filled_subtotal || 0,
-      psborrowing_requests_unfilled_chinese: psborrowing_requests_unfilled_chinese || 0,
-      psborrowing_requests_unfilled_japanese: psborrowing_requests_unfilled_japanese || 0,
-      psborrowing_requests_unfilled_korean: psborrowing_requests_unfilled_korean || 0,
-      psborrowing_requests_unfilled_eastasian: psborrowing_requests_unfilled_eastasian || 0,
       psborrowing_requests_unfilled_subtotal: psborrowing_requests_unfilled_subtotal || 0,
       psnotes: psnotes || "",
-    };
+    } as const;
 
     let result;
     if (existingRecord) {
       // Update existing record
       result = await db.public_Services.update({
-        where: {
-          id: existingRecord.id,
-        },
+        where: { id: existingRecord.id },
         data: publicServicesData,
       });
     } else {
@@ -162,7 +95,6 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("API error (public services create):", error);
-
     return NextResponse.json(
       { error: "Failed to save public services data", detail: error?.message },
       { status: 500 }

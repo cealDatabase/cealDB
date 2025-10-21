@@ -39,9 +39,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
       },
     });
 
-    console.log(`[Electronic Status] Library ID: ${libid}, Current Year: ${currentYear}`);
-    console.log(`[Electronic Status] Current year record exists:`, !!existingData);
-
     // Extract previous year's data - try current record's eprevious_* fields first
     let previousYearData = null;
     
