@@ -7,6 +7,8 @@ import { toast } from "sonner"
 
 import { ReusableFormField, ReusableNumberFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -98,6 +100,20 @@ export default function VolumeHoldingsForm() {
 
   const physicalGrandTotal = previousYearSubtotal + addedGrossSubtotal - withdrawnSubtotal
   const overallGrandTotal = physicalGrandTotal + ebookVolumesTotal
+
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = (libraryYearStatus as any).year || new Date().getFullYear()
+    const close = (libraryYearStatus as any).libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
 
   // Pre-populate form with existing data
   useEffect(() => {
@@ -401,6 +417,7 @@ export default function VolumeHoldingsForm() {
         submitButtonText="Submit Volume Holdings Data"
         onSaveDraft={handleSaveDraft}
       />
+      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   )
 }

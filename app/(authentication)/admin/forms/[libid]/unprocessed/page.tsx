@@ -14,6 +14,8 @@ import { Container } from "@/components/Container"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { ReusableFormField, ReusableNumberFormField } from "@/components/forms/ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -77,6 +79,20 @@ const UnprocessedForm = () => {
                           (watchedValues.ubjapanese || 0) + 
                           (watchedValues.ubkorean || 0) + 
                           (watchedValues.ubnoncjk || 0)
+
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = (libraryYearStatus as any).year || new Date().getFullYear()
+    const close = (libraryYearStatus as any).libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
 
   async function onSubmit(values: FormData) {
     setIsSubmitting(true)
@@ -199,6 +215,7 @@ const UnprocessedForm = () => {
         submitButtonText="Submit Unprocessed Materials Data"
         onSaveDraft={handleSaveDraft}
       />
+      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   )
 }

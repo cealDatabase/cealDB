@@ -9,6 +9,8 @@ import { Download, Loader2 } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -395,6 +397,20 @@ export default function OtherHoldingsForm() {
     return <div className="flex justify-center items-center h-32">Loading...</div>
   }
 
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = (libraryYearStatus as any).year || new Date().getFullYear()
+    const close = (libraryYearStatus as any).libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
+
   return (
     <FormWrapper
       form={form}
@@ -764,6 +780,7 @@ export default function OtherHoldingsForm() {
         submitButtonText='Save Other Holdings Data'
         onSaveDraft={handleSaveDraft}
       />
+      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   );
 }

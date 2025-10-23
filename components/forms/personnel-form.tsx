@@ -7,6 +7,8 @@ import { toast } from "sonner"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -109,6 +111,20 @@ export default function PersonnelForm() {
                                    (watchedValues.psfstudent_assistants_eastasian || 0)
 
   const totalPersonnel = professionalSubtotal + supportStaffSubtotal + studentAssistantsSubtotal + (watchedValues.psfothers || 0)
+
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = (libraryYearStatus as any).year || new Date().getFullYear()
+    const close = (libraryYearStatus as any).libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
 
   async function onSubmit(values: FormData) {
     setIsSubmitting(true)
@@ -381,6 +397,7 @@ export default function PersonnelForm() {
         submitButtonText="Submit Personnel Support Data"
         onSaveDraft={handleSaveDraft}
       />
+      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   )
 }

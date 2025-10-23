@@ -14,7 +14,7 @@ interface FormStatusBadgeProps {
 export function FormStatusBadge({ formHref, statusData }: FormStatusBadgeProps) {
   // Determine status based on server-side data
   let status = {
-    text: "Ready to complete",
+    text: "Ready",
     color: "text-purple-600",
     dotColor: "bg-purple-400",
   }
@@ -31,7 +31,7 @@ export function FormStatusBadge({ formHref, statusData }: FormStatusBadgeProps) 
     const formData = statusData.forms[formHref]
     if (formData && formData.submitted) {
       status = {
-        text: "In progress",
+        text: "Filled",
         color: "text-blue-600",
         dotColor: "bg-blue-400",
       }

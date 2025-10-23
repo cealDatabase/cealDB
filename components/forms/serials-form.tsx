@@ -9,6 +9,8 @@ import { Download } from "lucide-react"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -134,6 +136,20 @@ export default function SerialsForm() {
   const electronicGrandTotal = purchasedElectronicSubtotal + nonPurchasedElectronicSubtotal;
   const printGrandTotal = purchasedPrintSubtotal + nonPurchasedPrintSubtotal;
   const overallGrandTotal = electronicGrandTotal + printGrandTotal;
+
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = (libraryYearStatus as any).year || new Date().getFullYear()
+    const close = (libraryYearStatus as any).libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
 
   // Import E-Journal data function
   const importEJournalData = async () => {
@@ -559,6 +575,7 @@ export default function SerialsForm() {
         submitButtonText='Submit Serials Data'
         onSaveDraft={handleSaveDraft}
       />
+      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   );
 }

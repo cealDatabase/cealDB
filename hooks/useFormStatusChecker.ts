@@ -12,6 +12,7 @@ interface LibraryYearStatus {
   data?: any
   existingData?: any
   previousYearData?: any
+  libraryYear?: any
 }
 
 export function useFormStatusChecker(apiEndpoint: string) {

@@ -55,6 +55,7 @@ export async function GET(
       is_active: libraryYear.is_active,
       year: libraryYear.year,
       library_id: libraryYear.library,
+      libraryYear: libraryYear,
       existingData,
       message: libraryYear.is_open_for_editing 
         ? "Form is available for editing" 

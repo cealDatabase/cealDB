@@ -7,6 +7,8 @@ import { toast } from "sonner"
 
 import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
+import { getSurveyDates } from "@/lib/surveyDates"
+import { formatSimpleDate } from "@/lib/dateFormatting"
 import {
   FormWrapper,
   FormSection,
@@ -124,6 +126,20 @@ export default function MonographicForm() {
 
   const titleTotal = purchasedTitlesSubtotal + nonPurchasedTitlesSubtotal
   const volumeTotal = purchasedVolumesSubtotal + nonPurchasedVolumesSubtotal
+
+  const closingDateText = (() => {
+    if (!libraryYearStatus) return null
+    const year = libraryYearStatus.year || new Date().getFullYear()
+    const close = libraryYearStatus.libraryYear?.closing_date as any
+    if (close) {
+      const d = typeof close === 'string' ? new Date(close) : close
+      if (!isNaN(d?.getTime?.() ?? NaN)) {
+        return formatSimpleDate(d)
+      }
+    }
+    const dates = getSurveyDates(year)
+    return formatSimpleDate(dates.closingDate)
+  })()
 
 
   async function onSubmit(values: FormData) {
@@ -341,9 +357,10 @@ export default function MonographicForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Save Monographic Data"
+        submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
       />
+      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
     </FormWrapper>
   )
 }

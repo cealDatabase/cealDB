@@ -31,7 +31,8 @@ export function getSurveyDates(
 
   // Helper function to convert date string to Pacific Time midnight
   const toPacificMidnight = (dateInput: Date | string): Date => {
-    const dateStr = typeof dateInput === 'string' ? dateInput : dateInput.toISOString().split('T')[0];
+    const raw = typeof dateInput === 'string' ? dateInput : dateInput.toISOString();
+    const dateStr = raw.split('T')[0];
     const [y, m, d] = dateStr.split('-').map(Number);
     // Create date at midnight Pacific Time by adding 7 or 8 hours to UTC
     // Use 8 hours (PST) as default - this ensures the date stays correct year-round
@@ -40,7 +41,8 @@ export function getSurveyDates(
 
   // Helper function to convert date string to Pacific Time 11:59 PM
   const toPacificEndOfDay = (dateInput: Date | string): Date => {
-    const dateStr = typeof dateInput === 'string' ? dateInput : dateInput.toISOString().split('T')[0];
+    const raw = typeof dateInput === 'string' ? dateInput : dateInput.toISOString();
+    const dateStr = raw.split('T')[0];
     const [y, m, d] = dateStr.split('-').map(Number);
     // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
     // Example: 12/19 11:59 PM PST = 12/20 7:59 AM UTC
