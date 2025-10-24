@@ -14,6 +14,7 @@ const TABLES = [
   "List_EJournal_Counts",
   "Monographic_Acquisitions",
   "Volume_Holdings",
+  "Other_Holdings",
   "Serials",
   "Unprocessed_Backlog_Materials",
   "Fiscal_Support",
