@@ -6,7 +6,6 @@ async function verifyJWTToken(token: string): Promise<{ username: string } | nul
   try {
     const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
-    
     const username = payload.username as string;
     if (username && typeof username === 'string') {
       return { username };
@@ -17,7 +16,7 @@ async function verifyJWTToken(token: string): Promise<{ username: string } | nul
   }
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Define different types of protected routes
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isSuperAdminRoute = request.nextUrl.pathname.startsWith('/signup') ||
@@ -33,7 +32,7 @@ export default async function middleware(request: NextRequest) {
                              request.nextUrl.pathname.startsWith('/api/update') ||
                              request.nextUrl.pathname.startsWith('/api/delete');
 
-  // Get cookies using official Next.js middleware API
+  // Get cookies using official Next.js proxy API
   const sessionCookie = request.cookies.get('session');
   const userCookie = request.cookies.get('uinf');
   const roleCookie = request.cookies.get('role');
@@ -44,7 +43,6 @@ export default async function middleware(request: NextRequest) {
   if (sessionCookie && userCookie) {
     try {
       const tokenData = await verifyJWTToken(sessionCookie.value);
-      
       if (tokenData && tokenData.username) {
         const decodedUserCookie = decodeURIComponent(userCookie.value).toLowerCase();
         const tokenUsername = tokenData.username.toLowerCase();
