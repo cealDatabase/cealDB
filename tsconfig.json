@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,7 +13,7 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {
@@ -25,14 +21,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
-    "types": [
-      "react/experimental",
-      "node"
-    ]
+    "types": ["react/experimental", "node"]
   },
   "include": [
     "next-env.d.ts",
@@ -44,10 +35,7 @@
     "app/libraries/[libraryid]/page.jsx",
     "components/LibSingle.jsx",
     "app/api/submit-form/route.js",
-    "tailwind.config.mjs",
-    ".next/dev/types/**/*.ts"
+    "tailwind.config.mjs"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
