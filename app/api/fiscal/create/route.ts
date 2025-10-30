@@ -1,6 +1,7 @@
 // /app/api/fiscal/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,7 @@ export async function POST(req: Request) {
     const {
       entryid,
       libid,
+      finalSubmit,
       fschinese_appropriations_monographic,
       fschinese_appropriations_serial,
       fschinese_appropriations_other_material,
@@ -144,6 +146,10 @@ export async function POST(req: Request) {
       result = await db.fiscal_Support.create({
         data: fiscalData,
       });
+    }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYearRecord.id, 'fiscal');
     }
 
     return NextResponse.json({

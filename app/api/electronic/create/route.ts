@@ -1,6 +1,7 @@
 // /app/api/electronic/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
       id, // Extract id but don't use it
       entryid,
       libid,
+      finalSubmit,
       eonetime_computer_title_chinese,
       eonetime_computer_title_japanese,
       eonetime_computer_title_korean,
@@ -328,6 +330,11 @@ export async function POST(req: Request) {
       result = await db.electronic.create({
         data: electronicData,
       });
+    }
+
+    // If this was a final submission (not just Save Draft), mark Entry_Status
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'electronic');
     }
 
     return NextResponse.json({

@@ -62,6 +62,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
           Public_Services: true,
           Electronic: true,
           Electronic_Books: true,
+          Entry_Status: true,
         },
       })
 
@@ -70,43 +71,53 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
           isFormsClosed: !libraryYear.is_open_for_editing,
           forms: {
             monographic: {
-              submitted: !!libraryYear.Monographic_Acquisitions,
+              filled: !!libraryYear.Monographic_Acquisitions,
+              submitted: !!libraryYear.Entry_Status?.monographic_acquisitions,
               recordId: libraryYear.Monographic_Acquisitions?.id || null,
             },
             volumeHoldings: {
-              submitted: !!libraryYear.Volume_Holdings,
+              filled: !!libraryYear.Volume_Holdings,
+              submitted: !!libraryYear.Entry_Status?.volume_holdings,
               recordId: libraryYear.Volume_Holdings?.id || null,
             },
             serials: {
-              submitted: !!libraryYear.Serials,
+              filled: !!libraryYear.Serials,
+              submitted: !!libraryYear.Entry_Status?.serials,
               recordId: libraryYear.Serials?.id || null,
             },
             otherHoldings: {
-              submitted: !!libraryYear.Other_Holdings,
+              filled: !!libraryYear.Other_Holdings,
+              submitted: !!libraryYear.Entry_Status?.other_holdings,
               recordId: libraryYear.Other_Holdings?.id || null,
             },
             unprocessed: {
-              submitted: !!libraryYear.Unprocessed_Backlog_Materials,
+              filled: !!libraryYear.Unprocessed_Backlog_Materials,
+              submitted: !!libraryYear.Entry_Status?.unprocessed_backlog_materials,
               recordId: libraryYear.Unprocessed_Backlog_Materials?.id || null,
             },
             fiscal: {
-              submitted: !!libraryYear.Fiscal_Support,
+              filled: !!libraryYear.Fiscal_Support,
+              submitted: !!libraryYear.Entry_Status?.fiscal_support,
               recordId: libraryYear.Fiscal_Support?.id || null,
             },
             personnel: {
-              submitted: !!libraryYear.Personnel_Support,
+              filled: !!libraryYear.Personnel_Support,
+              submitted: !!libraryYear.Entry_Status?.personnel_support_fte,
               recordId: libraryYear.Personnel_Support?.id || null,
             },
             publicServices: {
-              submitted: !!libraryYear.Public_Services,
+              filled: !!libraryYear.Public_Services,
+              submitted: !!libraryYear.Entry_Status?.public_services,
               recordId: libraryYear.Public_Services?.id || null,
             },
             electronic: {
-              submitted: !!libraryYear.Electronic,
+              filled: !!libraryYear.Electronic,
+              submitted: !!libraryYear.Entry_Status?.electronic,
               recordId: libraryYear.Electronic?.id || null,
             },
             electronicBooks: {
-              submitted: !!libraryYear.Electronic_Books,
+              filled: !!libraryYear.Electronic_Books,
+              submitted: !!libraryYear.Entry_Status?.electronic_books,
               recordId: libraryYear.Electronic_Books?.id || null,
             },
           },

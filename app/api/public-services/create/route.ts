@@ -1,6 +1,7 @@
 // /app/api/public-services/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,7 @@ export async function POST(req: Request) {
     const {
       entryid,
       libid,
+      finalSubmit,
       pspresentations_subtotal,
       pspresentation_participants_subtotal,
       psreference_transactions_subtotal,
@@ -85,6 +87,10 @@ export async function POST(req: Request) {
       result = await db.public_Services.create({
         data: publicServicesData,
       });
+    }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'public-services');
     }
 
     return NextResponse.json({

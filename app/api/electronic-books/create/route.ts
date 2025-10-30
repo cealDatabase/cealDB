@@ -1,11 +1,12 @@
 // /app/api/electronic-books/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { libid, ...formData } = body;
+    const { libid, finalSubmit, ...formData } = body;
 
     // Validate required fields
     if (!libid || isNaN(Number(libid))) {
@@ -54,8 +55,8 @@ export async function POST(req: Request) {
 
     // Map all form fields to database fields (excluding libid)
     Object.keys(formData).forEach((key) => {
-      if (key !== 'libid') {
-        electronicBooksData[key] = formData[key] ?? 0;
+      if (key !== 'libid' && key !== 'finalSubmit') {
+        electronicBooksData[key] = (formData as any)[key] ?? 0;
       }
     });
 
@@ -75,6 +76,10 @@ export async function POST(req: Request) {
       result = await db.electronic_Books.create({
         data: electronicBooksData,
       });
+    }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'electronicBooks');
     }
 
     return NextResponse.json({

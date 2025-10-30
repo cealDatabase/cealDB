@@ -107,6 +107,7 @@ const UnprocessedForm = () => {
         },
         body: JSON.stringify({
           ...values,
+          finalSubmit: true,
           libid: Number(params.libid),
         }),
       })

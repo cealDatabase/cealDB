@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Other Holdings API received body:", body);
 
-    const { libid, ...otherHoldingsData } = body;
+    const { libid, finalSubmit, ...otherHoldingsData } = body;
 
     // Validate required fields
     if (!libid || isNaN(Number(libid))) {
@@ -85,13 +86,17 @@ export async function POST(req: Request) {
       });
 
       console.log("Created new other holdings record:", result);
-
-      return NextResponse.json({
-        success: true,
-        message: "Other holdings record created successfully",
-        data: result,
-      });
     }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'otherHoldings');
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: existingRecord ? "Other holdings record updated successfully" : "Other holdings record created successfully",
+      data: result,
+    });
 
   } catch (error: any) {
     console.error("API error (create other holdings):", error);

@@ -1,6 +1,7 @@
 // /app/api/personnel/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,7 @@ export async function POST(req: Request) {
     const {
       entryid,
       libid,
+      finalSubmit,
       psfprofessional_chinese,
       psfprofessional_japanese,
       psfprofessional_korean,
@@ -109,6 +111,10 @@ export async function POST(req: Request) {
       result = await db.personnel_Support.create({
         data: personnelData,
       });
+    }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'personnel');
     }
 
     return NextResponse.json({

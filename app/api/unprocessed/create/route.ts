@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Unprocessed Backlog Materials API received body:", body);
 
-    const { libid, ...unprocessedData } = body;
+    const { libid, finalSubmit, ...unprocessedData } = body;
 
     // Validate required fields
     if (!libid || isNaN(Number(libid))) {
@@ -69,12 +70,6 @@ export async function POST(req: Request) {
       });
 
       console.log("Updated existing unprocessed backlog materials record:", result);
-
-      return NextResponse.json({
-        success: true,
-        message: "Unprocessed backlog materials record updated successfully",
-        data: result,
-      });
     } else {
       // Create new record
       result = await db.unprocessed_Backlog_Materials.create({
@@ -85,13 +80,17 @@ export async function POST(req: Request) {
       });
 
       console.log("Created new unprocessed backlog materials record:", result);
-
-      return NextResponse.json({
-        success: true,
-        message: "Unprocessed backlog materials record created successfully",
-        data: result,
-      });
     }
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'unprocessed');
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: existingRecord ? "Unprocessed backlog materials record updated successfully" : "Unprocessed backlog materials record created successfully",
+      data: result,
+    });
 
   } catch (error: any) {
     console.error("API error (create unprocessed backlog materials):", error);

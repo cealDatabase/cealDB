@@ -363,6 +363,7 @@ export default function ElectronicBooksForm() {
         ebooks_total_titles: totalTitles,
         ebooks_total_volumes: totalVolumes,
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/electronic-books/create', {

@@ -1,6 +1,7 @@
 // /app/api/serials/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
 
     const {
       entryid,
+      finalSubmit,
       // Purchased Serials (Print)
       spurchased_chinese,
       spurchased_japanese,
@@ -197,6 +199,10 @@ export async function POST(req: Request) {
     });
 
     console.log(`Updated Library_Year ${libraryYear.id} is_active to true`);
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'serials');
+    }
 
     return NextResponse.json({ 
       success: true, 

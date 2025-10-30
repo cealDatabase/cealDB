@@ -319,6 +319,7 @@ export default function OtherHoldingsForm() {
         ohgrandtotal: grandTotal,
         // Remove libraryyear - API will handle the relationship via libid
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/otherHoldings/create', {

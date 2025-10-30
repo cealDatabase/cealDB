@@ -1,6 +1,7 @@
 // /app/api/monographic/create/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
 
     const {
       entryid,
+      finalSubmit,
       mapurchased_titles_chinese,
       mapurchased_titles_japanese,
       mapurchased_titles_korean,
@@ -144,6 +146,11 @@ export async function POST(req: Request) {
     });
 
     console.log("Successfully processed monographic record with ID:", monographicRecord.id);
+
+    // If final submit, mark Entry_Status for this library year
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'monographic');
+    }
 
     // Update Library_Year is_active to true after successful form submission
     await db.library_Year.update({

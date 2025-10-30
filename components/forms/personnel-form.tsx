@@ -139,6 +139,7 @@ export default function PersonnelForm() {
         psfstudent_assistants_subtotal: studentAssistantsSubtotal,
         psftotal: totalPersonnel,
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/personnel/create', {

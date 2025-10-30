@@ -229,6 +229,7 @@ export default function SerialsForm() {
         s_egrandtotal: electronicGrandTotal,
         sgrandtotal: printGrandTotal,
         libid: params.libid,
+        finalSubmit: true,
       };
 
       const response = await fetch('/api/serials/create', {

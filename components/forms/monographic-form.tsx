@@ -157,6 +157,7 @@ export default function MonographicForm() {
         matotal_titles: titleTotal,
         matotal_volumes: volumeTotal,
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/monographic/create', {

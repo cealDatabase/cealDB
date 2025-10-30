@@ -90,6 +90,7 @@ export default function PublicServicesForm() {
       const submissionData = {
         ...values,
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/public-services/create', {

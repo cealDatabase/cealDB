@@ -4,7 +4,8 @@ interface FormStatusBadgeProps {
     isFormsClosed: boolean
     forms: {
       [key: string]: {
-        submitted: boolean
+        filled?: boolean
+        submitted?: boolean
         recordId: number | null
       }
     }
@@ -27,13 +28,20 @@ export function FormStatusBadge({ formHref, statusData }: FormStatusBadgeProps) 
       dotColor: "bg-red-400",
     }
   } else {
-    // Check if this specific form has been submitted
     const formData = statusData.forms[formHref]
-    if (formData && formData.submitted) {
-      status = {
-        text: "Filled",
-        color: "text-blue-600",
-        dotColor: "bg-blue-400",
+    if (formData) {
+      if (formData.submitted) {
+        status = {
+          text: "Submitted",
+          color: "text-emerald-700",
+          dotColor: "bg-emerald-500",
+        }
+      } else if (formData.filled) {
+        status = {
+          text: "Filled",
+          color: "text-blue-600",
+          dotColor: "bg-blue-400",
+        }
       }
     }
   }

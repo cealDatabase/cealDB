@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { markEntryStatus } from "@/lib/entryStatus";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Volume Holdings API received body:", body);
 
-    const { libid, ...volumeHoldingsData } = body;
+    const { libid, finalSubmit, ...volumeHoldingsData } = body;
 
     // Validate required fields
     if (!libid || isNaN(Number(libid))) {
@@ -109,6 +110,10 @@ export async function POST(req: Request) {
     });
 
     console.log("Volume Holdings upsert result:", volumeHoldings);
+
+    if (finalSubmit) {
+      await markEntryStatus(libraryYear.id, 'volumeHoldings');
+    }
 
     return NextResponse.json({
       success: true,

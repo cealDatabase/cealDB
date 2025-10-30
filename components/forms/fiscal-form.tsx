@@ -193,6 +193,7 @@ export default function FiscalForm() {
         },
         body: JSON.stringify({
           ...values,
+          finalSubmit: true,
           libid: Number(params.libid),
         }),
       })

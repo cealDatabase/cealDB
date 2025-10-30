@@ -342,6 +342,7 @@ export default function ElectronicForm() {
         etotal_electronic_title_subtotal: totalElectronicSubtotal,
         
         libid: Number(params.libid),
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/electronic/create', {

@@ -219,6 +219,7 @@ export default function VolumeHoldingsForm() {
         vhwithdrawn_subtotal: withdrawnSubtotal,
         vhgrandtotal: physicalGrandTotal,
         libid: Number(params.libid), // Get library ID from URL params
+        finalSubmit: true,
       }
 
       const response = await fetch('/api/volumeHoldings/create', {
