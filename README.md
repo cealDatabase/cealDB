@@ -2,6 +2,28 @@
 
 A comprehensive library database management system built with Next.js, Prisma, and PostgreSQL. This application provides forms and interfaces for managing various aspects of library collections including monographic acquisitions, serials, electronic resources, and more.
 
+## 🧭 Overview (for librarians and administrators)
+
+cealDB is an online system for collecting your library’s annual CEAL statistics. It guides you through ten structured forms, saves your progress safely, and clearly shows where you are in the process.
+
+- What you can do
+  - Fill out 10 survey forms (Monographic, Physical Volume Holdings, Serials, Other Holdings, Unprocessed Backlog, Fiscal Support, Personnel Support, Public Services, Electronic, Electronic Books).
+  - Save Draft at any time and come back later.
+  - Submit when a form is complete. Submitting locks in a “Submitted” status for the year.
+
+- How statuses work on “My Forms”
+  - Ready: You have not entered data yet for the current year.
+  - Filled: You have saved data (a draft or an update exists).
+  - Submitted: You clicked Submit for that form, and the system recorded it as complete for this year.
+
+- Survey period and access
+  - Your institution’s survey window (open/close dates) is shown on the admin pages.
+  - If forms are closed, you’ll see “Form closed” and can no longer edit.
+
+- What happens to your data
+  - Drafts are only visible to your institution’s users.
+  - Submitted data is used for the official annual statistics publication.
+
 ## 🚀 Features
 
 - **Monographic Acquisitions Management** - Track purchased and non-purchased titles and volumes by language
@@ -159,6 +181,14 @@ npm start           # Start production server
 # Code Quality
 npm run lint        # Run ESLint
 ```
+
+## 🗺️ Roadmap
+
+- Submitted receipts: confirmation messages and optional email notifications after submission
+- Export tools: export your submitted data to CSV/PDF for local records
+- Progress tracker: visual indicators of overall completion across all forms
+- Accessibility and usability: continuous improvements for keyboard and screen-reader support
+- Admin dashboards: enhanced overviews for survey coordinators (open/close status, participation highlights)
 
 ## 🚀 Deployment
 
