@@ -39,8 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
       },
     });
 
-    console.log(`[E-Books Status] Library ID: ${libid}, Current Year: ${currentYear}`);
-    console.log(`[E-Books Status] Current year record exists:`, !!existingData);
+    // console.log(`[E-Books Status] Library ID: ${libid}, Current Year: ${currentYear}`);
 
     // Extract previous year's data - try current record's ebooks_purchased_prev_* fields first
     let previousYearData = null;
@@ -60,7 +59,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
       };
     } else {
       // Fetch from actual previous year's record
-      console.log('[E-Books Status] ebooks_purchased_prev_* fields not found, fetching from actual previous year');
+      // console.log('[E-Books Status] ebooks_purchased_prev_* fields not found, fetching from actual previous year');
       const previousYear = currentYear - 1;
       const previousLibraryYear = await db.library_Year.findFirst({
         where: {
@@ -69,16 +68,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
         },
       });
 
-      console.log(`[E-Books Status] Previous year (${previousYear}) Library_Year exists:`, !!previousLibraryYear);
-
       if (previousLibraryYear) {
         const previousEBooksData = await db.electronic_Books.findFirst({
           where: {
             libraryyear: previousLibraryYear.id,
           },
         });
-
-        console.log(`[E-Books Status] Previous year E-Books data exists: ${previousLibraryYear.id}, ${previousLibraryYear.year}`, !!previousEBooksData);
 
         if (previousEBooksData) {
           
@@ -113,7 +108,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
             ebooks_purchased_prev_volumes_noncjk: prevVolumesNoncjk,
           };
         } else {
-          console.log('[E-Books Status] No E-Books data found for previous year');
+          // console.log('[E-Books Status] No E-Books data found for previous year');
         }
       }
     }

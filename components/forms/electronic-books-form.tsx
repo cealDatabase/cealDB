@@ -1101,7 +1101,7 @@ export default function ElectronicBooksForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText='Submit Electronic Books Data'
+        submitButtonText='Submit'
         onSaveDraft={handleSaveDraft}
       />
       <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>

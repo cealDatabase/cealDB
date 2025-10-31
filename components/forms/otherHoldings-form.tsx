@@ -778,7 +778,7 @@ export default function OtherHoldingsForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText='Save Other Holdings Data'
+        submitButtonText='Submit'
         onSaveDraft={handleSaveDraft}
       />
       <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>

@@ -68,14 +68,7 @@ export async function POST(req: Request) {
           ...otherHoldingsData,
         },
       });
-
       console.log("Updated existing other holdings record:", result);
-
-      return NextResponse.json({
-        success: true,
-        message: "Other holdings record updated successfully",
-        data: result,
-      });
     } else {
       // Create new record
       result = await db.other_Holdings.create({

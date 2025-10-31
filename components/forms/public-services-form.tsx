@@ -278,7 +278,7 @@ export default function PublicServicesForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText="Submit Public Services Data"
+        submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
       />
       <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
