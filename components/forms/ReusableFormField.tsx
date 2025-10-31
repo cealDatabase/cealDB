@@ -129,6 +129,7 @@ export function ReusableNumberFormField<T extends FieldValues>({
             <Input
               type="number"
               min={min || "0"}
+              step={useFloat ? "any" : "1"}
               placeholder={placeholder}
               disabled={disabled}
               {...field}
