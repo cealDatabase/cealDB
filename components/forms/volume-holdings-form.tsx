@@ -397,7 +397,7 @@ export default function VolumeHoldingsForm() {
         <SubtotalDisplay
           label="Electronic Books Purchased Volume Total"
           value={ebookVolumesTotal}
-          formula="Imported from E-Book subscriptions"
+          formula="Imported from E-Book Databases"
           className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />
