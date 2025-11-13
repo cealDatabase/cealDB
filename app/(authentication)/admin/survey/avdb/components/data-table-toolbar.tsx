@@ -10,7 +10,7 @@ import { languages } from "../data/data";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -27,6 +27,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
 
   // Helper to fetch columns by id even if TanStack reorders them
@@ -88,6 +89,7 @@ export function DataTableToolbar<TData>({
   const isMemberUser = roleId?.trim() === "2";
 
   const handleExportCSV = async () => {
+    setIsExporting(true);
     try {
       const response = await fetch(`/api/av/export/${year}`);
       
@@ -109,6 +111,8 @@ export function DataTableToolbar<TData>({
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Failed to export AV database');
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -152,10 +156,15 @@ export function DataTableToolbar<TData>({
         variant="outline"
         size="sm"
         className='h-8'
-        title="Export current year data to CSV"
+        disabled={isExporting}
+        title={isExporting ? "Preparing CSV export..." : "Export current year data to CSV"}
       >
-        <Download className='mr-2 h-4 w-4' />
-        Export CSV
+        {isExporting ? (
+          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+        ) : (
+          <Download className='mr-2 h-4 w-4' />
+        )}
+        {isExporting ? "Preparing..." : "Export CSV"}
       </Button>
 
       {/* Action visible only to Super Admin (not role 2) */}
