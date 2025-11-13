@@ -17,7 +17,7 @@ async function verifyJWTToken(token: string): Promise<{ username: string } | nul
   }
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Define different types of protected routes
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isSuperAdminRoute = request.nextUrl.pathname.startsWith('/signup') ||

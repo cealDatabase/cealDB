@@ -10,6 +10,7 @@ import { languages } from "../data/data";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Download } from "lucide-react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -86,6 +87,31 @@ export function DataTableToolbar<TData>({
 
   const isMemberUser = roleId?.trim() === "2";
 
+  const handleExportCSV = async () => {
+    try {
+      const response = await fetch(`/api/av/export/${year}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to export data');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AV_Database_${year}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('AV database exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export AV database');
+    }
+  };
+
   return (
     <div className='flex items-center justify-between gap-3'>
       <div className='flex flex-1 items-center space-x-2'>
@@ -119,6 +145,18 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
+
+      {/* Export button visible to all users */}
+      <Button
+        onClick={handleExportCSV}
+        variant="outline"
+        size="sm"
+        className='h-8'
+        title="Export current year data to CSV"
+      >
+        <Download className='mr-2 h-4 w-4' />
+        Export CSV
+      </Button>
 
       {/* Action visible only to Super Admin (not role 2) */}
       {!isMemberUser && (
