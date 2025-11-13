@@ -85,7 +85,18 @@ export default function PersonnelForm() {
     if (existingData) {
       Object.keys(existingData).forEach((key) => {
         if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
-          form.setValue(key as keyof FormData, existingData[key])
+          // Parse numeric values to prevent string concatenation in calculations
+          const isBooleanField = key === 'psfosacquisition' || key === 'psfosprocessing'
+          const isTextField = key === 'psfnotes'
+          let value
+          if (isBooleanField) {
+            value = Boolean(existingData[key])
+          } else if (isTextField) {
+            value = existingData[key]
+          } else {
+            value = typeof existingData[key] === 'number' ? existingData[key] : parseFloat(existingData[key]) || 0
+          }
+          form.setValue(key as keyof FormData, value)
         }
       })
     }

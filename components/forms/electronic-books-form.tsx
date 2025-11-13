@@ -128,7 +128,11 @@ export default function ElectronicBooksForm() {
     if (existingData) {
       Object.keys(existingData).forEach((key) => {
         if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
-          form.setValue(key as keyof FormData, existingData[key])
+          // Parse numeric values to prevent string concatenation in calculations
+          const value = key === 'ebooks_notes' 
+            ? existingData[key] 
+            : (typeof existingData[key] === 'number' ? existingData[key] : parseFloat(existingData[key]) || 0)
+          form.setValue(key as keyof FormData, value)
         }
       })
     }
@@ -138,32 +142,35 @@ export default function ElectronicBooksForm() {
       // Only populate if this is a new form (existingData is null/undefined)
       console.log('[E-Books Form] Auto-filling previous year data:', previousYearData);
       
+      // Parse helper function for previous year data
+      const parseValue = (val: any) => typeof val === 'number' ? val : parseFloat(val) || 0;
+      
       // Purchased Titles Previous
       if (previousYearData.ebooks_purchased_prev_titles_chinese !== null && previousYearData.ebooks_purchased_prev_titles_chinese !== undefined) {
-        form.setValue('ebooks_purchased_prev_titles_chinese', previousYearData.ebooks_purchased_prev_titles_chinese);
+        form.setValue('ebooks_purchased_prev_titles_chinese', parseValue(previousYearData.ebooks_purchased_prev_titles_chinese));
       }
       if (previousYearData.ebooks_purchased_prev_titles_japanese !== null && previousYearData.ebooks_purchased_prev_titles_japanese !== undefined) {
-        form.setValue('ebooks_purchased_prev_titles_japanese', previousYearData.ebooks_purchased_prev_titles_japanese);
+        form.setValue('ebooks_purchased_prev_titles_japanese', parseValue(previousYearData.ebooks_purchased_prev_titles_japanese));
       }
       if (previousYearData.ebooks_purchased_prev_titles_korean !== null && previousYearData.ebooks_purchased_prev_titles_korean !== undefined) {
-        form.setValue('ebooks_purchased_prev_titles_korean', previousYearData.ebooks_purchased_prev_titles_korean);
+        form.setValue('ebooks_purchased_prev_titles_korean', parseValue(previousYearData.ebooks_purchased_prev_titles_korean));
       }
       if (previousYearData.ebooks_purchased_prev_titles_noncjk !== null && previousYearData.ebooks_purchased_prev_titles_noncjk !== undefined) {
-        form.setValue('ebooks_purchased_prev_titles_noncjk', previousYearData.ebooks_purchased_prev_titles_noncjk);
+        form.setValue('ebooks_purchased_prev_titles_noncjk', parseValue(previousYearData.ebooks_purchased_prev_titles_noncjk));
       }
 
       // Purchased Volumes Previous
       if (previousYearData.ebooks_purchased_prev_volumes_chinese !== null && previousYearData.ebooks_purchased_prev_volumes_chinese !== undefined) {
-        form.setValue('ebooks_purchased_prev_volumes_chinese', previousYearData.ebooks_purchased_prev_volumes_chinese);
+        form.setValue('ebooks_purchased_prev_volumes_chinese', parseValue(previousYearData.ebooks_purchased_prev_volumes_chinese));
       }
       if (previousYearData.ebooks_purchased_prev_volumes_japanese !== null && previousYearData.ebooks_purchased_prev_volumes_japanese !== undefined) {
-        form.setValue('ebooks_purchased_prev_volumes_japanese', previousYearData.ebooks_purchased_prev_volumes_japanese);
+        form.setValue('ebooks_purchased_prev_volumes_japanese', parseValue(previousYearData.ebooks_purchased_prev_volumes_japanese));
       }
       if (previousYearData.ebooks_purchased_prev_volumes_korean !== null && previousYearData.ebooks_purchased_prev_volumes_korean !== undefined) {
-        form.setValue('ebooks_purchased_prev_volumes_korean', previousYearData.ebooks_purchased_prev_volumes_korean);
+        form.setValue('ebooks_purchased_prev_volumes_korean', parseValue(previousYearData.ebooks_purchased_prev_volumes_korean));
       }
       if (previousYearData.ebooks_purchased_prev_volumes_noncjk !== null && previousYearData.ebooks_purchased_prev_volumes_noncjk !== undefined) {
-        form.setValue('ebooks_purchased_prev_volumes_noncjk', previousYearData.ebooks_purchased_prev_volumes_noncjk);
+        form.setValue('ebooks_purchased_prev_volumes_noncjk', parseValue(previousYearData.ebooks_purchased_prev_volumes_noncjk));
       }
     }
   }, [existingData, previousYearData, form])

@@ -120,7 +120,12 @@ export default function VolumeHoldingsForm() {
     if (existingData) {
       Object.keys(existingData).forEach((key) => {
         if (key in form.getValues() && existingData[key] !== null && existingData[key] !== undefined) {
-          form.setValue(key as keyof FormData, existingData[key])
+          // Parse numeric values to prevent string concatenation in calculations
+          const isTextField = key === 'entryid' || key === 'vhnotes'
+          const value = isTextField 
+            ? existingData[key] 
+            : (typeof existingData[key] === 'number' ? existingData[key] : parseFloat(existingData[key]) || 0)
+          form.setValue(key as keyof FormData, value)
         }
       })
     }
