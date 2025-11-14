@@ -132,12 +132,13 @@ export async function GET(
       csvRows.push(row.join(','));
     }
 
-    const csvContent = csvRows.join('\n');
+    // Add UTF-8 BOM for proper Excel encoding of CJK characters
+    const csvContent = '\uFEFF' + csvRows.join('\n');
 
-    // Return CSV response
+    // Return CSV response with UTF-8 charset
     return new NextResponse(csvContent, {
       headers: {
-        'Content-Type': 'text/csv',
+        'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="AV_Database_${year}.csv"`,
       },
     });
