@@ -42,13 +42,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // if (!libraryYear.is_active) {
-    //   return NextResponse.json(
-    //     { error: "Library year is not active. Please contact the administrator." },
-    //     { status: 403 }
-    //   );
-    // }
-
     // Calculate subtotals
     const vhprevious_year_subtotal = 
       (volumeHoldingsData.vhprevious_year_chinese || 0) +

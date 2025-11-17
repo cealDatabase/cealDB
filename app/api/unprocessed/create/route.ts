@@ -42,12 +42,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!libraryYear.is_active) {
-      return NextResponse.json(
-        { error: "Library year record is not active" },
-        { status: 403 }
-      );
-    }
+    // is_active check removed - it's for reporting purposes only, not for blocking form submission
 
     // Check if unprocessed backlog materials record already exists
     const existingRecord = await db.unprocessed_Backlog_Materials.findFirst({

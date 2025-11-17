@@ -116,7 +116,7 @@ export async function POST(req: Request) {
               opening_date: openDate,      // Set opening date
               closing_date: closeDate,     // Set closing date
               updated_at: new Date(),
-              is_active: false, // Only becomes true when library submits forms
+              is_active: false, // Only becomes true when library submits at least one form (for reporting)
               admin_notes: ``,
             },
           });
