@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Download } from "lucide-react";
 import { toast } from "sonner";
 import EditSubscriptionDialog from "./EditSubscriptionDialog";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
@@ -56,6 +56,7 @@ export default function SubscriptionManagementClient({
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
   const [editingRecord, setEditingRecord] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Expandable text component for truncated cells
   const ExpandableText = ({ content, maxWidth = "200px" }: { content: string; maxWidth?: string }) => {
@@ -264,6 +265,77 @@ export default function SubscriptionManagementClient({
     }
   };
 
+  const handleExportCSV = () => {
+    setIsExporting(true);
+    try {
+      // CSV headers matching the visible columns
+      const headers = [
+        'CJK Title',
+        'English Title',
+        'Subtitle',
+        'Publisher',
+        'Type',
+        'Language',
+        'Titles'
+      ];
+
+      // Helper function to escape CSV fields
+      const escapeCSV = (field: any): string => {
+        if (field === null || field === undefined || field === '') return '';
+        const str = String(field);
+        if (str.includes('"') || str.includes(',') || str.includes('\n')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      // Helper to format array fields
+      const formatArray = (field: any): string => {
+        if (Array.isArray(field)) {
+          return field.map(lang => lang === 'NON' ? 'NON-CJK' : lang).join('; ');
+        }
+        return String(field || '');
+      };
+
+      // Build CSV rows from the current data
+      const csvRows = [headers.join(',')];
+
+      for (const record of data) {
+        const row = [
+          escapeCSV(record.cjk_title),
+          escapeCSV(record.title),
+          escapeCSV(record.subtitle),
+          escapeCSV(record.publisher),
+          escapeCSV(record.type),
+          escapeCSV(formatArray(record.language)),
+          escapeCSV(record.counts)
+        ];
+        csvRows.push(row.join(','));
+      }
+
+      // Add UTF-8 BOM for proper Excel encoding of CJK characters
+      const csvContent = '\uFEFF' + csvRows.join('\n');
+      
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${libraryName.replace(/[^a-zA-Z0-9]/g, '_')}_AV_Access_${year}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success(`Exported ${data.length} AV access records successfully!`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export AV access');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Custom toolbar for subscription management
   const ManagementToolbar = ({ table }: { table: any }) => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -279,13 +351,25 @@ export default function SubscriptionManagementClient({
               {data.length} access for {year}
             </p>
           </div>
-          <Button
-            size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-            onClick={() => router.push(`/admin/survey/avdb/${year}`)}
-          >
-            ➕ Add More to My Access
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="lg"
+              variant="outline"
+              className="shadow-md"
+              onClick={handleExportCSV}
+              disabled={isExporting || data.length === 0}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {isExporting ? 'Exporting...' : 'Export CSV'}
+            </Button>
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+              onClick={() => router.push(`/admin/survey/avdb/${year}`)}
+            >
+              ➕ Add More to My Access
+            </Button>
+          </div>
         </div>
 
         {/* Table controls */}
