@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, X, User, Shield } from "lucide-react";
+import { Loader2, Save, X, User, Shield, Building } from "lucide-react";
 import { toast } from "sonner";
 
 interface User {
@@ -43,6 +43,12 @@ interface Role {
   role: string;
 }
 
+interface Library {
+  id: number;
+  library_name: string;
+  type: number;
+}
+
 interface RoleEditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,23 +59,35 @@ interface RoleEditModalProps {
 export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEditModalProps) {
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+  const [selectedLibraryId, setSelectedLibraryId] = useState<number | null>(null);
+  const [availableLibraries, setAvailableLibraries] = useState<Library[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
+  const [isFetchingLibraries, setIsFetchingLibraries] = useState(false);
 
-  // Initialize selected roles when user changes or modal opens
+  // Initialize selected roles and library when user changes or modal opens
   useEffect(() => {
     if (user && isOpen) {
       const currentRoleIds = user.User_Roles.map(ur => ur.role_id);
       setSelectedRoleIds(currentRoleIds);
+      
+      // Set selected library
+      const currentLibraryId = user.User_Library?.[0]?.Library?.id || null;
+      setSelectedLibraryId(currentLibraryId);
     }
   }, [user, isOpen]);
 
-  // Fetch available roles when modal opens
+  // Fetch available roles and libraries when modal opens
   useEffect(() => {
-    if (isOpen && availableRoles.length === 0) {
-      fetchRoles();
+    if (isOpen) {
+      if (availableRoles.length === 0) {
+        fetchRoles();
+      }
+      if (availableLibraries.length === 0) {
+        fetchLibraries();
+      }
     }
-  }, [isOpen, availableRoles.length]);
+  }, [isOpen, availableRoles.length, availableLibraries.length]);
 
   const fetchRoles = async () => {
     setIsFetchingRoles(true);
@@ -88,6 +106,23 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
     }
   };
 
+  const fetchLibraries = async () => {
+    setIsFetchingLibraries(true);
+    try {
+      const response = await fetch('/api/admin/libraries');
+      if (!response.ok) {
+        throw new Error('Failed to fetch libraries');
+      }
+      const data = await response.json();
+      setAvailableLibraries(data.libraries || []);
+    } catch (error) {
+      console.error('Error fetching libraries:', error);
+      toast.error('Failed to load available libraries');
+    } finally {
+      setIsFetchingLibraries(false);
+    }
+  };
+
   const handleRoleToggle = (roleId: number) => {
     setSelectedRoleIds(prev => 
       prev.includes(roleId) 
@@ -101,7 +136,8 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/users/${user.id}/roles`, {
+      // Update roles
+      const rolesResponse = await fetch(`/api/admin/users/${user.id}/roles`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -111,23 +147,45 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!rolesResponse.ok) {
+        const errorData = await rolesResponse.json();
         throw new Error(errorData.error || 'Failed to update roles');
       }
 
-      const data = await response.json();
-      
-      // Update the user with the new role information
-      if (data.user) {
-        onUserUpdated(data.user);
+      // Update library assignment if changed
+      const currentLibraryId = user.User_Library?.[0]?.Library?.id || null;
+      if (selectedLibraryId !== currentLibraryId) {
+        const libraryResponse = await fetch(`/api/admin/users/${user.id}/library`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            libraryId: selectedLibraryId,
+          }),
+        });
+
+        if (!libraryResponse.ok) {
+          const errorData = await libraryResponse.json();
+          throw new Error(errorData.error || 'Failed to update library assignment');
+        }
+
+        const libraryData = await libraryResponse.json();
+        if (libraryData.user) {
+          onUserUpdated(libraryData.user);
+        }
+      } else {
+        const rolesData = await rolesResponse.json();
+        if (rolesData.user) {
+          onUserUpdated(rolesData.user);
+        }
       }
 
-      toast.success('User roles updated successfully');
+      toast.success('User information updated successfully');
       onClose();
     } catch (error) {
-      console.error('Error updating roles:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to update roles');
+      console.error('Error updating user:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update user');
     } finally {
       setIsLoading(false);
     }
@@ -183,6 +241,33 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
             </div>
           )}
 
+          {/* Library Assignment */}
+          <div>
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              Assign Institution:
+            </Label>
+            {isFetchingLibraries ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading institutions...</span>
+              </div>
+            ) : (
+              <select
+                value={selectedLibraryId || ""}
+                onChange={(e) => setSelectedLibraryId(e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full mt-2 p-2 border rounded-md bg-background text-sm"
+              >
+                <option value="">No institution assigned</option>
+                {availableLibraries.map((library) => (
+                  <option key={library.id} value={library.id}>
+                    {library.library_name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           {/* Role Selection */}
           <div>
             <Label className="text-sm font-medium">Assign Roles:</Label>
@@ -224,7 +309,7 @@ export function RoleEditModal({ isOpen, onClose, user, onUserUpdated }: RoleEdit
             </Button>
             <Button 
               onClick={handleSave}
-              disabled={isLoading || isFetchingRoles}
+              disabled={isLoading || isFetchingRoles || isFetchingLibraries}
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
