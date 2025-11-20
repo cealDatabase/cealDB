@@ -1,13 +1,36 @@
 'use client';
 
-import '@ant-design/v5-patch-for-react-19';
 import { useState, useEffect } from 'react';
-import { Select, Button, Card, Spin, Typography, Space, Tag } from 'antd';
-import { Column, Line, DualAxes } from '@ant-design/plots';
-import { BarChartOutlined, LineChartOutlined } from '@ant-design/icons';
-
-const { Title, Text } = Typography;
-const { Option } = Select;
+import {
+  Bar,
+  BarChart,
+  Line,
+  LineChart,
+  Area,
+  AreaChart,
+  Pie,
+  PieChart,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Cell,
+  Legend as RechartsLegend,
+} from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartConfig } from '@/components/ui/chart';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BarChart3, LineChart as LineChartIcon, Activity, PieChart as PieChartIcon, Radar as RadarIcon, Loader2, TrendingUp, Check, ChevronsUpDown, X, Palette } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Library {
   value: number;
@@ -41,6 +64,44 @@ interface ChartDataResponse {
   tableLabel: string;
 }
 
+// Color theme definitions
+const COLOR_THEMES = {
+  neutral: {
+    name: 'Neutral',
+    colors: ['#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4']
+  },
+  blue: {
+    name: 'Blue',
+    colors: ['#0ea5e9', '#0284c7', '#0369a1', '#075985', '#0c4a6e']
+  },
+  green: {
+    name: 'Green',
+    colors: ['#22c55e', '#16a34a', '#15803d', '#166534', '#14532d']
+  },
+  orange: {
+    name: 'Orange',
+    colors: ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12']
+  },
+  red: {
+    name: 'Red',
+    colors: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d']
+  },
+  rose: {
+    name: 'Rose',
+    colors: ['#f43f5e', '#e11d48', '#be123c', '#9f1239', '#881337']
+  },
+  violet: {
+    name: 'Violet',
+    colors: ['#8b5cf6', '#7c3aed', '#6d28d9', '#5b21b6', '#4c1d95']
+  },
+  yellow: {
+    name: 'Yellow',
+    colors: ['#eab308', '#ca8a04', '#a16207', '#854d0e', '#713f12']
+  }
+};
+
+type ColorTheme = keyof typeof COLOR_THEMES;
+
 export default function GraphViewPage() {
   const [libraries, setLibraries] = useState<Library[]>([]);
   const [years, setYears] = useState<number[]>([]);
@@ -52,23 +113,24 @@ export default function GraphViewPage() {
   
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [tableLabel, setTableLabel] = useState<string>('');
-  const [chartType, setChartType] = useState<'grouped' | 'line' | 'dual'>('grouped');
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'area' | 'radar' | 'pie'>('bar');
   
   const [loading, setLoading] = useState(false);
   const [metadataLoading, setMetadataLoading] = useState(true);
+  
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
+  const [colorTheme, setColorTheme] = useState<ColorTheme>('neutral');
 
-  // Fetch metadata on component mount
   useEffect(() => {
     fetchMetadata();
   }, []);
 
-  // Set default selections when metadata is loaded
   useEffect(() => {
     if (libraries.length > 0 && years.length > 0 && dataTables.length > 0) {
-      // Default to first library, current year, and first two data tables
       setSelectedLibraries([libraries[0].value]);
       setSelectedYears([years[0]]);
-      setSelectedTables([dataTables[0].key, dataTables[1].key]);
+      setSelectedTables([dataTables[0].key, dataTables[1]?.key].filter(Boolean));
     }
   }, [libraries, years, dataTables]);
 
@@ -96,7 +158,6 @@ export default function GraphViewPage() {
     try {
       setLoading(true);
       
-      // Fetch data for each selected table
       const allDataPromises = selectedTables.map(async (tableKey) => {
         const params = new URLSearchParams({
           libraryIds: selectedLibraries.join(','),
@@ -110,7 +171,6 @@ export default function GraphViewPage() {
 
       const results = await Promise.all(allDataPromises);
       
-      // Combine all data with table information
       const combinedData: ChartDataPoint[] = [];
       let labels: string[] = [];
       
@@ -138,391 +198,592 @@ export default function GraphViewPage() {
     fetchChartData();
   };
 
-  // Prepare data for visualization
+  // Prepare data for bar, line, and area charts
   const prepareChartData = () => {
-    // Check if only one library is selected
     const uniqueLibraries = new Set(chartData.map(d => d.libraryId));
     const isSingleLibrary = uniqueLibraries.size === 1;
 
     if (selectedTables.length === 1) {
-      // Single table: simple format
       return chartData.map(d => ({
         category: isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`,
         value: d.value,
-        libraryName: d.libraryName,
-        year: d.year,
+        name: d.libraryName,
       }));
     } else {
-      // Multiple tables: include data table for grouping
-      return chartData.map(d => ({
-        category: isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`,
-        value: d.value,
-        libraryName: d.libraryName,
-        year: d.year,
-        type: d.dataTable || 'Unknown',
-      }));
+      const dataMap = new Map<string, any>();
+      
+      chartData.forEach(d => {
+        const key = isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`;
+        if (!dataMap.has(key)) {
+          dataMap.set(key, { category: key });
+        }
+        const tableName = d.dataTable || 'Unknown';
+        dataMap.get(key)[tableName] = d.value;
+      });
+      
+      return Array.from(dataMap.values());
     }
   };
 
-  const groupedColumnConfig = {
-    data: prepareChartData(),
-    xField: 'category',
-    yField: 'value',
-    colorField: selectedTables.length > 1 ? 'type' : undefined,
-    group: selectedTables.length > 1,
-    label: {
-      position: 'top' as const,
-      style: {
-        fill: '#000',
-        opacity: 0.6,
-        fontSize: 10,
-      },
-    },
-    legend: selectedTables.length > 1 ? {
-      position: 'top' as const,
-    } : false,
-    xAxis: {
-      label: {
-        autoRotate: true,
-        autoHide: false,
-      },
-    },
-    meta: {
-      category: {
-        alias: 'Library (Year)',
-      },
-      value: {
-        alias: 'Total',
-      },
-      type: {
-        alias: 'Data Table',
-      },
-    },
-  };
-
-  const lineConfig = (() => {
-    const uniqueLibraries = new Set(chartData.map(d => d.libraryId));
-    const isSingleLibrary = uniqueLibraries.size === 1;
-
-    return {
-      data: prepareChartData(),
-      xField: 'category',
-      yField: 'value',
-      colorField: selectedTables.length > 1 ? 'type' : undefined,
-      seriesField: selectedTables.length > 1 ? 'type' : undefined,
-      point: {
-        size: 5,
-        shape: 'diamond',
-      },
-      legend: selectedTables.length > 1 ? {
-        position: 'top' as const,
-      } : false,
-      xAxis: {
-        label: {
-          autoRotate: !isSingleLibrary,
-          autoHide: false,
-        },
-      },
-      meta: {
-        category: {
-          alias: isSingleLibrary ? 'Year' : 'Library (Year)',
-        },
-        value: {
-          alias: 'Total',
-        },
-        type: {
-          alias: 'Data Table',
-        },
-      },
-    };
-  })();
-
-  // Prepare dual axes data (only when exactly 2 tables selected)
-  const prepareDualAxesData = () => {
-    if (selectedTables.length !== 2) return { left: [], right: [] };
+  // Prepare data for radar chart
+  const prepareRadarData = () => {
+    if (selectedTables.length < 3) return [];
     
-    const table1Data = chartData.filter(d => d.tableKey === selectedTables[0]);
-    const table2Data = chartData.filter(d => d.tableKey === selectedTables[1]);
+    const uniqueLibYears = Array.from(new Set(chartData.map(d => `${d.libraryName} (${d.year})`)));
     
-    // Check if single library
-    const uniqueLibraries = new Set(chartData.map(d => d.libraryId));
-    const isSingleLibrary = uniqueLibraries.size === 1;
+    const metricsMap = new Map<string, any>();
     
-    // Get all unique categories from both datasets
-    const allCategories = new Set<string>();
-    [...table1Data, ...table2Data].forEach(d => {
-      const cat = isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`;
-      allCategories.add(cat);
+    chartData.forEach(d => {
+      const metric = d.dataTable || 'Unknown';
+      if (!metricsMap.has(metric)) {
+        metricsMap.set(metric, { metric });
+      }
+      const libYear = `${d.libraryName} (${d.year})`;
+      metricsMap.get(metric)[libYear] = d.value;
     });
     
-    // Create maps for quick lookup
-    const table1Map = new Map(
-      table1Data.map(d => {
-        const cat = isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`;
-        return [cat, d.value];
-      })
-    );
-    const table2Map = new Map(
-      table2Data.map(d => {
-        const cat = isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`;
-        return [cat, d.value];
-      })
-    );
-    
-    // Build datasets with matching categories, using 0 for missing values
-    const categories = Array.from(allCategories).sort();
-    
-    return {
-      left: categories.map(category => ({
-        category,
-        value: table1Map.get(category) || 0,
-      })),
-      right: categories.map(category => ({
-        category,
-        value: table2Map.get(category) || 0,
-      })),
-    };
+    return Array.from(metricsMap.values());
   };
 
-  const dualAxesConfig = () => {
-    const { left, right } = prepareDualAxesData();
-    const table1Label = dataTables.find(t => t.key === selectedTables[0])?.label || 'Table 1';
-    const table2Label = dataTables.find(t => t.key === selectedTables[1])?.label || 'Table 2';
-    const uniqueLibraries = new Set(chartData.map(d => d.libraryId));
-    const isSingleLibrary = uniqueLibraries.size === 1;
+  // Prepare data for pie chart
+  const preparePieData = () => {
+    const aggregated = new Map();
+    chartData.forEach(d => {
+      const key = d.dataTable || 'Unknown';
+      const current = aggregated.get(key) || 0;
+      aggregated.set(key, current + d.value);
+    });
     
-    return {
-      data: [left, right],
-      xField: 'category',
-      yField: ['value', 'value'],
-      geometryOptions: [
-        {
-          geometry: 'column',
-          isGroup: false,
-          seriesField: '',
-          columnWidthRatio: 0.4,
-        },
-        {
-          geometry: 'line',
-          lineStyle: {
-            lineWidth: 2,
-          },
-        },
-      ],
-      xAxis: {
-        label: {
-          autoRotate: !isSingleLibrary,
-          autoHide: false,
-        },
-        title: {
-          text: isSingleLibrary ? 'Year' : 'Library (Year)',
-          style: { fontSize: 12 },
-        },
-      },
-      yAxis: {},
-      legend: {
-        position: 'top' as const,
-        items: [
-          {
-            name: table1Label,
-            value: table1Label,
-            marker: {
-              symbol: 'square',
-              style: { fill: '#5B8FF9', r: 5 },
-            },
-          },
-          {
-            name: table2Label,
-            value: table2Label,
-            marker: {
-              symbol: 'line',
-              style: { stroke: '#5AD8A6', r: 5, lineWidth: 2 },
-            },
-          },
-        ],
-      },
-      tooltip: {
-        shared: true,
-        showCrosshairs: true,
-      },
-    };
+    return Array.from(aggregated.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  };
+
+  // Get current theme colors
+  const getThemeColors = () => {
+    return COLOR_THEMES[colorTheme].colors;
+  };
+
+  // Create chart config dynamically
+  const createChartConfig = (): ChartConfig => {
+    const config: ChartConfig = {};
+    const themeColors = getThemeColors();
+    
+    if (selectedTables.length === 1) {
+      config.value = {
+        label: tableLabel,
+        color: themeColors[0],
+      };
+    } else {
+      const uniqueTables = Array.from(new Set(chartData.map(d => d.dataTable)));
+      uniqueTables.forEach((table, index) => {
+        if (table) {
+          config[table] = {
+            label: table,
+            color: themeColors[index % themeColors.length],
+          };
+        }
+      });
+    }
+    
+    return config;
+  };
+
+  const toggleLibrary = (libId: number) => {
+    setSelectedLibraries(prev =>
+      prev.includes(libId) ? prev.filter(id => id !== libId) : [...prev, libId]
+    );
+  };
+
+  const toggleYear = (year: number) => {
+    setSelectedYears(prev =>
+      prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
+    );
+  };
+
+  const toggleTable = (tableKey: string) => {
+    setSelectedTables(prev =>
+      prev.includes(tableKey) ? prev.filter(k => k !== tableKey) : [...prev, tableKey]
+    );
   };
 
   if (metadataLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-        <Spin size="large" tip="Loading...">
-          <div style={{ padding: '50px' }} />
-        </Spin>
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
+  const chartConfig = createChartConfig();
+
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      <Title level={2}>Data Visualization Dashboard</Title>
-      <Text type="secondary">
-        Select libraries, years, and data tables to visualize CEAL statistics
-      </Text>
+    <div className="container mx-auto p-6 max-w-7xl space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">Data Visualization Dashboard</h1>
+        <p className="text-muted-foreground">
+          Select libraries, years, and data tables to visualize CEAL statistics with beautiful charts
+        </p>
+      </div>
 
-      <Card style={{ marginTop: '24px' }}>
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          {/* Selection Controls */}
-          <div>
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <div>
-                <Text strong>Select Libraries:</Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: '100%', marginTop: '8px' }}
-                  placeholder="Select one or more libraries"
-                  value={selectedLibraries}
-                  onChange={setSelectedLibraries}
-                  showSearch
-                  optionFilterProp="children"
-                  maxTagCount="responsive"
+      <Card>
+        <CardHeader>
+          <CardTitle>Chart Configuration</CardTitle>
+          <CardDescription>Configure your data visualization</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Libraries Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Select Libraries</label>
+            <Popover open={libraryOpen} onOpenChange={setLibraryOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={libraryOpen}
+                  className="w-full justify-between h-auto min-h-10"
                 >
-                  {libraries.map(lib => (
-                    <Option key={lib.value} value={lib.value}>
-                      {lib.label}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-
-              <div>
-                <Text strong>Select Years:</Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: '100%', marginTop: '8px' }}
-                  placeholder="Select one or more years"
-                  value={selectedYears}
-                  onChange={setSelectedYears}
-                  maxTagCount="responsive"
-                >
-                  {years.map(year => (
-                    <Option key={year} value={year}>
-                      {year}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-
-              <div>
-                <Text strong>Select Data Tables:</Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: '100%', marginTop: '8px' }}
-                  placeholder="Select one or more data tables"
-                  value={selectedTables}
-                  onChange={setSelectedTables}
-                  maxTagCount="responsive"
-                >
-                  {dataTables.map(table => (
-                    <Option key={table.key} value={table.key}>
-                      {table.label}
-                    </Option>
-                  ))}
-                </Select>
-                <Text type="secondary" style={{ fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                  Select 2 tables for Dual Axes comparison, or multiple for grouped visualization
-                </Text>
-              </div>
-
-              <div>
-                <Text strong>Chart Type:</Text>
-                <div style={{ marginTop: '8px' }}>
-                  <Space>
-                    <Button
-                      type={chartType === 'grouped' ? 'primary' : 'default'}
-                      icon={<BarChartOutlined />}
-                      onClick={() => setChartType('grouped')}
-                    >
-                      Grouped Column
-                    </Button>
-                    <Button
-                      type={chartType === 'line' ? 'primary' : 'default'}
-                      icon={<LineChartOutlined />}
-                      onClick={() => setChartType('line')}
-                    >
-                      Multi-Line
-                    </Button>
-                    <Button
-                      type={chartType === 'dual' ? 'primary' : 'default'}
-                      disabled={selectedTables.length !== 2}
-                      onClick={() => setChartType('dual')}
-                      title={selectedTables.length !== 2 ? 'Select exactly 2 data tables for Dual Axes' : ''}
-                    >
-                      Dual Axes
-                    </Button>
-                  </Space>
-                </div>
-                {selectedTables.length !== 2 && (
-                  <Text type="secondary" style={{ fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                    Dual Axes requires exactly 2 data tables selected
-                  </Text>
-                )}
-              </div>
-
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleGenerateChart}
-                disabled={selectedLibraries.length === 0 || selectedYears.length === 0 || selectedTables.length === 0}
-                loading={loading}
-                style={{ width: '200px' }}
-              >
-                Generate Chart
-              </Button>
-            </Space>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedLibraries.length === 0 ? (
+                      <span className="text-muted-foreground">Select libraries...</span>
+                    ) : (
+                      selectedLibraries.slice(0, 3).map(libId => {
+                        const lib = libraries.find(l => l.value === libId);
+                        return lib ? (
+                          <Badge key={libId} variant="secondary" className="mr-1">
+                            {lib.label}
+                          </Badge>
+                        ) : null;
+                      })
+                    )}
+                    {selectedLibraries.length > 3 && (
+                      <Badge variant="secondary">+{selectedLibraries.length - 3} more</Badge>
+                    )}
+                  </div>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[600px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search libraries..." />
+                  <CommandEmpty>No library found.</CommandEmpty>
+                  <CommandList className="max-h-[300px]">
+                    <CommandGroup>
+                      {libraries.map(lib => (
+                        <CommandItem
+                          key={lib.value}
+                          onSelect={() => toggleLibrary(lib.value)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 flex-1">
+                            <Checkbox
+                              checked={selectedLibraries.includes(lib.value)}
+                              onCheckedChange={() => toggleLibrary(lib.value)}
+                            />
+                            <span>{lib.label}</span>
+                          </div>
+                          {selectedLibraries.includes(lib.value) && (
+                            <Check className="ml-auto h-4 w-4" />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground">
+              {selectedLibraries.length} {selectedLibraries.length === 1 ? 'library' : 'libraries'} selected
+            </p>
           </div>
 
-          {/* Chart Display */}
-          {chartData.length > 0 && (
-            <Card
-              title={
-                <Space>
-                  <Text strong>{tableLabel}</Text>
-                  <Tag color="blue">{chartData.length} data points</Tag>
-                  <Tag color="green">{selectedTables.length} {selectedTables.length === 1 ? 'table' : 'tables'}</Tag>
-                </Space>
+          {/* Years Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Select Years</label>
+            <Popover open={yearOpen} onOpenChange={setYearOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={yearOpen}
+                  className="w-full justify-between h-auto min-h-10"
+                >
+                  <div className="flex flex-wrap gap-1">
+                    {selectedYears.length === 0 ? (
+                      <span className="text-muted-foreground">Select years...</span>
+                    ) : (
+                      selectedYears.slice(0, 5).map(year => (
+                        <Badge key={year} variant="secondary" className="mr-1">
+                          {year}
+                        </Badge>
+                      ))
+                    )}
+                    {selectedYears.length > 5 && (
+                      <Badge variant="secondary">+{selectedYears.length - 5} more</Badge>
+                    )}
+                  </div>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[500px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search years..." />
+                  <CommandEmpty>No year found.</CommandEmpty>
+                  <CommandList className="max-h-[300px]">
+                    <CommandGroup>
+                      {years.map(year => (
+                        <CommandItem
+                          key={year}
+                          onSelect={() => toggleYear(year)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 flex-1">
+                            <Checkbox
+                              checked={selectedYears.includes(year)}
+                              onCheckedChange={() => toggleYear(year)}
+                            />
+                            <span>{year}</span>
+                          </div>
+                          {selectedYears.includes(year) && (
+                            <Check className="ml-auto h-4 w-4" />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground">
+              {selectedYears.length} {selectedYears.length === 1 ? 'year' : 'years'} selected
+            </p>
+          </div>
+
+          {/* Tables Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Select Data Tables</label>
+            <div className="flex flex-wrap gap-2">
+              {dataTables.map(table => (
+                <Button
+                  key={table.key}
+                  variant={selectedTables.includes(table.key) ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => toggleTable(table.key)}
+                >
+                  {table.label}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {selectedTables.length < 3 && chartType === 'radar' && 
+                'Radar chart requires at least 3 data tables for meaningful comparison'
               }
-              style={{ marginTop: '24px' }}
-            >
-              {chartType === 'grouped' ? (
-                <Column {...groupedColumnConfig} />
-              ) : chartType === 'line' ? (
-                <Line {...lineConfig} />
-              ) : chartType === 'dual' && selectedTables.length === 2 ? (
-                <DualAxes {...dualAxesConfig()} />
-              ) : (
-                <Column {...groupedColumnConfig} />
-              )}
-            </Card>
-          )}
+            </p>
+          </div>
 
-          {chartData.length > 0 && selectedTables.length > 1 && (
-            <Card style={{ marginTop: '16px' }} size="small">
-              <Space direction="vertical" size="small">
-                <Text strong>Visualization Tips:</Text>
-                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                  <li><Text type="secondary">Grouped Column: Best for comparing multiple metrics side-by-side</Text></li>
-                  <li><Text type="secondary">Multi-Line: Ideal for tracking trends across different metrics</Text></li>
-                  <li><Text type="secondary">Dual Axes: Compare 2 metrics with different scales (requires exactly 2 tables)</Text></li>
-                </ul>
-              </Space>
-            </Card>
-          )}
+          {/* Chart Type Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Chart Type</label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={chartType === 'bar' ? 'default' : 'outline'}
+                onClick={() => setChartType('bar')}
+              >
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Bar Chart
+              </Button>
+              <Button
+                variant={chartType === 'line' ? 'default' : 'outline'}
+                onClick={() => setChartType('line')}
+              >
+                <LineChartIcon className="mr-2 h-4 w-4" />
+                Line Chart
+              </Button>
+              <Button
+                variant={chartType === 'area' ? 'default' : 'outline'}
+                onClick={() => setChartType('area')}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                Area Chart
+              </Button>
+              <Button
+                variant={chartType === 'radar' ? 'default' : 'outline'}
+                onClick={() => setChartType('radar')}
+                disabled={selectedTables.length < 3}
+              >
+                <RadarIcon className="mr-2 h-4 w-4" />
+                Radar Chart
+              </Button>
+              <Button
+                variant={chartType === 'pie' ? 'default' : 'outline'}
+                onClick={() => setChartType('pie')}
+              >
+                <PieChartIcon className="mr-2 h-4 w-4" />
+                Pie Chart
+              </Button>
+            </div>
+          </div>
 
-          {chartData.length === 0 && !loading && selectedTables.length > 0 && (
-            <Card style={{ marginTop: '24px' }}>
-              <Text type="secondary">
-                No data available for the selected criteria. Please try different selections.
-              </Text>
-            </Card>
-          )}
-        </Space>
+          {/* Color Theme Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Color Theme</label>
+            <div className="flex items-center gap-2">
+              <Palette className="h-4 w-4 text-muted-foreground" />
+              <select
+                value={colorTheme}
+                onChange={(e) => setColorTheme(e.target.value as ColorTheme)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {Object.entries(COLOR_THEMES).map(([key, theme]) => (
+                  <option key={key} value={key}>
+                    {theme.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 mt-2">
+              {getThemeColors().map((color, index) => (
+                <div
+                  key={index}
+                  className="h-6 w-6 rounded-full border-2 border-muted"
+                  style={{ backgroundColor: color }}
+                  title={`Color ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <Button
+            className="w-full"
+            onClick={handleGenerateChart}
+            disabled={selectedLibraries.length === 0 || selectedYears.length === 0 || selectedTables.length === 0 || loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <TrendingUp className="mr-2 h-4 w-4" />
+                Generate Chart
+              </>
+            )}
+          </Button>
+        </CardContent>
       </Card>
+
+      {/* Chart Display */}
+      {chartData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>{tableLabel}</span>
+              <div className="flex gap-2">
+                <Badge variant="secondary">{chartData.length} data points</Badge>
+                <Badge variant="secondary">{selectedTables.length} tables</Badge>
+              </div>
+            </CardTitle>
+            <CardDescription>
+              Interactive visualization of your selected data
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {chartType === 'bar' && (
+              <ChartContainer config={chartConfig} className="h-[500px]">
+                <BarChart data={prepareChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="category"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  {selectedTables.length === 1 ? (
+                    <Bar dataKey="value" fill={getThemeColors()[0]} radius={[4, 4, 0, 0]} />
+                  ) : (
+                    Object.keys(chartConfig).map((key, index) => (
+                      <Bar
+                        key={key}
+                        dataKey={key}
+                        fill={getThemeColors()[index % getThemeColors().length]}
+                        radius={[4, 4, 0, 0]}
+                      />
+                    ))
+                  )}
+                </BarChart>
+              </ChartContainer>
+            )}
+
+            {chartType === 'line' && (
+              <ChartContainer config={chartConfig} className="h-[500px]">
+                <LineChart data={prepareChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="category"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  {selectedTables.length === 1 ? (
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke={getThemeColors()[0]}
+                      strokeWidth={2}
+                      dot={{ fill: getThemeColors()[0], r: 4 }}
+                    />
+                  ) : (
+                    Object.keys(chartConfig).map((key, index) => (
+                      <Line
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        stroke={getThemeColors()[index % getThemeColors().length]}
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                      />
+                    ))
+                  )}
+                </LineChart>
+              </ChartContainer>
+            )}
+
+            {chartType === 'area' && (
+              <ChartContainer config={chartConfig} className="h-[500px]">
+                <AreaChart data={prepareChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="category"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  {selectedTables.length === 1 ? (
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      fill={getThemeColors()[0]}
+                      stroke={getThemeColors()[0]}
+                      fillOpacity={0.6}
+                    />
+                  ) : (
+                    Object.keys(chartConfig).map((key, index) => (
+                      <Area
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        fill={getThemeColors()[index % getThemeColors().length]}
+                        stroke={getThemeColors()[index % getThemeColors().length]}
+                        fillOpacity={0.6}
+                        stackId="1"
+                      />
+                    ))
+                  )}
+                </AreaChart>
+              </ChartContainer>
+            )}
+
+            {chartType === 'radar' && selectedTables.length >= 3 && (
+              <ChartContainer config={chartConfig} className="h-[500px]">
+                <RadarChart data={prepareRadarData()}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="metric" />
+                  <PolarRadiusAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  {Array.from(new Set(chartData.map(d => `${d.libraryName} (${d.year})`))).map((libYear, index) => (
+                    <Radar
+                      key={libYear}
+                      name={libYear}
+                      dataKey={libYear}
+                      stroke={getThemeColors()[index % getThemeColors().length]}
+                      fill={getThemeColors()[index % getThemeColors().length]}
+                      fillOpacity={0.3}
+                    />
+                  ))}
+                </RadarChart>
+              </ChartContainer>
+            )}
+
+            {chartType === 'pie' && (
+              <ChartContainer config={chartConfig} className="h-[500px]">
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Pie
+                    data={preparePieData()}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={150}
+                    label
+                  >
+                    {preparePieData().map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={getThemeColors()[index % getThemeColors().length]} />
+                    ))}
+                  </Pie>
+                  <RechartsLegend />
+                </PieChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Visualization Tips */}
+      {chartData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>📊 Visualization Guide</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 text-sm">
+              <div>
+                <span className="font-semibold">Bar Chart:</span> Best for comparing values across categories side-by-side
+              </div>
+              <div>
+                <span className="font-semibold">Line Chart:</span> Ideal for showing trends and changes over time
+              </div>
+              <div>
+                <span className="font-semibold">Area Chart:</span> Shows volume and cumulative trends with filled areas
+              </div>
+              <div>
+                <span className="font-semibold">Radar Chart:</span> Multi-dimensional comparison (requires 3+ tables)
+              </div>
+              <div>
+                <span className="font-semibold">Pie Chart:</span> Shows composition and proportions of categories
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {chartData.length === 0 && !loading && selectedTables.length > 0 && (
+        <Card>
+          <CardContent className="py-12">
+            <p className="text-center text-muted-foreground">
+              No data available for the selected criteria. Please try different selections.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
