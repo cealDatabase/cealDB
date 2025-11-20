@@ -62,6 +62,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "html-to-image": "^1.11.13",
     "jose": "^6.1.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.553.0",

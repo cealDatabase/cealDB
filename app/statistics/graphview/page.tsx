@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Bar,
   BarChart,
@@ -29,8 +29,9 @@ import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BarChart3, LineChart as LineChartIcon, Activity, PieChart as PieChartIcon, Radar as RadarIcon, Loader2, TrendingUp, Check, ChevronsUpDown, X, Palette } from 'lucide-react';
+import { BarChart3, LineChart as LineChartIcon, Activity, PieChart as PieChartIcon, Radar as RadarIcon, Loader2, TrendingUp, Check, ChevronsUpDown, X, Palette, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toPng } from 'html-to-image';
 
 interface Library {
   value: number;
@@ -121,6 +122,9 @@ export default function GraphViewPage() {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [yearOpen, setYearOpen] = useState(false);
   const [colorTheme, setColorTheme] = useState<ColorTheme>('neutral');
+  const [isExporting, setIsExporting] = useState(false);
+  
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchMetadata();
@@ -198,27 +202,66 @@ export default function GraphViewPage() {
     fetchChartData();
   };
 
+  const handleExportPNG = async () => {
+    if (!chartRef.current) return;
+    
+    try {
+      setIsExporting(true);
+      const dataUrl = await toPng(chartRef.current, {
+        quality: 1.0,
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+      });
+      
+      const link = document.createElement('a');
+      link.download = `ceal-chart-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Error exporting chart:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Prepare data for bar, line, and area charts
   const prepareChartData = () => {
-    const uniqueLibraries = new Set(chartData.map(d => d.libraryId));
-    const isSingleLibrary = uniqueLibraries.size === 1;
+    const uniqueLibraries = Array.from(new Set(chartData.map(d => d.libraryId)));
+    const uniqueYears = Array.from(new Set(chartData.map(d => d.year))).sort();
+    const isSingleLibrary = uniqueLibraries.length === 1;
+    const isSingleYear = uniqueYears.length === 1;
 
     if (selectedTables.length === 1) {
-      return chartData.map(d => ({
-        category: isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`,
-        value: d.value,
-        name: d.libraryName,
-      }));
+      // Single table: group by year on X-axis, series for each library
+      const dataMap = new Map<number, any>();
+      
+      chartData.forEach(d => {
+        if (!dataMap.has(d.year)) {
+          dataMap.set(d.year, { category: String(d.year) });
+        }
+        // Use library name as the series key
+        dataMap.get(d.year)![d.libraryName] = d.value;
+      });
+      
+      return Array.from(dataMap.values());
     } else {
+      // Multiple tables: smarter grouping
+      // If multiple years, group by year; if single year, group by library
       const dataMap = new Map<string, any>();
       
       chartData.forEach(d => {
-        const key = isSingleLibrary ? String(d.year) : `${d.libraryName} (${d.year})`;
+        const key = isSingleYear ? d.libraryName : String(d.year);
         if (!dataMap.has(key)) {
           dataMap.set(key, { category: key });
         }
         const tableName = d.dataTable || 'Unknown';
-        dataMap.get(key)[tableName] = d.value;
+        // For multiple libraries and years, create composite key
+        if (!isSingleYear && !isSingleLibrary) {
+          const seriesKey = `${tableName} (${d.libraryName})`;
+          dataMap.get(key)![seriesKey] = d.value;
+        } else {
+          dataMap.get(key)![tableName] = d.value;
+        }
       });
       
       return Array.from(dataMap.values());
@@ -269,22 +312,47 @@ export default function GraphViewPage() {
   const createChartConfig = (): ChartConfig => {
     const config: ChartConfig = {};
     const themeColors = getThemeColors();
+    const uniqueLibraries = Array.from(new Set(chartData.map(d => d.libraryName)));
+    const uniqueYears = Array.from(new Set(chartData.map(d => d.year)));
+    const isSingleYear = uniqueYears.length === 1;
+    const isSingleLibrary = uniqueLibraries.length === 1;
     
     if (selectedTables.length === 1) {
-      config.value = {
-        label: tableLabel,
-        color: themeColors[0],
-      };
-    } else {
-      const uniqueTables = Array.from(new Set(chartData.map(d => d.dataTable)));
-      uniqueTables.forEach((table, index) => {
-        if (table) {
-          config[table] = {
-            label: table,
-            color: themeColors[index % themeColors.length],
-          };
-        }
+      // Single table: each library gets its own color
+      uniqueLibraries.forEach((libraryName, index) => {
+        config[libraryName] = {
+          label: libraryName,
+          color: themeColors[index % themeColors.length],
+        };
       });
+    } else {
+      // Multiple tables: create series for table-library combinations
+      if (!isSingleYear && !isSingleLibrary) {
+        // Multiple years and libraries: combine table + library names
+        const uniqueTables = Array.from(new Set(chartData.map(d => d.dataTable)));
+        let colorIndex = 0;
+        uniqueTables.forEach(table => {
+          uniqueLibraries.forEach(library => {
+            const seriesKey = `${table} (${library})`;
+            config[seriesKey] = {
+              label: seriesKey,
+              color: themeColors[colorIndex % themeColors.length],
+            };
+            colorIndex++;
+          });
+        });
+      } else {
+        // Single year or single library: just use table names
+        const uniqueTables = Array.from(new Set(chartData.map(d => d.dataTable)));
+        uniqueTables.forEach((table, index) => {
+          if (table) {
+            config[table] = {
+              label: table,
+              color: themeColors[index % themeColors.length],
+            };
+          }
+        });
+      }
     }
     
     return config;
@@ -579,23 +647,43 @@ export default function GraphViewPage() {
 
       {/* Chart Display */}
       {chartData.length > 0 && (
-        <Card>
+        <Card ref={chartRef}>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>{tableLabel}</span>
+            <div className="flex items-start justify-between">
+              <div className="space-y-1.5">
+                <CardTitle>{tableLabel}</CardTitle>
+                <CardDescription>
+                  Interactive visualization of your selected data
+                </CardDescription>
+              </div>
               <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPNG}
+                  disabled={isExporting}
+                >
+                  {isExporting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-4 w-4" />
+                      Export PNG
+                    </>
+                  )}
+                </Button>
                 <Badge variant="secondary">{chartData.length} data points</Badge>
                 <Badge variant="secondary">{selectedTables.length} tables</Badge>
               </div>
-            </CardTitle>
-            <CardDescription>
-              Interactive visualization of your selected data
-            </CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             {chartType === 'bar' && (
-              <ChartContainer config={chartConfig} className="h-[500px]">
-                <BarChart data={prepareChartData()}>
+              <ChartContainer config={chartConfig} className="h-[600px]">
+                <BarChart data={prepareChartData()} margin={{ top: 5, right: 150, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="category"
@@ -606,26 +694,22 @@ export default function GraphViewPage() {
                   />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  {selectedTables.length === 1 ? (
-                    <Bar dataKey="value" fill={getThemeColors()[0]} radius={[4, 4, 0, 0]} />
-                  ) : (
-                    Object.keys(chartConfig).map((key, index) => (
-                      <Bar
-                        key={key}
-                        dataKey={key}
-                        fill={getThemeColors()[index % getThemeColors().length]}
-                        radius={[4, 4, 0, 0]}
-                      />
-                    ))
-                  )}
+                  <RechartsLegend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ paddingLeft: '20px' }} />
+                  {Object.keys(chartConfig).map((key, index) => (
+                    <Bar
+                      key={key}
+                      dataKey={key}
+                      fill={getThemeColors()[index % getThemeColors().length]}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  ))}
                 </BarChart>
               </ChartContainer>
             )}
 
             {chartType === 'line' && (
-              <ChartContainer config={chartConfig} className="h-[500px]">
-                <LineChart data={prepareChartData()}>
+              <ChartContainer config={chartConfig} className="h-[600px]">
+                <LineChart data={prepareChartData()} margin={{ top: 5, right: 150, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="category"
@@ -636,34 +720,24 @@ export default function GraphViewPage() {
                   />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  {selectedTables.length === 1 ? (
+                  <RechartsLegend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ paddingLeft: '20px' }} />
+                  {Object.keys(chartConfig).map((key, index) => (
                     <Line
+                      key={key}
                       type="monotone"
-                      dataKey="value"
-                      stroke={getThemeColors()[0]}
+                      dataKey={key}
+                      stroke={getThemeColors()[index % getThemeColors().length]}
                       strokeWidth={2}
-                      dot={{ fill: getThemeColors()[0], r: 4 }}
+                      dot={{ r: 4 }}
                     />
-                  ) : (
-                    Object.keys(chartConfig).map((key, index) => (
-                      <Line
-                        key={key}
-                        type="monotone"
-                        dataKey={key}
-                        stroke={getThemeColors()[index % getThemeColors().length]}
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                      />
-                    ))
-                  )}
+                  ))}
                 </LineChart>
               </ChartContainer>
             )}
 
             {chartType === 'area' && (
-              <ChartContainer config={chartConfig} className="h-[500px]">
-                <AreaChart data={prepareChartData()}>
+              <ChartContainer config={chartConfig} className="h-[600px]">
+                <AreaChart data={prepareChartData()} margin={{ top: 5, right: 150, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="category"
@@ -674,40 +748,30 @@ export default function GraphViewPage() {
                   />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  {selectedTables.length === 1 ? (
+                  <RechartsLegend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ paddingLeft: '20px' }} />
+                  {Object.keys(chartConfig).map((key, index) => (
                     <Area
+                      key={key}
                       type="monotone"
-                      dataKey="value"
-                      fill={getThemeColors()[0]}
-                      stroke={getThemeColors()[0]}
+                      dataKey={key}
+                      fill={getThemeColors()[index % getThemeColors().length]}
+                      stroke={getThemeColors()[index % getThemeColors().length]}
                       fillOpacity={0.6}
+                      stackId="1"
                     />
-                  ) : (
-                    Object.keys(chartConfig).map((key, index) => (
-                      <Area
-                        key={key}
-                        type="monotone"
-                        dataKey={key}
-                        fill={getThemeColors()[index % getThemeColors().length]}
-                        stroke={getThemeColors()[index % getThemeColors().length]}
-                        fillOpacity={0.6}
-                        stackId="1"
-                      />
-                    ))
-                  )}
+                  ))}
                 </AreaChart>
               </ChartContainer>
             )}
 
             {chartType === 'radar' && selectedTables.length >= 3 && (
-              <ChartContainer config={chartConfig} className="h-[500px]">
-                <RadarChart data={prepareRadarData()}>
+              <ChartContainer config={chartConfig} className="h-[600px]">
+                <RadarChart data={prepareRadarData()} margin={{ top: 20, right: 150, left: 20, bottom: 20 }}>
                   <PolarGrid />
                   <PolarAngleAxis dataKey="metric" />
                   <PolarRadiusAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent />} />
+                  <RechartsLegend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ paddingLeft: '20px' }} />
                   {Array.from(new Set(chartData.map(d => `${d.libraryName} (${d.year})`))).map((libYear, index) => (
                     <Radar
                       key={libYear}
@@ -723,23 +787,23 @@ export default function GraphViewPage() {
             )}
 
             {chartType === 'pie' && (
-              <ChartContainer config={chartConfig} className="h-[500px]">
-                <PieChart>
+              <ChartContainer config={chartConfig} className="h-[600px]">
+                <PieChart margin={{ top: 20, right: 150, left: 20, bottom: 20 }}>
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Pie
                     data={preparePieData()}
                     dataKey="value"
                     nameKey="name"
-                    cx="50%"
+                    cx="40%"
                     cy="50%"
-                    outerRadius={150}
+                    outerRadius={180}
                     label
                   >
                     {preparePieData().map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={getThemeColors()[index % getThemeColors().length]} />
                     ))}
                   </Pie>
-                  <RechartsLegend />
+                  <RechartsLegend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ paddingLeft: '20px' }} />
                 </PieChart>
               </ChartContainer>
             )}
