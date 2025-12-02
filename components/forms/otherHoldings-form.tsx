@@ -227,7 +227,7 @@ export default function OtherHoldingsForm() {
     (watchedValues.ohstreamingvideokorean || 0) +
     (watchedValues.ohstreamingvideononcjk || 0)
 
-  const grandTotal = microformSubtotal + graphicSubtotal + audioSubtotal + videoSubtotal + dvdSubtotal + customSubtotal + onlineMapSubtotal + onlineImageSubtotal + streamingAudioSubtotal + streamingVideoSubtotal
+  const grandTotal = microformSubtotal + graphicSubtotal + audioSubtotal + videoSubtotal + dvdSubtotal
 
   // Import AV data function
   const [isImporting, setIsImporting] = useState(false);
@@ -758,7 +758,7 @@ export default function OtherHoldingsForm() {
         <SubtotalDisplay
           label='51. GRAND TOTAL (Other Materials)'
           value={grandTotal}
-          formula='05 + 10 + 15 + 20 + 25 + 30 + 35 + 40 + 45 + 50'
+          formula='05 + 10 + 15 + 20 + 25'
           className='bg-blue-50 p-4 rounded-lg'
           valueClassName='bg-blue-200 px-3 py-1 rounded'
         />
