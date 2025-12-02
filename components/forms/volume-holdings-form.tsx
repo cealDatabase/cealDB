@@ -402,7 +402,7 @@ export default function VolumeHoldingsForm() {
         <SubtotalDisplay
           label="Electronic Books Purchased Volume Total"
           value={ebookVolumesTotal}
-          formula="Imported from E-Book Databases"
+          formula={`Pull the number from Line 20 (Subtotal - Total) under "Purchased Volumes" in Form 10 Electronic Books.`}
           className="bg-blue-50 p-4 rounded-lg"
           valueClassName="bg-blue-200 px-3 py-1 rounded"
         />
