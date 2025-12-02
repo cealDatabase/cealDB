@@ -182,25 +182,25 @@ export default function VolumeHoldingsForm() {
     }
   }, [params.libid, form]);
 
-  // Load Electronic Books Purchased Volume Total from subscriptions
+  // Load Electronic Books Purchased Volume Total from Form 10 (Electronic Books)
   useEffect(() => {
     const loadEBookVolumes = async () => {
       try {
         const libraryId = Number(params.libid);
         const currentYear = new Date().getFullYear();
 
-        const response = await fetch(`/api/electronic-books/import-subscription-volumes/${libraryId}/${currentYear}`);
+        const response = await fetch(`/api/electronic-books/purchased-volumes/${libraryId}/${currentYear}`);
         if (response.ok) {
           const data = await response.json();
           const total = data.total || 0;
           setEbookVolumesTotal(total);
-          console.log('E-Book volumes total loaded:', total);
+          console.log('E-Book Purchased Volumes total loaded:', total);
         } else {
-          console.log('No E-Book subscription data found');
+          console.log('No E-Book purchased volumes data found');
           setEbookVolumesTotal(0);
         }
       } catch (error) {
-        console.log('Error loading E-Book volumes:', error);
+        console.log('Error loading E-Book purchased volumes:', error);
         setEbookVolumesTotal(0);
       }
     };
