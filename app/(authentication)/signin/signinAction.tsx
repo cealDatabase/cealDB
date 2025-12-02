@@ -25,9 +25,14 @@ export default async function signinAction(
   }
 
   try {
-    // Find user in database with role and library information
+    // Find user in database with role and library information - case insensitive
     const user = await db.user.findFirst({
-      where: { username: username },
+      where: { 
+        username: {
+          equals: username,
+          mode: 'insensitive'
+        }
+      },
       select: {
         id: true,
         username: true,

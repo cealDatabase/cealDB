@@ -30,13 +30,13 @@ export async function POST(request: NextRequest) {
     console.log(`\n🚀 ARGON2ID SIGNIN ATTEMPT for email: "${email}"`);
     console.log(`📊 Request timestamp: ${new Date().toISOString()}`);
 
-    // Find user by email (treating username as email)
+    // Find user by email (treating username as email) - case insensitive
     const user = await db.user.findFirst({
       where: {
-        OR: [
-          { username: email.toLowerCase() },
-          { username: email.toLowerCase().trim() }
-        ]
+        username: {
+          equals: email.trim(),
+          mode: 'insensitive'
+        }
       },
       select: {
         id: true,
