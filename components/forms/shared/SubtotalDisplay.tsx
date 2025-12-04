@@ -14,7 +14,17 @@ export function SubtotalDisplay({
   valueClassName = "bg-blue-200 px-3 py-1 rounded"
 }: SubtotalDisplayProps) {
   // Handle NaN and undefined values
-  const displayValue = isNaN(value) || value === undefined || value === null ? 0 : value;
+  const rawValue = isNaN(value) || value === undefined || value === null ? 0 : value;
+  
+  // Format number to max 4 decimal places, removing trailing zeros
+  const formatNumber = (num: number): string => {
+    // Round to 4 decimal places to fix floating point precision
+    const rounded = Math.round(num * 10000) / 10000;
+    // Convert to string with up to 4 decimals, then remove trailing zeros
+    return rounded.toFixed(4).replace(/\.?0+$/, '');
+  };
+  
+  const displayValue = formatNumber(rawValue);
   
   return (
     <div className={className}>

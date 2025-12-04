@@ -65,8 +65,11 @@ export default function PastYearsPage() {
   }, [libid])
 
   const formatNumber = (value: number | null | undefined) => {
-    if (value === null || value === undefined) return "0.00"
-    return Number(value).toFixed(2)
+    if (value === null || value === undefined) return "0"
+    // Round to 4 decimal places to fix floating point precision
+    const rounded = Math.round(Number(value) * 10000) / 10000
+    // Convert to string with up to 4 decimals, then remove trailing zeros
+    return rounded.toFixed(4).replace(/\.?0+$/, '')
   }
 
   const formatBoolean = (value: boolean | null | undefined) => {
