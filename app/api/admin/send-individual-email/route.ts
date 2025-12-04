@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { Resend } from 'resend';
 import { cookies } from 'next/headers';
 import { logUserAction } from '@/lib/auditLogger';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 async function getUserRolesFromCookies(): Promise<string[] | null> {
   try {
@@ -133,8 +133,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Unexpected error sending email' },
       { status: 500 },
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

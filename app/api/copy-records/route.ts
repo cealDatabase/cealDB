@@ -115,9 +115,9 @@ export async function POST(request: Request) {
         console.log(`/api/copy-records: Partial duplicates found. Processing ${newRecords.length} new records, skipping ${duplicateIds.length} existing ones`);
         
         // Store info about partial operation for response
-        var isPartialCopy = true;
-        var skippedCount = duplicateIds.length;
-        var originalRequestCount = recordIds.length;
+        const isPartialCopy = true;
+        const skippedCount = duplicateIds.length;
+        const originalRequestCount = recordIds.length;
         
         // Continue processing with filtered records
         return await processRecords(newRecords, resource, targetYear, countsModel, countsField, listRefField, request, isPartialCopy, skippedCount, originalRequestCount);

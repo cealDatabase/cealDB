@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { getSurveyDates } from '@/lib/surveyDates';
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * GET /api/survey-dates
@@ -58,8 +58,5 @@ export async function GET(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

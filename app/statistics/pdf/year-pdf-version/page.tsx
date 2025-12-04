@@ -2,7 +2,7 @@ import { Container } from "@/components/Container";
 import Link from "next/link";
 
 function generateYears(startYear: number, endYear: number) {
-  let years = [];
+  const years = [];
   for (let year = startYear; year <= endYear; year++) {
     years.push(year.toString() + "-" + (year + 1).toString());
   }

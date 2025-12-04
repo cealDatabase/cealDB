@@ -1,10 +1,10 @@
 export type SinglePersonnelSupportType = {
   id: number;
-  entryid: String | null;
+  entryid: string | null;
   libraryyear: number | null;
-  psfnotes: String | null;
-  psfosacquisition: Boolean | null;
-  psfosprocessing: Boolean | null;
+  psfnotes: string | null;
+  psfosacquisition: boolean | null;
+  psfosprocessing: boolean | null;
   psfothers: number | null;
   psfprofessional_chinese: number | null;
   psfprofessional_eastasian: number | null;

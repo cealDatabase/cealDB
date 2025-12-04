@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { Resend } from 'resend';
 import { 
   sendFormsOpenedNotification, 
@@ -10,7 +10,7 @@ import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from
 import { logUserAction } from '@/lib/auditLogger';
 import { formatDateRange } from '@/lib/dateFormatting';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * Vercel Cron Job Handler - Automated Email & Form Status Management
@@ -506,10 +506,7 @@ export async function GET(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 // Also support POST for manual testing

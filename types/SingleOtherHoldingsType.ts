@@ -1,6 +1,6 @@
 export type SingleOtherHoldingsType = {
   id: number;
-  entryid: String | null;
+  entryid: string | null;
   libraryyear: number | null;
   ohaudio_chinese: number | null;
   ohaudio_japanese: number | null;
@@ -22,25 +22,25 @@ export type SingleOtherHoldingsType = {
   ohcomputer_files_korean: number | null;
   ohcomputer_files_noncjk: number | null;
   ohcomputer_files_subtotal: number | null;
-  ohcustom1_label: String | null;
+  ohcustom1_label: string | null;
   ohcustom1chinese: number | null;
   ohcustom1japanese: number | null;
   ohcustom1korean: number | null;
   ohcustom1noncjk: number | null;
   ohcustom1subtotal: number | null;
-  ohcustom2_label: String | null;
+  ohcustom2_label: string | null;
   ohcustom2chinese: number | null;
   ohcustom2japanese: number | null;
   ohcustom2korean: number | null;
   ohcustom2noncjk: number | null;
   ohcustom2subtotal: number | null;
-  ohcustom3_label: String | null;
+  ohcustom3_label: string | null;
   ohcustom3chinese: number | null;
   ohcustom3japanese: number | null;
   ohcustom3korean: number | null;
   ohcustom3noncjk: number | null;
   ohcustom3subtotal: number | null;
-  ohcustom4_label: String | null;
+  ohcustom4_label: string | null;
   ohcustom4chinese: number | null;
   ohcustom4japanese: number | null;
   ohcustom4korean: number | null;
@@ -63,7 +63,7 @@ export type SingleOtherHoldingsType = {
   ohmicroform_korean: number | null;
   ohmicroform_noncjk: number | null;
   ohmicroform_subtotal: number | null;
-  ohnotes: String | null;
+  ohnotes: string | null;
   ohonlineimagechinese: number | null;
   ohonlineimagejapanese: number | null;
   ohonlineimagekorean: number | null;

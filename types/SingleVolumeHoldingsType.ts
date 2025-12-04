@@ -1,6 +1,6 @@
 export type SingleVolumeHoldingsType = {
   id: number;
-  entryid: String | null;
+  entryid: string | null;
   vhprevious_year_chinese: number | null;
   vhprevious_year_japanese: number | null;
   vhprevious_year_korean: number | null;
@@ -29,6 +29,6 @@ export type SingleVolumeHoldingsType = {
   vh_film_fiche_korean: number | null;
   vh_film_fiche_subtotal: number | null;
   vhgrandtotal: number | null;
-  vhnotes: String | null;
+  vhnotes: string | null;
   libraryyear: number | null;
 };

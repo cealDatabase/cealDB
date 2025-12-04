@@ -1,6 +1,6 @@
 export type SingleMonographicType = {
   id: number;
-  entryid: String | null;
+  entryid: string | null;
   mapurchased_titles_chinese: number | null;
   mapurchased_titles_japanese: number | null;
   mapurchased_titles_korean: number | null;
@@ -23,6 +23,6 @@ export type SingleMonographicType = {
   manonpurchased_volumes_subtotal: number | null;
   matotal_titles: number | null;
   matotal_volumes: number | null;
-  manotes: String | null;
+  manotes: string | null;
   libraryyear: number | null;
 };

@@ -30,7 +30,7 @@ export type SingleUserType = {
   id: number;
   username: string;
   password: string;
-  isactive: Boolean;
+  isactive: boolean;
   lastlogin_at: Date | null;
   firstname: string | null;
   lastname: string | null;
@@ -76,17 +76,17 @@ export type LibraryYear_ListJournalType = {
 
 export type List_AV_Type = {
   id: number;
-  type: String | null;
-  title: String | null;
-  cjk_title: String | null;
-  romanized_title: String | null;
-  subtitle: String | null;
-  publisher: String | null;
-  description: String | null;
-  notes: String | null;
-  data_source: String | null;
+  type: string | null;
+  title: string | null;
+  cjk_title: string | null;
+  romanized_title: string | null;
+  subtitle: string | null;
+  publisher: string | null;
+  description: string | null;
+  notes: string | null;
+  data_source: string | null;
   updated_at: Date;
-  is_global: Boolean | null;
+  is_global: boolean | null;
   libraryyear: number | null;
   Library_Year: Library_Year_Type;
   LibraryYear_ListAV: LibraryYear_ListAVType[];
@@ -104,40 +104,40 @@ export type SingleListAVCountsType = {
   titles: number | null;
   year: number | null;
   updatedat: Date;
-  ishidden: Boolean | null;
+  ishidden: boolean | null;
 };
 
 export type List_EBook_Type = {
   id: number;
-  title: String | null;
-  sub_series_number: String | null;
-  publisher: String | null;
-  description: String | null;
-  notes: String | null;
+  title: string | null;
+  sub_series_number: string | null;
+  publisher: string | null;
+  description: string | null;
+  notes: string | null;
   updated_at: Date;
-  subtitle: String | null;
-  cjk_title: String | null;
-  romanized_title: String | null;
-  data_source: String | null;
-  is_global: Boolean | null;
+  subtitle: string | null;
+  cjk_title: string | null;
+  romanized_title: string | null;
+  data_source: string | null;
+  is_global: boolean | null;
   libraryyear: number | null;
 };
 
 export type List_EJournal_Type = {
   id: number;
-  title: String | null;
-  sub_series_number: String | null;
-  publisher: String | null;
-  description: String | null;
-  notes: String | null;
+  title: string | null;
+  sub_series_number: string | null;
+  publisher: string | null;
+  description: string | null;
+  notes: string | null;
   updated_at: Date;
-  subtitle: String | null;
-  series: String | null;
-  vendor: String | null;
-  cjk_title: String | null;
-  romanized_title: String | null;
-  data_source: String | null;
-  is_global: Boolean | null;
+  subtitle: string | null;
+  series: string | null;
+  vendor: string | null;
+  cjk_title: string | null;
+  romanized_title: string | null;
+  data_source: string | null;
+  is_global: boolean | null;
   libraryyear: number | null;
 };
 
@@ -191,11 +191,11 @@ export type SingleLibraryType = {
 export type Library_Year_Type = {
   id: number;
   library: number | null;
-  is_open_for_editing: Boolean | null;
-  admin_notes: String | null;
+  is_open_for_editing: boolean | null;
+  admin_notes: string | null;
   year: number;
   updated_at: Date;
-  is_active: Boolean | null;
+  is_active: boolean | null;
 
   Library: SingleLibraryType;
   Electronic: SingleElectronicType;

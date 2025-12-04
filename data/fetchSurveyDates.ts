@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { getSurveyDates, formatSurveyDate, getShortDateRange, formatFiscalYear, formatPublicationDate } from '@/lib/surveyDates';
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 export interface FormattedSurveyDates {
   year: number;
@@ -66,8 +66,5 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
       publicationMonth: formatPublicationDate(currentYear),
       isStoredInDatabase: false,
       isCurrentlyOpen: false,
-    };
-  } finally {
-    await prisma.$disconnect();
-  }
+    };}
 }

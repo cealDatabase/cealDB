@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 export async function GET(request: NextRequest) {
   try {
@@ -118,8 +118,5 @@ export async function GET(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

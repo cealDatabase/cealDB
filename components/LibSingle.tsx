@@ -159,7 +159,7 @@ export default async function LibSingle({
   const cookieStore = await cookies();
   const cookiesLibraryId = cookieStore.get("library")?.value;
   const cookiesRoleId = cookieStore.get("role")?.value;
-  let isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
+  const isMatchedUser = parseInt(cookiesLibraryId ?? "-1") === libraries.id;
 
   return (
     <LibraryViewWrapper 

@@ -1,10 +1,10 @@
 // app/api/admin/survey-sessions/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { cookies } from 'next/headers';
 import { logUserAction } from '@/lib/auditLogger';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * Get user info from cookies (server-side)
@@ -73,10 +73,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to fetch survey sessions' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 /**
@@ -171,10 +168,7 @@ export async function POST(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 /**
@@ -264,10 +258,7 @@ export async function PUT(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 /**
@@ -338,8 +329,5 @@ export async function DELETE(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

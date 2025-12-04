@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { logUserAction } from '@/lib/auditLogger';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 export async function GET(request: NextRequest) {
   try {
@@ -76,10 +76,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to retrieve form session status' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 export async function PATCH(request: NextRequest) {
@@ -176,8 +173,5 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to update form session' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

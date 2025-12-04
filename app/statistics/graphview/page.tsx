@@ -176,7 +176,7 @@ export default function GraphViewPage() {
       const results = await Promise.all(allDataPromises);
       
       const combinedData: ChartDataPoint[] = [];
-      let labels: string[] = [];
+      const labels: string[] = [];
       
       results.forEach(result => {
         labels.push(result.label);

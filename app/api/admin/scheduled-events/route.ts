@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { logUserAction } from '@/lib/auditLogger';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * GET - Fetch all scheduled events (pending, completed, cancelled)
@@ -49,10 +49,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to fetch scheduled events', detail: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 /**
@@ -147,10 +144,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to create scheduled event', detail: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 /**
@@ -227,8 +221,5 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to cancel scheduled event', detail: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

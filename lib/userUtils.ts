@@ -1,7 +1,7 @@
 // lib/userUtils.ts
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * Get all super admin users (role_id = 1)

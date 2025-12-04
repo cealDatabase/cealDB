@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * Health Check API Route
@@ -78,8 +78,6 @@ export async function GET(request: NextRequest) {
         'Expires': '0'
       }
     });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -91,7 +89,6 @@ export async function HEAD(request: NextRequest) {
   try {
     // Quick database test
     await prisma.$queryRaw`SELECT 1`;
-    await prisma.$disconnect();
     
     return new NextResponse(null, { 
       status: 200,
@@ -101,8 +98,6 @@ export async function HEAD(request: NextRequest) {
       }
     });
   } catch (error) {
-    await prisma.$disconnect();
-    
     return new NextResponse(null, { 
       status: 503,
       headers: {

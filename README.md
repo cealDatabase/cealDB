@@ -77,10 +77,6 @@ Create a `.env` file in the root directory:
 # Database
 DATABASE_URL="postgresql://username:password@localhost:5432/cealdb"
 
-# Next.js
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-
 # Add other environment variables as needed
 ```
 

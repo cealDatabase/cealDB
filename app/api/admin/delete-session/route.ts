@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { logUserAction } from '@/lib/auditLogger';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * DELETE endpoint to remove a scheduled form session
@@ -118,10 +118,7 @@ export async function DELETE(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
 
 // Also support POST for consistency with other endpoints

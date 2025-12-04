@@ -1,16 +1,16 @@
 export type SingleEntryStatusType = {
   id: number;
-  fiscal_support: Boolean | null;
-  monographic_acquisitions: Boolean | null;
-  other_holdings: Boolean | null;
-  participating_libraries_information: Boolean | null;
-  personnel_support_fte: Boolean | null;
-  public_services: Boolean | null;
-  serials: Boolean | null;
-  unprocessed_backlog_materials: Boolean | null;
-  volume_holdings: Boolean | null;
-  electronic: Boolean | null;
-  electronic_books: Boolean | null;
-  espublished: Boolean;
+  fiscal_support: boolean | null;
+  monographic_acquisitions: boolean | null;
+  other_holdings: boolean | null;
+  participating_libraries_information: boolean | null;
+  personnel_support_fte: boolean | null;
+  public_services: boolean | null;
+  serials: boolean | null;
+  unprocessed_backlog_materials: boolean | null;
+  volume_holdings: boolean | null;
+  electronic: boolean | null;
+  electronic_books: boolean | null;
+  espublished: boolean;
   libraryyear: number | null;
 };

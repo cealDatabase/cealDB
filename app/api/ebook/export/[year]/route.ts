@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 export async function GET(
   request: NextRequest,
@@ -148,8 +148,5 @@ export async function GET(
     return NextResponse.json(
       { error: 'Failed to export EBook data' },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }

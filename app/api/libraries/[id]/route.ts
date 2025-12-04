@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import db from '@/lib/db';
 import { cookies } from "next/headers";
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 export async function GET(
   request: NextRequest,
@@ -49,8 +49,6 @@ export async function GET(
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -143,7 +141,5 @@ export async function PUT(
       },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

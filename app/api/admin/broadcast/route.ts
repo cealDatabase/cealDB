@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import db from '@/lib/db'
 import { Resend } from "resend"
 import { logUserAction } from "@/lib/auditLogger"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 
-const prisma = new PrismaClient()
+const prisma = db
 
 export async function POST(request: NextRequest) {
   try {
@@ -488,8 +488,6 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 },
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
 

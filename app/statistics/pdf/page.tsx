@@ -3,7 +3,7 @@ import Link from "next/link";
 import { pdfs } from "@/constant/pdfs";
 
 function generateYears(startYear: number, endYear: number) {
-  let years = [];
+  const years = [];
   for (let year = startYear; year <= endYear; year++) {
     years.push(year.toString() + "-" + (year + 1).toString());
   }

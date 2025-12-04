@@ -1,5 +1,5 @@
 // scripts/fix-all-sequences.js
-/* eslint-disable no-console */
+ 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 

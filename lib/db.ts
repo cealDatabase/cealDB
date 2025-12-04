@@ -1,7 +1,19 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  // Prisma 7 requires either adapter or accelerateUrl
+  // Create connection pool for PostgreSQL adapter
+  const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/dummy';
+  
+  const pool = new Pool({
+    connectionString,
+  });
+  
+  const adapter = new PrismaPg(pool);
+  
+  return new PrismaClient({ adapter });
 }
 
 declare global {

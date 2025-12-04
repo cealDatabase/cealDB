@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { Resend } from 'resend';
 import { getSurveyDates } from '@/lib/surveyDates';
 import { formatAsEasternTime } from '@/lib/timezoneUtils';
 
-const prisma = new PrismaClient();
+const prisma = db;
 
 /**
  * TEST ENDPOINT - Send test broadcast email to super admin ONLY
@@ -209,8 +209,5 @@ export async function POST(request: NextRequest) {
         detail: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
+    );}
 }
