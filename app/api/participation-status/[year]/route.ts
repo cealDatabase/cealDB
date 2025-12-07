@@ -59,26 +59,29 @@ export async function GET(
     });
 
     // Transform the data for frontend consumption
-    const formattedData = participationData.map((item) => ({
-      libraryId: item.Library?.id || 0,
-      libraryName: item.Library?.library_name || 'Unknown',
-      region: 'Region', // Simplified for now
-      year: item.year,
-      libraryYearId: item.id,
-      forms: {
-        fiscal_support: item.Entry_Status?.fiscal_support || false,
-        monographic_acquisitions: item.Entry_Status?.monographic_acquisitions || false,
-        other_holdings: item.Entry_Status?.other_holdings || false,
-        personnel_support_fte: item.Entry_Status?.personnel_support_fte || false,
-        public_services: item.Entry_Status?.public_services || false,
-        serials: item.Entry_Status?.serials || false,
-        unprocessed_backlog_materials: item.Entry_Status?.unprocessed_backlog_materials || false,
-        volume_holdings: item.Entry_Status?.volume_holdings || false,
-        electronic: item.Entry_Status?.electronic || false,
-        electronic_books: item.Entry_Status?.electronic_books || false,
-        espublished: item.Entry_Status?.espublished || false,
-      },
-    }));
+    // Filter out records without valid Library association
+    const formattedData = participationData
+      .filter((item) => item.Library && item.Library.library_name)
+      .map((item) => ({
+        libraryId: item.Library!.id,
+        libraryName: item.Library!.library_name,
+        region: 'Region', // Simplified for now
+        year: item.year,
+        libraryYearId: item.id,
+        forms: {
+          fiscal_support: item.Entry_Status?.fiscal_support || false,
+          monographic_acquisitions: item.Entry_Status?.monographic_acquisitions || false,
+          other_holdings: item.Entry_Status?.other_holdings || false,
+          personnel_support_fte: item.Entry_Status?.personnel_support_fte || false,
+          public_services: item.Entry_Status?.public_services || false,
+          serials: item.Entry_Status?.serials || false,
+          unprocessed_backlog_materials: item.Entry_Status?.unprocessed_backlog_materials || false,
+          volume_holdings: item.Entry_Status?.volume_holdings || false,
+          electronic: item.Entry_Status?.electronic || false,
+          electronic_books: item.Entry_Status?.electronic_books || false,
+          espublished: item.Entry_Status?.espublished || false,
+        },
+      }));
 
     return NextResponse.json({
       success: true,
