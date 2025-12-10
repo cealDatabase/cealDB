@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 
-import { ReusableFormField } from "./ReusableFormField"
+import { ReusableFormField, ReusableCurrencyFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
@@ -994,12 +994,11 @@ export default function ElectronicBooksForm() {
         title='Expenditure'
         description='Field #41 (Grand Total Expenditures) in Electronic Form includes expenditures for Electronic Books. Please enter data there.'
       >
-        <ReusableFormField
+        <ReusableCurrencyFormField
           control={form.control}
           name='ebooks_expenditure_grandtotal'
           label='33. Expenditure Total'
-          placeholder=''
-          type='number'
+          placeholder='0.00'
           disabled={!libraryYearStatus?.is_open_for_editing}
         />
 
