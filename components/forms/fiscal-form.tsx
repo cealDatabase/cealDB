@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { ReusableFormField, ReusableNumberFormField } from "./ReusableFormField"
+import { ReusableFormField, ReusableCurrencyFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
@@ -275,43 +275,40 @@ export default function FiscalForm() {
         description="Enter appropriations for Chinese materials by category."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_monographic"
             label="01. Chinese Appropriations Monographic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_serial"
             label="02. Chinese Appropriations Serial"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_other_material"
             label="03. Chinese Appropriations Other Materials"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_electronic"
             label="04. Chinese Appropriations Electronic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
         </div>
         <SubtotalDisplay
           label="05. Chinese Appropriations Subtotal"
           value={chineseSubtotal}
           formula="01 + 02 + 03 + 04"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -321,43 +318,40 @@ export default function FiscalForm() {
         description="Enter appropriations for Japanese materials by category."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_monographic"
             label="06. Japanese Appropriations Monographic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_serial"
             label="07. Japanese Appropriations Serial"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_other_material"
             label="08. Japanese Appropriations Other Materials"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_electronic"
             label="09. Japanese Appropriations Electronic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
         </div>
         <SubtotalDisplay
           label="10. Japanese Appropriations Subtotal"
           value={japaneseSubtotal}
           formula="06 + 07 + 08 + 09"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -367,43 +361,40 @@ export default function FiscalForm() {
         description="Enter appropriations for Korean materials by category."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_monographic"
             label="11. Korean Appropriations Monographic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_serial"
             label="12. Korean Appropriations Serial"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_other_material"
             label="13. Korean Appropriations Other Materials"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_electronic"
             label="14. Korean Appropriations Electronic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
         </div>
         <SubtotalDisplay
           label="15. Korean Appropriations Subtotal"
           value={koreanSubtotal}
           formula="11 + 12 + 13 + 14"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -413,43 +404,40 @@ export default function FiscalForm() {
         description="Enter appropriations for Non-CJK materials by category."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_monographic"
             label="16. Non-CJK Appropriations Monographic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_serial"
             label="17. Non-CJK Appropriations Serial"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_other_material"
             label="18. Non-CJK Appropriations Other Materials"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
-          <ReusableNumberFormField
+          <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_electronic"
             label="19. Non-CJK Appropriations Electronic"
-            placeholder="Enter amount in USD"
+            placeholder="0.00"
             disabled={!libraryYearStatus?.is_open_for_editing}
-            type="number"
           />
         </div>
         <SubtotalDisplay
           label="20. Non-CJK Appropriations Subtotal"
           value={noncjkSubtotal}
           formula="16 + 17 + 18 + 19"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -462,6 +450,7 @@ export default function FiscalForm() {
           label="21. Appropriations Grand Total"
           value={appropriationsGrandTotal}
           formula="05 + 10 + 15 + 20"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -478,12 +467,13 @@ export default function FiscalForm() {
             korean: { name: "fsendowments_korean", label: "24. Endowments Korean", disabled: !libraryYearStatus?.is_open_for_editing },
             noncjk: { name: "fsendowments_noncjk", label: "25. Endowments Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
-          useFloatNumbers={true}
+          useCurrency={true}
         />
         <SubtotalDisplay
           label="26. Endowments Subtotal"
           value={endowmentsSubtotal}
           formula="22 + 23 + 24 + 25"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -500,12 +490,13 @@ export default function FiscalForm() {
             korean: { name: "fsgrants_korean", label: "29. Grants Korean", disabled: !libraryYearStatus?.is_open_for_editing },
             noncjk: { name: "fsgrants_noncjk", label: "30. Grants Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
-          useFloatNumbers={true}
+          useCurrency={true}
         />
         <SubtotalDisplay
           label="31. Grants Subtotal"
           value={grantsSubtotal}
           formula="27 + 28 + 29 + 30"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -522,12 +513,13 @@ export default function FiscalForm() {
             korean: { name: "fseast_asian_program_support_korean", label: "34. East Asian Program Support Korean", disabled: !libraryYearStatus?.is_open_for_editing },
             noncjk: { name: "fseast_asian_program_support_noncjk", label: "35. East Asian Program Support Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
           }}
-          useFloatNumbers={true}
+          useCurrency={true}
         />
         <SubtotalDisplay
           label="36. East Asian Program Support Subtotal"
           value={programSupportSubtotal}
           formula="32 + 33 + 34 + 35"
+          isCurrency={true}
         />
       </FormSection>
 
@@ -543,14 +535,13 @@ export default function FiscalForm() {
             <strong>Manual Entry Required:</strong> This field must be filled manually. Do not auto-calculate from other fields.
           </p>
         </div>
-        <ReusableNumberFormField
+        <ReusableCurrencyFormField
           control={form.control}
           name="fstotal_acquisition_budget"
           label="37. Total Acquisitions Budget"
-          placeholder="Enter total acquisitions budget in USD"
+          placeholder="0.00"
           disabled={!libraryYearStatus?.is_open_for_editing}
           className="border-amber-300 focus:ring-amber-500 text-xl font-bold"
-          type="number"
         />
       </FormSection>
 

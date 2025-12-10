@@ -3,6 +3,7 @@ import { Control, FieldPath, FieldValues } from "react-hook-form"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { CurrencyInput } from "@/components/ui/currency-input"
 
 interface ReusableFormFieldProps<T extends FieldValues> {
   control: Control<T>
@@ -140,6 +141,41 @@ export function ReusableNumberFormField<T extends FieldValues>({
                   : (parseInt(e.target.value) || 0)
                 field.onChange(value)
               }}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}
+
+// Currency input component with dollar sign prefix
+export function ReusableCurrencyFormField<T extends FieldValues>({
+  control,
+  name,
+  label,
+  placeholder = "0.00",
+  disabled = false,
+  className,
+  hideLabel = false
+}: Omit<ReusableFormFieldProps<T>, 'type' | 'min'>) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className={className}>
+          {!hideLabel && label && <FormLabel>{label}</FormLabel>}
+          <FormControl>
+            <CurrencyInput
+              placeholder={placeholder}
+              disabled={disabled}
+              value={field.value ?? 0}
+              onChange={(value) => {
+                field.onChange(value)
+              }}
+              onBlur={field.onBlur}
             />
           </FormControl>
           <FormMessage />
