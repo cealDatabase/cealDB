@@ -158,8 +158,9 @@ export function ReusableCurrencyFormField<T extends FieldValues>({
   placeholder = "0.00",
   disabled = false,
   className,
-  hideLabel = false
-}: Omit<ReusableFormFieldProps<T>, 'type' | 'min'>) {
+  hideLabel = false,
+  inputClassName
+}: Omit<ReusableFormFieldProps<T>, 'type' | 'min'> & { inputClassName?: string }) {
   return (
     <FormField
       control={control}
@@ -176,6 +177,7 @@ export function ReusableCurrencyFormField<T extends FieldValues>({
                 field.onChange(value)
               }}
               onBlur={field.onBlur}
+              className={inputClassName}
             />
           </FormControl>
           <FormMessage />

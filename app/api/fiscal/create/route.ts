@@ -39,6 +39,11 @@ export async function POST(req: Request) {
       fseast_asian_program_support_korean,
       fseast_asian_program_support_noncjk,
       fstotal_acquisition_budget,
+      fschinese_appropriations_subtotal_manual,
+      fsjapanese_appropriations_subtotal_manual,
+      fskorean_appropriations_subtotal_manual,
+      fsnoncjk_appropriations_subtotal_manual,
+      fstotal_appropriations_manual,
       fsnotes,
     } = body;
 
@@ -129,6 +134,11 @@ export async function POST(req: Request) {
       fseast_asian_program_support_korean: fseast_asian_program_support_korean || 0,
       fseast_asian_program_support_noncjk: fseast_asian_program_support_noncjk || 0,
       fstotal_acquisition_budget: fstotal_acquisition_budget || 0,
+      fschinese_appropriations_subtotal_manual: fschinese_appropriations_subtotal_manual ?? null,
+      fsjapanese_appropriations_subtotal_manual: fsjapanese_appropriations_subtotal_manual ?? null,
+      fskorean_appropriations_subtotal_manual: fskorean_appropriations_subtotal_manual ?? null,
+      fsnoncjk_appropriations_subtotal_manual: fsnoncjk_appropriations_subtotal_manual ?? null,
+      fstotal_appropriations_manual: fstotal_appropriations_manual ?? null,
       fsnotes: fsnotes || "",
     };
 

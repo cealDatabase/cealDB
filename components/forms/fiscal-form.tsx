@@ -63,6 +63,13 @@ const formSchema = z.object({
   // Total Budget (Manual Input)
   fstotal_acquisition_budget: z.number().min(0, { message: "Must be a non-negative number" }),
 
+  // Manual Entry Subtotals
+  fschinese_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fsjapanese_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fskorean_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fsnoncjk_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fstotal_appropriations_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+
   // Notes
   fsnotes: z.string().optional(),
 })
@@ -108,6 +115,11 @@ export default function FiscalForm() {
       fseast_asian_program_support_korean: 0,
       fseast_asian_program_support_noncjk: 0,
       fstotal_acquisition_budget: 0,
+      fschinese_appropriations_subtotal_manual: undefined,
+      fsjapanese_appropriations_subtotal_manual: undefined,
+      fskorean_appropriations_subtotal_manual: undefined,
+      fsnoncjk_appropriations_subtotal_manual: undefined,
+      fstotal_appropriations_manual: undefined,
       fsnotes: "",
     },
   })
@@ -310,6 +322,17 @@ export default function FiscalForm() {
           formula="01 + 02 + 03 + 04"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fschinese_appropriations_subtotal_manual"
+            label="05a. Chinese Appropriations Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Japanese Appropriations */}
@@ -353,6 +376,17 @@ export default function FiscalForm() {
           formula="06 + 07 + 08 + 09"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fsjapanese_appropriations_subtotal_manual"
+            label="10a. Japanese Appropriations Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Korean Appropriations */}
@@ -396,6 +430,17 @@ export default function FiscalForm() {
           formula="11 + 12 + 13 + 14"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fskorean_appropriations_subtotal_manual"
+            label="15a. Korean Appropriations Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Non-CJK Appropriations */}
@@ -439,6 +484,17 @@ export default function FiscalForm() {
           formula="16 + 17 + 18 + 19"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fsnoncjk_appropriations_subtotal_manual"
+            label="20a. Non-CJK Appropriations Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Appropriations Grand Total */}
@@ -452,6 +508,17 @@ export default function FiscalForm() {
           formula="05 + 10 + 15 + 20"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fstotal_appropriations_manual"
+            label="21a. Appropriations Grand Total (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual grand total if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Endowments */}

@@ -35,6 +35,11 @@ model Fiscal_Support {
   fseast_asian_program_support_korean      Decimal?
   fseast_asian_program_support_subtotal    Decimal?
   fstotal_acquisition_budget               Decimal?
+  fschinese_appropriations_subtotal_manual   Decimal?
+  fsjapanese_appropriations_subtotal_manual  Decimal?
+  fskorean_appropriations_subtotal_manual    Decimal?
+  fsnoncjk_appropriations_subtotal_manual    Decimal?
+  fstotal_appropriations_manual              Decimal?
   fsnotes                                  String?
   libraryyear                              Int?          @unique
   fsendowments_noncjk                      Decimal?
