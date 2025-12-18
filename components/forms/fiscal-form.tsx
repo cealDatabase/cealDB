@@ -69,6 +69,9 @@ const formSchema = z.object({
   fskorean_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
   fsnoncjk_appropriations_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
   fstotal_appropriations_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fsendowments_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fsgrants_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
+  fseast_asian_program_support_subtotal_manual: z.number().min(0, { message: "Must be a non-negative number" }).optional(),
 
   // Notes
   fsnotes: z.string().optional(),
@@ -120,6 +123,9 @@ export default function FiscalForm() {
       fskorean_appropriations_subtotal_manual: undefined,
       fsnoncjk_appropriations_subtotal_manual: undefined,
       fstotal_appropriations_manual: undefined,
+      fsendowments_subtotal_manual: undefined,
+      fsgrants_subtotal_manual: undefined,
+      fseast_asian_program_support_subtotal_manual: undefined,
       fsnotes: "",
     },
   })
@@ -542,6 +548,17 @@ export default function FiscalForm() {
           formula="22 + 23 + 24 + 25"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fsendowments_subtotal_manual"
+            label="26a. Endowments Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Grants */}
@@ -565,6 +582,17 @@ export default function FiscalForm() {
           formula="27 + 28 + 29 + 30"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fsgrants_subtotal_manual"
+            label="31a. Grants Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* East Asian Program Support */}
@@ -588,6 +616,17 @@ export default function FiscalForm() {
           formula="32 + 33 + 34 + 35"
           isCurrency={true}
         />
+        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <ReusableCurrencyFormField
+            control={form.control}
+            name="fseast_asian_program_support_subtotal_manual"
+            label="36a. East Asian Program Support Subtotal (Manual Entry)"
+            placeholder="0.00"
+            disabled={!libraryYearStatus?.is_open_for_editing}
+            inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
+          />
+          <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
+        </div>
       </FormSection>
 
       {/* Total Budget - Manual Input with Warning */}

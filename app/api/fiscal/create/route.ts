@@ -44,6 +44,9 @@ export async function POST(req: Request) {
       fskorean_appropriations_subtotal_manual,
       fsnoncjk_appropriations_subtotal_manual,
       fstotal_appropriations_manual,
+      fsendowments_subtotal_manual,
+      fsgrants_subtotal_manual,
+      fseast_asian_program_support_subtotal_manual,
       fsnotes,
     } = body;
 
@@ -139,6 +142,9 @@ export async function POST(req: Request) {
       fskorean_appropriations_subtotal_manual: fskorean_appropriations_subtotal_manual ?? null,
       fsnoncjk_appropriations_subtotal_manual: fsnoncjk_appropriations_subtotal_manual ?? null,
       fstotal_appropriations_manual: fstotal_appropriations_manual ?? null,
+      fsendowments_subtotal_manual: fsendowments_subtotal_manual ?? null,
+      fsgrants_subtotal_manual: fsgrants_subtotal_manual ?? null,
+      fseast_asian_program_support_subtotal_manual: fseast_asian_program_support_subtotal_manual ?? null,
       fsnotes: fsnotes || "",
     };
 

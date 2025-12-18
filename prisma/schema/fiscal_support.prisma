@@ -40,6 +40,9 @@ model Fiscal_Support {
   fskorean_appropriations_subtotal_manual    Decimal?
   fsnoncjk_appropriations_subtotal_manual    Decimal?
   fstotal_appropriations_manual              Decimal?
+  fsendowments_subtotal_manual               Decimal?
+  fsgrants_subtotal_manual                   Decimal?
+  fseast_asian_program_support_subtotal_manual Decimal?
   fsnotes                                  String?
   libraryyear                              Int?          @unique
   fsendowments_noncjk                      Decimal?
