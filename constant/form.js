@@ -182,8 +182,8 @@ export const eResourceActions = [
       title: 'Year-End Reports',
       href: '/admin/year-end-reports',
       icon: FileSpreadsheet,
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-100',
+      iconColor: 'text-rose-600',
+      iconBg: 'bg-rose-100',
       description: 'Export annual statistics reports in Excel format for all forms.',
     },
   ]
