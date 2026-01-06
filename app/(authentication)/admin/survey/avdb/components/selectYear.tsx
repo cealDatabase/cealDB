@@ -20,7 +20,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
   useEffect(() => {
     setIsClient(true);
     const yearLength = currentYear - beginYear + 1;
-    const yearsArray = Array.from({ length: yearLength }, (_, i) => beginYear + i);
+    const yearsArray = Array.from({ length: yearLength }, (_, i) => beginYear + i).reverse();
     setYears(yearsArray);
     
     // Set selectedYear based on yearCurrent prop or default to current year

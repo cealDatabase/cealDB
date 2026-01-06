@@ -76,12 +76,25 @@ async function exportSingleForm(formType: string, year: number) {
   
   let data: any[] = [];
   let title = '';
+  let fullTitle = '';
   let fieldMapping: any = {};
+  let groupedHeaders: { label: string; colspan: number }[] = [];
 
   switch (formType) {
     case 'monographic':
       title = '1_Monographs';
+      fullTitle = 'Acquisitions of East Asian Materials';
       fieldMapping = formFieldMappings.monographic;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased Titles', colspan: 5 },
+        { label: 'Purchased Volumes', colspan: 5 },
+        { label: 'Non-Purchased Titles', colspan: 5 },
+        { label: 'Non-Purchased Volumes', colspan: 5 },
+        { label: 'Total Titles', colspan: 1 },
+        { label: 'Total Volumes', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.monographic_Acquisitions.findMany({
         where: {
           Library_Year: {
@@ -107,7 +120,16 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'volumeHoldings':
       title = '2_VolumeHoldings';
+      fullTitle = 'Physical Volume Holdings';
       fieldMapping = formFieldMappings.volumeHoldings;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Previous Year Total', colspan: 5 },
+        { label: 'Added (Gross)', colspan: 5 },
+        { label: 'Withdrawn', colspan: 5 },
+        { label: 'Grand Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.volume_Holdings.findMany({
         where: {
           Library_Year: {
@@ -133,7 +155,15 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'serials':
       title = '3_Serials';
+      fullTitle = 'Current Serials (Print and Electronic)';
       fieldMapping = formFieldMappings.serials;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased', colspan: 5 },
+        { label: 'Non-Purchased', colspan: 5 },
+        { label: 'Total', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.serials.findMany({
         where: {
           Library_Year: {
@@ -159,7 +189,18 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'otherHoldings':
       title = '4_OtherHoldings';
+      fullTitle = 'Holdings of Other Materials';
       fieldMapping = formFieldMappings.otherHoldings;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Audio', colspan: 5 },
+        { label: 'Film', colspan: 5 },
+        { label: 'Microform', colspan: 5 },
+        { label: 'CD-ROM', colspan: 5 },
+        { label: 'DVD', colspan: 5 },
+        { label: 'Grand Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.other_Holdings.findMany({
         where: {
           Library_Year: {
@@ -185,7 +226,13 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'unprocessed':
       title = '5_GrandTotalHolding';
+      fullTitle = 'Unprocessed Backlog Materials';
       fieldMapping = formFieldMappings.unprocessed;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Backlog', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.unprocessed_Backlog_Materials.findMany({
         where: {
           Library_Year: {
@@ -211,7 +258,17 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'fiscal':
       title = '6_FiscalAppropriations';
+      fullTitle = 'Fiscal Support for East Asian Collections';
       fieldMapping = formFieldMappings.fiscal;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'CHN Appropriations', colspan: 5 },
+        { label: 'JPN Appropriations', colspan: 5 },
+        { label: 'KOR Appropriations', colspan: 5 },
+        { label: 'N-CJK Appropriations', colspan: 5 },
+        { label: 'Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.fiscal_Support.findMany({
         where: {
           Library_Year: {
@@ -237,7 +294,16 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'personnel':
       title = '7_PersonnelSupport';
+      fullTitle = 'Personnel Support for East Asian Collections';
       fieldMapping = formFieldMappings.personnel;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Professional', colspan: 5 },
+        { label: 'Support Staff', colspan: 5 },
+        { label: 'Student Assistants', colspan: 5 },
+        { label: 'Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.personnel_Support.findMany({
         where: {
           Library_Year: {
@@ -263,7 +329,15 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'publicServices':
       title = '8_PublicServices';
+      fullTitle = 'Public Services';
       fieldMapping = formFieldMappings.publicServices;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Presentations', colspan: 5 },
+        { label: 'Reference Transactions', colspan: 5 },
+        { label: 'Participants', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.public_Services.findMany({
         where: {
           Library_Year: {
@@ -289,7 +363,17 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'electronic':
       title = '9_Electronic';
+      fullTitle = 'Electronic Resources';
       fieldMapping = formFieldMappings.electronic;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Full-text Titles', colspan: 5 },
+        { label: 'Aggregated DBs', colspan: 1 },
+        { label: 'E-Journals', colspan: 1 },
+        { label: 'E-Books', colspan: 1 },
+        { label: 'Total Expenditure', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.electronic.findMany({
         where: {
           Library_Year: {
@@ -315,7 +399,18 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'electronicBooks':
       title = '10_ElectronicBooks';
+      fullTitle = 'Electronic Books Statistics';
       fieldMapping = formFieldMappings.electronicBooks;
+      groupedHeaders = [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased Volumes', colspan: 5 },
+        { label: 'Purchased Titles', colspan: 5 },
+        { label: 'Subscription Volumes', colspan: 5 },
+        { label: 'Subscription Titles', colspan: 5 },
+        { label: 'Total Volumes', colspan: 1 },
+        { label: 'Total Titles', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ];
       data = await prisma.electronic_Books.findMany({
         where: {
           Library_Year: {
@@ -366,8 +461,10 @@ async function exportSingleForm(formType: string, year: number) {
 
   await exporter.createWorksheet({
     title: title,
+    fullTitle: fullTitle,
     year: year,
     headers: headers,
+    groupedHeaders: groupedHeaders,
     data: transformedData,
     fieldMapping: fieldMapping
   });
@@ -386,21 +483,149 @@ async function exportSingleForm(formType: string, year: number) {
 async function exportAllForms(year: number) {
   const exporter = new ExcelExporter();
 
-  // Export all 10 forms
-  const formTypes = [
-    { type: 'monographic', title: '1_Monographs', model: 'monographic_Acquisitions' },
-    { type: 'volumeHoldings', title: '2_VolumeHoldings', model: 'volume_Holdings' },
-    { type: 'serials', title: '3_Serials', model: 'serials' },
-    { type: 'otherHoldings', title: '4_OtherHoldings', model: 'other_Holdings' },
-    { type: 'unprocessed', title: '5_GrandTotalHolding', model: 'unprocessed_Backlog_Materials' },
-    { type: 'fiscal', title: '6_FiscalAppropriations', model: 'fiscal_Support' },
-    { type: 'personnel', title: '7_PersonnelSupport', model: 'personnel_Support' },
-    { type: 'publicServices', title: '8_PublicServices', model: 'public_Services' },
-    { type: 'electronic', title: '9_Electronic', model: 'electronic' },
-    { type: 'electronicBooks', title: '10_ElectronicBooks', model: 'electronic_Books' }
+  // Export all 10 forms - using same configuration as single exports
+  const formConfigs: Array<{
+    type: string;
+    title: string;
+    fullTitle: string;
+    groupedHeaders: { label: string; colspan: number }[];
+  }> = [
+    {
+      type: 'monographic',
+      title: '1_Monographs',
+      fullTitle: 'Acquisitions of East Asian Materials',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased Titles', colspan: 5 },
+        { label: 'Purchased Volumes', colspan: 5 },
+        { label: 'Non-Purchased Titles', colspan: 5 },
+        { label: 'Non-Purchased Volumes', colspan: 5 },
+        { label: 'Total Titles', colspan: 1 },
+        { label: 'Total Volumes', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'volumeHoldings',
+      title: '2_VolumeHoldings',
+      fullTitle: 'Physical Volume Holdings',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Previous Year Total', colspan: 5 },
+        { label: 'Added (Gross)', colspan: 5 },
+        { label: 'Withdrawn', colspan: 5 },
+        { label: 'Grand Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'serials',
+      title: '3_Serials',
+      fullTitle: 'Current Serials (Print and Electronic)',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased', colspan: 5 },
+        { label: 'Non-Purchased', colspan: 5 },
+        { label: 'Total', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'otherHoldings',
+      title: '4_OtherHoldings',
+      fullTitle: 'Holdings of Other Materials',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Audio', colspan: 5 },
+        { label: 'Film', colspan: 5 },
+        { label: 'Microform', colspan: 5 },
+        { label: 'CD-ROM', colspan: 5 },
+        { label: 'DVD', colspan: 5 },
+        { label: 'Grand Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'unprocessed',
+      title: '5_GrandTotalHolding',
+      fullTitle: 'Unprocessed Backlog Materials',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Backlog', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'fiscal',
+      title: '6_FiscalAppropriations',
+      fullTitle: 'Fiscal Support for East Asian Collections',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'CHN Appropriations', colspan: 5 },
+        { label: 'JPN Appropriations', colspan: 5 },
+        { label: 'KOR Appropriations', colspan: 5 },
+        { label: 'N-CJK Appropriations', colspan: 5 },
+        { label: 'Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'personnel',
+      title: '7_PersonnelSupport',
+      fullTitle: 'Personnel Support for East Asian Collections',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Professional', colspan: 5 },
+        { label: 'Support Staff', colspan: 5 },
+        { label: 'Student Assistants', colspan: 5 },
+        { label: 'Total', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'publicServices',
+      title: '8_PublicServices',
+      fullTitle: 'Public Services',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Presentations', colspan: 5 },
+        { label: 'Reference Transactions', colspan: 5 },
+        { label: 'Participants', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'electronic',
+      title: '9_Electronic',
+      fullTitle: 'Electronic Resources',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Full-text Titles', colspan: 5 },
+        { label: 'Aggregated DBs', colspan: 1 },
+        { label: 'E-Journals', colspan: 1 },
+        { label: 'E-Books', colspan: 1 },
+        { label: 'Total Expenditure', colspan: 5 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    },
+    {
+      type: 'electronicBooks',
+      title: '10_ElectronicBooks',
+      fullTitle: 'Electronic Books Statistics',
+      groupedHeaders: [
+        { label: 'Institutions', colspan: 1 },
+        { label: 'Purchased Volumes', colspan: 5 },
+        { label: 'Purchased Titles', colspan: 5 },
+        { label: 'Subscription Volumes', colspan: 5 },
+        { label: 'Subscription Titles', colspan: 5 },
+        { label: 'Total Volumes', colspan: 1 },
+        { label: 'Total Titles', colspan: 1 },
+        { label: 'Notes', colspan: 1 }
+      ]
+    }
   ];
 
-  for (const form of formTypes) {
+  for (const form of formConfigs) {
     let data: any[] = [];
     const fieldMapping = (formFieldMappings as any)[form.type];
 
@@ -490,8 +715,10 @@ async function exportAllForms(year: number) {
 
       await exporter.createWorksheet({
         title: form.title,
+        fullTitle: form.fullTitle,
         year: year,
         headers: headers,
+        groupedHeaders: form.groupedHeaders,
         data: transformedData,
         fieldMapping: fieldMapping
       });

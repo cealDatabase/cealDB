@@ -3,8 +3,10 @@ import { Buffer } from "node:buffer";
 
 export interface ExportConfig {
   title: string;
+  fullTitle: string; // Full descriptive title
   year: number;
   headers: string[];
+  groupedHeaders?: { label: string; colspan: number }[]; // Optional grouped headers
   data: any[];
   fieldMapping: { [key: string]: string };
   includeNotes?: boolean;
@@ -23,24 +25,82 @@ export class ExcelExporter {
   async createWorksheet(config: ExportConfig): Promise<void> {
     const worksheet = this.workbook.addWorksheet(config.title);
 
-    // Add title row
-    const titleRow = worksheet.addRow([`${config.title} - ${config.year}`]);
-    titleRow.font = { bold: true, size: 14 };
-    titleRow.alignment = { horizontal: 'center' };
+    // Calculate academic year dates (July 1 to June 30)
+    const startDate = `July 1, ${config.year}`;
+    const endDate = `June 30, ${config.year + 1}`;
+
+    // Add main title row with date range
+    const mainTitle = `${config.fullTitle} from ${startDate} through ${endDate}`;
+    const titleRow = worksheet.addRow([mainTitle]);
+    titleRow.font = { bold: true, size: 12 };
+    titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
     worksheet.mergeCells(1, 1, 1, config.headers.length);
+    titleRow.height = 25;
 
-    // Add empty row
-    worksheet.addRow([]);
+    // Add grouped headers if provided
+    let headerStartRow = 2;
+    if (config.groupedHeaders && config.groupedHeaders.length > 0) {
+      const groupedRow = worksheet.addRow([]);
+      let colIndex = 1;
+      
+      config.groupedHeaders.forEach((group) => {
+        if (group.colspan > 1) {
+          worksheet.mergeCells(2, colIndex, 2, colIndex + group.colspan - 1);
+        }
+        const cell = worksheet.getCell(2, colIndex);
+        cell.value = group.label;
+        cell.font = { bold: true, size: 11 };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE7E6E6' }
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+        
+        // Apply border to all cells in the merged range
+        for (let i = colIndex; i < colIndex + group.colspan; i++) {
+          const mergedCell = worksheet.getCell(2, i);
+          mergedCell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+        }
+        
+        colIndex += group.colspan;
+      });
+      
+      groupedRow.height = 20;
+      headerStartRow = 3;
+    }
 
-    // Add header row
+    // Add column header row
     const headerRow = worksheet.addRow(config.headers);
-    headerRow.font = { bold: true };
+    headerRow.font = { bold: true, size: 10 };
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FFD9E1F2' }
     };
-    headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    headerRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    headerRow.height = 30;
+    
+    // Add borders to header cells
+    headerRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
 
     // Add data rows
     config.data.forEach((record) => {
@@ -110,193 +170,209 @@ export class ExcelExporter {
 export const formFieldMappings = {
   monographic: {
     'Library_Year.Library.library_name': 'Institution',
-    'mapurchased_titles_chinese': 'Purchased Titles - Chinese',
-    'mapurchased_titles_japanese': 'Purchased Titles - Japanese',
-    'mapurchased_titles_korean': 'Purchased Titles - Korean',
-    'mapurchased_titles_noncjk': 'Purchased Titles - Non-CJK',
-    'mapurchased_titles_subtotal': 'Purchased Titles - Subtotal',
-    'mapurchased_volumes_chinese': 'Purchased Volumes - Chinese',
-    'mapurchased_volumes_japanese': 'Purchased Volumes - Japanese',
-    'mapurchased_volumes_korean': 'Purchased Volumes - Korean',
-    'mapurchased_volumes_noncjk': 'Purchased Volumes - Non-CJK',
-    'mapurchased_volumes_subtotal': 'Purchased Volumes - Subtotal',
-    'manonpurchased_titles_chinese': 'Non-Purchased Titles - Chinese',
-    'manonpurchased_titles_japanese': 'Non-Purchased Titles - Japanese',
-    'manonpurchased_titles_korean': 'Non-Purchased Titles - Korean',
-    'manonpurchased_titles_noncjk': 'Non-Purchased Titles - Non-CJK',
-    'manonpurchased_titles_subtotal': 'Non-Purchased Titles - Subtotal',
-    'manonpurchased_volumes_chinese': 'Non-Purchased Volumes - Chinese',
-    'manonpurchased_volumes_japanese': 'Non-Purchased Volumes - Japanese',
-    'manonpurchased_volumes_korean': 'Non-Purchased Volumes - Korean',
-    'manonpurchased_volumes_noncjk': 'Non-Purchased Volumes - Non-CJK',
-    'manonpurchased_volumes_subtotal': 'Non-Purchased Volumes - Subtotal',
+    'mapurchased_titles_chinese': 'CHN',
+    'mapurchased_titles_japanese': 'JPN',
+    'mapurchased_titles_korean': 'KOR',
+    'mapurchased_titles_noncjk': 'N-CJK',
+    'mapurchased_titles_subtotal': 'TOTAL',
+    'mapurchased_volumes_chinese': 'CHN',
+    'mapurchased_volumes_japanese': 'JPN',
+    'mapurchased_volumes_korean': 'KOR',
+    'mapurchased_volumes_noncjk': 'N-CJK',
+    'mapurchased_volumes_subtotal': 'TOTAL',
+    'manonpurchased_titles_chinese': 'CHN',
+    'manonpurchased_titles_japanese': 'JPN',
+    'manonpurchased_titles_korean': 'KOR',
+    'manonpurchased_titles_noncjk': 'N-CJK',
+    'manonpurchased_titles_subtotal': 'TOTAL',
+    'manonpurchased_volumes_chinese': 'CHN',
+    'manonpurchased_volumes_japanese': 'JPN',
+    'manonpurchased_volumes_korean': 'KOR',
+    'manonpurchased_volumes_noncjk': 'N-CJK',
+    'manonpurchased_volumes_subtotal': 'TOTAL',
     'matotal_titles': 'Total Titles',
     'matotal_volumes': 'Total Volumes',
     'manotes': 'Notes'
   },
   volumeHoldings: {
     'Library_Year.Library.library_name': 'Institution',
-    'vhprevious_year_chinese': 'Previous Year - Chinese',
-    'vhprevious_year_japanese': 'Previous Year - Japanese',
-    'vhprevious_year_korean': 'Previous Year - Korean',
-    'vhprevious_year_noncjk': 'Previous Year - Non-CJK',
-    'vhprevious_year_subtotal': 'Previous Year - Subtotal',
-    'vhadded_gross_chinese': 'Added Gross - Chinese',
-    'vhadded_gross_japanese': 'Added Gross - Japanese',
-    'vhadded_gross_korean': 'Added Gross - Korean',
-    'vhadded_gross_noncjk': 'Added Gross - Non-CJK',
-    'vhadded_gross_subtotal': 'Added Gross - Subtotal',
-    'vhwithdrawn_chinese': 'Withdrawn - Chinese',
-    'vhwithdrawn_japanese': 'Withdrawn - Japanese',
-    'vhwithdrawn_korean': 'Withdrawn - Korean',
-    'vhwithdrawn_noncjk': 'Withdrawn - Non-CJK',
-    'vhwithdrawn_subtotal': 'Withdrawn - Subtotal',
+    'vhprevious_year_chinese': 'CHN',
+    'vhprevious_year_japanese': 'JPN',
+    'vhprevious_year_korean': 'KOR',
+    'vhprevious_year_noncjk': 'N-CJK',
+    'vhprevious_year_subtotal': 'TOTAL',
+    'vhadded_gross_chinese': 'CHN',
+    'vhadded_gross_japanese': 'JPN',
+    'vhadded_gross_korean': 'KOR',
+    'vhadded_gross_noncjk': 'N-CJK',
+    'vhadded_gross_subtotal': 'TOTAL',
+    'vhwithdrawn_chinese': 'CHN',
+    'vhwithdrawn_japanese': 'JPN',
+    'vhwithdrawn_korean': 'KOR',
+    'vhwithdrawn_noncjk': 'N-CJK',
+    'vhwithdrawn_subtotal': 'TOTAL',
     'vhgrandtotal': 'Grand Total',
     'vhnotes': 'Notes'
   },
   serials: {
     'Library_Year.Library.library_name': 'Institution',
-    'spurchased_chinese': 'Purchased - Chinese',
-    'spurchased_japanese': 'Purchased - Japanese',
-    'spurchased_korean': 'Purchased - Korean',
-    'spurchased_noncjk': 'Purchased - Non-CJK',
-    'spurchased_subtotal': 'Purchased - Subtotal',
-    'snonpurchased_chinese': 'Non-Purchased - Chinese',
-    'snonpurchased_japanese': 'Non-Purchased - Japanese',
-    'snonpurchased_korean': 'Non-Purchased - Korean',
-    'snonpurchased_noncjk': 'Non-Purchased - Non-CJK',
-    'snonpurchased_subtotal': 'Non-Purchased - Subtotal',
-    'stotal_chinese': 'Total - Chinese',
-    'stotal_japanese': 'Total - Japanese',
-    'stotal_korean': 'Total - Korean',
-    'stotal_noncjk': 'Total - Non-CJK',
-    'sgrandtotal': 'Grand Total',
+    'spurchased_chinese': 'CHN',
+    'spurchased_japanese': 'JPN',
+    'spurchased_korean': 'KOR',
+    'spurchased_noncjk': 'N-CJK',
+    'spurchased_subtotal': 'TOTAL',
+    'snonpurchased_chinese': 'CHN',
+    'snonpurchased_japanese': 'JPN',
+    'snonpurchased_korean': 'KOR',
+    'snonpurchased_noncjk': 'N-CJK',
+    'snonpurchased_subtotal': 'TOTAL',
+    'stotal_chinese': 'CHN',
+    'stotal_japanese': 'JPN',
+    'stotal_korean': 'KOR',
+    'stotal_noncjk': 'N-CJK',
+    'sgrandtotal': 'TOTAL',
     'snotes': 'Notes'
   },
   otherHoldings: {
     'Library_Year.Library.library_name': 'Institution',
-    'ohaudio_chinese': 'Audio - Chinese',
-    'ohaudio_japanese': 'Audio - Japanese',
-    'ohaudio_korean': 'Audio - Korean',
-    'ohaudio_noncjk': 'Audio - Non-CJK',
-    'ohaudio_subtotal': 'Audio - Subtotal',
-    'ohdvd_chinese': 'DVD - Chinese',
-    'ohdvd_japanese': 'DVD - Japanese',
-    'ohdvd_korean': 'DVD - Korean',
-    'ohdvd_noncjk': 'DVD - Non-CJK',
-    'ohdvd_subtotal': 'DVD - Subtotal',
-    'ohfilm_video_chinese': 'Film/Video - Chinese',
-    'ohfilm_video_japanese': 'Film/Video - Japanese',
-    'ohfilm_video_korean': 'Film/Video - Korean',
-    'ohfilm_video_noncjk': 'Film/Video - Non-CJK',
-    'ohfilm_video_subtotal': 'Film/Video - Subtotal',
-    'ohmicroform_chinese': 'Microform - Chinese',
-    'ohmicroform_japanese': 'Microform - Japanese',
-    'ohmicroform_korean': 'Microform - Korean',
-    'ohmicroform_noncjk': 'Microform - Non-CJK',
-    'ohmicroform_subtotal': 'Microform - Subtotal',
-    'ohgrandtotal': 'Grand Total',
+    'ohaudio_chinese': 'CHN',
+    'ohaudio_japanese': 'JPN',
+    'ohaudio_korean': 'KOR',
+    'ohaudio_noncjk': 'N-CJK',
+    'ohaudio_subtotal': 'TOTAL',
+    'ohfilm_video_chinese': 'CHN',
+    'ohfilm_video_japanese': 'JPN',
+    'ohfilm_video_korean': 'KOR',
+    'ohfilm_video_noncjk': 'N-CJK',
+    'ohfilm_video_subtotal': 'TOTAL',
+    'ohmicroform_chinese': 'CHN',
+    'ohmicroform_japanese': 'JPN',
+    'ohmicroform_korean': 'KOR',
+    'ohmicroform_noncjk': 'N-CJK',
+    'ohmicroform_subtotal': 'TOTAL',
+    'ohcdrom_chinese': 'CHN',
+    'ohcdrom_japanese': 'JPN',
+    'ohcdrom_korean': 'KOR',
+    'ohcdrom_noncjk': 'N-CJK',
+    'ohcdrom_subtotal': 'TOTAL',
+    'ohdvd_chinese': 'CHN',
+    'ohdvd_japanese': 'JPN',
+    'ohdvd_korean': 'KOR',
+    'ohdvd_noncjk': 'N-CJK',
+    'ohdvd_subtotal': 'TOTAL',
+    'ohgrandtotal': 'TOTAL',
     'ohnotes': 'Notes'
   },
   unprocessed: {
     'Library_Year.Library.library_name': 'Institution',
-    'ubchinese': 'Chinese',
-    'ubjapanese': 'Japanese',
-    'ubkorean': 'Korean',
-    'ubnoncjk': 'Non-CJK',
-    'ubtotal': 'Total',
-    'ubcatalog_title': 'Catalog Title',
-    'ubcatalog_volume': 'Catalog Volume',
-    'ub_title': 'Title',
-    'ub_volume': 'Volume',
+    'ubchinese': 'CHN',
+    'ubjapanese': 'JPN',
+    'ubkorean': 'KOR',
+    'ubnoncjk': 'N-CJK',
+    'ubtotal': 'TOTAL',
     'ubnotes': 'Notes'
   },
   fiscal: {
     'Library_Year.Library.library_name': 'Institution',
-    'fschinese_appropriations_monographic': 'Chinese Appropriations - Monographic',
-    'fschinese_appropriations_serial': 'Chinese Appropriations - Serial',
-    'fschinese_appropriations_other_material': 'Chinese Appropriations - Other Material',
-    'fschinese_appropriations_electronic': 'Chinese Appropriations - Electronic',
-    'fschinese_appropriations_subtotal': 'Chinese Appropriations - Subtotal',
-    'fsjapanese_appropriations_monographic': 'Japanese Appropriations - Monographic',
-    'fsjapanese_appropriations_serial': 'Japanese Appropriations - Serial',
-    'fsjapanese_appropriations_other_material': 'Japanese Appropriations - Other Material',
-    'fsjapanese_appropriations_electronic': 'Japanese Appropriations - Electronic',
-    'fsjapanese_appropriations_subtotal': 'Japanese Appropriations - Subtotal',
-    'fskorean_appropriations_monographic': 'Korean Appropriations - Monographic',
-    'fskorean_appropriations_serial': 'Korean Appropriations - Serial',
-    'fskorean_appropriations_other_material': 'Korean Appropriations - Other Material',
-    'fskorean_appropriations_electronic': 'Korean Appropriations - Electronic',
-    'fskorean_appropriations_subtotal': 'Korean Appropriations - Subtotal',
-    'fstotal_appropriations': 'Total Appropriations',
+    'fschinese_appropriations_monographic': 'Mono',
+    'fschinese_appropriations_serial': 'Serial',
+    'fschinese_appropriations_other_material': 'Other',
+    'fschinese_appropriations_electronic': 'Elec',
+    'fschinese_appropriations_subtotal': 'TOTAL',
+    'fsjapanese_appropriations_monographic': 'Mono',
+    'fsjapanese_appropriations_serial': 'Serial',
+    'fsjapanese_appropriations_other_material': 'Other',
+    'fsjapanese_appropriations_electronic': 'Elec',
+    'fsjapanese_appropriations_subtotal': 'TOTAL',
+    'fskorean_appropriations_monographic': 'Mono',
+    'fskorean_appropriations_serial': 'Serial',
+    'fskorean_appropriations_other_material': 'Other',
+    'fskorean_appropriations_electronic': 'Elec',
+    'fskorean_appropriations_subtotal': 'TOTAL',
+    'fsnoncjk_appropriations_monographic': 'Mono',
+    'fsnoncjk_appropriations_serial': 'Serial',
+    'fsnoncjk_appropriations_other_material': 'Other',
+    'fsnoncjk_appropriations_electronic': 'Elec',
+    'fsnoncjk_appropriations_subtotal': 'TOTAL',
+    'fstotal_appropriations': 'TOTAL',
     'fsnotes': 'Notes'
   },
   personnel: {
     'Library_Year.Library.library_name': 'Institution',
-    'psfprofessional_chinese': 'Professional - Chinese',
-    'psfprofessional_japanese': 'Professional - Japanese',
-    'psfprofessional_korean': 'Professional - Korean',
-    'psfprofessional_eastasian': 'Professional - East Asian',
-    'psfprofessional_subtotal': 'Professional - Subtotal',
-    'psfsupport_staff_chinese': 'Support Staff - Chinese',
-    'psfsupport_staff_japanese': 'Support Staff - Japanese',
-    'psfsupport_staff_korean': 'Support Staff - Korean',
-    'psfsupport_staff_eastasian': 'Support Staff - East Asian',
-    'psfsupport_staff_subtotal': 'Support Staff - Subtotal',
-    'psfstudent_assistants_chinese': 'Student Assistants - Chinese',
-    'psfstudent_assistants_japanese': 'Student Assistants - Japanese',
-    'psfstudent_assistants_korean': 'Student Assistants - Korean',
-    'psfstudent_assistants_eastasian': 'Student Assistants - East Asian',
-    'psfstudent_assistants_subtotal': 'Student Assistants - Subtotal',
-    'psftotal': 'Total',
+    'psfprofessional_chinese': 'CHN',
+    'psfprofessional_japanese': 'JPN',
+    'psfprofessional_korean': 'KOR',
+    'psfprofessional_eastasian': 'E-ASIA',
+    'psfprofessional_subtotal': 'TOTAL',
+    'psfsupport_staff_chinese': 'CHN',
+    'psfsupport_staff_japanese': 'JPN',
+    'psfsupport_staff_korean': 'KOR',
+    'psfsupport_staff_eastasian': 'E-ASIA',
+    'psfsupport_staff_subtotal': 'TOTAL',
+    'psfstudent_assistants_chinese': 'CHN',
+    'psfstudent_assistants_japanese': 'JPN',
+    'psfstudent_assistants_korean': 'KOR',
+    'psfstudent_assistants_eastasian': 'E-ASIA',
+    'psfstudent_assistants_subtotal': 'TOTAL',
+    'psftotal': 'TOTAL',
     'psfnotes': 'Notes'
   },
   publicServices: {
     'Library_Year.Library.library_name': 'Institution',
-    'pspresentations_subtotal': 'Presentations',
-    'pspresentation_participants_subtotal': 'Presentation Participants',
-    'psreference_transactions_subtotal': 'Reference Transactions',
-    'pstotal_circulations_subtotal': 'Total Circulations',
-    'pslending_requests_filled_subtotal': 'Lending Requests Filled',
-    'pslending_requests_unfilled_subtotal': 'Lending Requests Unfilled',
-    'psborrowing_requests_filled_subtotal': 'Borrowing Requests Filled',
-    'psborrowing_requests_unfilled_subtotal': 'Borrowing Requests Unfilled',
+    'pspresentations_chinese': 'CHN',
+    'pspresentations_japanese': 'JPN',
+    'pspresentations_korean': 'KOR',
+    'pspresentations_noncjk': 'N-CJK',
+    'pspresentations_subtotal': 'TOTAL',
+    'psreference_transactions_chinese': 'CHN',
+    'psreference_transactions_japanese': 'JPN',
+    'psreference_transactions_korean': 'KOR',
+    'psreference_transactions_noncjk': 'N-CJK',
+    'psreference_transactions_subtotal': 'TOTAL',
+    'pspresentation_participants_subtotal': 'Total',
     'psnotes': 'Notes'
   },
   electronic: {
     'Library_Year.Library.library_name': 'Institution',
-    'efulltext_electronic_title_chinese': 'Full-text Electronic Title - Chinese',
-    'efulltext_electronic_title_japanese': 'Full-text Electronic Title - Japanese',
-    'efulltext_electronic_title_korean': 'Full-text Electronic Title - Korean',
-    'efulltext_electronic_title_noncjk': 'Full-text Electronic Title - Non-CJK',
-    'efulltext_electronic_title_subtotal': 'Full-text Electronic Title - Subtotal',
-    'eindex_electronic_title_chinese': 'Index Electronic Title - Chinese',
-    'eindex_electronic_title_japanese': 'Index Electronic Title - Japanese',
-    'eindex_electronic_title_korean': 'Index Electronic Title - Korean',
-    'eindex_electronic_title_noncjk': 'Index Electronic Title - Non-CJK',
-    'eindex_electronic_title_subtotal': 'Index Electronic Title - Subtotal',
-    'etotal_expenditure_grandtotal': 'Total Expenditure Grand Total',
+    'efulltext_electronic_title_chinese': 'CHN',
+    'efulltext_electronic_title_japanese': 'JPN',
+    'efulltext_electronic_title_korean': 'KOR',
+    'efulltext_electronic_title_noncjk': 'N-CJK',
+    'efulltext_electronic_title_subtotal': 'TOTAL',
+    'eaggregated_databases': 'Total',
+    'etotal_ejournals': 'Total',
+    'etotal_ebooks': 'Total',
+    'etotal_electronic_expenditure_chinese': 'CHN',
+    'etotal_electronic_expenditure_japanese': 'JPN',
+    'etotal_electronic_expenditure_korean': 'KOR',
+    'etotal_electronic_expenditure_noncjk': 'N-CJK',
+    'etotal_electronic_expenditure_subtotal': 'TOTAL',
     'enotes': 'Notes'
   },
   electronicBooks: {
     'Library_Year.Library.library_name': 'Institution',
-    'ebooks_purchased_titles_chinese': 'Purchased Titles - Chinese',
-    'ebooks_purchased_titles_japanese': 'Purchased Titles - Japanese',
-    'ebooks_purchased_titles_korean': 'Purchased Titles - Korean',
-    'ebooks_purchased_titles_noncjk': 'Purchased Titles - Non-CJK',
-    'ebooks_purchased_titles_subtotal': 'Purchased Titles - Subtotal',
-    'ebooks_purchased_volumes_chinese': 'Purchased Volumes - Chinese',
-    'ebooks_purchased_volumes_japanese': 'Purchased Volumes - Japanese',
-    'ebooks_purchased_volumes_korean': 'Purchased Volumes - Korean',
-    'ebooks_purchased_volumes_noncjk': 'Purchased Volumes - Non-CJK',
-    'ebooks_purchased_volumes_subtotal': 'Purchased Volumes - Subtotal',
-    'ebooks_nonpurchased_titles_chinese': 'Non-Purchased Titles - Chinese',
-    'ebooks_nonpurchased_titles_japanese': 'Non-Purchased Titles - Japanese',
-    'ebooks_nonpurchased_titles_korean': 'Non-Purchased Titles - Korean',
-    'ebooks_nonpurchased_titles_noncjk': 'Non-Purchased Titles - Non-CJK',
-    'ebooks_nonpurchased_titles_subtotal': 'Non-Purchased Titles - Subtotal',
-    'ebooks_total_titles': 'Total Titles',
+    'ebooks_purchased_volumes_chinese': 'CHN',
+    'ebooks_purchased_volumes_japanese': 'JPN',
+    'ebooks_purchased_volumes_korean': 'KOR',
+    'ebooks_purchased_volumes_noncjk': 'N-CJK',
+    'ebooks_purchased_volumes_subtotal': 'TOTAL',
+    'ebooks_purchased_titles_chinese': 'CHN',
+    'ebooks_purchased_titles_japanese': 'JPN',
+    'ebooks_purchased_titles_korean': 'KOR',
+    'ebooks_purchased_titles_noncjk': 'N-CJK',
+    'ebooks_purchased_titles_subtotal': 'TOTAL',
+    'ebooks_subscription_volumes_chinese': 'CHN',
+    'ebooks_subscription_volumes_japanese': 'JPN',
+    'ebooks_subscription_volumes_korean': 'KOR',
+    'ebooks_subscription_volumes_noncjk': 'N-CJK',
+    'ebooks_subscription_volumes_subtotal': 'TOTAL',
+    'ebooks_subscription_titles_chinese': 'CHN',
+    'ebooks_subscription_titles_japanese': 'JPN',
+    'ebooks_subscription_titles_korean': 'KOR',
+    'ebooks_subscription_titles_noncjk': 'N-CJK',
+    'ebooks_subscription_titles_subtotal': 'TOTAL',
     'ebooks_total_volumes': 'Total Volumes',
+    'ebooks_total_titles': 'Total Titles',
     'ebooks_notes': 'Notes'
   }
 };
