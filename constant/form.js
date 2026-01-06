@@ -13,6 +13,7 @@ import {
   Shield,
   Calendar,
   Mail,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export const forms = [
@@ -176,6 +177,14 @@ export const eResourceActions = [
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
       description: 'Create, update, or remove database records and their associated data.',
+    },
+    {
+      title: 'Year-End Reports',
+      href: '/admin/year-end-reports',
+      icon: FileSpreadsheet,
+      iconColor: 'text-green-600',
+      iconBg: 'bg-green-100',
+      description: 'Export annual statistics reports in Excel format for all forms.',
     },
   ]
 
