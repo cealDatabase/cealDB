@@ -1,6 +1,10 @@
+'use client';
+
 import { Container } from "@/components/Container";
 import Link from "next/link";
 import { pdfs } from "@/constant/pdfs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Calendar } from 'lucide-react';
 
 function generateYears(startYear: number, endYear: number) {
   const years = [];
@@ -8,6 +12,53 @@ function generateYears(startYear: number, endYear: number) {
     years.push(year.toString() + "-" + (year + 1).toString());
   }
   return years;
+}
+
+interface YearGroup {
+  label: string;
+  years: string[];
+  value: string;
+}
+
+function groupYearsByDecade(years: string[]): YearGroup[] {
+  const currentYear = new Date().getFullYear();
+  
+  const groups: YearGroup[] = [
+    {
+      label: `2020 to Current`,
+      years: years.filter(y => {
+        const firstYear = parseInt(y.split('-')[0]);
+        return firstYear >= 2020;
+      }),
+      value: '2020-current'
+    },
+    {
+      label: `2010 - 2019`,
+      years: years.filter(y => {
+        const firstYear = parseInt(y.split('-')[0]);
+        return firstYear >= 2010 && firstYear <= 2019;
+      }),
+      value: '2010-2019'
+    },
+    {
+      label: `2000 - 2009`,
+      years: years.filter(y => {
+        const firstYear = parseInt(y.split('-')[0]);
+        return firstYear >= 2000 && firstYear <= 2009;
+      }),
+      value: '2000-2009'
+    },
+    {
+      label: `Before 2000`,
+      years: years.filter(y => {
+        const firstYear = parseInt(y.split('-')[0]);
+        return firstYear < 2000;
+      }),
+      value: 'before-2000'
+    }
+  ];
+  
+  return groups.filter(group => group.years.length > 0);
 }
 
 function PublishedPDFs() {
@@ -84,35 +135,52 @@ function PublishedPDFs() {
           </div>
         </section>
 
-        <section className="flex flex-col ">
-          <ul>
-            {generateYears(1998, 2022)
-              .reverse()
-              .map((year) => (
-                <div key={year} className="mt-6">
-                  <p className="font-semibold">{year}</p>
-                  <ol>
-                    {pdfs.map((pdfitem) => {
-                      return pdfitem.linkValue.map((singleItem) => {
-                        if (pdfitem.yearValue === year) {
-                          return (
-                            <div key={`${pdfitem.yearValue}-${singleItem.title}`}>
-                              <Link href={singleItem.link}>
-                                {singleItem.title}
-                              </Link>{" "}
-                              <span className="italic">
-                                {singleItem.journal}{" "}
-                              </span>
-                              {singleItem.appendix}
-                            </div>
-                          );
-                        }
-                      });
-                    })}
-                  </ol>
-                </div>
-              ))}
-          </ul>
+        <section className="flex flex-col">
+          <Accordion type="single" collapsible className="w-full" defaultValue="2020-current">
+            {groupYearsByDecade(generateYears(1998, 2022).reverse()).map((group) => (
+              <AccordionItem key={group.value} value={group.value} className="border rounded-lg mb-4 px-4">
+                <AccordionTrigger className="text-lg font-bold hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    {group.label} ({group.years.length} years)
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-6 pt-4">
+                    {group.years.map((year) => (
+                      <div key={year} className="border-l-2 border-gray-300 pl-4">
+                        <p className="font-semibold text-lg text-gray-800 mb-2">{year}</p>
+                        <ol className="space-y-2">
+                          {pdfs.map((pdfitem) => {
+                            return pdfitem.linkValue.map((singleItem, idx) => {
+                              if (pdfitem.yearValue === year) {
+                                return (
+                                  <li key={`${pdfitem.yearValue}-${singleItem.title}-${idx}`} className="text-gray-700">
+                                    <Link 
+                                      href={singleItem.link}
+                                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                                    >
+                                      {singleItem.title}
+                                    </Link>{" "}
+                                    <span className="italic text-gray-600">
+                                      {singleItem.journal}{" "}
+                                    </span>
+                                    <span className="text-gray-500">
+                                      {singleItem.appendix}
+                                    </span>
+                                  </li>
+                                );
+                              }
+                            });
+                          })}
+                        </ol>
+                      </div>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </section>
       </Container>
     </main>

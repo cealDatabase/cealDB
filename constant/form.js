@@ -186,6 +186,14 @@ export const eResourceActions = [
       iconBg: 'bg-rose-100',
       description: 'Export annual statistics reports in Excel format for all forms.',
     },
+    {
+      title: 'Participation Reports',
+      href: '/admin/participation-reports',
+      icon: BarChart3,
+      iconColor: 'text-rose-600',
+      iconBg: 'bg-rose-100',
+      description: 'Export library participation and statistics completion reports.',
+    },
   ]
 
 export const superAdminActions = [
