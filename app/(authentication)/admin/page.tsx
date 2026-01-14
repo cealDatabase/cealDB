@@ -10,6 +10,7 @@ import Link from "next/link";
 import {
   BookOpen,
   FileText,
+  FileBarChart,
 } from "lucide-react";
 
 import { eResourceActions, superAdminActions } from "@/constant/form";
@@ -197,6 +198,43 @@ async function UserLoggedInPage() {
                   <Button asChild className="">
                     <Link href={`/admin/forms?libraryName=${encodeURIComponent(userData.library?.name || '')}`}>
                       Access Forms
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            )}
+
+            {/* Institutional Reports Card - Visible to all authenticated users (Role 1, 2, 3, 4) */}
+            {canViewFormsManagement && (
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <FileBarChart className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Institutional Reports</CardTitle>
+                    <CardDescription>Export cross-year institutional statistics reports</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileBarChart className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-medium">Institutional Reports</p>
+                      <p className="text-sm text-muted-foreground">
+                        {hasMemberInstitution && !hasSuperAdmin && !hasEResourceEditor
+                          ? "Export yearly reports for your institution"
+                          : "Export cross-year reports for any institution"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild className="">
+                    <Link href="/admin/institutional-reports">
+                      Access Reports
                     </Link>
                   </Button>
                 </div>
