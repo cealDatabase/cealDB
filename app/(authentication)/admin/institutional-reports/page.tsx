@@ -224,7 +224,7 @@ export default function InstitutionalReportsPage() {
                 <FileBarChart className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Institutional Reports</h1>
+                <h1 className="text-3xl font-bold text-foreground text-start py-2">Institutional Reports</h1>
                 <p className="text-muted-foreground">Export cross-year statistics reports in Excel format</p>
               </div>
             </div>
