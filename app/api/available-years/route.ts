@@ -11,6 +11,11 @@ export async function GET() {
       orderBy: {
         year: 'desc',
       },
+      where: {
+        year: {
+          not: 1900,
+        },
+      },
     });
 
     const yearList = years.map((y: { year: number }) => y.year.toString());

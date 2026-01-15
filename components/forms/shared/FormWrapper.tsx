@@ -45,7 +45,19 @@ export function FormWrapper({
             <CardTitle className="text-red-800">Form Not Available</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-red-700 mb-4">{libraryYearStatus?.message}</p>
+            <div className="text-gray-800 space-y-4">
+              <p>This form is not currently displayed because it is outside the data entry period.</p>
+              <p>If you would like to review data from the current year or past years, you might:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>
+                  Use <strong>&quot;View Data From Past 5 Years&quot;</strong> in the upper-right corner of this page, or
+                </li>
+                <li>
+                  Go to the <strong>Dashboard</strong> and download the forms from <strong>&quot;Institutional Reports.&quot;</strong>
+                </li>
+              </ul>
+              <p>If you believe this is an error, please contact the CEAL Statistics Committee.</p>
+            </div>
           </CardContent>
         </Card>
       </div>

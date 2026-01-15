@@ -142,9 +142,14 @@ export async function POST(request: NextRequest) {
       }
 
       if (formData.length > 0) {
-        const headers = Object.keys(formData[0]).filter(
-          (key) => !["id", "libraryyear"].includes(key)
+        const allHeaders = Object.keys(formData[0]).filter(
+          (key) => !['id', 'libraryyear'].includes(key)
         );
+        
+        // Put 'year' as the first column, then all other headers
+        const headers = allHeaders.includes('year')
+          ? ['year', ...allHeaders.filter(h => h !== 'year')]
+          : allHeaders;
 
         const headerRow = worksheet.addRow(headers);
         headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };

@@ -86,7 +86,10 @@ export default function InstitutionalReportsPage() {
       const response = await fetch("/api/libraries");
       if (response.ok) {
         const result = await response.json();
-        setLibraries(result.data || []);
+        const sortedLibraries = (result.data || []).sort((a: Library, b: Library) => 
+          a.library_name.localeCompare(b.library_name)
+        );
+        setLibraries(sortedLibraries);
       }
     } catch (error) {
       console.error("Failed to fetch libraries:", error);
