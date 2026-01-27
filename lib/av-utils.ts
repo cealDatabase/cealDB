@@ -1,5 +1,5 @@
 import db from "./db";
-import { List_AV } from "@prisma/client";
+import { List_AV } from "@/prisma/generated/client/client";
 
 export async function getLibraryYearId(libraryId: number, year: number): Promise<number | null> {
   try {

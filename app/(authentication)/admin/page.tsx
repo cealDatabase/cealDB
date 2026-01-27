@@ -172,7 +172,7 @@ async function UserLoggedInPage() {
               </Card>
             )}
 
-            {/* Forms Management Section - Visible to all authenticated users (Role 1, 2, 3, 4) */}
+            {/* Statistics Forms Section - Visible to all authenticated users (Role 1, 2, 3, 4) */}
             {canViewFormsManagement && (
             <Card className="border-2 border-primary/20">
               <CardHeader>
@@ -181,8 +181,8 @@ async function UserLoggedInPage() {
                     <FileText className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Forms Management</CardTitle>
-                    <CardDescription>Manage and access all system forms</CardDescription>
+                    <CardTitle className="text-lg">Statistics Forms</CardTitle>
+                    <CardDescription>View and manage statistics forms and submissions.</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -192,7 +192,7 @@ async function UserLoggedInPage() {
                     <FileText className="w-5 h-5 text-primary" />
                     <div>
                       <p className="font-medium">Forms Page</p>
-                      <p className="text-sm text-muted-foreground">Access all available forms and submissions</p>
+                      <p className="text-sm text-muted-foreground">Access all annual statistics survey forms.</p>
                     </div>
                   </div>
                   <Button asChild className="">
@@ -247,7 +247,7 @@ async function UserLoggedInPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground mb-2">E-Resource Editor Section</h2>
-                <p className="text-muted-foreground">Access forms for managing E-Resources</p>
+                <p className="text-muted-foreground">Access forms to manage database lists and review annual reports.</p>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">

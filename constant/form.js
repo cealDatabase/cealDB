@@ -184,7 +184,7 @@ export const eResourceActions = [
       icon: FileSpreadsheet,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-100',
-      description: 'Export annual statistics reports in Excel format for all forms.',
+      description: 'Generate annual statistics in Excel format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status.',
     },
     {
       title: 'Participation Reports',
@@ -192,7 +192,7 @@ export const eResourceActions = [
       icon: BarChart3,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-100',
-      description: 'Export library participation and statistics completion reports.',
+      description: 'Export library participation, contact information, and statistics completion reports.',
     },
     {
       title: 'Supplementary Reports',

@@ -98,12 +98,12 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  * Enums
  */
 
-export const TransactionIsolationLevel = {
+export const TransactionIsolationLevel = runtime.makeStrictEnum({
   ReadUncommitted: 'ReadUncommitted',
   ReadCommitted: 'ReadCommitted',
   RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
-} as const
+} as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
@@ -351,6 +351,14 @@ export const Fiscal_SupportScalarFieldEnum = {
   fseast_asian_program_support_korean: 'fseast_asian_program_support_korean',
   fseast_asian_program_support_subtotal: 'fseast_asian_program_support_subtotal',
   fstotal_acquisition_budget: 'fstotal_acquisition_budget',
+  fschinese_appropriations_subtotal_manual: 'fschinese_appropriations_subtotal_manual',
+  fsjapanese_appropriations_subtotal_manual: 'fsjapanese_appropriations_subtotal_manual',
+  fskorean_appropriations_subtotal_manual: 'fskorean_appropriations_subtotal_manual',
+  fsnoncjk_appropriations_subtotal_manual: 'fsnoncjk_appropriations_subtotal_manual',
+  fstotal_appropriations_manual: 'fstotal_appropriations_manual',
+  fsendowments_subtotal_manual: 'fsendowments_subtotal_manual',
+  fsgrants_subtotal_manual: 'fsgrants_subtotal_manual',
+  fseast_asian_program_support_subtotal_manual: 'fseast_asian_program_support_subtotal_manual',
   fsnotes: 'fsnotes',
   libraryyear: 'libraryyear',
   fsendowments_noncjk: 'fsendowments_noncjk',
@@ -1028,8 +1036,8 @@ export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
 export const NullableJsonNullValueInput = {
-  DbNull: 'DbNull',
-  JsonNull: 'JsonNull'
+  DbNull: DbNull,
+  JsonNull: JsonNull
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
@@ -1052,9 +1060,9 @@ export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const JsonNullValueFilter = {
-  DbNull: 'DbNull',
-  JsonNull: 'JsonNull',
-  AnyNull: 'AnyNull'
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]

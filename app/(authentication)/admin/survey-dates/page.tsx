@@ -232,7 +232,7 @@ export default function OpenYearPage() {
                                         </div>
                                     </div>
                                     <p className="text-sm text-emerald-700 mt-3">
-                                        💡 These dates are currently stored in the database and displayed on the Forms Management page.
+                                        💡 These dates are currently stored in the database and displayed on the Statistics Forms page.
                                     </p>
                                 </div>
                             </div>

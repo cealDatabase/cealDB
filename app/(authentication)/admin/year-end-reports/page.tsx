@@ -166,7 +166,7 @@ export default function YearEndReportsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Year-End Reports</h1>
           <p className="text-muted-foreground">
-            Export annual statistics reports in Excel format. Select a year and export individual forms or all forms at once.
+            Generate annual statistics in Excel format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status. 
           </p>
         </div>
 
@@ -221,7 +221,7 @@ export default function YearEndReportsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {forms.map(form => (
                 <div
                   key={form.id}

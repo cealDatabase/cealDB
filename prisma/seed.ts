@@ -28,7 +28,7 @@ import {
   User_Library,
   Users_Roles,
   Volume_Holdings,
-} from "@prisma/client";
+} from "@/prisma/generated/client/client";
 import db from "../lib/db";
 
 // Configuration for selective schema synchronization

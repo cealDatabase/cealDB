@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.1.0
- * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
+ * Prisma Client JS version: 7.3.0
+ * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.1.0",
-  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
+  client: "7.3.0",
+  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
 }
 
 /**
@@ -3610,6 +3610,14 @@ export const Fiscal_SupportScalarFieldEnum = {
   fseast_asian_program_support_korean: 'fseast_asian_program_support_korean',
   fseast_asian_program_support_subtotal: 'fseast_asian_program_support_subtotal',
   fstotal_acquisition_budget: 'fstotal_acquisition_budget',
+  fschinese_appropriations_subtotal_manual: 'fschinese_appropriations_subtotal_manual',
+  fsjapanese_appropriations_subtotal_manual: 'fsjapanese_appropriations_subtotal_manual',
+  fskorean_appropriations_subtotal_manual: 'fskorean_appropriations_subtotal_manual',
+  fsnoncjk_appropriations_subtotal_manual: 'fsnoncjk_appropriations_subtotal_manual',
+  fstotal_appropriations_manual: 'fstotal_appropriations_manual',
+  fsendowments_subtotal_manual: 'fsendowments_subtotal_manual',
+  fsgrants_subtotal_manual: 'fsgrants_subtotal_manual',
+  fseast_asian_program_support_subtotal_manual: 'fseast_asian_program_support_subtotal_manual',
   fsnotes: 'fsnotes',
   libraryyear: 'libraryyear',
   fsendowments_noncjk: 'fsendowments_noncjk',

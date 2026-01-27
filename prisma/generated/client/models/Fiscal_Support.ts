@@ -62,6 +62,14 @@ export type Fiscal_SupportAvgAggregateOutputType = {
   fseast_asian_program_support_korean: runtime.Decimal | null
   fseast_asian_program_support_subtotal: runtime.Decimal | null
   fstotal_acquisition_budget: runtime.Decimal | null
+  fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+  fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+  fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+  fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+  fstotal_appropriations_manual: runtime.Decimal | null
+  fsendowments_subtotal_manual: runtime.Decimal | null
+  fsgrants_subtotal_manual: runtime.Decimal | null
+  fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
   libraryyear: number | null
   fsendowments_noncjk: runtime.Decimal | null
   fsgrants_noncjk: runtime.Decimal | null
@@ -104,6 +112,14 @@ export type Fiscal_SupportSumAggregateOutputType = {
   fseast_asian_program_support_korean: runtime.Decimal | null
   fseast_asian_program_support_subtotal: runtime.Decimal | null
   fstotal_acquisition_budget: runtime.Decimal | null
+  fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+  fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+  fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+  fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+  fstotal_appropriations_manual: runtime.Decimal | null
+  fsendowments_subtotal_manual: runtime.Decimal | null
+  fsgrants_subtotal_manual: runtime.Decimal | null
+  fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
   libraryyear: number | null
   fsendowments_noncjk: runtime.Decimal | null
   fsgrants_noncjk: runtime.Decimal | null
@@ -147,6 +163,14 @@ export type Fiscal_SupportMinAggregateOutputType = {
   fseast_asian_program_support_korean: runtime.Decimal | null
   fseast_asian_program_support_subtotal: runtime.Decimal | null
   fstotal_acquisition_budget: runtime.Decimal | null
+  fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+  fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+  fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+  fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+  fstotal_appropriations_manual: runtime.Decimal | null
+  fsendowments_subtotal_manual: runtime.Decimal | null
+  fsgrants_subtotal_manual: runtime.Decimal | null
+  fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
   fsnotes: string | null
   libraryyear: number | null
   fsendowments_noncjk: runtime.Decimal | null
@@ -191,6 +215,14 @@ export type Fiscal_SupportMaxAggregateOutputType = {
   fseast_asian_program_support_korean: runtime.Decimal | null
   fseast_asian_program_support_subtotal: runtime.Decimal | null
   fstotal_acquisition_budget: runtime.Decimal | null
+  fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+  fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+  fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+  fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+  fstotal_appropriations_manual: runtime.Decimal | null
+  fsendowments_subtotal_manual: runtime.Decimal | null
+  fsgrants_subtotal_manual: runtime.Decimal | null
+  fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
   fsnotes: string | null
   libraryyear: number | null
   fsendowments_noncjk: runtime.Decimal | null
@@ -235,6 +267,14 @@ export type Fiscal_SupportCountAggregateOutputType = {
   fseast_asian_program_support_korean: number
   fseast_asian_program_support_subtotal: number
   fstotal_acquisition_budget: number
+  fschinese_appropriations_subtotal_manual: number
+  fsjapanese_appropriations_subtotal_manual: number
+  fskorean_appropriations_subtotal_manual: number
+  fsnoncjk_appropriations_subtotal_manual: number
+  fstotal_appropriations_manual: number
+  fsendowments_subtotal_manual: number
+  fsgrants_subtotal_manual: number
+  fseast_asian_program_support_subtotal_manual: number
   fsnotes: number
   libraryyear: number
   fsendowments_noncjk: number
@@ -280,6 +320,14 @@ export type Fiscal_SupportAvgAggregateInputType = {
   fseast_asian_program_support_korean?: true
   fseast_asian_program_support_subtotal?: true
   fstotal_acquisition_budget?: true
+  fschinese_appropriations_subtotal_manual?: true
+  fsjapanese_appropriations_subtotal_manual?: true
+  fskorean_appropriations_subtotal_manual?: true
+  fsnoncjk_appropriations_subtotal_manual?: true
+  fstotal_appropriations_manual?: true
+  fsendowments_subtotal_manual?: true
+  fsgrants_subtotal_manual?: true
+  fseast_asian_program_support_subtotal_manual?: true
   libraryyear?: true
   fsendowments_noncjk?: true
   fsgrants_noncjk?: true
@@ -322,6 +370,14 @@ export type Fiscal_SupportSumAggregateInputType = {
   fseast_asian_program_support_korean?: true
   fseast_asian_program_support_subtotal?: true
   fstotal_acquisition_budget?: true
+  fschinese_appropriations_subtotal_manual?: true
+  fsjapanese_appropriations_subtotal_manual?: true
+  fskorean_appropriations_subtotal_manual?: true
+  fsnoncjk_appropriations_subtotal_manual?: true
+  fstotal_appropriations_manual?: true
+  fsendowments_subtotal_manual?: true
+  fsgrants_subtotal_manual?: true
+  fseast_asian_program_support_subtotal_manual?: true
   libraryyear?: true
   fsendowments_noncjk?: true
   fsgrants_noncjk?: true
@@ -365,6 +421,14 @@ export type Fiscal_SupportMinAggregateInputType = {
   fseast_asian_program_support_korean?: true
   fseast_asian_program_support_subtotal?: true
   fstotal_acquisition_budget?: true
+  fschinese_appropriations_subtotal_manual?: true
+  fsjapanese_appropriations_subtotal_manual?: true
+  fskorean_appropriations_subtotal_manual?: true
+  fsnoncjk_appropriations_subtotal_manual?: true
+  fstotal_appropriations_manual?: true
+  fsendowments_subtotal_manual?: true
+  fsgrants_subtotal_manual?: true
+  fseast_asian_program_support_subtotal_manual?: true
   fsnotes?: true
   libraryyear?: true
   fsendowments_noncjk?: true
@@ -409,6 +473,14 @@ export type Fiscal_SupportMaxAggregateInputType = {
   fseast_asian_program_support_korean?: true
   fseast_asian_program_support_subtotal?: true
   fstotal_acquisition_budget?: true
+  fschinese_appropriations_subtotal_manual?: true
+  fsjapanese_appropriations_subtotal_manual?: true
+  fskorean_appropriations_subtotal_manual?: true
+  fsnoncjk_appropriations_subtotal_manual?: true
+  fstotal_appropriations_manual?: true
+  fsendowments_subtotal_manual?: true
+  fsgrants_subtotal_manual?: true
+  fseast_asian_program_support_subtotal_manual?: true
   fsnotes?: true
   libraryyear?: true
   fsendowments_noncjk?: true
@@ -453,6 +525,14 @@ export type Fiscal_SupportCountAggregateInputType = {
   fseast_asian_program_support_korean?: true
   fseast_asian_program_support_subtotal?: true
   fstotal_acquisition_budget?: true
+  fschinese_appropriations_subtotal_manual?: true
+  fsjapanese_appropriations_subtotal_manual?: true
+  fskorean_appropriations_subtotal_manual?: true
+  fsnoncjk_appropriations_subtotal_manual?: true
+  fstotal_appropriations_manual?: true
+  fsendowments_subtotal_manual?: true
+  fsgrants_subtotal_manual?: true
+  fseast_asian_program_support_subtotal_manual?: true
   fsnotes?: true
   libraryyear?: true
   fsendowments_noncjk?: true
@@ -584,6 +664,14 @@ export type Fiscal_SupportGroupByOutputType = {
   fseast_asian_program_support_korean: runtime.Decimal | null
   fseast_asian_program_support_subtotal: runtime.Decimal | null
   fstotal_acquisition_budget: runtime.Decimal | null
+  fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+  fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+  fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+  fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+  fstotal_appropriations_manual: runtime.Decimal | null
+  fsendowments_subtotal_manual: runtime.Decimal | null
+  fsgrants_subtotal_manual: runtime.Decimal | null
+  fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
   fsnotes: string | null
   libraryyear: number | null
   fsendowments_noncjk: runtime.Decimal | null
@@ -651,6 +739,14 @@ export type Fiscal_SupportWhereInput = {
   fseast_asian_program_support_korean?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.StringNullableFilter<"Fiscal_Support"> | string | null
   libraryyear?: Prisma.IntNullableFilter<"Fiscal_Support"> | number | null
   fsendowments_noncjk?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -696,6 +792,14 @@ export type Fiscal_SupportOrderByWithRelationInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrderInput | Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrderInput | Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrderInput | Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
   fsnotes?: Prisma.SortOrderInput | Prisma.SortOrder
   libraryyear?: Prisma.SortOrderInput | Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -745,6 +849,14 @@ export type Fiscal_SupportWhereUniqueInput = Prisma.AtLeast<{
   fseast_asian_program_support_korean?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.StringNullableFilter<"Fiscal_Support"> | string | null
   fsendowments_noncjk?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: Prisma.DecimalNullableFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -789,6 +901,14 @@ export type Fiscal_SupportOrderByWithAggregationInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrderInput | Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrderInput | Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrderInput | Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrderInput | Prisma.SortOrder
   fsnotes?: Prisma.SortOrderInput | Prisma.SortOrder
   libraryyear?: Prisma.SortOrderInput | Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -841,6 +961,14 @@ export type Fiscal_SupportScalarWhereWithAggregatesInput = {
   fseast_asian_program_support_korean?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.StringNullableWithAggregatesFilter<"Fiscal_Support"> | string | null
   libraryyear?: Prisma.IntNullableWithAggregatesFilter<"Fiscal_Support"> | number | null
   fsendowments_noncjk?: Prisma.DecimalNullableWithAggregatesFilter<"Fiscal_Support"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -884,6 +1012,14 @@ export type Fiscal_SupportCreateInput = {
   fseast_asian_program_support_korean?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: string | null
   fsendowments_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -928,6 +1064,14 @@ export type Fiscal_SupportUncheckedCreateInput = {
   fseast_asian_program_support_korean?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: string | null
   libraryyear?: number | null
   fsendowments_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -971,6 +1115,14 @@ export type Fiscal_SupportUpdateInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1015,6 +1167,14 @@ export type Fiscal_SupportUncheckedUpdateInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   libraryyear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1059,6 +1219,14 @@ export type Fiscal_SupportCreateManyInput = {
   fseast_asian_program_support_korean?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: string | null
   libraryyear?: number | null
   fsendowments_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1102,6 +1270,14 @@ export type Fiscal_SupportUpdateManyMutationInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1145,6 +1321,14 @@ export type Fiscal_SupportUncheckedUpdateManyInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   libraryyear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1189,6 +1373,14 @@ export type Fiscal_SupportCountOrderByAggregateInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrder
   fsnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrder
@@ -1232,6 +1424,14 @@ export type Fiscal_SupportAvgOrderByAggregateInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrder
   fsgrants_noncjk?: Prisma.SortOrder
@@ -1275,6 +1475,14 @@ export type Fiscal_SupportMaxOrderByAggregateInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrder
   fsnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrder
@@ -1319,6 +1527,14 @@ export type Fiscal_SupportMinOrderByAggregateInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrder
   fsnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrder
@@ -1362,6 +1578,14 @@ export type Fiscal_SupportSumOrderByAggregateInput = {
   fseast_asian_program_support_korean?: Prisma.SortOrder
   fseast_asian_program_support_subtotal?: Prisma.SortOrder
   fstotal_acquisition_budget?: Prisma.SortOrder
+  fschinese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsjapanese_appropriations_subtotal_manual?: Prisma.SortOrder
+  fskorean_appropriations_subtotal_manual?: Prisma.SortOrder
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.SortOrder
+  fstotal_appropriations_manual?: Prisma.SortOrder
+  fsendowments_subtotal_manual?: Prisma.SortOrder
+  fsgrants_subtotal_manual?: Prisma.SortOrder
+  fseast_asian_program_support_subtotal_manual?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
   fsendowments_noncjk?: Prisma.SortOrder
   fsgrants_noncjk?: Prisma.SortOrder
@@ -1441,6 +1665,14 @@ export type Fiscal_SupportCreateWithoutLibrary_YearInput = {
   fseast_asian_program_support_korean?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: string | null
   fsendowments_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1484,6 +1716,14 @@ export type Fiscal_SupportUncheckedCreateWithoutLibrary_YearInput = {
   fseast_asian_program_support_korean?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: string | null
   fsendowments_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1542,6 +1782,14 @@ export type Fiscal_SupportUpdateWithoutLibrary_YearInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1585,6 +1833,14 @@ export type Fiscal_SupportUncheckedUpdateWithoutLibrary_YearInput = {
   fseast_asian_program_support_korean?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fseast_asian_program_support_subtotal?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fstotal_acquisition_budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fschinese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsjapanese_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fskorean_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsnoncjk_appropriations_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fstotal_appropriations_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsendowments_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fsgrants_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  fseast_asian_program_support_subtotal_manual?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fsendowments_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   fsgrants_noncjk?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1630,6 +1886,14 @@ export type Fiscal_SupportSelect<ExtArgs extends runtime.Types.Extensions.Intern
   fseast_asian_program_support_korean?: boolean
   fseast_asian_program_support_subtotal?: boolean
   fstotal_acquisition_budget?: boolean
+  fschinese_appropriations_subtotal_manual?: boolean
+  fsjapanese_appropriations_subtotal_manual?: boolean
+  fskorean_appropriations_subtotal_manual?: boolean
+  fsnoncjk_appropriations_subtotal_manual?: boolean
+  fstotal_appropriations_manual?: boolean
+  fsendowments_subtotal_manual?: boolean
+  fsgrants_subtotal_manual?: boolean
+  fseast_asian_program_support_subtotal_manual?: boolean
   fsnotes?: boolean
   libraryyear?: boolean
   fsendowments_noncjk?: boolean
@@ -1675,6 +1939,14 @@ export type Fiscal_SupportSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   fseast_asian_program_support_korean?: boolean
   fseast_asian_program_support_subtotal?: boolean
   fstotal_acquisition_budget?: boolean
+  fschinese_appropriations_subtotal_manual?: boolean
+  fsjapanese_appropriations_subtotal_manual?: boolean
+  fskorean_appropriations_subtotal_manual?: boolean
+  fsnoncjk_appropriations_subtotal_manual?: boolean
+  fstotal_appropriations_manual?: boolean
+  fsendowments_subtotal_manual?: boolean
+  fsgrants_subtotal_manual?: boolean
+  fseast_asian_program_support_subtotal_manual?: boolean
   fsnotes?: boolean
   libraryyear?: boolean
   fsendowments_noncjk?: boolean
@@ -1720,6 +1992,14 @@ export type Fiscal_SupportSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   fseast_asian_program_support_korean?: boolean
   fseast_asian_program_support_subtotal?: boolean
   fstotal_acquisition_budget?: boolean
+  fschinese_appropriations_subtotal_manual?: boolean
+  fsjapanese_appropriations_subtotal_manual?: boolean
+  fskorean_appropriations_subtotal_manual?: boolean
+  fsnoncjk_appropriations_subtotal_manual?: boolean
+  fstotal_appropriations_manual?: boolean
+  fsendowments_subtotal_manual?: boolean
+  fsgrants_subtotal_manual?: boolean
+  fseast_asian_program_support_subtotal_manual?: boolean
   fsnotes?: boolean
   libraryyear?: boolean
   fsendowments_noncjk?: boolean
@@ -1765,6 +2045,14 @@ export type Fiscal_SupportSelectScalar = {
   fseast_asian_program_support_korean?: boolean
   fseast_asian_program_support_subtotal?: boolean
   fstotal_acquisition_budget?: boolean
+  fschinese_appropriations_subtotal_manual?: boolean
+  fsjapanese_appropriations_subtotal_manual?: boolean
+  fskorean_appropriations_subtotal_manual?: boolean
+  fsnoncjk_appropriations_subtotal_manual?: boolean
+  fstotal_appropriations_manual?: boolean
+  fsendowments_subtotal_manual?: boolean
+  fsgrants_subtotal_manual?: boolean
+  fseast_asian_program_support_subtotal_manual?: boolean
   fsnotes?: boolean
   libraryyear?: boolean
   fsendowments_noncjk?: boolean
@@ -1772,7 +2060,7 @@ export type Fiscal_SupportSelectScalar = {
   fseast_asian_program_support_noncjk?: boolean
 }
 
-export type Fiscal_SupportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryid" | "fschinese_appropriations_monographic" | "fschinese_appropriations_serial" | "fschinese_appropriations_other_material" | "fschinese_appropriations_electronic" | "fschinese_appropriations_subtotal" | "fsjapanese_appropriations_monographic" | "fsjapanese_appropriations_serial" | "fsjapanese_appropriations_other_material" | "fsjapanese_appropriations_electronic" | "fsjapanese_appropriations_subtotal" | "fskorean_appropriations_monographic" | "fskorean_appropriations_serial" | "fskorean_appropriations_other_material" | "fskorean_appropriations_electronic" | "fskorean_appropriations_subtotal" | "fsnoncjk_appropriations_monographic" | "fsnoncjk_appropriations_serial" | "fsnoncjk_appropriations_other_material" | "fsnoncjk_appropriations_electronic" | "fsnoncjk_appropriations_subtotal" | "fstotal_appropriations" | "fsendowments_chinese" | "fsendowments_japanese" | "fsendowments_korean" | "fsendowments_subtotal" | "fsgrants_chinese" | "fsgrants_japanese" | "fsgrants_korean" | "fsgrants_subtotal" | "fseast_asian_program_support_chinese" | "fseast_asian_program_support_japanese" | "fseast_asian_program_support_korean" | "fseast_asian_program_support_subtotal" | "fstotal_acquisition_budget" | "fsnotes" | "libraryyear" | "fsendowments_noncjk" | "fsgrants_noncjk" | "fseast_asian_program_support_noncjk", ExtArgs["result"]["fiscal_Support"]>
+export type Fiscal_SupportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryid" | "fschinese_appropriations_monographic" | "fschinese_appropriations_serial" | "fschinese_appropriations_other_material" | "fschinese_appropriations_electronic" | "fschinese_appropriations_subtotal" | "fsjapanese_appropriations_monographic" | "fsjapanese_appropriations_serial" | "fsjapanese_appropriations_other_material" | "fsjapanese_appropriations_electronic" | "fsjapanese_appropriations_subtotal" | "fskorean_appropriations_monographic" | "fskorean_appropriations_serial" | "fskorean_appropriations_other_material" | "fskorean_appropriations_electronic" | "fskorean_appropriations_subtotal" | "fsnoncjk_appropriations_monographic" | "fsnoncjk_appropriations_serial" | "fsnoncjk_appropriations_other_material" | "fsnoncjk_appropriations_electronic" | "fsnoncjk_appropriations_subtotal" | "fstotal_appropriations" | "fsendowments_chinese" | "fsendowments_japanese" | "fsendowments_korean" | "fsendowments_subtotal" | "fsgrants_chinese" | "fsgrants_japanese" | "fsgrants_korean" | "fsgrants_subtotal" | "fseast_asian_program_support_chinese" | "fseast_asian_program_support_japanese" | "fseast_asian_program_support_korean" | "fseast_asian_program_support_subtotal" | "fstotal_acquisition_budget" | "fschinese_appropriations_subtotal_manual" | "fsjapanese_appropriations_subtotal_manual" | "fskorean_appropriations_subtotal_manual" | "fsnoncjk_appropriations_subtotal_manual" | "fstotal_appropriations_manual" | "fsendowments_subtotal_manual" | "fsgrants_subtotal_manual" | "fseast_asian_program_support_subtotal_manual" | "fsnotes" | "libraryyear" | "fsendowments_noncjk" | "fsgrants_noncjk" | "fseast_asian_program_support_noncjk", ExtArgs["result"]["fiscal_Support"]>
 export type Fiscal_SupportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Library_Year?: boolean | Prisma.Fiscal_Support$Library_YearArgs<ExtArgs>
 }
@@ -1825,6 +2113,14 @@ export type $Fiscal_SupportPayload<ExtArgs extends runtime.Types.Extensions.Inte
     fseast_asian_program_support_korean: runtime.Decimal | null
     fseast_asian_program_support_subtotal: runtime.Decimal | null
     fstotal_acquisition_budget: runtime.Decimal | null
+    fschinese_appropriations_subtotal_manual: runtime.Decimal | null
+    fsjapanese_appropriations_subtotal_manual: runtime.Decimal | null
+    fskorean_appropriations_subtotal_manual: runtime.Decimal | null
+    fsnoncjk_appropriations_subtotal_manual: runtime.Decimal | null
+    fstotal_appropriations_manual: runtime.Decimal | null
+    fsendowments_subtotal_manual: runtime.Decimal | null
+    fsgrants_subtotal_manual: runtime.Decimal | null
+    fseast_asian_program_support_subtotal_manual: runtime.Decimal | null
     fsnotes: string | null
     libraryyear: number | null
     fsendowments_noncjk: runtime.Decimal | null
@@ -2290,6 +2586,14 @@ export interface Fiscal_SupportFieldRefs {
   readonly fseast_asian_program_support_korean: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
   readonly fseast_asian_program_support_subtotal: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
   readonly fstotal_acquisition_budget: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fschinese_appropriations_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fsjapanese_appropriations_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fskorean_appropriations_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fsnoncjk_appropriations_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fstotal_appropriations_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fsendowments_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fsgrants_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
+  readonly fseast_asian_program_support_subtotal_manual: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>
   readonly fsnotes: Prisma.FieldRef<"Fiscal_Support", 'String'>
   readonly libraryyear: Prisma.FieldRef<"Fiscal_Support", 'Int'>
   readonly fsendowments_noncjk: Prisma.FieldRef<"Fiscal_Support", 'Decimal'>

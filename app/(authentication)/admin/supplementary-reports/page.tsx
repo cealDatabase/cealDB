@@ -9,9 +9,9 @@ import { toast } from 'sonner';
 
 const supplementaryReports = [
   { id: 'organizational', name: 'Participating Libraries Organizational Structure and Operation Status', filename: 'Organizational_Structure' },
-  { id: 'av', name: 'Audio/Visual Database', filename: 'AudioVisual_Database' },
-  { id: 'ebook', name: 'E-Book Database', filename: 'EBook_Database' },
-  { id: 'ejournal', name: 'E-Journal Database', filename: 'EJournal_Database' }
+  { id: 'av', name: 'Audio/Visual Databases', filename: 'AudioVisual_Databases' },
+  { id: 'ebook', name: 'E-Book Databases', filename: 'EBook_Databases' },
+  { id: 'ejournal', name: 'E-Journal Databases', filename: 'EJournal_Databases' }
 ];
 
 export default function SupplementaryReportsPage() {

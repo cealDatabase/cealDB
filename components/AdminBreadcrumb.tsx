@@ -74,10 +74,10 @@ export function AdminBreadcrumb({ libraryName }: AdminBreadcrumbProps) {
             <SlashIcon />
           </BreadcrumbSeparator>
 
-          {/* Forms Management */}
+          {/* Statistics Forms */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/admin/forms" className="no-underline">Forms Management</Link>
+              <Link href="/admin/forms" className="no-underline">Statistics Forms</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
 
