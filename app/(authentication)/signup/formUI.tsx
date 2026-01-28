@@ -120,14 +120,16 @@ export default function SignUpForm({
                   onChange={handleInstitutionChange}
                 >
                   {Array.isArray(libraries) &&
-                    libraries.map(
-                      (library: SingleLibraryType) =>
-                        !library.hideinlibrarylist && (
-                          <MenuItem value={library.id} key={library.id}>
-                            {library.library_name}
-                          </MenuItem>
-                        )
-                    )}
+                    libraries
+                      .filter((library: SingleLibraryType) => !library.hideinlibrarylist)
+                      .sort((a: SingleLibraryType, b: SingleLibraryType) => 
+                        a.library_name.localeCompare(b.library_name)
+                      )
+                      .map((library: SingleLibraryType) => (
+                        <MenuItem value={library.id} key={library.id}>
+                          {library.library_name}
+                        </MenuItem>
+                      ))}
                 </Select>
               </FormControl>
             </Box>

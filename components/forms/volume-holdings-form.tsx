@@ -9,6 +9,7 @@ import { ReusableFormField, ReusableNumberFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "./PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -54,7 +55,7 @@ export default function VolumeHoldingsForm() {
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/volumeHoldings/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/volumeHoldings/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -302,6 +303,8 @@ export default function VolumeHoldingsForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Physical Volume Numbers from Last Year */}
       <FormSection
@@ -338,6 +341,7 @@ export default function VolumeHoldingsForm() {
             korean: { name: "vhadded_gross_korean", label: "08. Added Korean" },
             noncjk: { name: "vhadded_gross_noncjk", label: "09. Added Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="10. Added Subtotal"
@@ -359,6 +363,7 @@ export default function VolumeHoldingsForm() {
             korean: { name: "vhwithdrawn_korean", label: "13. Withdrawn Korean" },
             noncjk: { name: "vhwithdrawn_noncjk", label: "14. Withdrawn Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="15. Withdrawn Subtotal"
@@ -392,6 +397,7 @@ export default function VolumeHoldingsForm() {
           label=""
           type="textarea"
           placeholder="Enter any additional notes or comments..."
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -422,8 +428,13 @@ export default function VolumeHoldingsForm() {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

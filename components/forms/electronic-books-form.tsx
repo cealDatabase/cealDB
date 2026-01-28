@@ -7,17 +7,18 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 
-import { ReusableFormField, ReusableCurrencyFormField } from "./ReusableFormField"
-import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
-import { getSurveyDates } from "@/lib/surveyDates"
-import { formatSimpleDate } from "@/lib/dateFormatting"
+import { ReusableFormField, ReusableCurrencyFormField } from './ReusableFormField';
+import { useFormStatusChecker } from '@/hooks/useFormStatusChecker';
+import { getSurveyDates } from '@/lib/surveyDates';
+import { formatSimpleDate } from '@/lib/dateFormatting';
+import { PostCollectionWarning } from './PostCollectionWarning';
 import {
   FormWrapper,
   FormSection,
   LanguageFieldGroup,
   SubtotalDisplay,
   FormSubmitSection
-} from "./shared"
+} from './shared';
 
 const formSchema = z.object({
   // Purchased Titles (Previous + Add = Total)
@@ -121,7 +122,7 @@ export default function ElectronicBooksForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData, previousYearData } = useFormStatusChecker('/api/electronic-books/status')
+  const { libraryYearStatus, isLoading, existingData, previousYearData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/electronic-books/status')
 
   // Pre-populate form with existing data and previous year data
   useEffect(() => {
@@ -461,6 +462,8 @@ export default function ElectronicBooksForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Purchased Titles */}
       <FormSection
@@ -502,7 +505,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_titles_chinese'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -530,7 +533,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_titles_japanese'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -558,7 +561,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_titles_korean'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -586,7 +589,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_titles_noncjk'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -636,24 +639,21 @@ export default function ElectronicBooksForm() {
             chinese: {
               name: "ebooks_nonpurchased_titles_chinese",
               label: "06. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "ebooks_nonpurchased_titles_japanese",
               label: "07. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "ebooks_nonpurchased_titles_korean",
               label: "08. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "ebooks_nonpurchased_titles_noncjk",
               label: "09. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='10. Non-Purchased Titles Subtotal (06 + 07 + 08 + 09)'
@@ -678,7 +678,7 @@ export default function ElectronicBooksForm() {
             onClick={importSubscriptionTitles}
             className='flex items-center gap-2'
             variant='default'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           >
             <Download className='h-4 w-4' />
             Import from &quot;E-Book Databases&quot;
@@ -690,24 +690,21 @@ export default function ElectronicBooksForm() {
             chinese: {
               name: "ebooks_subscription_titles_chinese",
               label: "11. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "ebooks_subscription_titles_japanese",
               label: "12. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "ebooks_subscription_titles_korean",
               label: "13. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "ebooks_subscription_titles_noncjk",
               label: "14. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='15. Subscription Titles Subtotal (11 + 12 + 13 + 14)'
@@ -756,7 +753,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_volumes_chinese'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -784,7 +781,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_volumes_japanese'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -812,7 +809,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_volumes_korean'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -840,7 +837,7 @@ export default function ElectronicBooksForm() {
                     control={form.control}
                     name='ebooks_purchased_add_volumes_noncjk'
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                     hideLabel
                   />
                 </td>
@@ -890,24 +887,21 @@ export default function ElectronicBooksForm() {
             chinese: {
               name: "ebooks_nonpurchased_volumes_chinese",
               label: "21. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "ebooks_nonpurchased_volumes_japanese",
               label: "22. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "ebooks_nonpurchased_volumes_korean",
               label: "23. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "ebooks_nonpurchased_volumes_noncjk",
               label: "24. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='25. Non-Purchased Volumes Subtotal (21 + 22 + 23 + 24)'
@@ -932,7 +926,7 @@ export default function ElectronicBooksForm() {
             onClick={importSubscriptionVolumes}
             className='flex items-center gap-2'
             variant='default'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           >
             <Download className='h-4 w-4' />
             Import from E-Book Databases
@@ -944,24 +938,21 @@ export default function ElectronicBooksForm() {
             chinese: {
               name: "ebooks_subscription_volumes_chinese",
               label: "26. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "ebooks_subscription_volumes_japanese",
               label: "27. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "ebooks_subscription_volumes_korean",
               label: "28. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "ebooks_subscription_volumes_noncjk",
               label: "29. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='30. Subscription Volumes Subtotal (26 + 27 + 28 + 29)'
@@ -999,7 +990,7 @@ export default function ElectronicBooksForm() {
           name='ebooks_expenditure_grandtotal'
           label='33. Expenditure Total'
           placeholder='0.00'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
 
         <ReusableFormField
@@ -1008,7 +999,7 @@ export default function ElectronicBooksForm() {
           label='34. Memo/Footnote for this form'
           placeholder='Enter any notes, footnotes, or additional information...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -1077,29 +1068,15 @@ export default function ElectronicBooksForm() {
       </FormSection>
 
       {/* Notes */}
-      <FormSection title='Notes' description=''>
-        <div className='bg-blue-50 border-l-4 border-blue-400 p-4'>
-          <ol className='list-decimal list-inside space-y-3 text-sm text-gray-700'>
-            <li>
-              The{" "}
-              <span className='font-semibold'>
-                &quot;Calculate Totals&quot;
-              </span>{" "}
-              feature will overwrite any entered numbers in the Subtotal and
-              Total fields! Do not click if you do not wish to have the
-              subtotals automatically calculated.
-            </li>
-            <li>
-              The E-Books Volume Total (item #32 on this Form) will be used
-              together with item #16 on the Physical Volume Holdings Form to
-              calculate the Grand Total Volume Holdings for your institution.
-            </li>
-            <li>
-              Both the Physical Volumes Total and the Grand Total Volume
-              Holdings are for information only, and do not belong to this form.
-            </li>
-          </ol>
-        </div>
+      <FormSection title='Notes' description='Additional notes or comments for this form.'>
+        <ReusableFormField
+          control={form.control}
+          name='ebooks_notes'
+          label='Memo/Footnote for this form'
+          placeholder='Enter any notes, footnotes, or additional information...'
+          type='textarea'
+          disabled={isReadOnly}
+        />
       </FormSection>
 
       <FormSubmitSection
@@ -1107,10 +1084,15 @@ export default function ElectronicBooksForm() {
         isSavingDraft={isSavingDraft}
         successMessage={successMessage}
         errorMessage={errorMessage}
-        submitButtonText='Submit'
+        submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   );
 }

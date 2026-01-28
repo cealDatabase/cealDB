@@ -16,6 +16,7 @@ import { ReusableFormField, ReusableNumberFormField } from "@/components/forms/R
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "@/components/forms/PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -58,7 +59,7 @@ const UnprocessedForm = () => {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/unprocessed/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/unprocessed/status')
 
   // Pre-populate form with existing data
   useEffect(() => {
@@ -170,6 +171,8 @@ const UnprocessedForm = () => {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Unprocessed Backlog Materials */}
       <FormSection
@@ -179,12 +182,13 @@ const UnprocessedForm = () => {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "ubchinese", label: "01. Unprocessed Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "ubjapanese", label: "02. Unprocessed Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "ubkorean", label: "03. Unprocessed Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            noncjk: { name: "ubnoncjk", label: "04. Unprocessed Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "ubchinese", label: "01. Unprocessed Chinese" },
+            japanese: { name: "ubjapanese", label: "02. Unprocessed Japanese" },
+            korean: { name: "ubkorean", label: "03. Unprocessed Korean" },
+            noncjk: { name: "ubnoncjk", label: "04. Unprocessed Non-CJK" }
           }}
           useFloatNumbers={false}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="05. Unprocessed Total"
@@ -204,7 +208,7 @@ const UnprocessedForm = () => {
           label="06. Memo/Footnote for this form"
           placeholder="Enter any notes or footnotes..."
           type="textarea"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -215,8 +219,13 @@ const UnprocessedForm = () => {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

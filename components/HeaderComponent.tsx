@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import React from "react";
 import { Button } from "@/components/Button";
 import { MainMenu } from "@/constant/nav";
@@ -33,6 +33,11 @@ export function HeaderComponent({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [statisticsOpen, setStatisticsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="relative isolate z-10 border-b-2 border-gray-400">
@@ -68,37 +73,47 @@ export function HeaderComponent({
             Home
           </Link>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 focus:outline-none">
+          {mounted ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700 focus:outline-none">
+                Statistics
+                <ChevronDown
+                  className="h-5 w-5 flex-none text-gray-400"
+                  aria-hidden="true"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-auto max-w-7xl bg-white shadow-lg ring-1 ring-gray-900/5 p-8" 
+                align="center" 
+                sideOffset={16}
+              >
+                <div className="grid grid-cols-4 gap-x-6 gap-y-8">
+                  {StatisticsMenu.map((item) => (
+                    <DropdownMenuItem key={item.name} asChild className="cursor-pointer p-0 h-auto">
+                      <Link href={item.href} className="group relative rounded-lg p-6 text-sm leading-6 hover:bg-gray-50 flex flex-col items-start no-underline">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white mb-4">
+                          <item.icon
+                            className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+                            aria-hidden="true"
+                          />
+                        </div>
+                        <div className="font-semibold text-gray-900">{item.name}</div>
+                        <p className="mt-1 text-gray-600">{item.description}</p>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <span className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
               Statistics
               <ChevronDown
                 className="h-5 w-5 flex-none text-gray-400"
                 aria-hidden="true"
               />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              className="w-auto max-w-7xl bg-white shadow-lg ring-1 ring-gray-900/5 p-8" 
-              align="center" 
-              sideOffset={16}
-            >
-              <div className="grid grid-cols-4 gap-x-6 gap-y-8">
-                {StatisticsMenu.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild className="cursor-pointer p-0 h-auto">
-                    <Link href={item.href} className="group relative rounded-lg p-6 text-sm leading-6 hover:bg-gray-50 flex flex-col items-start no-underline">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white mb-4">
-                        <item.icon
-                          className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <div className="font-semibold text-gray-900">{item.name}</div>
-                      <p className="mt-1 text-gray-600">{item.description}</p>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </span>
+          )}
 
           {[...MainMenu].map((item) => (
             <Link

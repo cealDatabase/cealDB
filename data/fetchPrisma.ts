@@ -26,6 +26,9 @@ export const getAllLibraries = async () => {
         libraryType: true,
         User_Library: true,
       },
+      orderBy: {
+        library_name: 'asc'
+      }
     });
     return allLibraries;
   } catch {

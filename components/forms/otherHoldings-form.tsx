@@ -7,10 +7,11 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 
-import { ReusableFormField } from "./ReusableFormField"
-import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
-import { getSurveyDates } from "@/lib/surveyDates"
-import { formatSimpleDate } from "@/lib/dateFormatting"
+import { ReusableFormField, ReusableNumberFormField } from './ReusableFormField';
+import { useFormStatusChecker } from '@/hooks/useFormStatusChecker';
+import { getSurveyDates } from '@/lib/surveyDates';
+import { formatSimpleDate } from '@/lib/dateFormatting';
+import { PostCollectionWarning } from './PostCollectionWarning';
 import {
   FormWrapper,
   FormSection,
@@ -97,7 +98,7 @@ export default function OtherHoldingsForm() {
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/otherHoldings/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/otherHoldings/status');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -423,6 +424,8 @@ export default function OtherHoldingsForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Microforms Section */}
       <FormSection
@@ -449,6 +452,7 @@ export default function OtherHoldingsForm() {
               label: "04. Microform Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='05. Microforms Subtotal'
@@ -482,6 +486,7 @@ export default function OtherHoldingsForm() {
               label: "09. Graphic Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='10. Graphics Subtotal'
@@ -503,6 +508,7 @@ export default function OtherHoldingsForm() {
             korean: { name: "ohaudio_korean", label: "13. Audio Korean" },
             noncjk: { name: "ohaudio_noncjk", label: "14. Audio Non-CJK" },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='15. Audio Subtotal'
@@ -530,6 +536,7 @@ export default function OtherHoldingsForm() {
             korean: { name: "ohfilm_video_korean", label: "18. Video Korean" },
             noncjk: { name: "ohfilm_video_noncjk", label: "19. Video Non-CJK" },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='20. Video Subtotal'
@@ -551,6 +558,7 @@ export default function OtherHoldingsForm() {
             korean: { name: "ohdvd_korean", label: "23. DVD Korean" },
             noncjk: { name: "ohdvd_noncjk", label: "24. DVD Non-CJK" },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='25. DVD Subtotal'
@@ -575,7 +583,7 @@ export default function OtherHoldingsForm() {
             onClick={importAVData}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isImporting}
+            disabled={isImporting || isReadOnly}
           >
             {isImporting ? (
               <>
@@ -614,6 +622,7 @@ export default function OtherHoldingsForm() {
                 label: "29. Online Map Non-CJK",
               },
             }}
+            disabled={isReadOnly}
           />
           <div className='mt-4'></div>
           <SubtotalDisplay
@@ -648,6 +657,7 @@ export default function OtherHoldingsForm() {
                 label: "34. Online Image/Photograph Non-CJK",
               },
             }}
+            disabled={isReadOnly}
           />
           <div className='mt-4'></div>
           <SubtotalDisplay
@@ -682,6 +692,7 @@ export default function OtherHoldingsForm() {
                 label: "39. Streaming Audio Non-CJK",
               },
             }}
+            disabled={isReadOnly}
           />
           <div className='mt-4'></div>
           <SubtotalDisplay
@@ -716,6 +727,7 @@ export default function OtherHoldingsForm() {
                 label: "44. Streaming Film/Video Non-CJK",
               },
             }}
+            disabled={isReadOnly}
           />
           <div className='mt-4'></div>
           <SubtotalDisplay
@@ -742,6 +754,7 @@ export default function OtherHoldingsForm() {
             korean: { name: "ohcustom1korean", label: "48. Custom Korean" },
             noncjk: { name: "ohcustom1noncjk", label: "49. Custom Non-CJK" },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='50. Custom Subtotal'
@@ -770,11 +783,12 @@ export default function OtherHoldingsForm() {
         description='Additional comments or clarifications'
       >
         <ReusableFormField
-          control={form.control as any}
+          control={form.control}
           name='ohnotes'
+          label='52. Memo/Footnote for this form'
+          placeholder='Enter any notes or footnotes...'
           type='textarea'
-          placeholder='Enter any additional notes or comments...'
-          label={""}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -785,8 +799,13 @@ export default function OtherHoldingsForm() {
         errorMessage={errorMessage}
         submitButtonText='Submit'
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   );
 }

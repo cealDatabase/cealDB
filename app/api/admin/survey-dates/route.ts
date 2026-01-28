@@ -130,7 +130,8 @@ export async function PUT(request: NextRequest) {
       // No records exist - we need to create them
       // Get all libraries to create Library_Year records for each
       const libraries = await prisma.library.findMany({
-        select: { id: true }
+        select: { id: true },
+        orderBy: { library_name: 'asc' }
       });
 
       // Create Library_Year records for all libraries

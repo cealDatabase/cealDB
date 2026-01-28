@@ -5,13 +5,21 @@ import { getCurrentUser } from './auth';
 export interface AuditLogData {
   userId?: number;
   username?: string;
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN' | 'SIGNOUT' | 'SIGNIN_FAILED' | 'UPDATE_ROLES' | 'SYSTEM_OPEN_FORMS' | 'SYSTEM_CLOSE_FORMS';
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN' | 'SIGNOUT' | 'SIGNIN_FAILED' | 'UPDATE_ROLES' | 'SYSTEM_OPEN_FORMS' | 'SYSTEM_CLOSE_FORMS' | 'POST_COLLECTION_EDIT';
   tableName?: string;
   recordId?: string | number;
   oldValues?: any;
   newValues?: any;
   success?: boolean;
   errorMessage?: string;
+  metadata?: {
+    isPostCollectionEdit?: boolean;
+    userRoles?: string[];
+    academicYear?: number;
+    libraryId?: number;
+    formType?: string;
+    changeReason?: string;
+  };
 }
 
 export async function logAuditEvent(data: AuditLogData, request?: Request) {
@@ -49,6 +57,15 @@ export async function logAuditEvent(data: AuditLogData, request?: Request) {
       ipAddress = forwardedHeader?.split(',')[0] || realIpHeader || ipAddress;
     }
 
+    // Enhance new_values with metadata for post-collection edits
+    let enhancedNewValues = data.newValues;
+    if (data.metadata) {
+      enhancedNewValues = {
+        ...(data.newValues || {}),
+        _audit_metadata: data.metadata
+      };
+    }
+
     await db.auditLog.create({
       data: {
         user_id: userId || null,
@@ -57,7 +74,7 @@ export async function logAuditEvent(data: AuditLogData, request?: Request) {
         table_name: data.tableName || null,
         record_id: data.recordId?.toString() || null,
         old_values: data.oldValues || null,
-        new_values: data.newValues || null,
+        new_values: enhancedNewValues || null,
         ip_address: ipAddress,
         user_agent: userAgent,
         success: data.success ?? true,

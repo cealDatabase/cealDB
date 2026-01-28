@@ -19,13 +19,25 @@ export async function GET(
     const libraryId = Number(libid);
     const currentYear = new Date().getFullYear();
 
-    // Find Library_Year record for current year and library
-    const libraryYear = await db.library_Year.findFirst({
+    // Find Library_Year record
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
     });
+
+    // If current year doesn't exist, use the most recent year
+    if (!libraryYear) {
+      libraryYear = await db.library_Year.findFirst({
+        where: {
+          library: libraryId,
+        },
+        orderBy: {
+          year: 'desc'
+        }
+      });
+    }
 
     if (!libraryYear) {
       return NextResponse.json({
@@ -33,7 +45,7 @@ export async function GET(
         is_open_for_editing: false,
         is_active: false,
         data: null,
-        message: "No library_year record exists for this library and year. Please contact the administrator."
+        message: "No library_year record exists for this library. Please contact the administrator."
       });
     }
 

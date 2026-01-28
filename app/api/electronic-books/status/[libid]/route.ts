@@ -16,12 +16,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
     }
 
     // Find the Library_Year record
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libid,
         year: currentYear,
       },
     });
+
+    // If current year doesn't exist, use the most recent year
+    if (!libraryYear) {
+      libraryYear = await db.library_Year.findFirst({
+        where: {
+          library: libid,
+        },
+        orderBy: {
+          year: 'desc'
+        }
+      });
+    }
 
     if (!libraryYear) {
       return NextResponse.json({
@@ -117,6 +129,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
       exists: true,
       is_open_for_editing: libraryYear.is_open_for_editing,
       is_active: true,
+      year: libraryYear.year,
+      library_id: libraryYear.library,
       message: libraryYear.is_open_for_editing ? "Form is available for editing" : "Form is read-only",
       existingData: existingData,
       libraryYear: libraryYear,

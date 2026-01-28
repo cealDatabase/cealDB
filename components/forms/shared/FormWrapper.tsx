@@ -2,6 +2,7 @@ import { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form } from "@/components/ui/form"
 import { UseFormReturn } from "react-hook-form"
+import { AlertCircle, Lock } from "lucide-react"
 
 interface LibraryYearStatus {
   exists: boolean
@@ -17,6 +18,8 @@ interface FormWrapperProps {
   libraryYearStatus: LibraryYearStatus | null
   children: ReactNode
   className?: string
+  isReadOnly?: boolean
+  readOnlyReason?: string
 }
 
 export function FormWrapper({
@@ -25,7 +28,9 @@ export function FormWrapper({
   isLoading,
   libraryYearStatus,
   children,
-  className = "space-y-8"
+  className = "space-y-8",
+  isReadOnly = false,
+  readOnlyReason
 }: FormWrapperProps) {
   // Show loading state
   if (isLoading) {
@@ -36,8 +41,9 @@ export function FormWrapper({
     )
   }
 
-  // Show error message if library year doesn't exist or is not open for editing
-  if (!libraryYearStatus?.exists || !libraryYearStatus?.is_open_for_editing) {
+  // Only block if library year doesn't exist at all
+  // If it exists but is closed for editing, show it in read-only mode instead
+  if (!libraryYearStatus?.exists) {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <Card className="border-red-200 bg-red-50">
@@ -65,10 +71,28 @@ export function FormWrapper({
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={className}>
-        {children}
-      </form>
-    </Form>
+    <div className="space-y-4">
+      {isReadOnly && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="">
+            <div className="flex items-start gap-3">
+              <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-blue-900 space-y-1">
+                <p className="font-semibold">Read-Only Mode</p>
+                <p className="text-sm">
+                  {readOnlyReason || "The survey period has closed. You can view the submitted data but cannot make changes."}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className={className}>
+          {children}
+        </form>
+      </Form>
+    </div>
   )
 }

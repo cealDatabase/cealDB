@@ -9,6 +9,7 @@ import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "./PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -52,7 +53,7 @@ export default function PublicServicesForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/public-services/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/public-services/status')
 
   // Pre-populate form with existing data
   useEffect(() => {
@@ -161,6 +162,8 @@ export default function PublicServicesForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Presentations Section */}
       <FormSection
@@ -171,17 +174,17 @@ export default function PublicServicesForm() {
           control={form.control}
           name="pspresentations_subtotal"
           label="01. Presentations"
-          placeholder="Enter total number of presentations"
           type="number"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          placeholder="0"
+          disabled={isReadOnly}
         />
         <ReusableFormField
           control={form.control}
           name="pspresentation_participants_subtotal"
           label="02. Presentation Participants"
-          placeholder="Enter total number of participants"
           type="number"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          placeholder="0"
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -194,9 +197,9 @@ export default function PublicServicesForm() {
           control={form.control}
           name="psreference_transactions_subtotal"
           label="03. Reference Transactions"
-          placeholder="Enter total reference transactions"
           type="number"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          placeholder="0"
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -209,9 +212,9 @@ export default function PublicServicesForm() {
           control={form.control}
           name="pstotal_circulations_subtotal"
           label="04. Total Circulations"
-          placeholder="Enter total circulations"
           type="number"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          placeholder="0"
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -227,7 +230,7 @@ export default function PublicServicesForm() {
             label="05. Lending Requests Filled"
             placeholder="Enter filled lending requests"
             type="number"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableFormField
             control={form.control}
@@ -235,7 +238,7 @@ export default function PublicServicesForm() {
             label="06. Lending Requests Unfilled"
             placeholder="Enter unfilled lending requests"
             type="number"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,7 +248,7 @@ export default function PublicServicesForm() {
             label="07. Borrowing Requests Filled"
             placeholder="Enter filled borrowing requests"
             type="number"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableFormField
             control={form.control}
@@ -253,7 +256,7 @@ export default function PublicServicesForm() {
             label="08. Borrowing Requests Unfilled"
             placeholder="Enter unfilled borrowing requests"
             type="number"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -269,7 +272,7 @@ export default function PublicServicesForm() {
           label="09. Memo/Footnote for this form"
           placeholder="Enter any notes, footnotes, or additional information..."
           type="textarea"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -280,8 +283,13 @@ export default function PublicServicesForm() {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

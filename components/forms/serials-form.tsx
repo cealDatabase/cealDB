@@ -11,6 +11,7 @@ import { ReusableFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from './PostCollectionWarning';
 import {
   FormWrapper,
   FormSection,
@@ -73,7 +74,7 @@ export default function SerialsForm() {
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/serials/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/serials/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -321,6 +322,8 @@ export default function SerialsForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* 1. Serial Titles: Purchased (including Subscriptions) - Electronic */}
       <FormSection
@@ -338,6 +341,7 @@ export default function SerialsForm() {
             onClick={importEJournalData}
             className='flex items-center gap-2'
             variant='default'
+            disabled={isReadOnly}
           >
             <Download className='h-4 w-4' />
             Import from &quot;E-Journal Databases&quot;
@@ -364,6 +368,7 @@ export default function SerialsForm() {
               label: "04. Purchased Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='05. Electronic Purchased Subtotal'
@@ -397,6 +402,7 @@ export default function SerialsForm() {
               label: "09. Purchased Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='10. Print Purchased Subtotal'
@@ -430,6 +436,7 @@ export default function SerialsForm() {
               label: "14. Non-Purchased Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='15. Electronic Non-Purchased Subtotal'
@@ -463,6 +470,7 @@ export default function SerialsForm() {
               label: "19. Non-Purchased Non-CJK",
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='20. Print Non-Purchased Subtotal'
@@ -500,6 +508,7 @@ export default function SerialsForm() {
               disabled: true,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='25. Electronic Grand Total'
@@ -537,6 +546,7 @@ export default function SerialsForm() {
               disabled: true,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='30. Print Grand Total'
@@ -570,6 +580,7 @@ export default function SerialsForm() {
           label=''
           type='textarea'
           placeholder='Enter any additional notes or comments...'
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -580,8 +591,13 @@ export default function SerialsForm() {
         errorMessage={errorMessage}
         submitButtonText='Submit'
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   );
 }

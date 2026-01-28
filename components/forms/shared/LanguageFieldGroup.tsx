@@ -21,6 +21,7 @@ interface LanguageFieldGroupProps<T extends FieldValues> {
   useCurrency?: boolean
   className?: string
   singleField?: boolean
+  disabled?: boolean
 }
 
 export function LanguageFieldGroup<T extends FieldValues>({
@@ -29,9 +30,11 @@ export function LanguageFieldGroup<T extends FieldValues>({
   useFloatNumbers = false,
   useCurrency = false,
   className = "grid grid-cols-1 md:grid-cols-2 gap-4",
-  singleField = false
+  singleField = false,
+  disabled = false
 }: LanguageFieldGroupProps<T>) {
   const renderField = (field: LanguageField) => {
+    const isDisabled = disabled || field.disabled;
     if (useCurrency) {
       return (
         <ReusableCurrencyFormField
@@ -39,7 +42,7 @@ export function LanguageFieldGroup<T extends FieldValues>({
           name={field.name as FieldPath<T>}
           label={field.label}
           placeholder="0.00"
-          disabled={field.disabled}
+          disabled={isDisabled}
         />
       )
     }
@@ -51,7 +54,7 @@ export function LanguageFieldGroup<T extends FieldValues>({
           name={field.name as FieldPath<T>}
           label={field.label}
           type="number"
-          disabled={field.disabled}
+          disabled={isDisabled}
           useFloat={true}
         />
       )
@@ -63,7 +66,7 @@ export function LanguageFieldGroup<T extends FieldValues>({
         name={field.name as FieldPath<T>}
         label={field.label}
         type="number"
-        disabled={field.disabled}
+        disabled={isDisabled}
       />
     )
   }

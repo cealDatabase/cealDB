@@ -5,10 +5,11 @@ import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 
-import { ReusableFormField } from "./ReusableFormField"
+import { ReusableFormField, ReusableNumberFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "./PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -59,7 +60,7 @@ export default function MonographicForm() {
   const params = useParams()
 
   // Use the reusable hook for status checking
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/monographic/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/monographic/status')
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -238,6 +239,8 @@ export default function MonographicForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Purchased Titles */}
       <FormSection
@@ -252,6 +255,7 @@ export default function MonographicForm() {
             korean: { name: "mapurchased_titles_korean", label: "03. Purchased Titles Korean" },
             noncjk: { name: "mapurchased_titles_noncjk", label: "04. Purchased Titles Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="05. Purchased Titles Subtotal"
@@ -273,6 +277,7 @@ export default function MonographicForm() {
             korean: { name: "mapurchased_volumes_korean", label: "08. Purchased Volumes Korean" },
             noncjk: { name: "mapurchased_volumes_noncjk", label: "09. Purchased Volumes Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="10. Purchased Volumes Subtotal"
@@ -294,6 +299,7 @@ export default function MonographicForm() {
             korean: { name: "manonpurchased_titles_korean", label: "13. Non-Purchased Titles Korean" },
             noncjk: { name: "manonpurchased_titles_noncjk", label: "14. Non-Purchased Titles Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="15. Non-Purchased Titles Subtotal"
@@ -315,6 +321,7 @@ export default function MonographicForm() {
             korean: { name: "manonpurchased_volumes_korean", label: "18. Non-Purchased Volumes Korean" },
             noncjk: { name: "manonpurchased_volumes_noncjk", label: "19. Non-Purchased Volumes Non-CJK" }
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="20. Non-Purchased Volumes Subtotal"
@@ -355,6 +362,7 @@ export default function MonographicForm() {
           label=""
           type="textarea"
           placeholder="Enter any additional notes or comments..."
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -365,8 +373,13 @@ export default function MonographicForm() {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

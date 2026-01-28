@@ -55,6 +55,9 @@ export async function POST(req: Request) {
         id: true,
         library_name: true,
       },
+      orderBy: {
+        library_name: 'asc'
+      }
     });
 
     if (libraries.length === 0) {

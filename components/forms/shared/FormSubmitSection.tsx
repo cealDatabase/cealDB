@@ -10,6 +10,7 @@ interface FormSubmitSectionProps {
   className?: string
   onSaveDraft?: () => Promise<void>
   isSavingDraft?: boolean
+  isReadOnly?: boolean
 }
 
 export function FormSubmitSection({
@@ -19,7 +20,8 @@ export function FormSubmitSection({
   submitButtonText,
   className = "space-y-4",
   onSaveDraft,
-  isSavingDraft = false
+  isSavingDraft = false,
+  isReadOnly = false
 }: FormSubmitSectionProps) {
   return (
     <div className={className}>
@@ -35,44 +37,46 @@ export function FormSubmitSection({
         show={!!errorMessage}
       />
 
-      <div className="flex justify-end gap-3 mb-4">
-        {onSaveDraft && (
+      {!isReadOnly && (
+        <div className="flex justify-end gap-3 mb-4">
+          {onSaveDraft && (
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={onSaveDraft}
+              disabled={isSubmitting || isSavingDraft}
+              className="min-w-[150px]"
+            >
+              {isSavingDraft ? (
+                <>
+                  <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5" />
+                  Saving Draft...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Draft
+                </>
+              )}
+            </Button>
+          )}
+          
           <Button 
-            type="button"
-            variant="outline"
-            onClick={onSaveDraft}
+            type="submit" 
             disabled={isSubmitting || isSavingDraft}
-            className="min-w-[150px]"
+            className="min-w-[200px]"
           >
-            {isSavingDraft ? (
+            {isSubmitting ? (
               <>
-                <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5" />
-                Saving Draft...
+                <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                Submitting...
               </>
             ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Draft
-              </>
+              submitButtonText
             )}
           </Button>
-        )}
-        
-        <Button 
-          type="submit" 
-          disabled={isSubmitting || isSavingDraft}
-          className="min-w-[200px]"
-        >
-          {isSubmitting ? (
-            <>
-              <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-              Submitting...
-            </>
-          ) : (
-            submitButtonText
-          )}
-        </Button>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -5,10 +5,11 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { ReusableFormField } from "./ReusableFormField"
+import { ReusableFormField, ReusableNumberFormField } from "./ReusableFormField"
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "./PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -78,7 +79,7 @@ export default function PersonnelForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/personnel/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/personnel/status')
 
   // Pre-populate form with existing data
   useEffect(() => {
@@ -225,6 +226,8 @@ export default function PersonnelForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Professional Staff */}
       <FormSection
@@ -234,12 +237,13 @@ export default function PersonnelForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "psfprofessional_chinese", label: "01. Professional Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "psfprofessional_japanese", label: "02. Professional Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "psfprofessional_korean", label: "03. Professional Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "psfprofessional_eastasian", label: "04. Professional East Asian", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "psfprofessional_chinese", label: "01. Professional Chinese" },
+            japanese: { name: "psfprofessional_japanese", label: "02. Professional Japanese" },
+            korean: { name: "psfprofessional_korean", label: "03. Professional Korean" },
+            eastasian: { name: "psfprofessional_eastasian", label: "04. Professional East Asian" }
           }}
           useFloatNumbers={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="05. Professional Total"
@@ -256,12 +260,13 @@ export default function PersonnelForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "psfsupport_staff_chinese", label: "06. Support Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "psfsupport_staff_japanese", label: "07. Support Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "psfsupport_staff_korean", label: "08. Support Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "psfsupport_staff_eastasian", label: "09. Support East Asian", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "psfsupport_staff_chinese", label: "06. Support Chinese" },
+            japanese: { name: "psfsupport_staff_japanese", label: "07. Support Japanese" },
+            korean: { name: "psfsupport_staff_korean", label: "08. Support Korean" },
+            eastasian: { name: "psfsupport_staff_eastasian", label: "09. Support East Asian" }
           }}
           useFloatNumbers={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="10. Support Total"
@@ -278,12 +283,13 @@ export default function PersonnelForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "psfstudent_assistants_chinese", label: "11. Student Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "psfstudent_assistants_japanese", label: "12. Student Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "psfstudent_assistants_korean", label: "13. Student Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            eastasian: { name: "psfstudent_assistants_eastasian", label: "14. Student East Asian", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "psfstudent_assistants_chinese", label: "11. Student Chinese" },
+            japanese: { name: "psfstudent_assistants_japanese", label: "12. Student Japanese" },
+            korean: { name: "psfstudent_assistants_korean", label: "13. Student Korean" },
+            eastasian: { name: "psfstudent_assistants_eastasian", label: "14. Student East Asian" }
           }}
           useFloatNumbers={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="15. Student Total"
@@ -301,10 +307,11 @@ export default function PersonnelForm() {
           <LanguageFieldGroup
             control={form.control}
             fields={{
-              others: { name: "psfothers", label: "16. Others", disabled: !libraryYearStatus?.is_open_for_editing }
+              others: { name: "psfothers", label: "16. Others" }
             }}
             useFloatNumbers={true}
             singleField={true}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -339,7 +346,7 @@ export default function PersonnelForm() {
                   type="radio"
                   checked={form.watch("psfosacquisition") === true}
                   onChange={() => form.setValue("psfosacquisition", true)}
-                  disabled={!libraryYearStatus?.is_open_for_editing}
+                  disabled={isReadOnly}
                   className="mr-2"
                 />
                 Yes
@@ -349,7 +356,7 @@ export default function PersonnelForm() {
                   type="radio"
                   checked={form.watch("psfosacquisition") === false}
                   onChange={() => form.setValue("psfosacquisition", false)}
-                  disabled={!libraryYearStatus?.is_open_for_editing}
+                  disabled={isReadOnly}
                   className="mr-2"
                 />
                 No
@@ -366,7 +373,7 @@ export default function PersonnelForm() {
                   type="radio"
                   checked={form.watch("psfosprocessing") === true}
                   onChange={() => form.setValue("psfosprocessing", true)}
-                  disabled={!libraryYearStatus?.is_open_for_editing}
+                  disabled={isReadOnly}
                   className="mr-2"
                 />
                 Yes
@@ -376,7 +383,7 @@ export default function PersonnelForm() {
                   type="radio"
                   checked={form.watch("psfosprocessing") === false}
                   onChange={() => form.setValue("psfosprocessing", false)}
-                  disabled={!libraryYearStatus?.is_open_for_editing}
+                  disabled={isReadOnly}
                   className="mr-2"
                 />
                 No
@@ -397,7 +404,7 @@ export default function PersonnelForm() {
           label="20. Memo/Footnote for this form"
           placeholder="Enter any notes, footnotes, or additional information..."
           type="textarea"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -408,8 +415,13 @@ export default function PersonnelForm() {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

@@ -11,6 +11,7 @@ import { ReusableFormField, ReusableCurrencyFormField } from "./ReusableFormFiel
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from './PostCollectionWarning';
 import {
   FormWrapper,
   FormSection,
@@ -87,7 +88,6 @@ export default function ElectronicForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
-  const [previousYearData, setPreviousYearData] = useState<any>(null)
   const params = useParams()
 
   const form = useForm<FormData>({
@@ -139,7 +139,7 @@ export default function ElectronicForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/electronic/status')
+  const { libraryYearStatus, isLoading, existingData, previousYearData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/electronic/status')
 
   // Pre-populate form with existing data and extract previous year data
   useEffect(() => {
@@ -157,12 +157,7 @@ export default function ElectronicForm() {
     }
   }, [existingData, form])
 
-  // Extract previous year data from libraryYearStatus
-  useEffect(() => {
-    if (libraryYearStatus && (libraryYearStatus as any).previousYearData) {
-      setPreviousYearData((libraryYearStatus as any).previousYearData)
-    }
-  }, [libraryYearStatus])
+  // previousYearData is now provided directly by useFormStatusChecker hook
 
   // Watch form values for calculations
   const watchedValues = form.watch()
@@ -455,6 +450,8 @@ export default function ElectronicForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* One-time Computer Files */}
       <FormSection
@@ -485,7 +482,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_title_chinese'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
                 <td className='border border-gray-300 p-2'>
@@ -494,7 +491,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_cd_chinese'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
               </tr>
@@ -508,7 +505,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_title_japanese'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
                 <td className='border border-gray-300 p-2'>
@@ -517,7 +514,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_cd_japanese'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
               </tr>
@@ -531,7 +528,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_title_korean'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
                 <td className='border border-gray-300 p-2'>
@@ -540,7 +537,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_cd_korean'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
               </tr>
@@ -554,7 +551,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_title_noncjk'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
                 <td className='border border-gray-300 p-2'>
@@ -563,7 +560,7 @@ export default function ElectronicForm() {
                     name='eonetime_computer_cd_noncjk'
                     label=''
                     type='number'
-                    disabled={!libraryYearStatus?.is_open_for_editing}
+                    disabled={isReadOnly}
                   />
                 </td>
               </tr>
@@ -592,7 +589,7 @@ export default function ElectronicForm() {
             label='Comment for 1.1'
             placeholder='Optional notes for this section...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -652,7 +649,7 @@ export default function ElectronicForm() {
                       name={row.title as any}
                       label=''
                       type='number'
-                      disabled={!libraryYearStatus?.is_open_for_editing}
+                      disabled={isReadOnly}
                     />
                   </td>
                   <td className='border border-gray-300 p-2'>
@@ -661,7 +658,7 @@ export default function ElectronicForm() {
                       name={row.cd as any}
                       label=''
                       type='number'
-                      disabled={!libraryYearStatus?.is_open_for_editing}
+                      disabled={isReadOnly}
                     />
                   </td>
                 </tr>
@@ -691,7 +688,7 @@ export default function ElectronicForm() {
             label='Comment for 1.2'
             placeholder='Optional notes for this section...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -751,7 +748,7 @@ export default function ElectronicForm() {
                       name={row.title as any}
                       label=''
                       type='number'
-                      disabled={!libraryYearStatus?.is_open_for_editing}
+                      disabled={isReadOnly}
                     />
                   </td>
                   <td className='border border-gray-300 p-2'>
@@ -760,7 +757,7 @@ export default function ElectronicForm() {
                       name={row.cd as any}
                       label=''
                       type='number'
-                      disabled={!libraryYearStatus?.is_open_for_editing}
+                      disabled={isReadOnly}
                     />
                   </td>
                 </tr>
@@ -790,7 +787,7 @@ export default function ElectronicForm() {
             label='Comment for 1.3'
             placeholder='Optional notes for this section...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -873,7 +870,7 @@ export default function ElectronicForm() {
           label='Comment for 1.4'
           placeholder='Optional notes for total computer files...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -967,7 +964,7 @@ export default function ElectronicForm() {
             label='Comment for 1.5'
             placeholder='Optional notes about previous year data...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -1063,7 +1060,7 @@ export default function ElectronicForm() {
             label='Comment for 1.6'
             placeholder='Optional notes for grand total computer files...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -1079,24 +1076,21 @@ export default function ElectronicForm() {
             chinese: {
               name: "eindex_electronic_title_chinese",
               label: "31. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "eindex_electronic_title_japanese",
               label: "32. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "eindex_electronic_title_korean",
               label: "33. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "eindex_electronic_title_noncjk",
               label: "34. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='35. Subtotal'
@@ -1109,7 +1103,7 @@ export default function ElectronicForm() {
           label='Comment for 2.1'
           placeholder='Optional notes for this section...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -1130,6 +1124,7 @@ export default function ElectronicForm() {
             onClick={importAllData}
             className='flex items-center gap-2'
             variant='default'
+            disabled={isReadOnly}
           >
             <Download className='h-4 w-4' />
             Import from "Audio/Visual Databases", "E-Book Databases" and
@@ -1143,24 +1138,21 @@ export default function ElectronicForm() {
             chinese: {
               name: "efulltext_electronic_title_chinese",
               label: "36. Chinese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             japanese: {
               name: "efulltext_electronic_title_japanese",
               label: "37. Japanese",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             korean: {
               name: "efulltext_electronic_title_korean",
               label: "38. Korean",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
             eastasian: {
               name: "efulltext_electronic_title_noncjk",
               label: "39. Non-CJK",
-              disabled: !libraryYearStatus?.is_open_for_editing,
             },
           }}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label='40. Subtotal'
@@ -1173,7 +1165,7 @@ export default function ElectronicForm() {
           label='Comment for 2.2'
           placeholder='Optional notes for this section...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -1222,7 +1214,7 @@ export default function ElectronicForm() {
           label='Comment for 2.3'
           placeholder='Optional notes for total electronic resources...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -1237,7 +1229,7 @@ export default function ElectronicForm() {
             name='etotal_expenditure_grandtotal'
             label='41. Grand Total Expenditure'
             placeholder='0.00'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableFormField
             control={form.control}
@@ -1245,7 +1237,7 @@ export default function ElectronicForm() {
             label='Comment for 3'
             placeholder='Optional notes for expenditures...'
             type='textarea'
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
       </FormSection>
@@ -1261,7 +1253,7 @@ export default function ElectronicForm() {
           label='Notes/Memo for this form'
           placeholder='Enter any notes, footnotes, or additional information...'
           type='textarea'
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
       <FormSubmitSection
@@ -1271,8 +1263,13 @@ export default function ElectronicForm() {
         errorMessage={errorMessage}
         submitButtonText='Submit'
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className='text-muted-foreground text-xs text-right translate-y-[-20px]'>You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }

@@ -9,6 +9,7 @@ import { ReusableFormField, ReusableCurrencyFormField } from "./ReusableFormFiel
 import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
+import { PostCollectionWarning } from "./PostCollectionWarning"
 import {
   FormWrapper,
   FormSection,
@@ -130,7 +131,7 @@ export default function FiscalForm() {
     },
   })
 
-  const { libraryYearStatus, isLoading, existingData } = useFormStatusChecker('/api/fiscal/status')
+  const { libraryYearStatus, isLoading, existingData, isReadOnly, canEdit, formPermission, isPrivilegedPostClosing } = useFormStatusChecker('/api/fiscal/status')
 
   // Pre-populate form with existing data
   useEffect(() => {
@@ -286,6 +287,8 @@ export default function FiscalForm() {
       onSubmit={onSubmit}
       isLoading={isLoading}
       libraryYearStatus={libraryYearStatus}
+      isReadOnly={isReadOnly}
+      readOnlyReason={formPermission?.reason}
     >
       {/* Chinese Appropriations */}
       <FormSection
@@ -298,28 +301,28 @@ export default function FiscalForm() {
             name="fschinese_appropriations_monographic"
             label="01. Chinese Appropriations Monographic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_serial"
             label="02. Chinese Appropriations Serial"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_other_material"
             label="03. Chinese Appropriations Other Materials"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fschinese_appropriations_electronic"
             label="04. Chinese Appropriations Electronic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
         <SubtotalDisplay
@@ -334,7 +337,7 @@ export default function FiscalForm() {
             name="fschinese_appropriations_subtotal_manual"
             label="05a. Chinese Appropriations Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -352,28 +355,28 @@ export default function FiscalForm() {
             name="fsjapanese_appropriations_monographic"
             label="06. Japanese Appropriations Monographic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_serial"
             label="07. Japanese Appropriations Serial"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_other_material"
             label="08. Japanese Appropriations Other Materials"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsjapanese_appropriations_electronic"
             label="09. Japanese Appropriations Electronic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
         <SubtotalDisplay
@@ -388,7 +391,7 @@ export default function FiscalForm() {
             name="fsjapanese_appropriations_subtotal_manual"
             label="10a. Japanese Appropriations Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -406,28 +409,28 @@ export default function FiscalForm() {
             name="fskorean_appropriations_monographic"
             label="11. Korean Appropriations Monographic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_serial"
             label="12. Korean Appropriations Serial"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_other_material"
             label="13. Korean Appropriations Other Materials"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fskorean_appropriations_electronic"
             label="14. Korean Appropriations Electronic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
         <SubtotalDisplay
@@ -442,7 +445,7 @@ export default function FiscalForm() {
             name="fskorean_appropriations_subtotal_manual"
             label="15a. Korean Appropriations Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -460,28 +463,28 @@ export default function FiscalForm() {
             name="fsnoncjk_appropriations_monographic"
             label="16. Non-CJK Appropriations Monographic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_serial"
             label="17. Non-CJK Appropriations Serial"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_other_material"
             label="18. Non-CJK Appropriations Other Materials"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
           <ReusableCurrencyFormField
             control={form.control}
             name="fsnoncjk_appropriations_electronic"
             label="19. Non-CJK Appropriations Electronic"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
           />
         </div>
         <SubtotalDisplay
@@ -496,7 +499,7 @@ export default function FiscalForm() {
             name="fsnoncjk_appropriations_subtotal_manual"
             label="20a. Non-CJK Appropriations Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -520,7 +523,7 @@ export default function FiscalForm() {
             name="fstotal_appropriations_manual"
             label="21a. Appropriations Grand Total (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual grand total if different from the calculated value above.</p>
@@ -535,12 +538,13 @@ export default function FiscalForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "fsendowments_chinese", label: "22. Endowments Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "fsendowments_japanese", label: "23. Endowments Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "fsendowments_korean", label: "24. Endowments Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            noncjk: { name: "fsendowments_noncjk", label: "25. Endowments Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "fsendowments_chinese", label: "22. Endowments Chinese" },
+            japanese: { name: "fsendowments_japanese", label: "23. Endowments Japanese" },
+            korean: { name: "fsendowments_korean", label: "24. Endowments Korean" },
+            noncjk: { name: "fsendowments_noncjk", label: "25. Endowments Non-CJK" }
           }}
           useCurrency={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="26. Endowments Subtotal"
@@ -554,7 +558,7 @@ export default function FiscalForm() {
             name="fsendowments_subtotal_manual"
             label="26a. Endowments Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -569,12 +573,13 @@ export default function FiscalForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "fsgrants_chinese", label: "27. Grants Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "fsgrants_japanese", label: "28. Grants Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "fsgrants_korean", label: "29. Grants Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            noncjk: { name: "fsgrants_noncjk", label: "30. Grants Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "fsgrants_chinese", label: "27. Grants Chinese" },
+            japanese: { name: "fsgrants_japanese", label: "28. Grants Japanese" },
+            korean: { name: "fsgrants_korean", label: "29. Grants Korean" },
+            noncjk: { name: "fsgrants_noncjk", label: "30. Grants Non-CJK" }
           }}
           useCurrency={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="31. Grants Subtotal"
@@ -588,7 +593,7 @@ export default function FiscalForm() {
             name="fsgrants_subtotal_manual"
             label="31a. Grants Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -603,12 +608,13 @@ export default function FiscalForm() {
         <LanguageFieldGroup
           control={form.control}
           fields={{
-            chinese: { name: "fseast_asian_program_support_chinese", label: "32. East Asian Program Support Chinese", disabled: !libraryYearStatus?.is_open_for_editing },
-            japanese: { name: "fseast_asian_program_support_japanese", label: "33. East Asian Program Support Japanese", disabled: !libraryYearStatus?.is_open_for_editing },
-            korean: { name: "fseast_asian_program_support_korean", label: "34. East Asian Program Support Korean", disabled: !libraryYearStatus?.is_open_for_editing },
-            noncjk: { name: "fseast_asian_program_support_noncjk", label: "35. East Asian Program Support Non-CJK", disabled: !libraryYearStatus?.is_open_for_editing }
+            chinese: { name: "fseast_asian_program_support_chinese", label: "32. East Asian Program Support Chinese" },
+            japanese: { name: "fseast_asian_program_support_japanese", label: "33. East Asian Program Support Japanese" },
+            korean: { name: "fseast_asian_program_support_korean", label: "34. East Asian Program Support Korean" },
+            noncjk: { name: "fseast_asian_program_support_noncjk", label: "35. East Asian Program Support Non-CJK" }
           }}
           useCurrency={true}
+          disabled={isReadOnly}
         />
         <SubtotalDisplay
           label="36. East Asian Program Support Subtotal"
@@ -622,7 +628,7 @@ export default function FiscalForm() {
             name="fseast_asian_program_support_subtotal_manual"
             label="36a. East Asian Program Support Subtotal (Manual Entry)"
             placeholder="0.00"
-            disabled={!libraryYearStatus?.is_open_for_editing}
+            disabled={isReadOnly}
             inputClassName="bg-yellow-50 border-yellow-300 focus:ring-yellow-500"
           />
           <p className="text-xs text-yellow-700 mt-1">Optional: Enter a manual subtotal if different from the calculated value above.</p>
@@ -646,7 +652,7 @@ export default function FiscalForm() {
           name="fstotal_acquisition_budget"
           label="37. Total Acquisitions Budget"
           placeholder="0.00"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
           className="border-amber-300 focus:ring-amber-500 text-xl font-bold"
         />
       </FormSection>
@@ -662,7 +668,7 @@ export default function FiscalForm() {
           label="Notes/Memo for this form"
           placeholder="Enter any notes, footnotes, or additional information..."
           type="textarea"
-          disabled={!libraryYearStatus?.is_open_for_editing}
+          disabled={isReadOnly}
         />
       </FormSection>
 
@@ -673,8 +679,13 @@ export default function FiscalForm() {
         errorMessage={errorMessage}
         submitButtonText="Submit"
         onSaveDraft={handleSaveDraft}
+        isReadOnly={isReadOnly}
       />
-      <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      {isPrivilegedPostClosing ? (
+        <PostCollectionWarning className="mt-4" />
+      ) : (
+        <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
+      )}
     </FormWrapper>
   )
 }
