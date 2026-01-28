@@ -9,8 +9,7 @@ export interface ExportConfig {
   groupedHeaders?: { label: string; colspan: number }[]; // Optional grouped headers
   data: any[];
   fieldMapping: { [key: string]: string };
-  includeNotes?: boolean;
-  notesField?: string;
+  notesField?: string; // Field name containing notes (will be placed at bottom)
 }
 
 export class ExcelExporter {
@@ -81,7 +80,7 @@ export class ExcelExporter {
       headerStartRow = 3;
     }
 
-    // Add column header row
+    // Add column header row (excluding notes field)
     const headerRow = worksheet.addRow(config.headers);
     headerRow.font = { bold: true, size: 10 };
     headerRow.fill = {
@@ -102,14 +101,25 @@ export class ExcelExporter {
       };
     });
 
-    // Add data rows
+    // Determine if this form needs decimal formatting (fiscal and personnel only)
+    const needsDecimals = config.title.includes('Fiscal') || config.title.includes('Personnel');
+    
+    // Add data rows (excluding notes field)
     config.data.forEach((record) => {
       const rowData: any[] = [];
       Object.keys(config.fieldMapping).forEach((field) => {
+        // Skip notes field - it will be added at the bottom
+        if (config.notesField && field === config.notesField) {
+          return;
+        }
+        
         const value = record[field];
         // Handle different data types
         if (value === null || value === undefined) {
           rowData.push('');
+        } else if (typeof value === 'boolean') {
+          // Convert boolean to yes/no
+          rowData.push(value ? 'yes' : 'no');
         } else if (typeof value === 'number') {
           rowData.push(value);
         } else if (typeof value === 'string') {
@@ -120,10 +130,11 @@ export class ExcelExporter {
       });
       const row = worksheet.addRow(rowData);
       
-      // Format all numeric cells to 2 decimal places
+      // Format numeric cells based on form type
       row.eachCell((cell, colNumber) => {
         if (typeof cell.value === 'number') {
-          cell.numFmt = '0.00';
+          // Fiscal and Personnel forms get 2 decimal places, others get 0
+          cell.numFmt = needsDecimals ? '0.00' : '0';
         }
       });
     });
@@ -141,9 +152,9 @@ export class ExcelExporter {
     });
 
     // Add borders to all cells with data
-    const lastRow = worksheet.rowCount;
+    const lastDataRow = worksheet.rowCount;
     const lastCol = config.headers.length;
-    for (let row = 3; row <= lastRow; row++) {
+    for (let row = headerStartRow; row <= lastDataRow; row++) {
       for (let col = 1; col <= lastCol; col++) {
         const cell = worksheet.getCell(row, col);
         cell.border = {
@@ -153,6 +164,54 @@ export class ExcelExporter {
           right: { style: 'thin' }
         };
       }
+    }
+
+    // Add notes section at the bottom if notesField is specified
+    if (config.notesField) {
+      // Add blank row for spacing
+      worksheet.addRow([]);
+      
+      // Add "Notes" header row
+      const notesHeaderRow = worksheet.addRow(['Institution', 'Notes']);
+      notesHeaderRow.font = { bold: true, size: 10 };
+      notesHeaderRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFD966' } // Yellow background for notes section
+      };
+      notesHeaderRow.alignment = { horizontal: 'center', vertical: 'middle' };
+      notesHeaderRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+
+      // Add notes data rows
+      config.data.forEach((record) => {
+        const institutionName = record['Library_Year.Library.library_name'] || '';
+        const notes = config.notesField ? (record[config.notesField] || '') : '';
+        
+        // Only add row if there are notes
+        if (notes && notes.trim() !== '') {
+          const notesRow = worksheet.addRow([institutionName, notes]);
+          notesRow.alignment = { vertical: 'top', wrapText: true };
+          notesRow.eachCell((cell) => {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          });
+        }
+      });
+
+      // Set notes column widths
+      worksheet.getColumn(1).width = 30; // Institution column
+      worksheet.getColumn(2).width = 70; // Notes column
     }
   }
 
@@ -165,217 +224,6 @@ export class ExcelExporter {
     return this.workbook;
   }
 }
-
-// Form-specific field mappings
-export const formFieldMappings = {
-  monographic: {
-    'Library_Year.Library.library_name': 'Institution',
-    'mapurchased_titles_chinese': 'CHN',
-    'mapurchased_titles_japanese': 'JPN',
-    'mapurchased_titles_korean': 'KOR',
-    'mapurchased_titles_noncjk': 'N-CJK',
-    'mapurchased_titles_subtotal': 'TOTAL',
-    'mapurchased_volumes_chinese': 'CHN',
-    'mapurchased_volumes_japanese': 'JPN',
-    'mapurchased_volumes_korean': 'KOR',
-    'mapurchased_volumes_noncjk': 'N-CJK',
-    'mapurchased_volumes_subtotal': 'TOTAL',
-    'manonpurchased_titles_chinese': 'CHN',
-    'manonpurchased_titles_japanese': 'JPN',
-    'manonpurchased_titles_korean': 'KOR',
-    'manonpurchased_titles_noncjk': 'N-CJK',
-    'manonpurchased_titles_subtotal': 'TOTAL',
-    'manonpurchased_volumes_chinese': 'CHN',
-    'manonpurchased_volumes_japanese': 'JPN',
-    'manonpurchased_volumes_korean': 'KOR',
-    'manonpurchased_volumes_noncjk': 'N-CJK',
-    'manonpurchased_volumes_subtotal': 'TOTAL',
-    'matotal_titles': 'Total Titles',
-    'matotal_volumes': 'Total Volumes',
-    'manotes': 'Notes'
-  },
-  volumeHoldings: {
-    'Library_Year.Library.library_name': 'Institution',
-    'vhprevious_year_chinese': 'CHN',
-    'vhprevious_year_japanese': 'JPN',
-    'vhprevious_year_korean': 'KOR',
-    'vhprevious_year_noncjk': 'N-CJK',
-    'vhprevious_year_subtotal': 'TOTAL',
-    'vhadded_gross_chinese': 'CHN',
-    'vhadded_gross_japanese': 'JPN',
-    'vhadded_gross_korean': 'KOR',
-    'vhadded_gross_noncjk': 'N-CJK',
-    'vhadded_gross_subtotal': 'TOTAL',
-    'vhwithdrawn_chinese': 'CHN',
-    'vhwithdrawn_japanese': 'JPN',
-    'vhwithdrawn_korean': 'KOR',
-    'vhwithdrawn_noncjk': 'N-CJK',
-    'vhwithdrawn_subtotal': 'TOTAL',
-    'vhgrandtotal': 'Grand Total',
-    'vhnotes': 'Notes'
-  },
-  serials: {
-    'Library_Year.Library.library_name': 'Institution',
-    'spurchased_chinese': 'CHN',
-    'spurchased_japanese': 'JPN',
-    'spurchased_korean': 'KOR',
-    'spurchased_noncjk': 'N-CJK',
-    'spurchased_subtotal': 'TOTAL',
-    'snonpurchased_chinese': 'CHN',
-    'snonpurchased_japanese': 'JPN',
-    'snonpurchased_korean': 'KOR',
-    'snonpurchased_noncjk': 'N-CJK',
-    'snonpurchased_subtotal': 'TOTAL',
-    'stotal_chinese': 'CHN',
-    'stotal_japanese': 'JPN',
-    'stotal_korean': 'KOR',
-    'stotal_noncjk': 'N-CJK',
-    'sgrandtotal': 'TOTAL',
-    'snotes': 'Notes'
-  },
-  otherHoldings: {
-    'Library_Year.Library.library_name': 'Institution',
-    'ohaudio_chinese': 'CHN',
-    'ohaudio_japanese': 'JPN',
-    'ohaudio_korean': 'KOR',
-    'ohaudio_noncjk': 'N-CJK',
-    'ohaudio_subtotal': 'TOTAL',
-    'ohfilm_video_chinese': 'CHN',
-    'ohfilm_video_japanese': 'JPN',
-    'ohfilm_video_korean': 'KOR',
-    'ohfilm_video_noncjk': 'N-CJK',
-    'ohfilm_video_subtotal': 'TOTAL',
-    'ohmicroform_chinese': 'CHN',
-    'ohmicroform_japanese': 'JPN',
-    'ohmicroform_korean': 'KOR',
-    'ohmicroform_noncjk': 'N-CJK',
-    'ohmicroform_subtotal': 'TOTAL',
-    'ohcdrom_chinese': 'CHN',
-    'ohcdrom_japanese': 'JPN',
-    'ohcdrom_korean': 'KOR',
-    'ohcdrom_noncjk': 'N-CJK',
-    'ohcdrom_subtotal': 'TOTAL',
-    'ohdvd_chinese': 'CHN',
-    'ohdvd_japanese': 'JPN',
-    'ohdvd_korean': 'KOR',
-    'ohdvd_noncjk': 'N-CJK',
-    'ohdvd_subtotal': 'TOTAL',
-    'ohgrandtotal': 'TOTAL',
-    'ohnotes': 'Notes'
-  },
-  unprocessed: {
-    'Library_Year.Library.library_name': 'Institution',
-    'ubchinese': 'CHN',
-    'ubjapanese': 'JPN',
-    'ubkorean': 'KOR',
-    'ubnoncjk': 'N-CJK',
-    'ubtotal': 'TOTAL',
-    'ubnotes': 'Notes'
-  },
-  fiscal: {
-    'Library_Year.Library.library_name': 'Institution',
-    'fschinese_appropriations_monographic': 'Mono',
-    'fschinese_appropriations_serial': 'Serial',
-    'fschinese_appropriations_other_material': 'Other',
-    'fschinese_appropriations_electronic': 'Elec',
-    'fschinese_appropriations_subtotal': 'TOTAL',
-    'fsjapanese_appropriations_monographic': 'Mono',
-    'fsjapanese_appropriations_serial': 'Serial',
-    'fsjapanese_appropriations_other_material': 'Other',
-    'fsjapanese_appropriations_electronic': 'Elec',
-    'fsjapanese_appropriations_subtotal': 'TOTAL',
-    'fskorean_appropriations_monographic': 'Mono',
-    'fskorean_appropriations_serial': 'Serial',
-    'fskorean_appropriations_other_material': 'Other',
-    'fskorean_appropriations_electronic': 'Elec',
-    'fskorean_appropriations_subtotal': 'TOTAL',
-    'fsnoncjk_appropriations_monographic': 'Mono',
-    'fsnoncjk_appropriations_serial': 'Serial',
-    'fsnoncjk_appropriations_other_material': 'Other',
-    'fsnoncjk_appropriations_electronic': 'Elec',
-    'fsnoncjk_appropriations_subtotal': 'TOTAL',
-    'fstotal_appropriations': 'TOTAL',
-    'fsnotes': 'Notes'
-  },
-  personnel: {
-    'Library_Year.Library.library_name': 'Institution',
-    'psfprofessional_chinese': 'CHN',
-    'psfprofessional_japanese': 'JPN',
-    'psfprofessional_korean': 'KOR',
-    'psfprofessional_eastasian': 'E-ASIA',
-    'psfprofessional_subtotal': 'TOTAL',
-    'psfsupport_staff_chinese': 'CHN',
-    'psfsupport_staff_japanese': 'JPN',
-    'psfsupport_staff_korean': 'KOR',
-    'psfsupport_staff_eastasian': 'E-ASIA',
-    'psfsupport_staff_subtotal': 'TOTAL',
-    'psfstudent_assistants_chinese': 'CHN',
-    'psfstudent_assistants_japanese': 'JPN',
-    'psfstudent_assistants_korean': 'KOR',
-    'psfstudent_assistants_eastasian': 'E-ASIA',
-    'psfstudent_assistants_subtotal': 'TOTAL',
-    'psftotal': 'TOTAL',
-    'psfnotes': 'Notes'
-  },
-  publicServices: {
-    'Library_Year.Library.library_name': 'Institution',
-    'pspresentations_chinese': 'CHN',
-    'pspresentations_japanese': 'JPN',
-    'pspresentations_korean': 'KOR',
-    'pspresentations_noncjk': 'N-CJK',
-    'pspresentations_subtotal': 'TOTAL',
-    'psreference_transactions_chinese': 'CHN',
-    'psreference_transactions_japanese': 'JPN',
-    'psreference_transactions_korean': 'KOR',
-    'psreference_transactions_noncjk': 'N-CJK',
-    'psreference_transactions_subtotal': 'TOTAL',
-    'pspresentation_participants_subtotal': 'Total',
-    'psnotes': 'Notes'
-  },
-  electronic: {
-    'Library_Year.Library.library_name': 'Institution',
-    'efulltext_electronic_title_chinese': 'CHN',
-    'efulltext_electronic_title_japanese': 'JPN',
-    'efulltext_electronic_title_korean': 'KOR',
-    'efulltext_electronic_title_noncjk': 'N-CJK',
-    'efulltext_electronic_title_subtotal': 'TOTAL',
-    'eaggregated_databases': 'Total',
-    'etotal_ejournals': 'Total',
-    'etotal_ebooks': 'Total',
-    'etotal_electronic_expenditure_chinese': 'CHN',
-    'etotal_electronic_expenditure_japanese': 'JPN',
-    'etotal_electronic_expenditure_korean': 'KOR',
-    'etotal_electronic_expenditure_noncjk': 'N-CJK',
-    'etotal_electronic_expenditure_subtotal': 'TOTAL',
-    'enotes': 'Notes'
-  },
-  electronicBooks: {
-    'Library_Year.Library.library_name': 'Institution',
-    'ebooks_purchased_volumes_chinese': 'CHN',
-    'ebooks_purchased_volumes_japanese': 'JPN',
-    'ebooks_purchased_volumes_korean': 'KOR',
-    'ebooks_purchased_volumes_noncjk': 'N-CJK',
-    'ebooks_purchased_volumes_subtotal': 'TOTAL',
-    'ebooks_purchased_titles_chinese': 'CHN',
-    'ebooks_purchased_titles_japanese': 'JPN',
-    'ebooks_purchased_titles_korean': 'KOR',
-    'ebooks_purchased_titles_noncjk': 'N-CJK',
-    'ebooks_purchased_titles_subtotal': 'TOTAL',
-    'ebooks_subscription_volumes_chinese': 'CHN',
-    'ebooks_subscription_volumes_japanese': 'JPN',
-    'ebooks_subscription_volumes_korean': 'KOR',
-    'ebooks_subscription_volumes_noncjk': 'N-CJK',
-    'ebooks_subscription_volumes_subtotal': 'TOTAL',
-    'ebooks_subscription_titles_chinese': 'CHN',
-    'ebooks_subscription_titles_japanese': 'JPN',
-    'ebooks_subscription_titles_korean': 'KOR',
-    'ebooks_subscription_titles_noncjk': 'N-CJK',
-    'ebooks_subscription_titles_subtotal': 'TOTAL',
-    'ebooks_total_volumes': 'Total Volumes',
-    'ebooks_total_titles': 'Total Titles',
-    'ebooks_notes': 'Notes'
-  }
-};
 
 export function getNestedValue(obj: any, path: string): any {
   return path.split('.').reduce((current, key) => current?.[key], obj);
