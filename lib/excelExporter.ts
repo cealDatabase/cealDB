@@ -104,6 +104,9 @@ export class ExcelExporter {
     // Determine if this form needs decimal formatting (fiscal and personnel only)
     const needsDecimals = config.title.includes('Fiscal') || config.title.includes('Personnel');
     
+    // Helper to round numbers to 2 decimal places
+    const round2 = (num: number): number => Math.round(num * 100) / 100;
+    
     // Add data rows (excluding notes field)
     config.data.forEach((record) => {
       const rowData: any[] = [];
@@ -121,7 +124,8 @@ export class ExcelExporter {
           // Convert boolean to yes/no
           rowData.push(value ? 'yes' : 'no');
         } else if (typeof value === 'number') {
-          rowData.push(value);
+          // Round to 2 decimals for Fiscal and Personnel forms to fix precision issues
+          rowData.push(needsDecimals ? round2(value) : value);
         } else if (typeof value === 'string') {
           rowData.push(value);
         } else {

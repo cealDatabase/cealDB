@@ -225,7 +225,7 @@ async function exportSingleForm(formType: string, year: number) {
   switch (formType) {
     case 'monographic':
       title = '1_Monographs';
-      fullTitle = 'Acquisitions of East Asian Materials';
+      fullTitle = 'Monographic Acquisitions';
       fieldMapping = formFieldMappings.monographic;
       groupedHeaders = [
         { label: 'Institutions', colspan: 1 },
@@ -298,12 +298,12 @@ async function exportSingleForm(formType: string, year: number) {
       fieldMapping = formFieldMappings.serials;
       groupedHeaders = [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Electronic Purchased', colspan: 5 },
-        { label: 'Print Purchased', colspan: 5 },
-        { label: 'Electronic Non-Purchased', colspan: 5 },
-        { label: 'Print Non-Purchased', colspan: 5 },
-        { label: 'Electronic Totals', colspan: 5 },
-        { label: 'Print Totals', colspan: 5 },
+        { label: 'ELECTRONIC: Purchased', colspan: 5 },
+        { label: 'PRINT: Purchased', colspan: 5 },
+        { label: 'ELECTRONIC: Non-Purchased', colspan: 5 },
+        { label: 'PRINT: Non-Purchased', colspan: 5 },
+        { label: 'ELECTRONIC: Totals', colspan: 5 },
+        { label: 'PRINT: Totals', colspan: 5 },
         { label: 'Overall Total', colspan: 1 }
       ];
       data = await prisma.serials.findMany({
@@ -397,8 +397,8 @@ async function exportSingleForm(formType: string, year: number) {
       break;
 
     case 'fiscal':
-      title = '6_FiscalAppropriations';
-      fullTitle = 'Fiscal Support for East Asian Collections';
+      title = '6_FiscalSupport';
+      fullTitle = 'Fiscal Support';
       fieldMapping = formFieldMappings.fiscal;
       groupedHeaders = [
         { label: 'Institutions', colspan: 1 },
@@ -437,7 +437,7 @@ async function exportSingleForm(formType: string, year: number) {
 
     case 'personnel':
       title = '7_PersonnelSupport';
-      fullTitle = 'Personnel Support for East Asian Collections';
+      fullTitle = 'Personnel Support';
       fieldMapping = formFieldMappings.personnel;
       groupedHeaders = [
         { label: 'Institutions', colspan: 1 },
@@ -604,13 +604,28 @@ async function exportSingleForm(formType: string, year: number) {
     );
   }
 
+  // Determine if this form needs decimal rounding (fiscal and personnel only)
+  const needsDecimalRounding = formType === 'fiscal' || formType === 'personnel';
+  
   // Transform data to include nested values and calculated fields
   const transformedData = data.map(record => {
     const transformed: any = {};
     
     // First, get all base field values
     Object.keys(fieldMapping).forEach(field => {
-      transformed[field] = getNestedValue(record, field);
+      let value = getNestedValue(record, field);
+      
+      // Handle Prisma Decimal types - convert to number and round if needed
+      if (value !== null && value !== undefined && typeof value === 'object' && 'toNumber' in value) {
+        value = value.toNumber();
+      }
+      
+      // Round numeric values for Fiscal and Personnel forms to fix precision
+      if (needsDecimalRounding && typeof value === 'number' && !isNaN(value)) {
+        value = round2(value);
+      }
+      
+      transformed[field] = value;
     });
     
     // Calculate all computed fields for this form type
@@ -663,7 +678,7 @@ async function exportAllForms(year: number) {
     {
       type: 'monographic',
       title: '1_Monographs',
-      fullTitle: 'Acquisitions of East Asian Materials',
+      fullTitle: 'Monographic Acquisitions',
       groupedHeaders: [
         { label: 'Institutions', colspan: 1 },
         { label: 'Purchased Titles', colspan: 5 },
@@ -691,12 +706,12 @@ async function exportAllForms(year: number) {
       fullTitle: 'Current Serials (Print and Electronic)',
       groupedHeaders: [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Electronic Purchased', colspan: 5 },
-        { label: 'Print Purchased', colspan: 5 },
-        { label: 'Electronic Non-Purchased', colspan: 5 },
-        { label: 'Print Non-Purchased', colspan: 5 },
-        { label: 'Electronic Totals', colspan: 5 },
-        { label: 'Print Totals', colspan: 5 },
+        { label: 'ELECTRONIC: Purchased', colspan: 5 },
+        { label: 'PRINT: Purchased', colspan: 5 },
+        { label: 'ELECTRONIC: Non-Purchased', colspan: 5 },
+        { label: 'PRINT: Non-Purchased', colspan: 5 },
+        { label: 'ELECTRONIC: Totals', colspan: 5 },
+        { label: 'PRINT: Totals', colspan: 5 },
         { label: 'Overall Total', colspan: 1 }
       ]
     },
@@ -726,7 +741,7 @@ async function exportAllForms(year: number) {
     {
       type: 'fiscal',
       title: '6_FiscalAppropriations',
-      fullTitle: 'Fiscal Support for East Asian Collections',
+      fullTitle: 'Fiscal Support',
       groupedHeaders: [
         { label: 'Institutions', colspan: 1 },
         { label: 'CHN Appropriations', colspan: 5 },
@@ -743,7 +758,7 @@ async function exportAllForms(year: number) {
     {
       type: 'personnel',
       title: '7_PersonnelSupport',
-      fullTitle: 'Personnel Support for East Asian Collections',
+      fullTitle: 'Personnel Support',
       groupedHeaders: [
         { label: 'Institutions', colspan: 1 },
         { label: 'Professional', colspan: 5 },
@@ -887,12 +902,27 @@ async function exportAllForms(year: number) {
     }
 
     if (data.length > 0) {
+      // Determine if this form needs decimal rounding (fiscal and personnel only)
+      const needsDecimalRounding = form.type === 'fiscal' || form.type === 'personnel';
+      
       const transformedData = data.map(record => {
         const transformed: any = {};
         
         // First, get all base field values
         Object.keys(fieldMapping).forEach(field => {
-          transformed[field] = getNestedValue(record, field);
+          let value = getNestedValue(record, field);
+          
+          // Handle Prisma Decimal types - convert to number and round if needed
+          if (value !== null && value !== undefined && typeof value === 'object' && 'toNumber' in value) {
+            value = value.toNumber();
+          }
+          
+          // Round numeric values for Fiscal and Personnel forms to fix precision
+          if (needsDecimalRounding && typeof value === 'number' && !isNaN(value)) {
+            value = round2(value);
+          }
+          
+          transformed[field] = value;
         });
         
         // Calculate all computed fields for this form type
