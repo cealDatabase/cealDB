@@ -496,8 +496,8 @@ export async function POST(request: NextRequest) {
           year: firstYear,
           headers: headers,
           groupedHeaders: groupedHeaders.length > 0 ? [
-            { label: '', colspan: 1 }, // Year column
-            ...groupedHeaders.slice(1) // Skip the Institution header since we have Year instead
+            { label: 'Year', colspan: 1 }, // Year column added first
+            ...groupedHeaders // Keep all original headers including Institution
           ] : undefined,
           data: allYearsData,
           fieldMapping: extendedFieldMapping,
