@@ -137,8 +137,13 @@ export class ExcelExporter {
       // Format numeric cells based on form type
       row.eachCell((cell, colNumber) => {
         if (typeof cell.value === 'number') {
-          // Fiscal and Personnel forms get 2 decimal places, others get 0
-          cell.numFmt = needsDecimals ? '0.00' : '0';
+          // First column (Year) should always be integer format
+          if (colNumber === 1) {
+            cell.numFmt = '0';
+          } else {
+            // Fiscal and Personnel forms get 2 decimal places, others get 0
+            cell.numFmt = needsDecimals ? '0.00' : '0';
+          }
         }
       });
     });
