@@ -246,12 +246,12 @@ export const superAdminActions = [
       description: 'Add a new library institution to the database. New libraries can then participate in annual surveys.',
     },
     {
-      title: 'Edit Institutions',
+      title: 'Publish Institutions',
       href: '/libraries',
       icon: Database,
       iconColor: 'text-sky-600',
       iconBg: 'bg-sky-100',
-      description: 'Add or modify institution information participating in surveys.',
+      description: 'Publish institutions once they have completed surveys, and manage their publication status (in Participation Status tab).',
     },
     {
       title: 'Enter/Edit Current or Past Surveys',

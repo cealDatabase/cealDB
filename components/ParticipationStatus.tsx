@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Edit, Save, X } from 'lucide-react'
+import { useToast } from "@/hooks/use-toast"
 
 interface ParticipationData {
   libraryId: number
@@ -48,12 +52,20 @@ const formLabels = {
   espublished: 'Published'
 }
 
-export default function ParticipationStatus() {
+interface ParticipationStatusProps {
+  isSuperAdmin: boolean;
+}
+
+export default function ParticipationStatus({ isSuperAdmin }: ParticipationStatusProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [availableYears, setAvailableYears] = useState<number[]>([])
   const [participationData, setParticipationData] = useState<ParticipationData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editedStatuses, setEditedStatuses] = useState<Record<number, boolean>>({})
+  const [saving, setSaving] = useState(false)
+  const { toast } = useToast()
 
   // Fetch available years on component mount
   useEffect(() => {
@@ -111,6 +123,88 @@ export default function ParticipationStatus() {
     fetchParticipationData()
   }, [selectedYear])
 
+  const handleEditClick = () => {
+    const initialStatuses: Record<number, boolean> = {}
+    participationData.forEach(lib => {
+      initialStatuses[lib.libraryYearId] = lib.forms.espublished
+    })
+    setEditedStatuses(initialStatuses)
+    setIsEditMode(true)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false)
+    setEditedStatuses({})
+  }
+
+  const handleTogglePublished = (libraryYearId: number, currentStatus: boolean) => {
+    setEditedStatuses(prev => ({
+      ...prev,
+      [libraryYearId]: !currentStatus
+    }))
+  }
+
+  const handleSaveChanges = async () => {
+    setSaving(true)
+    try {
+      const updates = Object.entries(editedStatuses)
+        .filter(([id, newStatus]) => {
+          const original = participationData.find(lib => lib.libraryYearId === parseInt(id))
+          return original && original.forms.espublished !== newStatus
+        })
+        .map(([id, published]) => ({ libraryYearId: parseInt(id), published }))
+
+      if (updates.length === 0) {
+        toast({
+          title: 'No changes',
+          description: 'No published status changes to save.',
+        })
+        setIsEditMode(false)
+        return
+      }
+
+      const response = await fetch('/api/participation-status/update-published', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast({
+          title: 'Success',
+          description: `Updated ${updates.length} institution(s) published status.`,
+        })
+        
+        // Refresh data
+        const refreshResponse = await fetch(`/api/participation-status/${selectedYear}`)
+        const refreshData = await refreshResponse.json()
+        if (refreshData.success) {
+          setParticipationData(refreshData.data)
+        }
+        
+        setIsEditMode(false)
+        setEditedStatuses({})
+      } else {
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to update published status.',
+          variant: 'destructive'
+        })
+      }
+    } catch (err) {
+      console.error('Error saving changes:', err)
+      toast({
+        title: 'Error',
+        description: 'Failed to save changes. Please try again.',
+        variant: 'destructive'
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const StatusIcon = ({ status }: { status: boolean }) => {
     return status ? (
       <span className="text-green-600 font-bold text-lg">✓</span>
@@ -138,21 +232,57 @@ export default function ParticipationStatus() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Participating Libraries Information for Year</span>
-            <Select
-              value={selectedYear?.toString() || ''}
-              onValueChange={(value) => setSelectedYear(parseInt(value))}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Select year" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableYears.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-3">
+              <Select
+                value={selectedYear?.toString() || ''}
+                onValueChange={(value) => setSelectedYear(parseInt(value))}
+                disabled={isEditMode}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableYears.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {isSuperAdmin && participationData.length > 0 && (
+                isEditMode ? (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSaveChanges}
+                      disabled={saving}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {saving ? 'Saving...' : 'Save'}
+                    </Button>
+                    <Button
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                      size="sm"
+                      variant="outline"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleEditClick}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Published Status
+                  </Button>
+                )
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
         
@@ -201,13 +331,30 @@ export default function ParticipationStatus() {
                         <td className="p-3 font-medium text-blue-600 border-r border-gray-300">
                           {library.libraryName}
                         </td>
-                        {Object.keys(formLabels).map((formKey) => (
-                          <td key={formKey} className="p-3 text-center border-r border-gray-300">
-                            <StatusIcon 
-                              status={library.forms[formKey as keyof typeof library.forms]} 
-                            />
-                          </td>
-                        ))}
+                        {Object.keys(formLabels).map((formKey) => {
+                          const isPublishedColumn = formKey === 'espublished'
+                          const status = isEditMode && isPublishedColumn
+                            ? editedStatuses[library.libraryYearId]
+                            : library.forms[formKey as keyof typeof library.forms]
+                          
+                          return (
+                            <td key={formKey} className="p-3 text-center border-r border-gray-300">
+                              {isEditMode && isPublishedColumn && isSuperAdmin ? (
+                                <div className="flex justify-center">
+                                  <Switch
+                                    checked={status}
+                                    onCheckedChange={() => handleTogglePublished(
+                                      library.libraryYearId,
+                                      editedStatuses[library.libraryYearId]
+                                    )}
+                                  />
+                                </div>
+                              ) : (
+                                <StatusIcon status={status} />
+                              )}
+                            </td>
+                          )
+                        })}
                       </tr>
                     );
                   })}

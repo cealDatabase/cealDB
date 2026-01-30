@@ -13,25 +13,10 @@ export async function GET(request: NextRequest) {
     const userEmail = cookieStore.get('uinf')?.value;
     const roleData = cookieStore.get('role')?.value;
 
-    if (!userEmail || !roleData) {
+    if (!userEmail) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
         { status: 401 }
-      );
-    }
-
-    let userRoles: string[] = [];
-    try {
-      userRoles = JSON.parse(roleData);
-    } catch {
-      userRoles = [roleData];
-    }
-
-    const hasAccess = userRoles.includes('1') || userRoles.includes('3');
-    if (!hasAccess) {
-      return NextResponse.json(
-        { error: 'Forbidden - Super Admin or E-Resource Editor role required' },
-        { status: 403 }
       );
     }
 
@@ -108,7 +93,6 @@ async function exportSingleReport(reportType: string, year: number) {
 }
 
 async function exportBatchReports(year: number) {
-  const organizational = await generateOrganizationalStructureReport(year);
   const av = await generateAVDatabaseReport(year);
   const ebook = await generateEBookDatabaseReport(year);
   const ejournal = await generateEJournalDatabaseReport(year);
@@ -123,7 +107,6 @@ async function exportBatchReports(year: number) {
     archive.on('error', reject);
   });
 
-  archive.append(organizational, { name: `Organizational_Structure-${year}.xlsx` });
   archive.append(av, { name: `AudioVisual_Database-${year}.xlsx` });
   archive.append(ebook, { name: `EBook_Database-${year}.xlsx` });
   archive.append(ejournal, { name: `EJournal_Database-${year}.xlsx` });
@@ -135,7 +118,7 @@ async function exportBatchReports(year: number) {
   return new NextResponse(uint8Array, {
     headers: {
       'Content-Type': 'application/zip',
-      'Content-Disposition': `attachment; filename="Supplementary_Reports_${year}.zip"`
+      'Content-Disposition': `attachment; filename="Global_Survey_Reports_${year}.zip"`
     }
   });
 }
@@ -388,10 +371,10 @@ async function generateAVDatabaseReport(year: number): Promise<Buffer> {
 
   avRecords.forEach((av) => {
     const languages = av.List_AV_Language.map(l => l.Language.full);
-    const hasChinese = languages.includes('Chinese') ? 'Yes' : 'No';
-    const hasJapanese = languages.includes('Japanese') ? 'Yes' : 'No';
-    const hasKorean = languages.includes('Korean') ? 'Yes' : 'No';
-    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : 'No';
+    const hasChinese = languages.includes('Chinese') ? 'Yes' : '';
+    const hasJapanese = languages.includes('Japanese') ? 'Yes' : '';
+    const hasKorean = languages.includes('Korean') ? 'Yes' : '';
+    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : '';
 
     const titles = av.List_AV_Counts[0]?.titles || 0;
 
@@ -539,10 +522,10 @@ async function generateEBookDatabaseReport(year: number): Promise<Buffer> {
 
   ebookRecords.forEach((ebook) => {
     const languages = ebook.List_EBook_Language.map(l => l.Language.full);
-    const hasChinese = languages.includes('Chinese') ? 'Yes' : 'No';
-    const hasJapanese = languages.includes('Japanese') ? 'Yes' : 'No';
-    const hasKorean = languages.includes('Korean') ? 'Yes' : 'No';
-    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : 'No';
+    const hasChinese = languages.includes('Chinese') ? 'Yes' : '';
+    const hasJapanese = languages.includes('Japanese') ? 'Yes' : '';
+    const hasKorean = languages.includes('Korean') ? 'Yes' : '';
+    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : '';
 
     const titles = ebook.List_EBook_Counts[0]?.titles || 0;
     const volumes = ebook.List_EBook_Counts[0]?.volumes || 0;
@@ -694,10 +677,10 @@ async function generateEJournalDatabaseReport(year: number): Promise<Buffer> {
 
   ejournalRecords.forEach((ejournal) => {
     const languages = ejournal.List_EJournal_Language.map(l => l.Language.full);
-    const hasChinese = languages.includes('Chinese') ? 'Yes' : 'No';
-    const hasJapanese = languages.includes('Japanese') ? 'Yes' : 'No';
-    const hasKorean = languages.includes('Korean') ? 'Yes' : 'No';
-    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : 'No';
+    const hasChinese = languages.includes('Chinese') ? 'Yes' : '';
+    const hasJapanese = languages.includes('Japanese') ? 'Yes' : '';
+    const hasKorean = languages.includes('Korean') ? 'Yes' : '';
+    const hasNonCJK = languages.some(l => !['Chinese', 'Japanese', 'Korean'].includes(l)) ? 'Yes' : '';
 
     const journals = ejournal.List_EJournal_Counts[0]?.journals || 0;
     const dbs = ejournal.List_EJournal_Counts[0]?.dbs || 0;

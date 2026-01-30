@@ -214,8 +214,8 @@ async function UserLoggedInPage() {
                     <FileBarChart className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Institutional Reports</CardTitle>
-                    <CardDescription>Export cross-year institutional statistics reports</CardDescription>
+                    <CardTitle className="text-lg">CEAL Statistics Reports</CardTitle>
+                    <CardDescription>Export institutional and global survey reports</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -224,16 +224,16 @@ async function UserLoggedInPage() {
                   <div className="flex items-center gap-3">
                     <FileBarChart className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="font-medium">Institutional Reports</p>
+                      <p className="font-medium">Institutional & Survey Reports</p>
                       <p className="text-sm text-muted-foreground">
                         {hasMemberInstitution && !hasSuperAdmin && !hasEResourceEditor
-                          ? "Export yearly reports for your institution"
-                          : "Export cross-year reports for any institution"}
+                          ? "Export institutional reports and global survey data"
+                          : "Export cross-year institutional reports and AV/E-Book/E-Journal surveys"}
                       </p>
                     </div>
                   </div>
                   <Button asChild className="">
-                    <Link href="/admin/institutional-reports">
+                    <Link href="/admin/reports">
                       Access Reports
                     </Link>
                   </Button>
