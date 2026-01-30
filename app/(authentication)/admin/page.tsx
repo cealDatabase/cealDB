@@ -214,7 +214,7 @@ async function UserLoggedInPage() {
                     <FileBarChart className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">CEAL Statistics Reports</CardTitle>
+                    <CardTitle className="text-lg">Statistics Reports</CardTitle>
                     <CardDescription>Export institutional and global survey reports</CardDescription>
                   </div>
                 </div>

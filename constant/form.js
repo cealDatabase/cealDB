@@ -194,14 +194,6 @@ export const eResourceActions = [
       iconBg: 'bg-rose-100',
       description: 'Export library participation, contact information, and statistics completion reports.',
     },
-    {
-      title: 'Supplementary Reports',
-      href: '/admin/supplementary-reports',
-      icon: FileSpreadsheet,
-      iconColor: 'text-rose-600',
-      iconBg: 'bg-rose-100',
-      description: 'Export library organizational structure and global collection information by year.',
-    },
   ]
 
 export const superAdminActions = [
