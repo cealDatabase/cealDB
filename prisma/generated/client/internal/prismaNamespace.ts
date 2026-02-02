@@ -4279,6 +4279,8 @@ export const Volume_HoldingsScalarFieldEnum = {
   vh_film_fiche_korean: 'vh_film_fiche_korean',
   vh_film_fiche_subtotal: 'vh_film_fiche_subtotal',
   vhgrandtotal: 'vhgrandtotal',
+  vhebooks_purchased_volume_total: 'vhebooks_purchased_volume_total',
+  vhoverall_grand_total: 'vhoverall_grand_total',
   vhnotes: 'vhnotes',
   libraryyear: 'libraryyear'
 } as const

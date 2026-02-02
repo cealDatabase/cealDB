@@ -56,6 +56,8 @@ export type Volume_HoldingsAvgAggregateOutputType = {
   vh_film_fiche_korean: number | null
   vh_film_fiche_subtotal: number | null
   vhgrandtotal: number | null
+  vhebooks_purchased_volume_total: number | null
+  vhoverall_grand_total: number | null
   libraryyear: number | null
 }
 
@@ -89,6 +91,8 @@ export type Volume_HoldingsSumAggregateOutputType = {
   vh_film_fiche_korean: number | null
   vh_film_fiche_subtotal: number | null
   vhgrandtotal: number | null
+  vhebooks_purchased_volume_total: number | null
+  vhoverall_grand_total: number | null
   libraryyear: number | null
 }
 
@@ -123,6 +127,8 @@ export type Volume_HoldingsMinAggregateOutputType = {
   vh_film_fiche_korean: number | null
   vh_film_fiche_subtotal: number | null
   vhgrandtotal: number | null
+  vhebooks_purchased_volume_total: number | null
+  vhoverall_grand_total: number | null
   vhnotes: string | null
   libraryyear: number | null
 }
@@ -158,6 +164,8 @@ export type Volume_HoldingsMaxAggregateOutputType = {
   vh_film_fiche_korean: number | null
   vh_film_fiche_subtotal: number | null
   vhgrandtotal: number | null
+  vhebooks_purchased_volume_total: number | null
+  vhoverall_grand_total: number | null
   vhnotes: string | null
   libraryyear: number | null
 }
@@ -193,6 +201,8 @@ export type Volume_HoldingsCountAggregateOutputType = {
   vh_film_fiche_korean: number
   vh_film_fiche_subtotal: number
   vhgrandtotal: number
+  vhebooks_purchased_volume_total: number
+  vhoverall_grand_total: number
   vhnotes: number
   libraryyear: number
   _all: number
@@ -229,6 +239,8 @@ export type Volume_HoldingsAvgAggregateInputType = {
   vh_film_fiche_korean?: true
   vh_film_fiche_subtotal?: true
   vhgrandtotal?: true
+  vhebooks_purchased_volume_total?: true
+  vhoverall_grand_total?: true
   libraryyear?: true
 }
 
@@ -262,6 +274,8 @@ export type Volume_HoldingsSumAggregateInputType = {
   vh_film_fiche_korean?: true
   vh_film_fiche_subtotal?: true
   vhgrandtotal?: true
+  vhebooks_purchased_volume_total?: true
+  vhoverall_grand_total?: true
   libraryyear?: true
 }
 
@@ -296,6 +310,8 @@ export type Volume_HoldingsMinAggregateInputType = {
   vh_film_fiche_korean?: true
   vh_film_fiche_subtotal?: true
   vhgrandtotal?: true
+  vhebooks_purchased_volume_total?: true
+  vhoverall_grand_total?: true
   vhnotes?: true
   libraryyear?: true
 }
@@ -331,6 +347,8 @@ export type Volume_HoldingsMaxAggregateInputType = {
   vh_film_fiche_korean?: true
   vh_film_fiche_subtotal?: true
   vhgrandtotal?: true
+  vhebooks_purchased_volume_total?: true
+  vhoverall_grand_total?: true
   vhnotes?: true
   libraryyear?: true
 }
@@ -366,6 +384,8 @@ export type Volume_HoldingsCountAggregateInputType = {
   vh_film_fiche_korean?: true
   vh_film_fiche_subtotal?: true
   vhgrandtotal?: true
+  vhebooks_purchased_volume_total?: true
+  vhoverall_grand_total?: true
   vhnotes?: true
   libraryyear?: true
   _all?: true
@@ -488,6 +508,8 @@ export type Volume_HoldingsGroupByOutputType = {
   vh_film_fiche_korean: number | null
   vh_film_fiche_subtotal: number | null
   vhgrandtotal: number | null
+  vhebooks_purchased_volume_total: number | null
+  vhoverall_grand_total: number | null
   vhnotes: string | null
   libraryyear: number | null
   _count: Volume_HoldingsCountAggregateOutputType | null
@@ -546,6 +568,8 @@ export type Volume_HoldingsWhereInput = {
   vh_film_fiche_korean?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vh_film_fiche_subtotal?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vhgrandtotal?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
+  vhebooks_purchased_volume_total?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
+  vhoverall_grand_total?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vhnotes?: Prisma.StringNullableFilter<"Volume_Holdings"> | string | null
   libraryyear?: Prisma.IntNullableFilter<"Volume_Holdings"> | number | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearNullableScalarRelationFilter, Prisma.Library_YearWhereInput> | null
@@ -582,6 +606,8 @@ export type Volume_HoldingsOrderByWithRelationInput = {
   vh_film_fiche_korean?: Prisma.SortOrderInput | Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrderInput | Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrderInput | Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrderInput | Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrderInput | Prisma.SortOrder
   vhnotes?: Prisma.SortOrderInput | Prisma.SortOrder
   libraryyear?: Prisma.SortOrderInput | Prisma.SortOrder
   Library_Year?: Prisma.Library_YearOrderByWithRelationInput
@@ -622,6 +648,8 @@ export type Volume_HoldingsWhereUniqueInput = Prisma.AtLeast<{
   vh_film_fiche_korean?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vh_film_fiche_subtotal?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vhgrandtotal?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
+  vhebooks_purchased_volume_total?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
+  vhoverall_grand_total?: Prisma.FloatNullableFilter<"Volume_Holdings"> | number | null
   vhnotes?: Prisma.StringNullableFilter<"Volume_Holdings"> | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearNullableScalarRelationFilter, Prisma.Library_YearWhereInput> | null
 }, "id" | "libraryyear">
@@ -657,6 +685,8 @@ export type Volume_HoldingsOrderByWithAggregationInput = {
   vh_film_fiche_korean?: Prisma.SortOrderInput | Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrderInput | Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrderInput | Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrderInput | Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrderInput | Prisma.SortOrder
   vhnotes?: Prisma.SortOrderInput | Prisma.SortOrder
   libraryyear?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.Volume_HoldingsCountOrderByAggregateInput
@@ -700,6 +730,8 @@ export type Volume_HoldingsScalarWhereWithAggregatesInput = {
   vh_film_fiche_korean?: Prisma.FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
   vh_film_fiche_subtotal?: Prisma.FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
   vhgrandtotal?: Prisma.FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
+  vhebooks_purchased_volume_total?: Prisma.FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
+  vhoverall_grand_total?: Prisma.FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
   vhnotes?: Prisma.StringNullableWithAggregatesFilter<"Volume_Holdings"> | string | null
   libraryyear?: Prisma.IntNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
 }
@@ -734,6 +766,8 @@ export type Volume_HoldingsCreateInput = {
   vh_film_fiche_korean?: number | null
   vh_film_fiche_subtotal?: number | null
   vhgrandtotal?: number | null
+  vhebooks_purchased_volume_total?: number | null
+  vhoverall_grand_total?: number | null
   vhnotes?: string | null
   Library_Year?: Prisma.Library_YearCreateNestedOneWithoutVolume_HoldingsInput
 }
@@ -769,6 +803,8 @@ export type Volume_HoldingsUncheckedCreateInput = {
   vh_film_fiche_korean?: number | null
   vh_film_fiche_subtotal?: number | null
   vhgrandtotal?: number | null
+  vhebooks_purchased_volume_total?: number | null
+  vhoverall_grand_total?: number | null
   vhnotes?: string | null
   libraryyear?: number | null
 }
@@ -803,6 +839,8 @@ export type Volume_HoldingsUpdateInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Library_Year?: Prisma.Library_YearUpdateOneWithoutVolume_HoldingsNestedInput
 }
@@ -838,6 +876,8 @@ export type Volume_HoldingsUncheckedUpdateInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   libraryyear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -873,6 +913,8 @@ export type Volume_HoldingsCreateManyInput = {
   vh_film_fiche_korean?: number | null
   vh_film_fiche_subtotal?: number | null
   vhgrandtotal?: number | null
+  vhebooks_purchased_volume_total?: number | null
+  vhoverall_grand_total?: number | null
   vhnotes?: string | null
   libraryyear?: number | null
 }
@@ -907,6 +949,8 @@ export type Volume_HoldingsUpdateManyMutationInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -941,6 +985,8 @@ export type Volume_HoldingsUncheckedUpdateManyInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   libraryyear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -981,6 +1027,8 @@ export type Volume_HoldingsCountOrderByAggregateInput = {
   vh_film_fiche_korean?: Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrder
   vhnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
 }
@@ -1015,6 +1063,8 @@ export type Volume_HoldingsAvgOrderByAggregateInput = {
   vh_film_fiche_korean?: Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
 }
 
@@ -1049,6 +1099,8 @@ export type Volume_HoldingsMaxOrderByAggregateInput = {
   vh_film_fiche_korean?: Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrder
   vhnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
 }
@@ -1084,6 +1136,8 @@ export type Volume_HoldingsMinOrderByAggregateInput = {
   vh_film_fiche_korean?: Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrder
   vhnotes?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
 }
@@ -1118,6 +1172,8 @@ export type Volume_HoldingsSumOrderByAggregateInput = {
   vh_film_fiche_korean?: Prisma.SortOrder
   vh_film_fiche_subtotal?: Prisma.SortOrder
   vhgrandtotal?: Prisma.SortOrder
+  vhebooks_purchased_volume_total?: Prisma.SortOrder
+  vhoverall_grand_total?: Prisma.SortOrder
   libraryyear?: Prisma.SortOrder
 }
 
@@ -1183,6 +1239,8 @@ export type Volume_HoldingsCreateWithoutLibrary_YearInput = {
   vh_film_fiche_korean?: number | null
   vh_film_fiche_subtotal?: number | null
   vhgrandtotal?: number | null
+  vhebooks_purchased_volume_total?: number | null
+  vhoverall_grand_total?: number | null
   vhnotes?: string | null
 }
 
@@ -1217,6 +1275,8 @@ export type Volume_HoldingsUncheckedCreateWithoutLibrary_YearInput = {
   vh_film_fiche_korean?: number | null
   vh_film_fiche_subtotal?: number | null
   vhgrandtotal?: number | null
+  vhebooks_purchased_volume_total?: number | null
+  vhoverall_grand_total?: number | null
   vhnotes?: string | null
 }
 
@@ -1266,6 +1326,8 @@ export type Volume_HoldingsUpdateWithoutLibrary_YearInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1300,6 +1362,8 @@ export type Volume_HoldingsUncheckedUpdateWithoutLibrary_YearInput = {
   vh_film_fiche_korean?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vh_film_fiche_subtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhgrandtotal?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhebooks_purchased_volume_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  vhoverall_grand_total?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   vhnotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1336,6 +1400,8 @@ export type Volume_HoldingsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   vh_film_fiche_korean?: boolean
   vh_film_fiche_subtotal?: boolean
   vhgrandtotal?: boolean
+  vhebooks_purchased_volume_total?: boolean
+  vhoverall_grand_total?: boolean
   vhnotes?: boolean
   libraryyear?: boolean
   Library_Year?: boolean | Prisma.Volume_Holdings$Library_YearArgs<ExtArgs>
@@ -1372,6 +1438,8 @@ export type Volume_HoldingsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   vh_film_fiche_korean?: boolean
   vh_film_fiche_subtotal?: boolean
   vhgrandtotal?: boolean
+  vhebooks_purchased_volume_total?: boolean
+  vhoverall_grand_total?: boolean
   vhnotes?: boolean
   libraryyear?: boolean
   Library_Year?: boolean | Prisma.Volume_Holdings$Library_YearArgs<ExtArgs>
@@ -1408,6 +1476,8 @@ export type Volume_HoldingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   vh_film_fiche_korean?: boolean
   vh_film_fiche_subtotal?: boolean
   vhgrandtotal?: boolean
+  vhebooks_purchased_volume_total?: boolean
+  vhoverall_grand_total?: boolean
   vhnotes?: boolean
   libraryyear?: boolean
   Library_Year?: boolean | Prisma.Volume_Holdings$Library_YearArgs<ExtArgs>
@@ -1444,11 +1514,13 @@ export type Volume_HoldingsSelectScalar = {
   vh_film_fiche_korean?: boolean
   vh_film_fiche_subtotal?: boolean
   vhgrandtotal?: boolean
+  vhebooks_purchased_volume_total?: boolean
+  vhoverall_grand_total?: boolean
   vhnotes?: boolean
   libraryyear?: boolean
 }
 
-export type Volume_HoldingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryid" | "vhprevious_year_chinese" | "vhprevious_year_japanese" | "vhprevious_year_korean" | "vhprevious_year_noncjk" | "vhprevious_year_subtotal" | "vhadded_gross_chinese" | "vhadded_gross_japanese" | "vhadded_gross_korean" | "vhadded_gross_noncjk" | "vhadded_gross_subtotal" | "vhwithdrawn_chinese" | "vhwithdrawn_japanese" | "vhwithdrawn_korean" | "vhwithdrawn_noncjk" | "vhwithdrawn_subtotal" | "vh_film_chinese" | "vh_film_japanese" | "vh_film_korean" | "vh_film_subtotal" | "vh_fiche_chinese" | "vh_fiche_japanese" | "vh_fiche_korean" | "vh_fiche_subtotal" | "vh_film_fiche_chinese" | "vh_film_fiche_japanese" | "vh_film_fiche_korean" | "vh_film_fiche_subtotal" | "vhgrandtotal" | "vhnotes" | "libraryyear", ExtArgs["result"]["volume_Holdings"]>
+export type Volume_HoldingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryid" | "vhprevious_year_chinese" | "vhprevious_year_japanese" | "vhprevious_year_korean" | "vhprevious_year_noncjk" | "vhprevious_year_subtotal" | "vhadded_gross_chinese" | "vhadded_gross_japanese" | "vhadded_gross_korean" | "vhadded_gross_noncjk" | "vhadded_gross_subtotal" | "vhwithdrawn_chinese" | "vhwithdrawn_japanese" | "vhwithdrawn_korean" | "vhwithdrawn_noncjk" | "vhwithdrawn_subtotal" | "vh_film_chinese" | "vh_film_japanese" | "vh_film_korean" | "vh_film_subtotal" | "vh_fiche_chinese" | "vh_fiche_japanese" | "vh_fiche_korean" | "vh_fiche_subtotal" | "vh_film_fiche_chinese" | "vh_film_fiche_japanese" | "vh_film_fiche_korean" | "vh_film_fiche_subtotal" | "vhgrandtotal" | "vhebooks_purchased_volume_total" | "vhoverall_grand_total" | "vhnotes" | "libraryyear", ExtArgs["result"]["volume_Holdings"]>
 export type Volume_HoldingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Library_Year?: boolean | Prisma.Volume_Holdings$Library_YearArgs<ExtArgs>
 }
@@ -1495,6 +1567,8 @@ export type $Volume_HoldingsPayload<ExtArgs extends runtime.Types.Extensions.Int
     vh_film_fiche_korean: number | null
     vh_film_fiche_subtotal: number | null
     vhgrandtotal: number | null
+    vhebooks_purchased_volume_total: number | null
+    vhoverall_grand_total: number | null
     vhnotes: string | null
     libraryyear: number | null
   }, ExtArgs["result"]["volume_Holdings"]>
@@ -1951,6 +2025,8 @@ export interface Volume_HoldingsFieldRefs {
   readonly vh_film_fiche_korean: Prisma.FieldRef<"Volume_Holdings", 'Float'>
   readonly vh_film_fiche_subtotal: Prisma.FieldRef<"Volume_Holdings", 'Float'>
   readonly vhgrandtotal: Prisma.FieldRef<"Volume_Holdings", 'Float'>
+  readonly vhebooks_purchased_volume_total: Prisma.FieldRef<"Volume_Holdings", 'Float'>
+  readonly vhoverall_grand_total: Prisma.FieldRef<"Volume_Holdings", 'Float'>
   readonly vhnotes: Prisma.FieldRef<"Volume_Holdings", 'String'>
   readonly libraryyear: Prisma.FieldRef<"Volume_Holdings", 'Int'>
 }

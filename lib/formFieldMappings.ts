@@ -45,7 +45,9 @@ export const formFieldMappings = {
     'vhwithdrawn_korean': '13. Withdrawn Korean',
     'vhwithdrawn_noncjk': '14. Withdrawn Non-CJK',
     'vhwithdrawn_subtotal': '15. Withdrawn Subtotal',
-    'vhgrandtotal': '16. Grand Total (Physical Vols)'
+    'vhgrandtotal': '16. Grand Total (Physical Vols)',
+    'vhebooks_purchased_volume_total': '17. E-Books Purchased Volume Total',
+    'vhoverall_grand_total': '18. Overall Grand Total'
   },
   
   serials: {

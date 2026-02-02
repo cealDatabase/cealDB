@@ -29,6 +29,8 @@ model Volume_Holdings {
   vh_film_fiche_korean     Float?
   vh_film_fiche_subtotal   Float?
   vhgrandtotal             Float?
+  vhebooks_purchased_volume_total Float?
+  vhoverall_grand_total    Float?
   vhnotes                  String?
   libraryyear              Int?          @unique
   Library_Year             Library_Year? @relation(fields: [libraryyear], references: [id])

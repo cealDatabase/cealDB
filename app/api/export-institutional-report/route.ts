@@ -37,6 +37,8 @@ function calculateFormFields(formType: string, record: any): any {
       calculated.vhadded_gross_subtotal = parseNum(record.vhadded_gross_chinese) + parseNum(record.vhadded_gross_japanese) + parseNum(record.vhadded_gross_korean) + parseNum(record.vhadded_gross_noncjk);
       calculated.vhwithdrawn_subtotal = parseNum(record.vhwithdrawn_chinese) + parseNum(record.vhwithdrawn_japanese) + parseNum(record.vhwithdrawn_korean) + parseNum(record.vhwithdrawn_noncjk);
       calculated.vhgrandtotal = calculated.vhprevious_year_subtotal + calculated.vhadded_gross_subtotal - calculated.vhwithdrawn_subtotal;
+      calculated.vhebooks_purchased_volume_total = parseNum(record.vhebooks_purchased_volume_total);
+      calculated.vhoverall_grand_total = parseNum(record.vhoverall_grand_total);
       break;
       
     case 'serials':
@@ -165,7 +167,9 @@ function getGroupedHeaders(formType: string): { label: string; colspan: number }
         { label: 'Previous Year Total', colspan: 5 },
         { label: 'Added (Gross)', colspan: 5 },
         { label: 'Withdrawn', colspan: 5 },
-        { label: 'Grand Total', colspan: 1 }
+        { label: 'Grand Total (Physical)', colspan: 1 },
+        { label: 'E-Books Purchased Volume Total', colspan: 1 },
+        { label: 'Overall Grand Total', colspan: 1 }
       ];
     case 'serials':
       return [

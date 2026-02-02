@@ -78,6 +78,29 @@ export async function POST(req: Request) {
 
     const vhgrandtotal = vhprevious_year_subtotal + vhadded_gross_subtotal - vhwithdrawn_subtotal;
 
+    // Fetch Electronic Books Purchased Volume Total from Form 10
+    let ebooksPurchasedVolumeTotal = 0;
+    try {
+      const electronicBooksData = await db.electronic_Books.findFirst({
+        where: {
+          libraryyear: libraryYear.id,
+        },
+        select: {
+          ebooks_purchased_volumes_subtotal: true,
+        }
+      });
+
+      if (electronicBooksData?.ebooks_purchased_volumes_subtotal) {
+        ebooksPurchasedVolumeTotal = electronicBooksData.ebooks_purchased_volumes_subtotal;
+      }
+    } catch (error) {
+      console.log('Error fetching Electronic Books data for Volume Holdings:', error);
+      // Continue with 0 if there's an error
+    }
+
+    // Calculate overall grand total: Physical Grand Total + Electronic Books Purchased Volume Total
+    const vhoverall_grand_total = vhgrandtotal + ebooksPurchasedVolumeTotal;
+
     // Prepare data for upsert
     const dataToUpsert = {
       ...volumeHoldingsData,
@@ -88,6 +111,8 @@ export async function POST(req: Request) {
       vh_fiche_subtotal,
       vh_film_fiche_subtotal,
       vhgrandtotal,
+      vhebooks_purchased_volume_total: ebooksPurchasedVolumeTotal,
+      vhoverall_grand_total,
       libraryyear: libraryYear.id,
     };
 
