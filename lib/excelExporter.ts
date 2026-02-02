@@ -24,12 +24,8 @@ export class ExcelExporter {
   async createWorksheet(config: ExportConfig): Promise<void> {
     const worksheet = this.workbook.addWorksheet(config.title);
 
-    // Calculate academic year dates (July 1 to June 30)
-    const startDate = `July 1, ${config.year}`;
-    const endDate = `June 30, ${config.year + 1}`;
-
-    // Add main title row with date range
-    const mainTitle = `${config.fullTitle} from ${startDate} through ${endDate}`;
+    // Add main title row without date range
+    const mainTitle = config.fullTitle;
     const titleRow = worksheet.addRow([mainTitle]);
     titleRow.font = { bold: true, size: 12 };
     titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -180,8 +176,8 @@ export class ExcelExporter {
       // Add blank row for spacing
       worksheet.addRow([]);
       
-      // Add "Notes" header row
-      const notesHeaderRow = worksheet.addRow(['Institution', 'Notes']);
+      // Add "Notes" header row with Year column
+      const notesHeaderRow = worksheet.addRow(['Year', 'Institution', 'Notes']);
       notesHeaderRow.font = { bold: true, size: 10 };
       notesHeaderRow.fill = {
         type: 'pattern',
@@ -200,27 +196,34 @@ export class ExcelExporter {
 
       // Add notes data rows
       config.data.forEach((record) => {
+        const year = record['year'] || '';
         const institutionName = record['Library_Year.Library.library_name'] || '';
         const notes = config.notesField ? (record[config.notesField] || '') : '';
         
         // Only add row if there are notes
         if (notes && notes.trim() !== '') {
-          const notesRow = worksheet.addRow([institutionName, notes]);
+          const notesRow = worksheet.addRow([year, institutionName, notes]);
           notesRow.alignment = { vertical: 'top', wrapText: true };
-          notesRow.eachCell((cell) => {
+          notesRow.eachCell((cell, colNumber) => {
             cell.border = {
               top: { style: 'thin' },
               left: { style: 'thin' },
               bottom: { style: 'thin' },
               right: { style: 'thin' }
             };
+            // Format year column as integer
+            if (colNumber === 1 && typeof cell.value === 'number') {
+              cell.numFmt = '0';
+            }
           });
         }
       });
 
       // Set notes column widths
-      worksheet.getColumn(1).width = 30; // Institution column
-      worksheet.getColumn(2).width = 70; // Notes column
+      const notesStartCol = worksheet.rowCount > lastDataRow + 2 ? 1 : 1;
+      worksheet.getColumn(notesStartCol).width = 8; // Year column
+      worksheet.getColumn(notesStartCol + 1).width = 30; // Institution column
+      worksheet.getColumn(notesStartCol + 2).width = 70; // Notes column
     }
   }
 
