@@ -58,11 +58,23 @@ function calculateFormFields(formType: string, record: any): any {
       break;
       
     case 'otherHoldings':
+      // Physical materials subtotals
       calculated.ohmicroform_subtotal = parseNum(record.ohmicroform_chinese) + parseNum(record.ohmicroform_japanese) + parseNum(record.ohmicroform_korean) + parseNum(record.ohmicroform_noncjk);
       calculated.ohcarto_graphic_subtotal = parseNum(record.ohcarto_graphic_chinese) + parseNum(record.ohcarto_graphic_japanese) + parseNum(record.ohcarto_graphic_korean) + parseNum(record.ohcarto_graphic_noncjk);
       calculated.ohaudio_subtotal = parseNum(record.ohaudio_chinese) + parseNum(record.ohaudio_japanese) + parseNum(record.ohaudio_korean) + parseNum(record.ohaudio_noncjk);
       calculated.ohfilm_video_subtotal = parseNum(record.ohfilm_video_chinese) + parseNum(record.ohfilm_video_japanese) + parseNum(record.ohfilm_video_korean) + parseNum(record.ohfilm_video_noncjk);
       calculated.ohdvd_subtotal = parseNum(record.ohdvd_chinese) + parseNum(record.ohdvd_japanese) + parseNum(record.ohdvd_korean) + parseNum(record.ohdvd_noncjk);
+      
+      // Online materials subtotals
+      calculated.ohonlinemapsubtotal = parseNum(record.ohonlinemapchinese) + parseNum(record.ohonlinemapjapanese) + parseNum(record.ohonlinemapkorean) + parseNum(record.ohonlinemapnoncjk);
+      calculated.ohonlineimagesubtotal = parseNum(record.ohonlineimagechinese) + parseNum(record.ohonlineimagejapanese) + parseNum(record.ohonlineimagekorean) + parseNum(record.ohonlineimagenoncjk);
+      calculated.ohstreamingsubtotal = parseNum(record.ohstreamingchinese) + parseNum(record.ohstreamingjapanese) + parseNum(record.ohstreamingkorean) + parseNum(record.ohstreamingnoncjk);
+      calculated.ohstreamingvideosubtotal = parseNum(record.ohstreamingvideochinese) + parseNum(record.ohstreamingvideojapanese) + parseNum(record.ohstreamingvideokorean) + parseNum(record.ohstreamingvideononcjk);
+      
+      // Custom materials subtotal
+      calculated.ohcustom1subtotal = parseNum(record.ohcustom1chinese) + parseNum(record.ohcustom1japanese) + parseNum(record.ohcustom1korean) + parseNum(record.ohcustom1noncjk);
+      
+      // Grand total (only physical materials per form specification - line 51)
       calculated.ohgrandtotal = calculated.ohmicroform_subtotal + calculated.ohcarto_graphic_subtotal + calculated.ohaudio_subtotal + calculated.ohfilm_video_subtotal + calculated.ohdvd_subtotal;
       break;
       
