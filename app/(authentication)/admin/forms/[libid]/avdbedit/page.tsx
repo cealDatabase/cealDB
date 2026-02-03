@@ -39,7 +39,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   // Debug all cookies first
   const allCookies = cookieStore.getAll();
   
-  const libidFromCookie = cookieStore.get("library")?.value;
+  // Get effective library ID: observe_library if exists (viewing another library), otherwise library (home library)
+  const observeLibrary = cookieStore.get("observe_library")?.value;
+  const homeLibrary = cookieStore.get("library")?.value;
+  const libidFromCookie = observeLibrary || homeLibrary;
   const roleFromCookie = cookieStore.get("role")?.value;
   
   // If libidStr is "member" or not a valid number, get libid from cookies

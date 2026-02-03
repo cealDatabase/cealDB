@@ -16,8 +16,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName?: string }> }) => {
   const cookieStore = await cookies()
-  const library = cookieStore.get("library")
-  const libid = library?.value
+  
+  // Get effective library ID: observe_library if exists (user is viewing another library), otherwise library (home library)
+  const observeLibrary = cookieStore.get("observe_library")
+  const homeLibrary = cookieStore.get("library")
+  const libid = observeLibrary?.value || homeLibrary?.value
 
   // Get library name with fallback logic
   const resolvedSearchParams = await searchParams;
