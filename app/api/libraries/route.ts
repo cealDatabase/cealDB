@@ -1,8 +1,43 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getAllLibraries } from "@/data/fetchPrisma";
+import db from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const yearParam = searchParams.get('year');
+
+    // If year is provided, get libraries with Library_Year for that year
+    if (yearParam) {
+      const year = parseInt(yearParam);
+      if (isNaN(year)) {
+        return NextResponse.json(
+          { error: "Invalid year parameter" },
+          { status: 400 }
+        );
+      }
+
+      const libraryYears = await db.library_Year.findMany({
+        where: { year },
+        include: { Library: true },
+        orderBy: { Library: { library_name: 'asc' } }
+      });
+
+      const libraries = libraryYears
+        .filter(ly => ly.Library !== null)
+        .map(ly => ({
+          id: ly.Library!.id,
+          library_name: ly.Library!.library_name
+        }));
+
+      return NextResponse.json({
+        success: true,
+        libraries,
+        total: libraries.length,
+      });
+    }
+
+    // Default: return all libraries
     const libraries = await getAllLibraries();
     
     if (!libraries) {
@@ -10,7 +45,7 @@ export async function GET() {
         { 
           success: false,
           error: "Failed to fetch libraries",
-          data: []
+          libraries: []
         },
         { status: 500 }
       );
@@ -18,7 +53,8 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: libraries,
+      libraries,
+      data: libraries, // Keep for backwards compatibility
       total: libraries.length,
     });
 
@@ -29,7 +65,7 @@ export async function GET() {
         success: false,
         error: "Failed to fetch libraries",
         details: error instanceof Error ? error.message : 'Unknown error',
-        data: []
+        libraries: []
       },
       { status: 500 }
     );

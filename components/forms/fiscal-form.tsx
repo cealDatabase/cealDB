@@ -10,6 +10,7 @@ import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
 import { PostCollectionWarning } from "./PostCollectionWarning"
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher"
 import {
   FormWrapper,
   FormSection,
@@ -282,7 +283,11 @@ export default function FiscalForm() {
   }
 
   return (
-    <FormWrapper
+    <>
+      <InstitutionSwitcher 
+        currentYear={libraryYearStatus?.year}
+      />
+      <FormWrapper
       form={form}
       onSubmit={onSubmit}
       isLoading={isLoading}
@@ -687,5 +692,6 @@ export default function FiscalForm() {
         <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
       )}
     </FormWrapper>
+    </>
   )
 }

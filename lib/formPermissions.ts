@@ -21,15 +21,15 @@ export async function checkFormEditPermission(
   surveySession?: any;
 }> {
   try {
-    // Super admins (role 1) and E-Resource Editors (role 3) can always edit
+    // Role definitions:
+    // - Super Admin (role 1): Can always edit, even after closing
+    // - Member (role 2): Can edit only during open period, read-only after closing
+    // - Editor (role 3): Can view all institutions, but read-only after closing
     const isSuperAdmin = userRoles.includes('1');
-    const isEResourceEditor = userRoles.includes('3');
-    const isPrivilegedUser = isSuperAdmin || isEResourceEditor;
-    const isRegularUser = userRoles.includes('2') && userRoles.length === 1;
+    const isEditor = userRoles.includes('3');
+    const isMember = userRoles.includes('2');
 
-    console.log('[formPermissions] Checking permissions for year:', year);
-    console.log('[formPermissions] User roles:', userRoles);
-    console.log('[formPermissions] Is privileged user:', isPrivilegedUser);
+    console.log('[formPermissions] isSuperAdmin:', isSuperAdmin, 'isEditor:', isEditor, 'isMember:', isMember);
 
     // Check if there's a survey session for this year
     const surveySession = await prisma.surveySession.findUnique({
@@ -51,31 +51,28 @@ export async function checkFormEditPermission(
     const closingDate = new Date(surveySession.closingDate);
     const isAfterClosing = now > closingDate;
 
-    console.log('[formPermissions] Current date:', now.toISOString());
-    console.log('[formPermissions] Closing date:', closingDate.toISOString());
-    console.log('[formPermissions] Is after closing:', isAfterClosing);
-
-    // Privileged users can edit after closing, but we need to flag it for warning display
-    if (isPrivilegedUser && isAfterClosing) {
-      console.log('[formPermissions] ✅ RETURNING isPrivilegedPostClosing: TRUE');
-      return {
-        canEdit: true,
-        isAfterClosing: true,
-        isPrivilegedPostClosing: true,
-        reason: 'Privileged user editing after collection period',
-        surveySession
-      };
-    }
-
-    // Regular users cannot edit after closing date
-    if (isRegularUser && isAfterClosing) {
-      return {
-        canEdit: false,
-        isAfterClosing: true,
-        isPrivilegedPostClosing: false,
-        reason: 'Survey period has closed. Form is now read-only.',
-        surveySession
-      };
+    // AFTER CLOSING: Only Super Admin can edit
+    if (isAfterClosing) {
+      if (isSuperAdmin) {
+        console.log('[formPermissions] ✅ Super Admin can edit after closing');
+        return {
+          canEdit: true,
+          isAfterClosing: true,
+          isPrivilegedPostClosing: true,
+          reason: 'Super Admin editing after collection period',
+          surveySession
+        };
+      } else {
+        // Editor and Member are read-only after closing
+        console.log('[formPermissions] 🔒 Read-only after closing for non-Super Admin');
+        return {
+          canEdit: false,
+          isAfterClosing: true,
+          isPrivilegedPostClosing: false,
+          reason: 'Survey period has closed. Form is now read-only.',
+          surveySession
+        };
+      }
     }
 
     // Check if before opening date
@@ -93,7 +90,6 @@ export async function checkFormEditPermission(
     }
 
     // Within survey period - allow editing
-    console.log('[formPermissions] ⚠️ RETURNING isPrivilegedPostClosing: FALSE (within period)');
     return {
       canEdit: true,
       isAfterClosing: false,

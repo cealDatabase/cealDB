@@ -162,9 +162,15 @@ export default async function signinAction(
     const userRoleIds = user.User_Roles?.map(userRole => userRole.Role.id.toString()) || ['2'];
     const userLibraryId = user.User_Library?.[0]?.Library?.id?.toString() || '';
     
+    // Client-accessible cookie options (no httpOnly so JS can read them)
+    const clientCookieOptions = {
+      ...cookieOptions,
+      httpOnly: false, // Allow client-side JS to read these
+    };
+    
     // Store role IDs array as JSON string in cookie
-    cookieStore.set('role', JSON.stringify(userRoleIds), cookieOptions);
-    cookieStore.set('library', userLibraryId, cookieOptions);
+    cookieStore.set('role', JSON.stringify(userRoleIds), clientCookieOptions);
+    cookieStore.set('library', userLibraryId, clientCookieOptions);
 
     // Update user's last login time
     await db.user.update({

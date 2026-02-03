@@ -10,6 +10,7 @@ import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
 import { PostCollectionWarning } from "./PostCollectionWarning"
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher"
 import {
   FormWrapper,
   FormSection,
@@ -234,14 +235,18 @@ export default function MonographicForm() {
   }
 
   return (
-    <FormWrapper
-      form={form}
-      onSubmit={onSubmit}
-      isLoading={isLoading}
-      libraryYearStatus={libraryYearStatus}
-      isReadOnly={isReadOnly}
-      readOnlyReason={formPermission?.reason}
-    >
+    <>
+      <InstitutionSwitcher 
+        currentYear={libraryYearStatus?.year}
+      />
+      <FormWrapper
+        form={form}
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        libraryYearStatus={libraryYearStatus}
+        isReadOnly={isReadOnly}
+        readOnlyReason={formPermission?.reason}
+      >
       {/* Purchased Titles */}
       <FormSection
         title="Purchased Titles"
@@ -381,5 +386,6 @@ export default function MonographicForm() {
         <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
       )}
     </FormWrapper>
+    </>
   )
 }
