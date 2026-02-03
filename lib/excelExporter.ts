@@ -6,7 +6,11 @@ export interface ExportConfig {
   fullTitle: string; // Full descriptive title
   year: number;
   headers: string[];
-  groupedHeaders?: { label: string; colspan: number }[]; // Optional grouped headers
+  groupedHeaders?: { label: string; colspan: number }[]; // Optional grouped headers (single tier)
+  multiTierHeaders?: {
+    tier1?: { label: string; colspan: number }[];  // Top level groups
+    tier2?: { label: string; colspan: number }[];  // Second level subgroups
+  };
   data: any[];
   fieldMapping: { [key: string]: string };
   notesField?: string; // Field name containing notes (will be placed at bottom)
@@ -32,9 +36,100 @@ export class ExcelExporter {
     worksheet.mergeCells(1, 1, 1, config.headers.length);
     titleRow.height = 25;
 
-    // Add grouped headers if provided
+    // Add multi-tier headers if provided (supports 2-tier structure)
     let headerStartRow = 2;
-    if (config.groupedHeaders && config.groupedHeaders.length > 0) {
+    if (config.multiTierHeaders) {
+      let currentRow = 2;
+      
+      // Add Tier 1 headers (top level groups)
+      if (config.multiTierHeaders.tier1 && config.multiTierHeaders.tier1.length > 0) {
+        const tier1Row = worksheet.addRow([]);
+        let colIndex = 1;
+        
+        config.multiTierHeaders.tier1.forEach((group) => {
+          if (group.colspan > 1) {
+            worksheet.mergeCells(currentRow, colIndex, currentRow, colIndex + group.colspan - 1);
+          }
+          const cell = worksheet.getCell(currentRow, colIndex);
+          cell.value = group.label;
+          cell.font = { bold: true, size: 11 };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFD9E1F2' } // Light blue
+          };
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          
+          // Apply border to all cells in the merged range
+          for (let i = colIndex; i < colIndex + group.colspan; i++) {
+            const mergedCell = worksheet.getCell(currentRow, i);
+            mergedCell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          }
+          
+          colIndex += group.colspan;
+        });
+        
+        tier1Row.height = 25;
+        currentRow++;
+      }
+      
+      // Add Tier 2 headers (subgroups)
+      if (config.multiTierHeaders.tier2 && config.multiTierHeaders.tier2.length > 0) {
+        const tier2Row = worksheet.addRow([]);
+        let colIndex = 1;
+        
+        config.multiTierHeaders.tier2.forEach((group) => {
+          if (group.colspan > 1) {
+            worksheet.mergeCells(currentRow, colIndex, currentRow, colIndex + group.colspan - 1);
+          }
+          const cell = worksheet.getCell(currentRow, colIndex);
+          cell.value = group.label;
+          cell.font = { bold: true, size: 10 };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFCE4D6' } // Light orange
+          };
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          
+          // Apply border to all cells in the merged range
+          for (let i = colIndex; i < colIndex + group.colspan; i++) {
+            const mergedCell = worksheet.getCell(currentRow, i);
+            mergedCell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          }
+          
+          colIndex += group.colspan;
+        });
+        
+        tier2Row.height = 22;
+        currentRow++;
+      }
+      
+      headerStartRow = currentRow + 1;
+    } else if (config.groupedHeaders && config.groupedHeaders.length > 0) {
+      // Legacy single-tier grouped headers
       const groupedRow = worksheet.addRow([]);
       let colIndex = 1;
       

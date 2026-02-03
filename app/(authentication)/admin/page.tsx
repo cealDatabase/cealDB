@@ -148,7 +148,7 @@ async function UserLoggedInPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
-        <div className={`grid grid-cols-1 gap-y-8 ${isRegularUserOnly ? 'max-w-2xl mx-auto' : 'lg:grid-cols-3'}`}>
+        <div className={`grid grid-cols-1 ${isRegularUserOnly ? 'max-w-2xl mx-auto gap-y-8' : 'gap-8 lg:grid-cols-3'}`}>
           {/* User Profile Section - Left Column */}
           <div className={isRegularUserOnly ? '' : 'lg:col-span-1'}>
             <UserProfile

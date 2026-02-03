@@ -6,11 +6,21 @@ import { Buffer } from "node:buffer";
 
 const prisma = db;
 
-// Helper function to safely parse numbers from record values
+// Helper function for calculations - treats null as 0 for math operations
 function parseNum(value: any): number {
   if (value === null || value === undefined || value === '') return 0;
   const parsed = typeof value === 'number' ? value : parseFloat(value);
   return isNaN(parsed) ? 0 : parsed;
+}
+
+// Helper function for subtotal calculations - returns null if all inputs are null
+function sumWithNull(...values: any[]): number | null {
+  // Check if all values are null/undefined
+  const allNull = values.every(v => v === null || v === undefined || v === '');
+  if (allNull) return null;
+  
+  // Otherwise sum, treating null as 0
+  return values.reduce((sum, val) => sum + parseNum(val), 0);
 }
 
 // Helper function to round to 2 decimal places (fixes floating-point precision)
@@ -24,83 +34,101 @@ function calculateFormFields(formType: string, record: any): any {
   
   switch (formType) {
     case 'monographic':
-      calculated.mapurchased_titles_subtotal = parseNum(record.mapurchased_titles_chinese) + parseNum(record.mapurchased_titles_japanese) + parseNum(record.mapurchased_titles_korean) + parseNum(record.mapurchased_titles_noncjk);
-      calculated.mapurchased_volumes_subtotal = parseNum(record.mapurchased_volumes_chinese) + parseNum(record.mapurchased_volumes_japanese) + parseNum(record.mapurchased_volumes_korean) + parseNum(record.mapurchased_volumes_noncjk);
-      calculated.manonpurchased_titles_subtotal = parseNum(record.manonpurchased_titles_chinese) + parseNum(record.manonpurchased_titles_japanese) + parseNum(record.manonpurchased_titles_korean) + parseNum(record.manonpurchased_titles_noncjk);
-      calculated.manonpurchased_volumes_subtotal = parseNum(record.manonpurchased_volumes_chinese) + parseNum(record.manonpurchased_volumes_japanese) + parseNum(record.manonpurchased_volumes_korean) + parseNum(record.manonpurchased_volumes_noncjk);
-      calculated.matotal_titles = calculated.mapurchased_titles_subtotal + calculated.manonpurchased_titles_subtotal;
-      calculated.matotal_volumes = calculated.mapurchased_volumes_subtotal + calculated.manonpurchased_volumes_subtotal;
+      calculated.mapurchased_titles_subtotal = sumWithNull(record.mapurchased_titles_chinese, record.mapurchased_titles_japanese, record.mapurchased_titles_korean, record.mapurchased_titles_noncjk);
+      calculated.mapurchased_volumes_subtotal = sumWithNull(record.mapurchased_volumes_chinese, record.mapurchased_volumes_japanese, record.mapurchased_volumes_korean, record.mapurchased_volumes_noncjk);
+      calculated.manonpurchased_titles_subtotal = sumWithNull(record.manonpurchased_titles_chinese, record.manonpurchased_titles_japanese, record.manonpurchased_titles_korean, record.manonpurchased_titles_noncjk);
+      calculated.manonpurchased_volumes_subtotal = sumWithNull(record.manonpurchased_volumes_chinese, record.manonpurchased_volumes_japanese, record.manonpurchased_volumes_korean, record.manonpurchased_volumes_noncjk);
+      calculated.matotal_titles = sumWithNull(calculated.mapurchased_titles_subtotal, calculated.manonpurchased_titles_subtotal);
+      calculated.matotal_volumes = sumWithNull(calculated.mapurchased_volumes_subtotal, calculated.manonpurchased_volumes_subtotal);
       break;
       
     case 'volumeHoldings':
-      calculated.vhprevious_year_subtotal = parseNum(record.vhprevious_year_chinese) + parseNum(record.vhprevious_year_japanese) + parseNum(record.vhprevious_year_korean) + parseNum(record.vhprevious_year_noncjk);
-      calculated.vhadded_gross_subtotal = parseNum(record.vhadded_gross_chinese) + parseNum(record.vhadded_gross_japanese) + parseNum(record.vhadded_gross_korean) + parseNum(record.vhadded_gross_noncjk);
-      calculated.vhwithdrawn_subtotal = parseNum(record.vhwithdrawn_chinese) + parseNum(record.vhwithdrawn_japanese) + parseNum(record.vhwithdrawn_korean) + parseNum(record.vhwithdrawn_noncjk);
-      calculated.vhgrandtotal = calculated.vhprevious_year_subtotal + calculated.vhadded_gross_subtotal - calculated.vhwithdrawn_subtotal;
-      calculated.vhebooks_purchased_volume_total = parseNum(record.vhebooks_purchased_volume_total);
-      calculated.vhoverall_grand_total = parseNum(record.vhoverall_grand_total);
+      calculated.vhprevious_year_subtotal = sumWithNull(record.vhprevious_year_chinese, record.vhprevious_year_japanese, record.vhprevious_year_korean, record.vhprevious_year_noncjk);
+      calculated.vhadded_gross_subtotal = sumWithNull(record.vhadded_gross_chinese, record.vhadded_gross_japanese, record.vhadded_gross_korean, record.vhadded_gross_noncjk);
+      calculated.vhwithdrawn_subtotal = sumWithNull(record.vhwithdrawn_chinese, record.vhwithdrawn_japanese, record.vhwithdrawn_korean, record.vhwithdrawn_noncjk);
+      // Grand total: if all subtotals are null, result is null
+      const vhPrev = calculated.vhprevious_year_subtotal ?? 0;
+      const vhAdded = calculated.vhadded_gross_subtotal ?? 0;
+      const vhWith = calculated.vhwithdrawn_subtotal ?? 0;
+      const allVhNull = calculated.vhprevious_year_subtotal === null && calculated.vhadded_gross_subtotal === null && calculated.vhwithdrawn_subtotal === null;
+      calculated.vhgrandtotal = allVhNull ? null : (vhPrev + vhAdded - vhWith);
+      calculated.vhebooks_purchased_volume_total = record.vhebooks_purchased_volume_total;
+      calculated.vhoverall_grand_total = record.vhoverall_grand_total;
       break;
       
     case 'serials':
-      calculated.s_epurchased_subtotal = parseNum(record.s_epurchased_chinese) + parseNum(record.s_epurchased_japanese) + parseNum(record.s_epurchased_korean) + parseNum(record.s_epurchased_noncjk);
-      calculated.spurchased_subtotal = parseNum(record.spurchased_chinese) + parseNum(record.spurchased_japanese) + parseNum(record.spurchased_korean) + parseNum(record.spurchased_noncjk);
-      calculated.s_enonpurchased_subtotal = parseNum(record.s_enonpurchased_chinese) + parseNum(record.s_enonpurchased_japanese) + parseNum(record.s_enonpurchased_korean) + parseNum(record.s_enonpurchased_noncjk);
-      calculated.snonpurchased_subtotal = parseNum(record.snonpurchased_chinese) + parseNum(record.snonpurchased_japanese) + parseNum(record.snonpurchased_korean) + parseNum(record.snonpurchased_noncjk);
-      calculated.s_etotal_chinese = parseNum(record.s_epurchased_chinese) + parseNum(record.s_enonpurchased_chinese);
-      calculated.s_etotal_japanese = parseNum(record.s_epurchased_japanese) + parseNum(record.s_enonpurchased_japanese);
-      calculated.s_etotal_korean = parseNum(record.s_epurchased_korean) + parseNum(record.s_enonpurchased_korean);
-      calculated.s_etotal_noncjk = parseNum(record.s_epurchased_noncjk) + parseNum(record.s_enonpurchased_noncjk);
-      calculated.s_egrandtotal = calculated.s_epurchased_subtotal + calculated.s_enonpurchased_subtotal;
-      calculated.stotal_chinese = parseNum(record.spurchased_chinese) + parseNum(record.snonpurchased_chinese);
-      calculated.stotal_japanese = parseNum(record.spurchased_japanese) + parseNum(record.snonpurchased_japanese);
-      calculated.stotal_korean = parseNum(record.spurchased_korean) + parseNum(record.snonpurchased_korean);
-      calculated.stotal_noncjk = parseNum(record.spurchased_noncjk) + parseNum(record.snonpurchased_noncjk);
-      calculated.sgrandtotal = calculated.spurchased_subtotal + calculated.snonpurchased_subtotal;
-      calculated.stotal_overall = calculated.s_egrandtotal + calculated.sgrandtotal;
+      calculated.s_epurchased_subtotal = sumWithNull(record.s_epurchased_chinese, record.s_epurchased_japanese, record.s_epurchased_korean, record.s_epurchased_noncjk);
+      calculated.spurchased_subtotal = sumWithNull(record.spurchased_chinese, record.spurchased_japanese, record.spurchased_korean, record.spurchased_noncjk);
+      calculated.s_enonpurchased_subtotal = sumWithNull(record.s_enonpurchased_chinese, record.s_enonpurchased_japanese, record.s_enonpurchased_korean, record.s_enonpurchased_noncjk);
+      calculated.snonpurchased_subtotal = sumWithNull(record.snonpurchased_chinese, record.snonpurchased_japanese, record.snonpurchased_korean, record.snonpurchased_noncjk);
+      calculated.s_etotal_chinese = sumWithNull(record.s_epurchased_chinese, record.s_enonpurchased_chinese);
+      calculated.s_etotal_japanese = sumWithNull(record.s_epurchased_japanese, record.s_enonpurchased_japanese);
+      calculated.s_etotal_korean = sumWithNull(record.s_epurchased_korean, record.s_enonpurchased_korean);
+      calculated.s_etotal_noncjk = sumWithNull(record.s_epurchased_noncjk, record.s_enonpurchased_noncjk);
+      calculated.s_egrandtotal = sumWithNull(calculated.s_epurchased_subtotal, calculated.s_enonpurchased_subtotal);
+      calculated.stotal_chinese = sumWithNull(record.spurchased_chinese, record.snonpurchased_chinese);
+      calculated.stotal_japanese = sumWithNull(record.spurchased_japanese, record.snonpurchased_japanese);
+      calculated.stotal_korean = sumWithNull(record.spurchased_korean, record.snonpurchased_korean);
+      calculated.stotal_noncjk = sumWithNull(record.spurchased_noncjk, record.snonpurchased_noncjk);
+      calculated.sgrandtotal = sumWithNull(calculated.spurchased_subtotal, calculated.snonpurchased_subtotal);
+      calculated.stotal_overall = sumWithNull(calculated.s_egrandtotal, calculated.sgrandtotal);
       break;
       
     case 'otherHoldings':
       // Physical materials subtotals
-      calculated.ohmicroform_subtotal = parseNum(record.ohmicroform_chinese) + parseNum(record.ohmicroform_japanese) + parseNum(record.ohmicroform_korean) + parseNum(record.ohmicroform_noncjk);
-      calculated.ohcarto_graphic_subtotal = parseNum(record.ohcarto_graphic_chinese) + parseNum(record.ohcarto_graphic_japanese) + parseNum(record.ohcarto_graphic_korean) + parseNum(record.ohcarto_graphic_noncjk);
-      calculated.ohaudio_subtotal = parseNum(record.ohaudio_chinese) + parseNum(record.ohaudio_japanese) + parseNum(record.ohaudio_korean) + parseNum(record.ohaudio_noncjk);
-      calculated.ohfilm_video_subtotal = parseNum(record.ohfilm_video_chinese) + parseNum(record.ohfilm_video_japanese) + parseNum(record.ohfilm_video_korean) + parseNum(record.ohfilm_video_noncjk);
-      calculated.ohdvd_subtotal = parseNum(record.ohdvd_chinese) + parseNum(record.ohdvd_japanese) + parseNum(record.ohdvd_korean) + parseNum(record.ohdvd_noncjk);
+      calculated.ohmicroform_subtotal = sumWithNull(record.ohmicroform_chinese, record.ohmicroform_japanese, record.ohmicroform_korean, record.ohmicroform_noncjk);
+      calculated.ohcarto_graphic_subtotal = sumWithNull(record.ohcarto_graphic_chinese, record.ohcarto_graphic_japanese, record.ohcarto_graphic_korean, record.ohcarto_graphic_noncjk);
+      calculated.ohaudio_subtotal = sumWithNull(record.ohaudio_chinese, record.ohaudio_japanese, record.ohaudio_korean, record.ohaudio_noncjk);
+      calculated.ohfilm_video_subtotal = sumWithNull(record.ohfilm_video_chinese, record.ohfilm_video_japanese, record.ohfilm_video_korean, record.ohfilm_video_noncjk);
+      calculated.ohdvd_subtotal = sumWithNull(record.ohdvd_chinese, record.ohdvd_japanese, record.ohdvd_korean, record.ohdvd_noncjk);
       
       // Online materials subtotals
-      calculated.ohonlinemapsubtotal = parseNum(record.ohonlinemapchinese) + parseNum(record.ohonlinemapjapanese) + parseNum(record.ohonlinemapkorean) + parseNum(record.ohonlinemapnoncjk);
-      calculated.ohonlineimagesubtotal = parseNum(record.ohonlineimagechinese) + parseNum(record.ohonlineimagejapanese) + parseNum(record.ohonlineimagekorean) + parseNum(record.ohonlineimagenoncjk);
-      calculated.ohstreamingsubtotal = parseNum(record.ohstreamingchinese) + parseNum(record.ohstreamingjapanese) + parseNum(record.ohstreamingkorean) + parseNum(record.ohstreamingnoncjk);
-      calculated.ohstreamingvideosubtotal = parseNum(record.ohstreamingvideochinese) + parseNum(record.ohstreamingvideojapanese) + parseNum(record.ohstreamingvideokorean) + parseNum(record.ohstreamingvideononcjk);
+      calculated.ohonlinemapsubtotal = sumWithNull(record.ohonlinemapchinese, record.ohonlinemapjapanese, record.ohonlinemapkorean, record.ohonlinemapnoncjk);
+      calculated.ohonlineimagesubtotal = sumWithNull(record.ohonlineimagechinese, record.ohonlineimagejapanese, record.ohonlineimagekorean, record.ohonlineimagenoncjk);
+      calculated.ohstreamingsubtotal = sumWithNull(record.ohstreamingchinese, record.ohstreamingjapanese, record.ohstreamingkorean, record.ohstreamingnoncjk);
+      calculated.ohstreamingvideosubtotal = sumWithNull(record.ohstreamingvideochinese, record.ohstreamingvideojapanese, record.ohstreamingvideokorean, record.ohstreamingvideononcjk);
       
       // Custom materials subtotal
-      calculated.ohcustom1subtotal = parseNum(record.ohcustom1chinese) + parseNum(record.ohcustom1japanese) + parseNum(record.ohcustom1korean) + parseNum(record.ohcustom1noncjk);
+      calculated.ohcustom1subtotal = sumWithNull(record.ohcustom1chinese, record.ohcustom1japanese, record.ohcustom1korean, record.ohcustom1noncjk);
       
       // Grand total (only physical materials per form specification - line 51)
-      calculated.ohgrandtotal = calculated.ohmicroform_subtotal + calculated.ohcarto_graphic_subtotal + calculated.ohaudio_subtotal + calculated.ohfilm_video_subtotal + calculated.ohdvd_subtotal;
+      calculated.ohgrandtotal = sumWithNull(calculated.ohmicroform_subtotal, calculated.ohcarto_graphic_subtotal, calculated.ohaudio_subtotal, calculated.ohfilm_video_subtotal, calculated.ohdvd_subtotal);
       break;
       
     case 'unprocessed':
-      calculated.ubtotal = parseNum(record.ubchinese) + parseNum(record.ubjapanese) + parseNum(record.ubkorean) + parseNum(record.ubnoncjk);
+      calculated.ubtotal = sumWithNull(record.ubchinese, record.ubjapanese, record.ubkorean, record.ubnoncjk);
       break;
       
     case 'fiscal':
-      calculated.fschinese_appropriations_subtotal = round2(parseNum(record.fschinese_appropriations_monographic) + parseNum(record.fschinese_appropriations_serial) + parseNum(record.fschinese_appropriations_other_material) + parseNum(record.fschinese_appropriations_electronic));
-      calculated.fsjapanese_appropriations_subtotal = round2(parseNum(record.fsjapanese_appropriations_monographic) + parseNum(record.fsjapanese_appropriations_serial) + parseNum(record.fsjapanese_appropriations_other_material) + parseNum(record.fsjapanese_appropriations_electronic));
-      calculated.fskorean_appropriations_subtotal = round2(parseNum(record.fskorean_appropriations_monographic) + parseNum(record.fskorean_appropriations_serial) + parseNum(record.fskorean_appropriations_other_material) + parseNum(record.fskorean_appropriations_electronic));
-      calculated.fsnoncjk_appropriations_subtotal = round2(parseNum(record.fsnoncjk_appropriations_monographic) + parseNum(record.fsnoncjk_appropriations_serial) + parseNum(record.fsnoncjk_appropriations_other_material) + parseNum(record.fsnoncjk_appropriations_electronic));
-      calculated.fstotal_appropriations = round2(calculated.fschinese_appropriations_subtotal + calculated.fsjapanese_appropriations_subtotal + calculated.fskorean_appropriations_subtotal + calculated.fsnoncjk_appropriations_subtotal);
-      calculated.fsendowments_subtotal = round2(parseNum(record.fsendowments_chinese) + parseNum(record.fsendowments_japanese) + parseNum(record.fsendowments_korean) + parseNum(record.fsendowments_noncjk));
-      calculated.fsgrants_subtotal = round2(parseNum(record.fsgrants_chinese) + parseNum(record.fsgrants_japanese) + parseNum(record.fsgrants_korean) + parseNum(record.fsgrants_noncjk));
-      calculated.fseast_asian_program_support_subtotal = round2(parseNum(record.fseast_asian_program_support_chinese) + parseNum(record.fseast_asian_program_support_japanese) + parseNum(record.fseast_asian_program_support_korean) + parseNum(record.fseast_asian_program_support_noncjk));
-      calculated.fstotal_acquisition_budget = round2(calculated.fstotal_appropriations + calculated.fsendowments_subtotal + calculated.fsgrants_subtotal + calculated.fseast_asian_program_support_subtotal);
+      const fsChinese = sumWithNull(record.fschinese_appropriations_monographic, record.fschinese_appropriations_serial, record.fschinese_appropriations_other_material, record.fschinese_appropriations_electronic);
+      calculated.fschinese_appropriations_subtotal = fsChinese !== null ? round2(fsChinese) : null;
+      const fsJapanese = sumWithNull(record.fsjapanese_appropriations_monographic, record.fsjapanese_appropriations_serial, record.fsjapanese_appropriations_other_material, record.fsjapanese_appropriations_electronic);
+      calculated.fsjapanese_appropriations_subtotal = fsJapanese !== null ? round2(fsJapanese) : null;
+      const fsKorean = sumWithNull(record.fskorean_appropriations_monographic, record.fskorean_appropriations_serial, record.fskorean_appropriations_other_material, record.fskorean_appropriations_electronic);
+      calculated.fskorean_appropriations_subtotal = fsKorean !== null ? round2(fsKorean) : null;
+      const fsNonCjk = sumWithNull(record.fsnoncjk_appropriations_monographic, record.fsnoncjk_appropriations_serial, record.fsnoncjk_appropriations_other_material, record.fsnoncjk_appropriations_electronic);
+      calculated.fsnoncjk_appropriations_subtotal = fsNonCjk !== null ? round2(fsNonCjk) : null;
+      const fsTotalApprop = sumWithNull(calculated.fschinese_appropriations_subtotal, calculated.fsjapanese_appropriations_subtotal, calculated.fskorean_appropriations_subtotal, calculated.fsnoncjk_appropriations_subtotal);
+      calculated.fstotal_appropriations = fsTotalApprop !== null ? round2(fsTotalApprop) : null;
+      const fsEndow = sumWithNull(record.fsendowments_chinese, record.fsendowments_japanese, record.fsendowments_korean, record.fsendowments_noncjk);
+      calculated.fsendowments_subtotal = fsEndow !== null ? round2(fsEndow) : null;
+      const fsGrants = sumWithNull(record.fsgrants_chinese, record.fsgrants_japanese, record.fsgrants_korean, record.fsgrants_noncjk);
+      calculated.fsgrants_subtotal = fsGrants !== null ? round2(fsGrants) : null;
+      const fsEAProgram = sumWithNull(record.fseast_asian_program_support_chinese, record.fseast_asian_program_support_japanese, record.fseast_asian_program_support_korean, record.fseast_asian_program_support_noncjk);
+      calculated.fseast_asian_program_support_subtotal = fsEAProgram !== null ? round2(fsEAProgram) : null;
+      const fsTotalBudget = sumWithNull(calculated.fstotal_appropriations, calculated.fsendowments_subtotal, calculated.fsgrants_subtotal, calculated.fseast_asian_program_support_subtotal);
+      calculated.fstotal_acquisition_budget = fsTotalBudget !== null ? round2(fsTotalBudget) : null;
       break;
       
     case 'personnel':
-      calculated.psfprofessional_subtotal = round2(parseNum(record.psfprofessional_chinese) + parseNum(record.psfprofessional_japanese) + parseNum(record.psfprofessional_korean) + parseNum(record.psfprofessional_eastasian));
-      calculated.psfsupport_staff_subtotal = round2(parseNum(record.psfsupport_staff_chinese) + parseNum(record.psfsupport_staff_japanese) + parseNum(record.psfsupport_staff_korean) + parseNum(record.psfsupport_staff_eastasian));
-      calculated.psfstudent_assistants_subtotal = round2(parseNum(record.psfstudent_assistants_chinese) + parseNum(record.psfstudent_assistants_japanese) + parseNum(record.psfstudent_assistants_korean) + parseNum(record.psfstudent_assistants_eastasian));
-      calculated.psftotal = round2(calculated.psfprofessional_subtotal + calculated.psfsupport_staff_subtotal + calculated.psfstudent_assistants_subtotal + parseNum(record.psfothers));
+      const psProf = sumWithNull(record.psfprofessional_chinese, record.psfprofessional_japanese, record.psfprofessional_korean, record.psfprofessional_eastasian);
+      calculated.psfprofessional_subtotal = psProf !== null ? round2(psProf) : null;
+      const psSupport = sumWithNull(record.psfsupport_staff_chinese, record.psfsupport_staff_japanese, record.psfsupport_staff_korean, record.psfsupport_staff_eastasian);
+      calculated.psfsupport_staff_subtotal = psSupport !== null ? round2(psSupport) : null;
+      const psStudent = sumWithNull(record.psfstudent_assistants_chinese, record.psfstudent_assistants_japanese, record.psfstudent_assistants_korean, record.psfstudent_assistants_eastasian);
+      calculated.psfstudent_assistants_subtotal = psStudent !== null ? round2(psStudent) : null;
+      const psTotal = sumWithNull(calculated.psfprofessional_subtotal, calculated.psfsupport_staff_subtotal, calculated.psfstudent_assistants_subtotal, record.psfothers);
+      calculated.psftotal = psTotal !== null ? round2(psTotal) : null;
       break;
       
     case 'publicServices':
@@ -109,60 +137,64 @@ function calculateFormFields(formType: string, record: any): any {
       
     case 'electronic':
       // One-time Computer Files subtotals
-      calculated.eonetime_computer_title_subtotal = parseNum(record.eonetime_computer_title_chinese) + parseNum(record.eonetime_computer_title_japanese) + parseNum(record.eonetime_computer_title_korean) + parseNum(record.eonetime_computer_title_noncjk);
-      calculated.eonetime_computer_cd_subtotal = parseNum(record.eonetime_computer_cd_chinese) + parseNum(record.eonetime_computer_cd_japanese) + parseNum(record.eonetime_computer_cd_korean) + parseNum(record.eonetime_computer_cd_noncjk);
+      calculated.eonetime_computer_title_subtotal = sumWithNull(record.eonetime_computer_title_chinese, record.eonetime_computer_title_japanese, record.eonetime_computer_title_korean, record.eonetime_computer_title_noncjk);
+      calculated.eonetime_computer_cd_subtotal = sumWithNull(record.eonetime_computer_cd_chinese, record.eonetime_computer_cd_japanese, record.eonetime_computer_cd_korean, record.eonetime_computer_cd_noncjk);
       // Accompanied Computer Files subtotals
-      calculated.eaccompanied_computer_title_subtotal = parseNum(record.eaccompanied_computer_title_chinese) + parseNum(record.eaccompanied_computer_title_japanese) + parseNum(record.eaccompanied_computer_title_korean) + parseNum(record.eaccompanied_computer_title_noncjk);
-      calculated.eaccompanied_computer_cd_subtotal = parseNum(record.eaccompanied_computer_cd_chinese) + parseNum(record.eaccompanied_computer_cd_japanese) + parseNum(record.eaccompanied_computer_cd_korean) + parseNum(record.eaccompanied_computer_cd_noncjk);
+      calculated.eaccompanied_computer_title_subtotal = sumWithNull(record.eaccompanied_computer_title_chinese, record.eaccompanied_computer_title_japanese, record.eaccompanied_computer_title_korean, record.eaccompanied_computer_title_noncjk);
+      calculated.eaccompanied_computer_cd_subtotal = sumWithNull(record.eaccompanied_computer_cd_chinese, record.eaccompanied_computer_cd_japanese, record.eaccompanied_computer_cd_korean, record.eaccompanied_computer_cd_noncjk);
       // Gift Computer Files subtotals
-      calculated.egift_computer_title_subtotal = parseNum(record.egift_computer_title_chinese) + parseNum(record.egift_computer_title_japanese) + parseNum(record.egift_computer_title_korean) + parseNum(record.egift_computer_title_noncjk);
-      calculated.egift_computer_cd_subtotal = parseNum(record.egift_computer_cd_chinese) + parseNum(record.egift_computer_cd_japanese) + parseNum(record.egift_computer_cd_korean) + parseNum(record.egift_computer_cd_noncjk);
+      calculated.egift_computer_title_subtotal = sumWithNull(record.egift_computer_title_chinese, record.egift_computer_title_japanese, record.egift_computer_title_korean, record.egift_computer_title_noncjk);
+      calculated.egift_computer_cd_subtotal = sumWithNull(record.egift_computer_cd_chinese, record.egift_computer_cd_japanese, record.egift_computer_cd_korean, record.egift_computer_cd_noncjk);
       // Total Computer Files (Current Year) subtotals
-      calculated.etotal_computer_title_subtotal = parseNum(record.etotal_computer_title_chinese) + parseNum(record.etotal_computer_title_japanese) + parseNum(record.etotal_computer_title_korean) + parseNum(record.etotal_computer_title_noncjk);
-      calculated.etotal_computer_cd_subtotal = parseNum(record.etotal_computer_cd_chinese) + parseNum(record.etotal_computer_cd_japanese) + parseNum(record.etotal_computer_cd_korean) + parseNum(record.etotal_computer_cd_noncjk);
+      calculated.etotal_computer_title_subtotal = sumWithNull(record.etotal_computer_title_chinese, record.etotal_computer_title_japanese, record.etotal_computer_title_korean, record.etotal_computer_title_noncjk);
+      calculated.etotal_computer_cd_subtotal = sumWithNull(record.etotal_computer_cd_chinese, record.etotal_computer_cd_japanese, record.etotal_computer_cd_korean, record.etotal_computer_cd_noncjk);
       // Previous Year Totals subtotals
-      calculated.eprevious_total_title_subtotal = parseNum(record.eprevious_total_title_chinese) + parseNum(record.eprevious_total_title_japanese) + parseNum(record.eprevious_total_title_korean) + parseNum(record.eprevious_total_title_noncjk);
-      calculated.eprevious_total_cd_subtotal = parseNum(record.eprevious_total_cd_chinese) + parseNum(record.eprevious_total_cd_japanese) + parseNum(record.eprevious_total_cd_korean) + parseNum(record.eprevious_total_cd_noncjk);
+      calculated.eprevious_total_title_subtotal = sumWithNull(record.eprevious_total_title_chinese, record.eprevious_total_title_japanese, record.eprevious_total_title_korean, record.eprevious_total_title_noncjk);
+      calculated.eprevious_total_cd_subtotal = sumWithNull(record.eprevious_total_cd_chinese, record.eprevious_total_cd_japanese, record.eprevious_total_cd_korean, record.eprevious_total_cd_noncjk);
       // Grand Totals subtotals
-      calculated.egrand_total_title_subtotal = parseNum(record.egrand_total_title_chinese) + parseNum(record.egrand_total_title_japanese) + parseNum(record.egrand_total_title_korean) + parseNum(record.egrand_total_title_noncjk);
-      calculated.egrand_total_cd_subtotal = parseNum(record.egrand_total_cd_chinese) + parseNum(record.egrand_total_cd_japanese) + parseNum(record.egrand_total_cd_korean) + parseNum(record.egrand_total_cd_noncjk);
+      calculated.egrand_total_title_subtotal = sumWithNull(record.egrand_total_title_chinese, record.egrand_total_title_japanese, record.egrand_total_title_korean, record.egrand_total_title_noncjk);
+      calculated.egrand_total_cd_subtotal = sumWithNull(record.egrand_total_cd_chinese, record.egrand_total_cd_japanese, record.egrand_total_cd_korean, record.egrand_total_cd_noncjk);
       // Electronic Indexes subtotals
-      calculated.eindex_electronic_title_subtotal = parseNum(record.eindex_electronic_title_chinese) + parseNum(record.eindex_electronic_title_japanese) + parseNum(record.eindex_electronic_title_korean) + parseNum(record.eindex_electronic_title_noncjk);
+      calculated.eindex_electronic_title_subtotal = sumWithNull(record.eindex_electronic_title_chinese, record.eindex_electronic_title_japanese, record.eindex_electronic_title_korean, record.eindex_electronic_title_noncjk);
       // Full-text Electronic subtotals
-      calculated.efulltext_electronic_title_subtotal = parseNum(record.efulltext_electronic_title_chinese) + parseNum(record.efulltext_electronic_title_japanese) + parseNum(record.efulltext_electronic_title_korean) + parseNum(record.efulltext_electronic_title_noncjk);
+      calculated.efulltext_electronic_title_subtotal = sumWithNull(record.efulltext_electronic_title_chinese, record.efulltext_electronic_title_japanese, record.efulltext_electronic_title_korean, record.efulltext_electronic_title_noncjk);
       // Total Electronic Titles subtotals
-      calculated.etotal_electronic_title_subtotal = parseNum(record.etotal_electronic_title_chinese) + parseNum(record.etotal_electronic_title_japanese) + parseNum(record.etotal_electronic_title_korean) + parseNum(record.etotal_electronic_title_noncjk);
+      calculated.etotal_electronic_title_subtotal = sumWithNull(record.etotal_electronic_title_chinese, record.etotal_electronic_title_japanese, record.etotal_electronic_title_korean, record.etotal_electronic_title_noncjk);
       break;
       
     case 'electronicBooks':
-      calculated.ebooks_purchased_prev_titles_subtotal = parseNum(record.ebooks_purchased_prev_titles_chinese) + parseNum(record.ebooks_purchased_prev_titles_japanese) + parseNum(record.ebooks_purchased_prev_titles_korean) + parseNum(record.ebooks_purchased_prev_titles_noncjk);
-      calculated.ebooks_purchased_add_titles_subtotal = parseNum(record.ebooks_purchased_add_titles_chinese) + parseNum(record.ebooks_purchased_add_titles_japanese) + parseNum(record.ebooks_purchased_add_titles_korean) + parseNum(record.ebooks_purchased_add_titles_noncjk);
-      calculated.ebooks_purchased_titles_chinese = parseNum(record.ebooks_purchased_prev_titles_chinese) + parseNum(record.ebooks_purchased_add_titles_chinese);
-      calculated.ebooks_purchased_titles_japanese = parseNum(record.ebooks_purchased_prev_titles_japanese) + parseNum(record.ebooks_purchased_add_titles_japanese);
-      calculated.ebooks_purchased_titles_korean = parseNum(record.ebooks_purchased_prev_titles_korean) + parseNum(record.ebooks_purchased_add_titles_korean);
-      calculated.ebooks_purchased_titles_noncjk = parseNum(record.ebooks_purchased_prev_titles_noncjk) + parseNum(record.ebooks_purchased_add_titles_noncjk);
-      calculated.ebooks_purchased_titles_subtotal = calculated.ebooks_purchased_titles_chinese + calculated.ebooks_purchased_titles_japanese + calculated.ebooks_purchased_titles_korean + calculated.ebooks_purchased_titles_noncjk;
-      calculated.ebooks_nonpurchased_titles_subtotal = parseNum(record.ebooks_nonpurchased_titles_chinese) + parseNum(record.ebooks_nonpurchased_titles_japanese) + parseNum(record.ebooks_nonpurchased_titles_korean) + parseNum(record.ebooks_nonpurchased_titles_noncjk);
-      calculated.ebooks_subscription_titles_subtotal = parseNum(record.ebooks_subscription_titles_chinese) + parseNum(record.ebooks_subscription_titles_japanese) + parseNum(record.ebooks_subscription_titles_korean) + parseNum(record.ebooks_subscription_titles_noncjk);
-      calculated.ebooks_purchased_prev_volumes_subtotal = parseNum(record.ebooks_purchased_prev_volumes_chinese) + parseNum(record.ebooks_purchased_prev_volumes_japanese) + parseNum(record.ebooks_purchased_prev_volumes_korean) + parseNum(record.ebooks_purchased_prev_volumes_noncjk);
-      calculated.ebooks_purchased_add_volumes_subtotal = parseNum(record.ebooks_purchased_add_volumes_chinese) + parseNum(record.ebooks_purchased_add_volumes_japanese) + parseNum(record.ebooks_purchased_add_volumes_korean) + parseNum(record.ebooks_purchased_add_volumes_noncjk);
-      calculated.ebooks_purchased_volumes_chinese = parseNum(record.ebooks_purchased_prev_volumes_chinese) + parseNum(record.ebooks_purchased_add_volumes_chinese);
-      calculated.ebooks_purchased_volumes_japanese = parseNum(record.ebooks_purchased_prev_volumes_japanese) + parseNum(record.ebooks_purchased_add_volumes_japanese);
-      calculated.ebooks_purchased_volumes_korean = parseNum(record.ebooks_purchased_prev_volumes_korean) + parseNum(record.ebooks_purchased_add_volumes_korean);
-      calculated.ebooks_purchased_volumes_noncjk = parseNum(record.ebooks_purchased_prev_volumes_noncjk) + parseNum(record.ebooks_purchased_add_volumes_noncjk);
-      calculated.ebooks_purchased_volumes_subtotal = calculated.ebooks_purchased_volumes_chinese + calculated.ebooks_purchased_volumes_japanese + calculated.ebooks_purchased_volumes_korean + calculated.ebooks_purchased_volumes_noncjk;
-      calculated.ebooks_nonpurchased_volumes_subtotal = parseNum(record.ebooks_nonpurchased_volumes_chinese) + parseNum(record.ebooks_nonpurchased_volumes_japanese) + parseNum(record.ebooks_nonpurchased_volumes_korean) + parseNum(record.ebooks_nonpurchased_volumes_noncjk);
-      calculated.ebooks_subscription_volumes_subtotal = parseNum(record.ebooks_subscription_volumes_chinese) + parseNum(record.ebooks_subscription_volumes_japanese) + parseNum(record.ebooks_subscription_volumes_korean) + parseNum(record.ebooks_subscription_volumes_noncjk);
-      calculated.ebooks_total_titles = calculated.ebooks_purchased_titles_subtotal + calculated.ebooks_nonpurchased_titles_subtotal;
-      calculated.ebooks_total_volumes = calculated.ebooks_purchased_volumes_subtotal + calculated.ebooks_nonpurchased_volumes_subtotal;
+      calculated.ebooks_purchased_prev_titles_subtotal = sumWithNull(record.ebooks_purchased_prev_titles_chinese, record.ebooks_purchased_prev_titles_japanese, record.ebooks_purchased_prev_titles_korean, record.ebooks_purchased_prev_titles_noncjk);
+      calculated.ebooks_purchased_add_titles_subtotal = sumWithNull(record.ebooks_purchased_add_titles_chinese, record.ebooks_purchased_add_titles_japanese, record.ebooks_purchased_add_titles_korean, record.ebooks_purchased_add_titles_noncjk);
+      calculated.ebooks_purchased_titles_chinese = sumWithNull(record.ebooks_purchased_prev_titles_chinese, record.ebooks_purchased_add_titles_chinese);
+      calculated.ebooks_purchased_titles_japanese = sumWithNull(record.ebooks_purchased_prev_titles_japanese, record.ebooks_purchased_add_titles_japanese);
+      calculated.ebooks_purchased_titles_korean = sumWithNull(record.ebooks_purchased_prev_titles_korean, record.ebooks_purchased_add_titles_korean);
+      calculated.ebooks_purchased_titles_noncjk = sumWithNull(record.ebooks_purchased_prev_titles_noncjk, record.ebooks_purchased_add_titles_noncjk);
+      calculated.ebooks_purchased_titles_subtotal = sumWithNull(calculated.ebooks_purchased_titles_chinese, calculated.ebooks_purchased_titles_japanese, calculated.ebooks_purchased_titles_korean, calculated.ebooks_purchased_titles_noncjk);
+      calculated.ebooks_nonpurchased_titles_subtotal = sumWithNull(record.ebooks_nonpurchased_titles_chinese, record.ebooks_nonpurchased_titles_japanese, record.ebooks_nonpurchased_titles_korean, record.ebooks_nonpurchased_titles_noncjk);
+      calculated.ebooks_subscription_titles_subtotal = sumWithNull(record.ebooks_subscription_titles_chinese, record.ebooks_subscription_titles_japanese, record.ebooks_subscription_titles_korean, record.ebooks_subscription_titles_noncjk);
+      calculated.ebooks_purchased_prev_volumes_subtotal = sumWithNull(record.ebooks_purchased_prev_volumes_chinese, record.ebooks_purchased_prev_volumes_japanese, record.ebooks_purchased_prev_volumes_korean, record.ebooks_purchased_prev_volumes_noncjk);
+      calculated.ebooks_purchased_add_volumes_subtotal = sumWithNull(record.ebooks_purchased_add_volumes_chinese, record.ebooks_purchased_add_volumes_japanese, record.ebooks_purchased_add_volumes_korean, record.ebooks_purchased_add_volumes_noncjk);
+      calculated.ebooks_purchased_volumes_chinese = sumWithNull(record.ebooks_purchased_prev_volumes_chinese, record.ebooks_purchased_add_volumes_chinese);
+      calculated.ebooks_purchased_volumes_japanese = sumWithNull(record.ebooks_purchased_prev_volumes_japanese, record.ebooks_purchased_add_volumes_japanese);
+      calculated.ebooks_purchased_volumes_korean = sumWithNull(record.ebooks_purchased_prev_volumes_korean, record.ebooks_purchased_add_volumes_korean);
+      calculated.ebooks_purchased_volumes_noncjk = sumWithNull(record.ebooks_purchased_prev_volumes_noncjk, record.ebooks_purchased_add_volumes_noncjk);
+      calculated.ebooks_purchased_volumes_subtotal = sumWithNull(calculated.ebooks_purchased_volumes_chinese, calculated.ebooks_purchased_volumes_japanese, calculated.ebooks_purchased_volumes_korean, calculated.ebooks_purchased_volumes_noncjk);
+      calculated.ebooks_nonpurchased_volumes_subtotal = sumWithNull(record.ebooks_nonpurchased_volumes_chinese, record.ebooks_nonpurchased_volumes_japanese, record.ebooks_nonpurchased_volumes_korean, record.ebooks_nonpurchased_volumes_noncjk);
+      calculated.ebooks_subscription_volumes_subtotal = sumWithNull(record.ebooks_subscription_volumes_chinese, record.ebooks_subscription_volumes_japanese, record.ebooks_subscription_volumes_korean, record.ebooks_subscription_volumes_noncjk);
+      calculated.ebooks_total_titles = sumWithNull(calculated.ebooks_purchased_titles_subtotal, calculated.ebooks_nonpurchased_titles_subtotal);
+      calculated.ebooks_total_volumes = sumWithNull(calculated.ebooks_purchased_volumes_subtotal, calculated.ebooks_nonpurchased_volumes_subtotal);
       break;
   }
   
   return calculated;
 }
 
-// Get grouped headers configuration for each form (EXACT COPY from year-end-reports)
-function getGroupedHeaders(formType: string): { label: string; colspan: number }[] {
+// Get grouped headers configuration for each form
+function getGroupedHeaders(formType: string): { label: string; colspan: number }[] | null {
+  // Electronic form uses multi-tier headers instead
+  if (formType === 'electronic') {
+    return null;
+  }
   switch (formType) {
     case 'monographic':
       return [
@@ -176,50 +208,54 @@ function getGroupedHeaders(formType: string): { label: string; colspan: number }
     case 'volumeHoldings':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Previous Year Total', colspan: 5 },
-        { label: 'Added (Gross)', colspan: 5 },
-        { label: 'Withdrawn', colspan: 5 },
-        { label: 'Grand Total (Physical)', colspan: 1 },
-        { label: 'E-Books Purchased Volume Total', colspan: 1 },
-        { label: 'Overall Grand Total', colspan: 1 }
+        { label: 'Physical Volume Numbers from Last Year', colspan: 5 },
+        { label: 'Physical Volumes Added This Year', colspan: 5 },
+        { label: 'Physical Volumes Withdrawn This Year', colspan: 5 },
+        { label: 'Total Physical Volume Holdings', colspan: 1 },
+        { label: 'Grand Total Volume Holdings', colspan: 2 }
       ];
     case 'serials':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'ELECTRONIC: Purchased', colspan: 5 },
-        { label: 'PRINT: Purchased', colspan: 5 },
-        { label: 'ELECTRONIC: Non-Purchased', colspan: 5 },
-        { label: 'PRINT: Non-Purchased', colspan: 5 },
-        { label: 'ELECTRONIC: Totals', colspan: 5 },
-        { label: 'PRINT: Totals', colspan: 5 },
-        { label: 'Overall Total', colspan: 1 }
+        { label: 'Serial Titles: Purchased (including Subscriptions) - Electronic', colspan: 5 },
+        { label: 'Serial Titles: Purchased (including Subscriptions) - Print and other formats', colspan: 5 },
+        { label: 'Non-Purchased Serials - Electronic', colspan: 5 },
+        { label: 'Non-Purchased Serials - Print and other formats', colspan: 5 },
+        { label: 'Totals - Electronic', colspan: 5 },
+        { label: 'Totals - Print and other formats', colspan: 5 },
+        { label: 'Grand Totals', colspan: 1 }
       ];
     case 'otherHoldings':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Microform', colspan: 5 },
+        { label: 'Microforms', colspan: 5 },
         { label: 'Cartographic and Graphic Materials', colspan: 5 },
-        { label: 'Audio', colspan: 5 },
-        { label: 'Video', colspan: 5 },
-        { label: 'DVD', colspan: 5 },
+        { label: 'Audio Materials', colspan: 5 },
+        { label: 'Video Materials', colspan: 5 },
+        { label: 'DVD Materials', colspan: 5 },
+        { label: 'Online Materials - Map', colspan: 5 },
+        { label: 'Online Materials - Image/Photograph', colspan: 5 },
+        { label: 'Online Materials - Streaming Audio/Music', colspan: 5 },
+        { label: 'Online Materials - Streaming Film/Video', colspan: 5 },
+        { label: 'Online Materials - Custom', colspan: 5 },
         { label: 'Grand Total', colspan: 1 }
       ];
     case 'unprocessed':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Materials by Language', colspan: 5 }
+        { label: 'Backlog', colspan: 5 }
       ];
     case 'fiscal':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'CHI Appropriations', colspan: 5 },
-        { label: 'JPN Appropriations', colspan: 5 },
-        { label: 'KOR Appropriations', colspan: 5 },
-        { label: 'Non-CJK Appropriations', colspan: 5 },
-        { label: 'Total Appropriations', colspan: 1 },
-        { label: 'Endowments', colspan: 5 },
-        { label: 'Grants', colspan: 5 },
-        { label: 'East Asian Program Support', colspan: 5 },
+        { label: 'Chinese Appropriations', colspan: 6 },
+        { label: 'Japanese Appropriations', colspan: 6 },
+        { label: 'Korean Appropriations', colspan: 6 },
+        { label: 'Non-CJK Appropriations', colspan: 6 },
+        { label: 'Total Appropriations', colspan: 2 },
+        { label: 'Endowments', colspan: 6 },
+        { label: 'Grants', colspan: 6 },
+        { label: 'East Asian Program Support', colspan: 6 },
         { label: 'Total Acquisition Budget', colspan: 1 }
       ];
     case 'personnel':
@@ -228,45 +264,52 @@ function getGroupedHeaders(formType: string): { label: string; colspan: number }
         { label: 'Professional', colspan: 5 },
         { label: 'Support Staff', colspan: 5 },
         { label: 'Student Assistants', colspan: 5 },
-        { label: 'Others/Total', colspan: 2 },
+        { label: 'Others', colspan: 1 },
+        { label: 'Total', colspan: 1 },
         { label: 'Outsourcing', colspan: 2 }
       ];
     case 'publicServices':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Presentations', colspan: 2 },
-        { label: 'Reference', colspan: 1 },
-        { label: 'Circulation', colspan: 1 },
+        { label: 'Presentations & Participants', colspan: 2 },
+        { label: 'Reference & Circulation', colspan: 2 },
         { label: 'Inter-Library Loan', colspan: 4 }
       ];
     case 'electronic':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'One-time Computer Files', colspan: 10 },
-        { label: 'Accompanied Computer Files', colspan: 10 },
-        { label: 'Gift Computer Files', colspan: 10 },
-        { label: 'Total Computer Files (Current Year)', colspan: 10 },
-        { label: 'Previous Year Totals', colspan: 10 },
-        { label: 'Grand Totals', colspan: 10 },
+        { label: 'One-time Purchases - Titles', colspan: 5 },
+        { label: 'One-time Purchases - CDs', colspan: 5 },
+        { label: 'Accompanied Materials - Titles', colspan: 5 },
+        { label: 'Accompanied Materials - CDs', colspan: 5 },
+        { label: 'Gifts - Titles', colspan: 5 },
+        { label: 'Gifts - CDs', colspan: 5 },
+        { label: 'Total Current Year - Titles', colspan: 5 },
+        { label: 'Total Current Year - CDs', colspan: 5 },
+        { label: 'Previous Year - Titles', colspan: 5 },
+        { label: 'Previous Year - CDs', colspan: 5 },
+        { label: 'Grand Total - Titles', colspan: 5 },
+        { label: 'Grand Total - CDs', colspan: 5 },
         { label: 'Electronic Indexes', colspan: 5 },
-        { label: 'Full-text Electronic', colspan: 5 },
+        { label: 'Full-text Electronic Resources', colspan: 5 },
         { label: 'Total Electronic Titles', colspan: 5 },
-        { label: 'Expenditure', colspan: 3 }
+        { label: 'Total Expenditure', colspan: 1 }
       ];
     case 'electronicBooks':
       return [
         { label: 'Institutions', colspan: 1 },
-        { label: 'Purchased Titles (Previous)', colspan: 5 },
-        { label: 'Purchased Titles (Added)', colspan: 5 },
-        { label: 'Purchased Titles (Total)', colspan: 5 },
+        { label: 'Purchased - Previous Year Titles', colspan: 5 },
+        { label: 'Purchased - Added This Year Titles', colspan: 5 },
+        { label: 'Purchased - Total Titles', colspan: 5 },
         { label: 'Non-Purchased Titles', colspan: 5 },
         { label: 'Subscription Titles', colspan: 5 },
-        { label: 'Purchased Volumes (Previous)', colspan: 5 },
-        { label: 'Purchased Volumes (Added)', colspan: 5 },
-        { label: 'Purchased Volumes (Total)', colspan: 5 },
+        { label: 'Purchased - Previous Year Volumes', colspan: 5 },
+        { label: 'Purchased - Added This Year Volumes', colspan: 5 },
+        { label: 'Purchased - Total Volumes', colspan: 5 },
         { label: 'Non-Purchased Volumes', colspan: 5 },
         { label: 'Subscription Volumes', colspan: 5 },
-        { label: 'Totals', colspan: 2 }
+        { label: 'Total Titles', colspan: 1 },
+        { label: 'Total Volumes', colspan: 1 }
       ];
     default:
       return [{ label: 'Data', colspan: 1 }];
@@ -506,19 +549,50 @@ export async function POST(request: NextRequest) {
         // Use the first year for the title (institutional reports are multi-year)
         const firstYear = parseInt(years[0]);
 
-        await exporter.createWorksheet({
+        // Special handling for electronic form with multi-tier headers
+        const worksheetConfig: any = {
           title: title,
           fullTitle: `${fullTitle} (${years.join(', ')})`,
           year: firstYear,
           headers: headers,
-          groupedHeaders: groupedHeaders.length > 0 ? [
-            { label: 'Year', colspan: 1 }, // Year column added first
-            ...groupedHeaders // Keep all original headers including Institution
-          ] : undefined,
           data: allYearsData,
           fieldMapping: extendedFieldMapping,
           notesField: (notesFields as any)[formType]
-        });
+        };
+
+        // Add multi-tier headers for electronic form, otherwise use groupedHeaders
+        if (formType === 'electronic') {
+          worksheetConfig.multiTierHeaders = {
+            tier1: [
+              { label: 'Year', colspan: 1 },
+              { label: 'Institution', colspan: 1 },
+              { label: '1. Computer Files (CD-ROMs)', colspan: 60 },
+              { label: '2. Electronic Resources', colspan: 15 },
+              { label: '3. Expenditure', colspan: 1 }
+            ],
+            tier2: [
+              { label: '', colspan: 1 }, // Year column
+              { label: '', colspan: 1 }, // Institution column
+              { label: '1.1 One-time Purchases', colspan: 10 },
+              { label: '1.2 Accompanied Materials', colspan: 10 },
+              { label: '1.3 Gifts', colspan: 10 },
+              { label: '1.4 Total Current Year', colspan: 10 },
+              { label: '1.5 Previous Year', colspan: 10 },
+              { label: '1.6 Grand Total', colspan: 10 },
+              { label: '2.1 Electronic Indexes', colspan: 5 },
+              { label: '2.2 Full-text Database', colspan: 5 },
+              { label: '2.3 Total Electronic', colspan: 5 },
+              { label: '', colspan: 1 } // Expenditure column
+            ]
+          };
+        } else if (groupedHeaders && groupedHeaders.length > 0) {
+          worksheetConfig.groupedHeaders = [
+            { label: 'Year', colspan: 1 }, // Year column added first
+            ...groupedHeaders // Keep all original headers including Institution
+          ];
+        }
+
+        await exporter.createWorksheet(worksheetConfig);
       }
     }
 
