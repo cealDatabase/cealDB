@@ -1,10 +1,18 @@
+'use server';
+
 import { cookies } from "next/headers";
 
 export async function signoutAction() {
-  // Destory the session
   const cookieStore = await cookies();
-  cookieStore.set("session", "", { maxAge: 0 });
-  cookieStore.has("uinf") && cookieStore.set("uinf", "", { maxAge: 0 });
-  cookieStore.has("role") && cookieStore.set("role", "", { maxAge: 0 });
-  cookieStore.has("library") && cookieStore.set("library", "", { maxAge: 0 });
+  
+  // Clear all authentication cookies (including deprecated home_library)
+  const cookiesToClear = ["session", "uinf", "role", "library", "observe_library", "home_library", "token"];
+  
+  for (const cookieName of cookiesToClear) {
+    if (cookieStore.has(cookieName)) {
+      cookieStore.delete(cookieName);
+    }
+  }
+  
+  console.log('[signoutAction] All authentication cookies cleared');
 }

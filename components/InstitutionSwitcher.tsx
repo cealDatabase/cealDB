@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Building2, AlertTriangle } from 'lucide-react';
+import { getCookies, getUserRoles } from '@/lib/cookieActions';
 
 interface Library {
   id: number;
@@ -36,71 +37,43 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
   useEffect(() => {
     console.log('[InstitutionSwitcher] 🚀 Component mounting on client...');
     setMounted(true);
+    
+    // Validate session to detect cookie tampering
+    const validateSession = async () => {
+      try {
+        const response = await fetch('/api/validate-session');
+        const data = await response.json();
+        
+        if (!data.valid) {
+          console.error('[InstitutionSwitcher] ⚠️ SESSION VALIDATION FAILED:', data.reason);
+          
+          if (data.tampered) {
+            // Cookie tampering detected - force sign out
+            alert('Security warning: Session validation failed. You will be signed out.');
+            window.location.href = '/signout';
+          }
+        } else {
+          console.log('[InstitutionSwitcher] ✅ Session validated successfully');
+        }
+      } catch (error) {
+        console.error('[InstitutionSwitcher] Session validation error:', error);
+      }
+    };
+    
+    validateSession();
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
     
-    const fetchUserRoles = () => {
+    const fetchUserRoles = async () => {
       try {
-        // Debug: Show ALL cookies
-        
-        const roleCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('role='))
-          ?.split('=')[1];
-        
-        console.log('[InstitutionSwitcher] Raw role cookie:', roleCookie);
-        
-        if (roleCookie) {
-          try {
-            // Decode URL-encoded cookie value
-            let decodedCookie = decodeURIComponent(roleCookie);
-            
-            // Fix corrupted cookie data (C instead of comma)
-            decodedCookie = decodedCookie.replace(/(\"\d+\")C(\"\d+\")/g, '$1,$2');
-            
-            // Fix malformed JSON (trailing commas before ])
-            const fixedJson = decodedCookie.replace(/,(\s*[\]}])/g, '$1');
-            
-            const roles = JSON.parse(fixedJson);
-            const rolesArray = Array.isArray(roles) ? roles : [roles];
-            setUserRoles(rolesArray);
-            setRolesLoaded(true);
-          } catch (parseError) {
-            console.error('[InstitutionSwitcher] ⚠️ Parse error:', parseError);
-            
-            // Aggressive fallback: extract all numbers from the cookie
-            try {
-              const decodedCookie = decodeURIComponent(roleCookie);
-              console.log('[InstitutionSwitcher] Attempting aggressive extraction from:', decodedCookie);
-              
-              // Extract all quoted numbers: "1", "2", etc.
-              const matches = decodedCookie.match(/"(\d+)"/g);
-              if (matches) {
-                const extractedRoles = matches.map(m => m.replace(/"/g, ''));
-                console.log('[InstitutionSwitcher] ✅ Extracted roles via regex:', extractedRoles);
-                setUserRoles(extractedRoles);
-                setRolesLoaded(true);
-              } else {
-                console.log('[InstitutionSwitcher] ⚠️ No roles found, using decoded value');
-                setUserRoles([decodedCookie]);
-                setRolesLoaded(true);
-              }
-            } catch (extractError) {
-              console.error('[InstitutionSwitcher] ❌ Extraction failed:', extractError);
-              console.log('[InstitutionSwitcher] Using completely raw value:', [roleCookie]);
-              setUserRoles([roleCookie]);
-              setRolesLoaded(true);
-            }
-          }
-        } else {
-          console.log('[InstitutionSwitcher] ❌ No role cookie found');
-          console.log('[InstitutionSwitcher] All cookies:', document.cookie);
-          setRolesLoaded(true);
-        }
+        const roles = await getUserRoles();
+        console.log('[InstitutionSwitcher] ✅ Roles from server action:', roles);
+        setUserRoles(roles);
+        setRolesLoaded(true);
       } catch (error) {
-        console.error('[InstitutionSwitcher] ❌ Failed to parse user roles:', error);
+        console.error('[InstitutionSwitcher] Failed to get roles:', error);
         setRolesLoaded(true);
       }
     };
@@ -111,32 +84,37 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
   useEffect(() => {
     if (!mounted) return;
     
-    const fetchCurrentLibraryId = () => {
+    const fetchLibraryIds = async () => {
       try {
-        const libraryCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('library='))
-          ?.split('=')[1];
+        const cookieData = await getCookies();
         
-        console.log('[InstitutionSwitcher] Library cookie:', libraryCookie);
+        console.log('[InstitutionSwitcher] Home library cookie:', cookieData.library);
+        console.log('[InstitutionSwitcher] Observe library cookie:', cookieData.observe_library);
         
-        if (libraryCookie) {
-          const libId = parseInt(libraryCookie);
-          if (!isNaN(libId)) {
-            console.log('[InstitutionSwitcher] ✅ Current library ID:', libId);
-            setCurrentLibraryId(libId);
-            // Store home library ID (user's actual library)
-            setHomeLibraryId(libId);
+        if (cookieData.library) {
+          const homeLibId = parseInt(cookieData.library);
+          if (!isNaN(homeLibId)) {
+            console.log('[InstitutionSwitcher] 🏠 Home library ID:', homeLibId);
+            setHomeLibraryId(homeLibId);
           }
         } else {
           console.log('[InstitutionSwitcher] ❌ No library cookie found');
         }
+        
+        // Current viewing library: observe_library if exists, otherwise library
+        const viewingLibId = cookieData.observe_library 
+          ? parseInt(cookieData.observe_library) 
+          : parseInt(cookieData.library || '0');
+        if (!isNaN(viewingLibId) && viewingLibId > 0) {
+          console.log('[InstitutionSwitcher] ✅ Current viewing library ID:', viewingLibId);
+          setCurrentLibraryId(viewingLibId);
+        }
       } catch (error) {
-        console.error('[InstitutionSwitcher] Failed to read library cookie:', error);
+        console.error('[InstitutionSwitcher] Failed to read library cookies:', error);
       }
     };
 
-    fetchCurrentLibraryId();
+    fetchLibraryIds();
   }, [mounted]);
 
   useEffect(() => {
@@ -205,7 +183,10 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
       });
       
       if (response.ok) {
-        console.log('[InstitutionSwitcher] ✅ Cookie updated, navigating to new library...');
+        console.log('[InstitutionSwitcher] ✅ Cookie updated, updating state and navigating...');
+        
+        // Update component state immediately to reflect the change
+        setCurrentLibraryId(libId);
         
         // Build new URL by replacing library ID in current path
         // e.g., /admin/forms/200/otherHoldings -> /admin/forms/123/otherHoldings
@@ -252,6 +233,14 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
   // Check if viewing non-home library
   const isViewingOtherLibrary = homeLibraryId !== null && currentLibraryId !== homeLibraryId;
   const currentLibraryName = libraries.find(lib => lib.id === currentLibraryId)?.library_name || 'Unknown';
+  const homeLibraryName = libraries.find(lib => lib.id === homeLibraryId)?.library_name || 'Unknown';
+
+  const handleReturnHome = () => {
+    if (homeLibraryId !== null) {
+      console.log('[InstitutionSwitcher] Returning to home library:', homeLibraryId);
+      handleLibraryChange(homeLibraryId.toString());
+    }
+  };
 
   return (
     <div className="space-y-2 mb-4">
@@ -261,10 +250,10 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
           <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-              ⚠️ You are viewing data for: {currentLibraryName}
+              ⚠️ You are viewing: {currentLibraryName}
             </p>
             <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-              This is not your home institution. You are viewing and editing another library's data.
+              This is not your home institution. You are viewing and editing data from another institution.
             </p>
           </div>
         </div>
@@ -295,9 +284,21 @@ export function InstitutionSwitcher({ currentYear }: InstitutionSwitcherProps) {
           </SelectContent>
         </Select>
         
-        <span className="text-xs text-blue-600 dark:text-blue-400 ml-2">
+        <span className="text-xs text-blue-600 dark:text-blue-400">
           {isSuperAdmin ? '(Can edit all data)' : '(View only)'}
         </span>
+
+        {/* Return to home button - only show when viewing other library */}
+        {isViewingOtherLibrary && (
+          <button
+            onClick={handleReturnHome}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-white dark:bg-gray-800 border border-blue-300 dark:border-blue-700 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+            title={`Return to ${homeLibraryName}`}
+          >
+            <Building2 className="h-3.5 w-3.5" />
+            <span>Return to my home institution</span>
+          </button>
+        )}
       </div>
     </div>
   );

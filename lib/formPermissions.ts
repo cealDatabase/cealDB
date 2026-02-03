@@ -112,27 +112,10 @@ export async function checkFormEditPermission(
 
 /**
  * Get user roles from cookies (for client-side use)
+ * NOTE: This function is deprecated - use getUserRoles() from @/lib/cookieActions instead
+ * Keeping for backwards compatibility
  */
 export function getUserRolesFromCookies(): string[] {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-
-  const cookies = document.cookie.split(';');
-  const roleCookie = cookies.find(c => c.trim().startsWith('role='));
-  
-  if (!roleCookie) {
-    return [];
-  }
-
-  const roleValue = roleCookie.split('=')[1];
-  
-  try {
-    // Try parsing as JSON array first
-    const parsed = JSON.parse(decodeURIComponent(roleValue));
-    return Array.isArray(parsed) ? parsed : [parsed];
-  } catch {
-    // If not JSON, treat as single value
-    return [roleValue];
-  }
+  console.warn('[formPermissions] getUserRolesFromCookies is deprecated - use getUserRoles() from cookieActions');
+  return [];
 }

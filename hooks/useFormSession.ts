@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import db from '@/lib/db';
+import { getCookies } from '@/lib/cookieActions';
 
 interface FormSession {
   year: number;
@@ -117,30 +119,34 @@ export function useCanEditForm(targetLibraryId: number) {
   } | null>(null);
 
   useEffect(() => {
-    // Get user info from cookies (this should match your authentication system)
-    const getUserInfo = () => {
+    // Get user info from cookies using Server Actions
+    const getUserInfo = async () => {
       try {
-        const userLibrariesCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('userLibraries='))
-          ?.split('=')[1];
+        const cookieData = await getCookies();
         
-        const userRolesCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('userRoles='))
-          ?.split('=')[1];
-
-        if (userLibrariesCookie && userRolesCookie) {
-          const libraries = JSON.parse(decodeURIComponent(userLibrariesCookie));
-          const roles = JSON.parse(decodeURIComponent(userRolesCookie));
+        if (cookieData.library && cookieData.role) {
+          // Parse roles from JSON
+          let roles: string[] = [];
+          try {
+            const parsed = JSON.parse(decodeURIComponent(cookieData.role));
+            roles = Array.isArray(parsed) ? parsed : [parsed];
+          } catch {
+            roles = [cookieData.role];
+          }
+          
+          // Home library as single ID
+          const libraryId = parseInt(cookieData.library);
           
           setUserInfo({
-            libraryIds: libraries,
+            libraryIds: [libraryId], // User's home library as array for compatibility
             roles: roles
           });
+        } else {
+          console.warn('[useFormSession] Missing required cookies (library or role)');
+          setUserInfo(null);
         }
       } catch (error) {
-        console.error('Failed to parse user info from cookies:', error);
+        console.error('[useFormSession] Failed to get user info from cookies:', error);
         setUserInfo(null);
       }
     };
