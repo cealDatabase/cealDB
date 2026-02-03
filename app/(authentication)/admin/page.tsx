@@ -131,7 +131,7 @@ async function UserLoggedInPage() {
   const canViewSuperAdminTools = hasSuperAdmin || hasAssistantAdmin;
   
   // Layout check: if user only has access to forms but not super admin tools
-  const isRegularUserOnly = canViewFormsManagement && !canViewSuperAdminTools;
+  const isRegularUserOnly = canViewFormsManagement && !canViewEResourceEditor;
 
   if (!userData) {
     return (
@@ -148,7 +148,7 @@ async function UserLoggedInPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
-        <div className={`grid grid-cols-1 gap-8 ${isRegularUserOnly ? 'max-w-2xl mx-auto' : 'lg:grid-cols-3'}`}>
+        <div className={`grid grid-cols-1 gap-y-8 ${isRegularUserOnly ? 'max-w-2xl mx-auto' : 'lg:grid-cols-3'}`}>
           {/* User Profile Section - Left Column */}
           <div className={isRegularUserOnly ? '' : 'lg:col-span-1'}>
             <UserProfile
@@ -160,7 +160,7 @@ async function UserLoggedInPage() {
           </div>
 
           {/* Main Content Area - Right Columns */}
-          <div className={`space-y-8 ${isRegularUserOnly ? '' : 'lg:col-span-2'}`}>
+          <div className={`space-y-8 lg:col-span-2`}>
             {/* No permissions message */}
             {!canViewFormsManagement && !canViewEResourceEditor && !canViewSuperAdminTools && (
               <Card className="border-2 border-muted">
