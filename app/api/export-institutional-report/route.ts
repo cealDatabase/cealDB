@@ -186,9 +186,9 @@ function getGroupedHeaders(formType: string): { label: string; colspan: number }
       return [
         { label: 'Institutions', colspan: 1 },
         { label: 'Microform', colspan: 5 },
-        { label: 'Cartographic/Graphic', colspan: 5 },
+        { label: 'Cartographic and Graphic Materials', colspan: 5 },
         { label: 'Audio', colspan: 5 },
-        { label: 'Film/Video', colspan: 5 },
+        { label: 'Video', colspan: 5 },
         { label: 'DVD', colspan: 5 },
         { label: 'Grand Total', colspan: 1 }
       ];

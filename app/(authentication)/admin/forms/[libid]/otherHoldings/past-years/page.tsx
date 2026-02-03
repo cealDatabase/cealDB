@@ -124,9 +124,9 @@ export default function PastYearsPage() {
                 {/* Computer Files headers */}
                 <th className="border border-gray-300 px-2 py-1 text-xs" colSpan={5}></th>
                 {/* Audiovisual Materials subcategories */}
-                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Cartographic/Graphic Materials</th>
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Cartographic and Graphic Materials</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Audio</th>
-                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Film and Video</th>
+                <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Video</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>DVD</th>
               </tr>
               <tr className="bg-teal-500 text-white text-xs">
@@ -158,7 +158,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-1">Non-CJK</th>
                 <th className="border border-gray-300 px-2 py-1">Total</th>
                 
-                {/* Film and Video languages */}
+                {/* Video languages */}
                 <th className="border border-gray-300 px-2 py-1">CHN</th>
                 <th className="border border-gray-300 px-2 py-1">JPN</th>
                 <th className="border border-gray-300 px-2 py-1">KOR</th>
@@ -260,7 +260,7 @@ export default function PastYearsPage() {
                       {formatNumber(data?.ohaudio_subtotal)}
                     </td>
                     
-                    {/* Film and Video */}
+                    {/* Video */}
                     <td className="border border-gray-300 px-2 py-2 text-center">
                       {formatNumber(data?.ohfilm_video_chinese)}
                     </td>

@@ -336,9 +336,9 @@ async function exportSingleForm(formType: string, year: number) {
       groupedHeaders = [
         { label: 'Institutions', colspan: 1 },
         { label: 'Microform', colspan: 5 },
-        { label: 'Cartographic/Graphic', colspan: 5 },
+        { label: 'Cartographic and Graphic Materials', colspan: 5 },
         { label: 'Audio', colspan: 5 },
-        { label: 'Film/Video', colspan: 5 },
+        { label: 'Video', colspan: 5 },
         { label: 'DVD', colspan: 5 },
         { label: 'Grand Total', colspan: 1 }
       ];
@@ -722,9 +722,9 @@ async function exportAllForms(year: number) {
       groupedHeaders: [
         { label: 'Institutions', colspan: 1 },
         { label: 'Microform', colspan: 5 },
-        { label: 'Cartographic/Graphic', colspan: 5 },
+        { label: 'Cartographic and Graphic Materials', colspan: 5 },
         { label: 'Audio', colspan: 5 },
-        { label: 'Film/Video', colspan: 5 },
+        { label: 'Video', colspan: 5 },
         { label: 'DVD', colspan: 5 },
         { label: 'Grand Total', colspan: 1 }
       ]
