@@ -383,7 +383,13 @@ export const formFieldMappings = {
     'ebooks_subscription_volumes_subtotal': '30. Subscription Volumes - Subtotal',
     // Grand Totals
     'ebooks_total_titles': '31. Total Titles',
-    'ebooks_total_volumes': '32. Total Volumes'
+    'ebooks_total_volumes': '32. Total Volumes',
+    // Expenditure
+    'ebooks_expenditure_grandtotal': '33. Expenditure Total',
+    // Physical Volumes Total (imported from Volume Holdings)
+    'physical_volumes_total': 'Physical Volumes Total',
+    // Grand Total Volume Holdings (Physical + E-Books)
+    'grand_total_volume_holdings': 'Grand Total Volume Holdings'
   }
 };
 

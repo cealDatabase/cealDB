@@ -181,6 +181,10 @@ function calculateFormFields(formType: string, record: any): any {
       calculated.ebooks_subscription_volumes_subtotal = sumWithNull(record.ebooks_subscription_volumes_chinese, record.ebooks_subscription_volumes_japanese, record.ebooks_subscription_volumes_korean, record.ebooks_subscription_volumes_noncjk);
       calculated.ebooks_total_titles = sumWithNull(calculated.ebooks_purchased_titles_subtotal, calculated.ebooks_nonpurchased_titles_subtotal);
       calculated.ebooks_total_volumes = sumWithNull(calculated.ebooks_purchased_volumes_subtotal, calculated.ebooks_nonpurchased_volumes_subtotal);
+      // Add Physical Volumes Total from Volume_Holdings (vhgrandtotal)
+      calculated.physical_volumes_total = (record as any).Library_Year?.Volume_Holdings?.vhgrandtotal || null;
+      // Add Grand Total Volume Holdings (Physical + E-Books)
+      calculated.grand_total_volume_holdings = sumWithNull(calculated.physical_volumes_total, calculated.ebooks_total_volumes);
       break;
   }
   
@@ -642,7 +646,9 @@ async function exportSingleForm(formType: string, year: number) {
           { label: 'Institution', colspan: 1 },
           { label: 'TITLES', colspan: 25 },
           { label: 'VOLUMES', colspan: 25 },
-          { label: 'Totals', colspan: 2 }
+          { label: 'Totals', colspan: 2 },
+          { label: 'Expenditure', colspan: 1 },
+          { label: 'Grand Total', colspan: 2 }
         ],
         tier2: [
           { label: '', colspan: 1 }, // Institution column
@@ -652,7 +658,10 @@ async function exportSingleForm(formType: string, year: number) {
           { label: 'Purchased', colspan: 15 },
           { label: 'Non-Purchased', colspan: 5 },
           { label: 'Subscription', colspan: 5 },
-          { label: '', colspan: 2 } // Totals columns
+          { label: '', colspan: 2 }, // Title Total & Volume Total
+          { label: '', colspan: 1 }, // Expenditure Total
+          { label: 'Physical Vol.', colspan: 1 }, // Physical Volumes Total
+          { label: 'Grand Total', colspan: 1 } // Grand Total Volume Holdings
         ]
       };
       data = await prisma.electronic_Books.findMany({
@@ -664,7 +673,8 @@ async function exportSingleForm(formType: string, year: number) {
         include: {
           Library_Year: {
             include: {
-              Library: true
+              Library: true,
+              Volume_Holdings: true
             }
           }
         },
@@ -954,7 +964,9 @@ async function exportAllForms(year: number) {
           { label: 'Institution', colspan: 1 },
           { label: 'TITLES', colspan: 25 },
           { label: 'VOLUMES', colspan: 25 },
-          { label: 'Totals', colspan: 2 }
+          { label: 'Totals', colspan: 2 },
+          { label: 'Expenditure', colspan: 1 },
+          { label: 'Grand Total', colspan: 2 }
         ],
         tier2: [
           { label: '', colspan: 1 },
@@ -964,7 +976,10 @@ async function exportAllForms(year: number) {
           { label: 'Purchased', colspan: 15 },
           { label: 'Non-Purchased', colspan: 5 },
           { label: 'Subscription', colspan: 5 },
-          { label: '', colspan: 2 }
+          { label: '', colspan: 2 },
+          { label: '', colspan: 1 },
+          { label: 'Physical Vol.', colspan: 1 },
+          { label: 'Grand Total', colspan: 1 }
         ]
       }
     }

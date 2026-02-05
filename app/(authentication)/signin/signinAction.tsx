@@ -200,8 +200,6 @@ export default async function signinAction(
       }
     });
 
-    console.log(`👤 User Role IDs: [${userRoleIds.join(', ')}], Library ID: ${userLibraryId}`);
-
     return {
       success: true,
       message: 'Login successful',

@@ -92,10 +92,8 @@ export default function SignInPage() {
       const result = await signinAction(undefined, formData);
 
       if (result.success) {
-        console.log("✅ Login successful, server action completed");
 
         // Server Action sets cookies directly, so redirect immediately
-        console.log("🔄 Redirecting to admin...");
         router.push("/admin");
 
       } else {

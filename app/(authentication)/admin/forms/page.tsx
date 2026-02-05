@@ -138,17 +138,33 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
     timeZone: "America/Los_Angeles"
   })
 
+  // Check if closing date has passed
+  const now = new Date()
+  const closingDateTime = new Date(surveyDates.fullClosingDate)
+  const hasClosed = now > closingDateTime
+  
+  // Check if dates are set in database or using defaults
+  const areDatesSet = surveyDates.isStoredInDatabase
+  
+  // Show gray badge if: dates not set OR period has closed
+  // Show green badge only if: dates are set AND period is still open
+  const shouldShowGray = !areDatesSet || hasClosed
+
   // Create dynamic FAQ with correct dates
   const dynamicInstructionGroup = {
     ...instructionGroup,
     "Survey Time Frame and Publication": [
       {
         question: "Input/Edit Time Frame",
-        answer: `The ${previousYear} - ${currentYear} Online Survey input/edit time frame is from ${openingDate} to ${closingDate} (11:59 pm Pacific Time)`,
+        answer: areDatesSet 
+          ? `The ${previousYear} - ${currentYear} Online Survey input/edit time frame is from ${openingDate} to ${closingDate} (11:59 pm Pacific Time)`
+          : `The ${previousYear} - ${currentYear} Online Survey input/edit dates are to be determined.`,
       },
       {
         question: "Publication Date",
-        answer: `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`,
+        answer: areDatesSet
+          ? `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`
+          : `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in ${currentYear + 1}.`,
       },
     ],
   }
@@ -160,10 +176,17 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
           <AdminBreadcrumb libraryName={libraryName} />
           <div className='pt-12'>
             <h1>Statistics Forms</h1>
-            <div className='mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium'>
-              <div className='w-2 h-2 bg-emerald-800 rounded-full mr-2'></div>
-              Active Survey Period: {openingDate} - {closingDate}
-            </div>
+            {shouldShowGray ? (
+              <div className='mt-4 inline-flex items-center px-3 py-1 rounded-full bg-gray-400/90 text-gray-50 text-sm font-medium'>
+                <div className='w-2 h-2 bg-gray-700 rounded-full mr-2'></div>
+                {hasClosed ? `Survey Period Closed: ${openingDate} - ${closingDate}` : 'Active Survey Period: To Be Determined'}
+              </div>
+            ) : (
+              <div className='mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium'>
+                <div className='w-2 h-2 bg-emerald-800 rounded-full mr-2 animate-pulse'></div>
+                Active Survey Period: {openingDate} - {closingDate}
+              </div>
+            )}
           </div>
         </Container>
       </div>
@@ -186,20 +209,45 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
             </div>
 
             <div className='prose prose-gray max-w-none'>
+              {hasClosed ? (
+                <div className='mb-6 p-4 bg-amber-50 border border-amber-300 rounded-lg'>
+                  <p className='text-amber-900 font-semibold mb-2'>
+                    ⚠️ The {previousYear}-{currentYear} survey period has closed.
+                  </p>
+                  <p className='text-amber-800'>
+                    The {currentYear}-{nextYear} survey dates will be announced soon. Please check back for updates.
+                  </p>
+                </div>
+              ) : null}
+              
               <p className='text-gray-700 leading-relaxed mb-6'>
                 The{" "}
                 <span className='font-semibold text-emerald-700'>
                   {previousYear}-{currentYear} CEAL Statistics Online Survey
                 </span>{" "}
-                input/edit period is from{" "}
-                <span className='font-semibold text-orange-600'>
-                  {openingDate} - {closingDate}
-                </span>
-                , with the results published in the{" "}
-                <span className='font-semibold text-blue-600'>
-                  February {currentYear + 1}
-                </span>{" "}
-                issue of the Journal of East Asian Libraries. The survey
+                input/edit period is {areDatesSet ? (
+                  <>
+                    from{" "}
+                    <span className='font-semibold text-orange-600'>
+                      {openingDate} - {closingDate}
+                    </span>
+                  </>
+                ) : (
+                  <span className='font-semibold text-orange-600'>to be determined</span>
+                )}
+                , with the results published in{" "}
+                {areDatesSet ? (
+                  <>
+                    the{" "}
+                    <span className='font-semibold text-blue-600'>
+                      {surveyDates.publicationMonth}
+                    </span>{" "}
+                    issue
+                  </>
+                ) : (
+                  <span className='font-semibold text-blue-600'>{currentYear + 1}</span>
+                )}{" "}
+                of the Journal of East Asian Libraries. The survey
                 covers the fiscal year{" "}
                 <span className='font-semibold text-purple-600'>
                   {surveyDates.fiscalYearPeriod}

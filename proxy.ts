@@ -71,21 +71,16 @@ export default async function proxy(request: NextRequest) {
     const hasAuthorization = userRoleIds.includes("1") || userRoleIds.includes("4");
     
     if (!hasAuthorization) {
-      console.log(`🚫 User lacks authorization for super admin route. Roles: [${userRoleIds.join(', ')}]`);
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
-    
-    console.log(`✅ User authorized for super admin route. Roles: [${userRoleIds.join(', ')}]`);
   }
 
   // Redirect logic using official Next.js patterns
   if (isProtectedRoute && !isAuthenticated) {
-    console.log(`🚫 Redirecting unauthenticated user to signin`);
     return NextResponse.redirect(new URL('/signin', request.url));
   }
 
   if (isAuthRoute && isAuthenticated) {
-    console.log(`🔄 Redirecting authenticated user to admin`);
     return NextResponse.redirect(new URL('/admin', request.url));
   }
 
