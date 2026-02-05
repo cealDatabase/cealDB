@@ -46,23 +46,48 @@ export async function GET(request: NextRequest) {
 }
 
 async function generateOrganizationalStructureReport(year: number): Promise<Buffer> {
-  const libraries = await prisma.library.findMany({
+  // Get Library_Year records with is_active flag and Entry_Status to match participation status logic
+  const libraryYearRecords = await prisma.library_Year.findMany({
     where: {
-      hideinlibrarylist: false,
-      Library_Year: {
-        some: {
-          year: year
-        }
-      }
+      year: year,
+      is_active: true,
     },
     include: {
-      libraryType: true,
-      libraryRegion: true
+      Library: {
+        include: {
+          libraryType: true,
+          libraryRegion: true
+        }
+      },
+      Entry_Status: true
     },
     orderBy: {
-      library_name: 'asc'
+      Library: {
+        library_name: 'asc'
+      }
     }
   });
+
+  // Filter to only include libraries that have submitted at least one form
+  const libraries = libraryYearRecords
+    .filter(ly => {
+      const status = ly.Entry_Status;
+      // Include if any form was submitted
+      return status && (
+        status.fiscal_support ||
+        status.monographic_acquisitions ||
+        status.other_holdings ||
+        status.personnel_support_fte ||
+        status.public_services ||
+        status.serials ||
+        status.unprocessed_backlog_materials ||
+        status.volume_holdings ||
+        status.electronic ||
+        status.electronic_books
+      );
+    })
+    .map(ly => ly.Library)
+    .filter((lib): lib is NonNullable<typeof lib> => lib !== null && !lib.hideinlibrarylist);
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'CEAL Statistics System';
@@ -73,19 +98,19 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
   const titleRow = worksheet.addRow([`Participating Libraries Organizational Structure and Operation Status, ${year}`]);
   titleRow.font = { bold: true, size: 12 };
   titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
-  worksheet.mergeCells(1, 1, 1, 23);
+  worksheet.mergeCells(1, 1, 1, 22);
   titleRow.height = 25;
 
   const sectionLabelRow = worksheet.addRow([
     'Collection Administration', '', '', '', '', '', '', '', '',
-    'Collection Building and Services', '', '', '', '', '', '', '', '', '', '', '', '', ''
+    'Collection Building and Services', '', '', '', '', '', '', '', '', '', '', '', ''
   ]);
   sectionLabelRow.font = { bold: true, size: 11 };
   sectionLabelRow.alignment = { horizontal: 'center', vertical: 'middle' };
   sectionLabelRow.height = 20;
   
   worksheet.mergeCells(2, 1, 2, 9);
-  worksheet.mergeCells(2, 10, 2, 23);
+  worksheet.mergeCells(2, 10, 2, 22);
 
   const headers = [
     'Library',
@@ -109,8 +134,7 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
     'Consortia Membership',
     'Acquisition Type',
     'Cataloging Type',
-    'Circulation Type',
-    'Notes'
+    'Circulation Type'
   ];
 
   const headerRow = worksheet.addRow(headers);
@@ -131,6 +155,9 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
       right: { style: 'thin' }
     };
   });
+
+  // Store library data for main table and notes separately
+  const libraryDataWithNotes: Array<{ library: typeof libraries[0], hasNotes: boolean }> = [];
 
   libraries.forEach((library) => {
     const rowData = [
@@ -155,9 +182,14 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
       library.pliconsortia || '',
       library.acquisition_type || '',
       library.cataloging_type || '',
-      library.circulation_type || '',
-      library.notes || ''
+      library.circulation_type || ''
     ];
+
+    // Track if library has notes
+    libraryDataWithNotes.push({
+      library,
+      hasNotes: !!(library.notes && library.notes.trim())
+    });
 
     const row = worksheet.addRow(rowData);
     row.alignment = { vertical: 'top', wrapText: true };
@@ -173,7 +205,7 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
 
   const totalRow = worksheet.addRow([`${libraries.length} Total Libraries`]);
   totalRow.font = { bold: true };
-  worksheet.mergeCells(totalRow.number, 1, totalRow.number, 23);
+  worksheet.mergeCells(totalRow.number, 1, totalRow.number, 22);
   totalRow.eachCell((cell) => {
     cell.border = {
       top: { style: 'thin' },
@@ -183,31 +215,78 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
     };
   });
 
+  // Add Notes section at bottom (only for libraries with notes)
+  const librariesWithNotes = libraryDataWithNotes.filter(item => item.hasNotes);
+  
+  if (librariesWithNotes.length > 0) {
+    // Add empty row for spacing
+    worksheet.addRow([]);
+
+    // Add Notes section header
+    const notesHeaderRow = worksheet.addRow(['Library', 'Notes']);
+    notesHeaderRow.font = { bold: true, size: 10 };
+    notesHeaderRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFD966' }
+    };
+    notesHeaderRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    notesHeaderRow.height = 25;
+    notesHeaderRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Add notes rows
+    librariesWithNotes.forEach(({ library }) => {
+      const notesRow = worksheet.addRow([
+        library.library_name || '',
+        library.notes || ''
+      ]);
+      notesRow.alignment = { vertical: 'top', wrapText: true };
+      notesRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
+  }
+
   worksheet.columns = [
-    { width: 30 },
-    { width: 20 },
-    { width: 25 },
-    { width: 25 },
-    { width: 20 },
-    { width: 20 },
-    { width: 25 },
-    { width: 20 },
-    { width: 30 },
-    { width: 30 },
-    { width: 15 },
-    { width: 15 },
-    { width: 15 },
-    { width: 15 },
-    { width: 30 },
-    { width: 12 },
-    { width: 20 },
-    { width: 25 },
-    { width: 25 },
-    { width: 15 },
-    { width: 15 },
-    { width: 15 },
-    { width: 30 }
+    { width: 30 },  // Library
+    { width: 20 },  // Institutional Affiliation
+    { width: 25 },  // Collection Name
+    { width: 25 },  // Collection Organized Under
+    { width: 20 },  // Head Position Title
+    { width: 20 },  // Collection Head Reports To
+    { width: 25 },  // Top Department
+    { width: 20 },  // Next Formal Position
+    { width: 30 },  // Other Departments
+    { width: 30 },  // Collection Librarians/Groups
+    { width: 15 },  // Collection Type
+    { width: 15 },  // Shelving Type
+    { width: 15 },  // Consultation Type
+    { width: 15 },  // Teaching Type
+    { width: 30 },  // Online Catalog URL
+    { width: 12 },  // Language Expertise Available
+    { width: 20 },  // Language Expertise (If yes)
+    { width: 25 },  // Bibliographic Utilities
+    { width: 25 },  // Consortia Membership
+    { width: 15 },  // Acquisition Type
+    { width: 15 },  // Cataloging Type
+    { width: 15 }   // Circulation Type
   ];
+  
+  // Set column widths for notes section (reusing column 1 and 2)
+  // Column 1 (Library name) already set to 30
+  // Column 2 will be used for notes and set to wider width dynamically if needed
 
   const data = await workbook.xlsx.writeBuffer();
   return Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
