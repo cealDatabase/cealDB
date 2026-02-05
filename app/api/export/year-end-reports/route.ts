@@ -262,6 +262,10 @@ async function exportSingleForm(formType: string, year: number) {
   let fieldMapping: any = {};
   let groupedHeaders: { label: string; colspan: number }[] = [];
   let electronicMultiTier: any = null;
+  let electronicBooksMultiTier: any = null;
+  let volumeHoldingsMultiTier: any = null;
+  let otherHoldingsMultiTier: any = null;
+  let fiscalMultiTier: any = null;
 
   switch (formType) {
     case 'monographic':
@@ -303,14 +307,23 @@ async function exportSingleForm(formType: string, year: number) {
       title = '2_VolumeHoldings';
       fullTitle = 'Physical Volume Holdings';
       fieldMapping = formFieldMappings.volumeHoldings;
-      groupedHeaders = [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Physical Volume Numbers from Last Year', colspan: 5 },
-        { label: 'Physical Volumes Added This Year', colspan: 5 },
-        { label: 'Physical Volumes Withdrawn This Year', colspan: 5 },
-        { label: 'Total Physical Volume Holdings', colspan: 1 },
-        { label: 'Grand Total Volume Holdings', colspan: 2 }
-      ];
+      // Use multi-tier headers to match web form structure
+      const volumeHoldingsMultiTier = {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Physical Volumes', colspan: 15 },
+          { label: 'Totals', colspan: 3 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'From Last Year', colspan: 5 },
+          { label: 'Added This Year', colspan: 5 },
+          { label: 'Withdrawn This Year', colspan: 5 },
+          { label: 'Physical Total', colspan: 1 },
+          { label: 'E-Books', colspan: 1 },
+          { label: 'Grand Total', colspan: 1 }
+        ]
+      };
       data = await prisma.volume_Holdings.findMany({
         where: {
           Library_Year: {
@@ -375,20 +388,29 @@ async function exportSingleForm(formType: string, year: number) {
       title = '4_OtherHoldings';
       fullTitle = 'Holdings of Other Materials';
       fieldMapping = formFieldMappings.otherHoldings;
-      groupedHeaders = [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Microforms', colspan: 5 },
-        { label: 'Cartographic and Graphic Materials', colspan: 5 },
-        { label: 'Audio Materials', colspan: 5 },
-        { label: 'Video Materials', colspan: 5 },
-        { label: 'DVD Materials', colspan: 5 },
-        { label: 'Online Materials - Map', colspan: 5 },
-        { label: 'Online Materials - Image/Photograph', colspan: 5 },
-        { label: 'Online Materials - Streaming Audio/Music', colspan: 5 },
-        { label: 'Online Materials - Streaming Film/Video', colspan: 5 },
-        { label: 'Online Materials - Custom', colspan: 5 },
-        { label: 'Grand Total', colspan: 1 }
-      ];
+      // Use multi-tier headers to match web form structure
+      const otherHoldingsMultiTier = {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Physical Materials', colspan: 25 },
+          { label: 'Online Materials', colspan: 25 },
+          { label: 'Total', colspan: 1 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'Microforms', colspan: 5 },
+          { label: 'Cartographic & Graphic', colspan: 5 },
+          { label: 'Audio', colspan: 5 },
+          { label: 'Video', colspan: 5 },
+          { label: 'DVD', colspan: 5 },
+          { label: 'Map', colspan: 5 },
+          { label: 'Image/Photo', colspan: 5 },
+          { label: 'Audio/Music', colspan: 5 },
+          { label: 'Film/Video', colspan: 5 },
+          { label: 'Custom', colspan: 5 },
+          { label: '', colspan: 1 }
+        ]
+      };
       data = await prisma.other_Holdings.findMany({
         where: {
           Library_Year: {
@@ -447,18 +469,28 @@ async function exportSingleForm(formType: string, year: number) {
       title = '6_FiscalSupport';
       fullTitle = 'Fiscal Support';
       fieldMapping = formFieldMappings.fiscal;
-      groupedHeaders = [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Chinese Appropriations', colspan: 6 },
-        { label: 'Japanese Appropriations', colspan: 6 },
-        { label: 'Korean Appropriations', colspan: 6 },
-        { label: 'Non-CJK Appropriations', colspan: 6 },
-        { label: 'Total Appropriations', colspan: 2 },
-        { label: 'Endowments', colspan: 6 },
-        { label: 'Grants', colspan: 6 },
-        { label: 'East Asian Program Support', colspan: 6 },
-        { label: 'Total Acquisition Budget', colspan: 1 }
-      ];
+      // Use multi-tier headers to match web form structure
+      const fiscalMultiTier = {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Appropriations by Language', colspan: 24 },
+          { label: 'Total Approp.', colspan: 2 },
+          { label: 'Other Funding Sources', colspan: 18 },
+          { label: 'Total Budget', colspan: 1 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'Chinese', colspan: 6 },
+          { label: 'Japanese', colspan: 6 },
+          { label: 'Korean', colspan: 6 },
+          { label: 'Non-CJK', colspan: 6 },
+          { label: '', colspan: 2 },
+          { label: 'Endowments', colspan: 6 },
+          { label: 'Grants', colspan: 6 },
+          { label: 'East Asian Program Support', colspan: 6 },
+          { label: '', colspan: 1 }
+        ]
+      };
       data = await prisma.fiscal_Support.findMany({
         where: {
           Library_Year: {
@@ -604,21 +636,25 @@ async function exportSingleForm(formType: string, year: number) {
       title = '10_ElectronicBooks';
       fullTitle = 'Electronic Books Statistics';
       fieldMapping = formFieldMappings.electronicBooks;
-      groupedHeaders = [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Purchased - Previous Year Titles', colspan: 5 },
-        { label: 'Purchased - Added This Year Titles', colspan: 5 },
-        { label: 'Purchased - Total Titles', colspan: 5 },
-        { label: 'Non-Purchased Titles', colspan: 5 },
-        { label: 'Subscription Titles', colspan: 5 },
-        { label: 'Purchased - Previous Year Volumes', colspan: 5 },
-        { label: 'Purchased - Added This Year Volumes', colspan: 5 },
-        { label: 'Purchased - Total Volumes', colspan: 5 },
-        { label: 'Non-Purchased Volumes', colspan: 5 },
-        { label: 'Subscription Volumes', colspan: 5 },
-        { label: 'Total Titles', colspan: 1 },
-        { label: 'Total Volumes', colspan: 1 }
-      ];
+      // Use multi-tier headers to match web form structure
+      electronicBooksMultiTier = {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'TITLES', colspan: 25 },
+          { label: 'VOLUMES', colspan: 25 },
+          { label: 'Totals', colspan: 2 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 }, // Institution column
+          { label: 'Purchased', colspan: 15 },
+          { label: 'Non-Purchased', colspan: 5 },
+          { label: 'Subscription', colspan: 5 },
+          { label: 'Purchased', colspan: 15 },
+          { label: 'Non-Purchased', colspan: 5 },
+          { label: 'Subscription', colspan: 5 },
+          { label: '', colspan: 2 } // Totals columns
+        ]
+      };
       data = await prisma.electronic_Books.findMany({
         where: {
           Library_Year: {
@@ -706,9 +742,17 @@ async function exportSingleForm(formType: string, year: number) {
     notesField: (notesFields as any)[formType]
   };
 
-  // Add multi-tier headers for electronic form, otherwise use groupedHeaders
+  // Add multi-tier headers for forms that have them, otherwise use groupedHeaders
   if (formType === 'electronic' && electronicMultiTier) {
     worksheetConfig.multiTierHeaders = electronicMultiTier;
+  } else if (formType === 'electronicBooks' && electronicBooksMultiTier) {
+    worksheetConfig.multiTierHeaders = electronicBooksMultiTier;
+  } else if (formType === 'volumeHoldings' && volumeHoldingsMultiTier) {
+    worksheetConfig.multiTierHeaders = volumeHoldingsMultiTier;
+  } else if (formType === 'otherHoldings' && otherHoldingsMultiTier) {
+    worksheetConfig.multiTierHeaders = otherHoldingsMultiTier;
+  } else if (formType === 'fiscal' && fiscalMultiTier) {
+    worksheetConfig.multiTierHeaders = fiscalMultiTier;
   } else {
     worksheetConfig.groupedHeaders = groupedHeaders;
   }
@@ -757,13 +801,22 @@ async function exportAllForms(year: number) {
       type: 'volumeHoldings',
       title: '2_VolumeHoldings',
       fullTitle: 'Physical Volume Holdings',
-      groupedHeaders: [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Previous Year Total', colspan: 5 },
-        { label: 'Added (Gross)', colspan: 5 },
-        { label: 'Withdrawn', colspan: 5 },
-        { label: 'Grand Total', colspan: 1 }
-      ]
+      multiTierHeaders: {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Physical Volumes', colspan: 15 },
+          { label: 'Totals', colspan: 3 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'From Last Year', colspan: 5 },
+          { label: 'Added This Year', colspan: 5 },
+          { label: 'Withdrawn This Year', colspan: 5 },
+          { label: 'Physical Total', colspan: 1 },
+          { label: 'E-Books', colspan: 1 },
+          { label: 'Grand Total', colspan: 1 }
+        ]
+      }
     },
     {
       type: 'serials',
@@ -784,15 +837,28 @@ async function exportAllForms(year: number) {
       type: 'otherHoldings',
       title: '4_OtherHoldings',
       fullTitle: 'Holdings of Other Materials',
-      groupedHeaders: [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Microform', colspan: 5 },
-        { label: 'Cartographic and Graphic Materials', colspan: 5 },
-        { label: 'Audio', colspan: 5 },
-        { label: 'Video', colspan: 5 },
-        { label: 'DVD', colspan: 5 },
-        { label: 'Grand Total', colspan: 1 }
-      ]
+      multiTierHeaders: {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Physical Materials', colspan: 25 },
+          { label: 'Online Materials', colspan: 25 },
+          { label: 'Total', colspan: 1 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'Microforms', colspan: 5 },
+          { label: 'Cartographic & Graphic', colspan: 5 },
+          { label: 'Audio', colspan: 5 },
+          { label: 'Video', colspan: 5 },
+          { label: 'DVD', colspan: 5 },
+          { label: 'Map', colspan: 5 },
+          { label: 'Image/Photo', colspan: 5 },
+          { label: 'Audio/Music', colspan: 5 },
+          { label: 'Film/Video', colspan: 5 },
+          { label: 'Custom', colspan: 5 },
+          { label: '', colspan: 1 }
+        ]
+      }
     },
     {
       type: 'unprocessed',
@@ -807,18 +873,27 @@ async function exportAllForms(year: number) {
       type: 'fiscal',
       title: '6_FiscalAppropriations',
       fullTitle: 'Fiscal Support',
-      groupedHeaders: [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'CHN Appropriations', colspan: 5 },
-        { label: 'JPN Appropriations', colspan: 5 },
-        { label: 'KOR Appropriations', colspan: 5 },
-        { label: 'N-CJK Appropriations', colspan: 5 },
-        { label: 'Total Appropriations', colspan: 1 },
-        { label: 'Endowments', colspan: 5 },
-        { label: 'Grants', colspan: 5 },
-        { label: 'East Asian Program Support', colspan: 5 },
-        { label: 'Total Budget', colspan: 1 }
-      ]
+      multiTierHeaders: {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'Appropriations by Language', colspan: 24 },
+          { label: 'Total Approp.', colspan: 2 },
+          { label: 'Other Funding Sources', colspan: 18 },
+          { label: 'Total Budget', colspan: 1 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'Chinese', colspan: 6 },
+          { label: 'Japanese', colspan: 6 },
+          { label: 'Korean', colspan: 6 },
+          { label: 'Non-CJK', colspan: 6 },
+          { label: '', colspan: 2 },
+          { label: 'Endowments', colspan: 6 },
+          { label: 'Grants', colspan: 6 },
+          { label: 'East Asian Program Support', colspan: 6 },
+          { label: '', colspan: 1 }
+        ]
+      }
     },
     {
       type: 'personnel',
@@ -874,20 +949,24 @@ async function exportAllForms(year: number) {
       type: 'electronicBooks',
       title: '10_ElectronicBooks',
       fullTitle: 'Electronic Books Statistics',
-      groupedHeaders: [
-        { label: 'Institutions', colspan: 1 },
-        { label: 'Purchased Titles (Prev)', colspan: 5 },
-        { label: 'Purchased Titles (Add)', colspan: 5 },
-        { label: 'Purchased Titles (Total)', colspan: 5 },
-        { label: 'Non-Purchased Titles', colspan: 5 },
-        { label: 'Subscription Titles', colspan: 5 },
-        { label: 'Purchased Volumes (Prev)', colspan: 5 },
-        { label: 'Purchased Volumes (Add)', colspan: 5 },
-        { label: 'Purchased Volumes (Total)', colspan: 5 },
-        { label: 'Non-Purchased Volumes', colspan: 5 },
-        { label: 'Subscription Volumes', colspan: 5 },
-        { label: 'Grand Totals', colspan: 2 }
-      ]
+      multiTierHeaders: {
+        tier1: [
+          { label: 'Institution', colspan: 1 },
+          { label: 'TITLES', colspan: 25 },
+          { label: 'VOLUMES', colspan: 25 },
+          { label: 'Totals', colspan: 2 }
+        ],
+        tier2: [
+          { label: '', colspan: 1 },
+          { label: 'Purchased', colspan: 15 },
+          { label: 'Non-Purchased', colspan: 5 },
+          { label: 'Subscription', colspan: 5 },
+          { label: 'Purchased', colspan: 15 },
+          { label: 'Non-Purchased', colspan: 5 },
+          { label: 'Subscription', colspan: 5 },
+          { label: '', colspan: 2 }
+        ]
+      }
     }
   ];
 

@@ -191,8 +191,9 @@ function calculateFormFields(formType: string, record: any): any {
 
 // Get grouped headers configuration for each form
 function getGroupedHeaders(formType: string): { label: string; colspan: number }[] | null {
-  // Electronic form uses multi-tier headers instead
-  if (formType === 'electronic') {
+  // Forms with multi-tier headers: electronic, electronicBooks, volumeHoldings, otherHoldings, fiscal
+  if (formType === 'electronic' || formType === 'electronicBooks' || 
+      formType === 'volumeHoldings' || formType === 'otherHoldings' || formType === 'fiscal') {
     return null;
   }
   switch (formType) {
@@ -560,7 +561,7 @@ export async function POST(request: NextRequest) {
           notesField: (notesFields as any)[formType]
         };
 
-        // Add multi-tier headers for electronic form, otherwise use groupedHeaders
+        // Add multi-tier headers for forms that have them, otherwise use groupedHeaders
         if (formType === 'electronic') {
           worksheetConfig.multiTierHeaders = {
             tier1: [
@@ -583,6 +584,95 @@ export async function POST(request: NextRequest) {
               { label: '2.2 Full-text Database', colspan: 5 },
               { label: '2.3 Total Electronic', colspan: 5 },
               { label: '', colspan: 1 } // Expenditure column
+            ]
+          };
+        } else if (formType === 'electronicBooks') {
+          worksheetConfig.multiTierHeaders = {
+            tier1: [
+              { label: 'Year', colspan: 1 },
+              { label: 'Institution', colspan: 1 },
+              { label: 'TITLES', colspan: 25 },
+              { label: 'VOLUMES', colspan: 25 },
+              { label: 'Totals', colspan: 2 }
+            ],
+            tier2: [
+              { label: '', colspan: 1 }, // Year column
+              { label: '', colspan: 1 }, // Institution column
+              { label: 'Purchased', colspan: 15 },
+              { label: 'Non-Purchased', colspan: 5 },
+              { label: 'Subscription', colspan: 5 },
+              { label: 'Purchased', colspan: 15 },
+              { label: 'Non-Purchased', colspan: 5 },
+              { label: 'Subscription', colspan: 5 },
+              { label: '', colspan: 2 } // Totals columns
+            ]
+          };
+        } else if (formType === 'volumeHoldings') {
+          worksheetConfig.multiTierHeaders = {
+            tier1: [
+              { label: 'Year', colspan: 1 },
+              { label: 'Institution', colspan: 1 },
+              { label: 'Physical Volumes', colspan: 15 },
+              { label: 'Totals', colspan: 3 }
+            ],
+            tier2: [
+              { label: '', colspan: 1 }, // Year column
+              { label: '', colspan: 1 }, // Institution column
+              { label: 'From Last Year', colspan: 5 },
+              { label: 'Added This Year', colspan: 5 },
+              { label: 'Withdrawn This Year', colspan: 5 },
+              { label: 'Physical Total', colspan: 1 },
+              { label: 'E-Books', colspan: 1 },
+              { label: 'Grand Total', colspan: 1 }
+            ]
+          };
+        } else if (formType === 'otherHoldings') {
+          worksheetConfig.multiTierHeaders = {
+            tier1: [
+              { label: 'Year', colspan: 1 },
+              { label: 'Institution', colspan: 1 },
+              { label: 'Physical Materials', colspan: 25 },
+              { label: 'Online Materials', colspan: 25 },
+              { label: 'Total', colspan: 1 }
+            ],
+            tier2: [
+              { label: '', colspan: 1 }, // Year column
+              { label: '', colspan: 1 }, // Institution column
+              { label: 'Microforms', colspan: 5 },
+              { label: 'Cartographic & Graphic', colspan: 5 },
+              { label: 'Audio', colspan: 5 },
+              { label: 'Video', colspan: 5 },
+              { label: 'DVD', colspan: 5 },
+              { label: 'Map', colspan: 5 },
+              { label: 'Image/Photo', colspan: 5 },
+              { label: 'Audio/Music', colspan: 5 },
+              { label: 'Film/Video', colspan: 5 },
+              { label: 'Custom', colspan: 5 },
+              { label: '', colspan: 1 } // Total column
+            ]
+          };
+        } else if (formType === 'fiscal') {
+          worksheetConfig.multiTierHeaders = {
+            tier1: [
+              { label: 'Year', colspan: 1 },
+              { label: 'Institution', colspan: 1 },
+              { label: 'Appropriations by Language', colspan: 24 },
+              { label: 'Total Approp.', colspan: 2 },
+              { label: 'Other Funding Sources', colspan: 18 },
+              { label: 'Total Budget', colspan: 1 }
+            ],
+            tier2: [
+              { label: '', colspan: 1 }, // Year column
+              { label: '', colspan: 1 }, // Institution column
+              { label: 'Chinese', colspan: 6 },
+              { label: 'Japanese', colspan: 6 },
+              { label: 'Korean', colspan: 6 },
+              { label: 'Non-CJK', colspan: 6 },
+              { label: '', colspan: 2 }, // Total Appropriations
+              { label: 'Endowments', colspan: 6 },
+              { label: 'Grants', colspan: 6 },
+              { label: 'East Asian Program Support', colspan: 6 },
+              { label: '', colspan: 1 } // Total Budget
             ]
           };
         } else if (groupedHeaders && groupedHeaders.length > 0) {
