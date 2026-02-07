@@ -79,6 +79,7 @@ export async function POST(req: Request) {
     const vhgrandtotal = vhprevious_year_subtotal + vhadded_gross_subtotal - vhwithdrawn_subtotal;
 
     // Fetch Electronic Books Purchased Volume Total from Form 10
+    // Uses stored subtotal, falls back to total fields, then to prev+add fields
     let ebooksPurchasedVolumeTotal = 0;
     try {
       const electronicBooksData = await db.electronic_Books.findFirst({
@@ -87,11 +88,36 @@ export async function POST(req: Request) {
         },
         select: {
           ebooks_purchased_volumes_subtotal: true,
+          ebooks_purchased_volumes_chinese: true,
+          ebooks_purchased_volumes_japanese: true,
+          ebooks_purchased_volumes_korean: true,
+          ebooks_purchased_volumes_noncjk: true,
+          ebooks_purchased_prev_volumes_chinese: true,
+          ebooks_purchased_prev_volumes_japanese: true,
+          ebooks_purchased_prev_volumes_korean: true,
+          ebooks_purchased_prev_volumes_noncjk: true,
+          ebooks_purchased_add_volumes_chinese: true,
+          ebooks_purchased_add_volumes_japanese: true,
+          ebooks_purchased_add_volumes_korean: true,
+          ebooks_purchased_add_volumes_noncjk: true,
         }
       });
 
-      if (electronicBooksData?.ebooks_purchased_volumes_subtotal) {
-        ebooksPurchasedVolumeTotal = electronicBooksData.ebooks_purchased_volumes_subtotal;
+      if (electronicBooksData) {
+        if (electronicBooksData.ebooks_purchased_volumes_subtotal != null) {
+          ebooksPurchasedVolumeTotal = electronicBooksData.ebooks_purchased_volumes_subtotal;
+        } else {
+          // Calculate from total fields or prev+add fields
+          const chi = electronicBooksData.ebooks_purchased_volumes_chinese ??
+            ((electronicBooksData.ebooks_purchased_prev_volumes_chinese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_chinese ?? 0));
+          const jpn = electronicBooksData.ebooks_purchased_volumes_japanese ??
+            ((electronicBooksData.ebooks_purchased_prev_volumes_japanese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_japanese ?? 0));
+          const kor = electronicBooksData.ebooks_purchased_volumes_korean ??
+            ((electronicBooksData.ebooks_purchased_prev_volumes_korean ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_korean ?? 0));
+          const ncjk = electronicBooksData.ebooks_purchased_volumes_noncjk ??
+            ((electronicBooksData.ebooks_purchased_prev_volumes_noncjk ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_noncjk ?? 0));
+          ebooksPurchasedVolumeTotal = chi + jpn + kor + ncjk;
+        }
       }
     } catch (error) {
       console.log('Error fetching Electronic Books data for Volume Holdings:', error);

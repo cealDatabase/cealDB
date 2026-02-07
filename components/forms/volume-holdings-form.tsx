@@ -138,8 +138,9 @@ export default function VolumeHoldingsForm() {
     const loadPreviousYearData = async () => {
       try {
         const libraryId = Number(params.libid);
-        const currentYear = new Date().getFullYear();
-        const previousYear = currentYear - 1;
+        const surveyYear = libraryYearStatus?.year;
+        if (!surveyYear) return;
+        const previousYear = surveyYear - 1;
 
         const response = await fetch(`/api/volumeHoldings/previousYear/${libraryId}/${previousYear}`);
         if (response.ok) {
@@ -179,19 +180,20 @@ export default function VolumeHoldingsForm() {
       }
     };
 
-    if (params.libid) {
+    if (params.libid && libraryYearStatus?.year) {
       loadPreviousYearData();
     }
-  }, [params.libid, form]);
+  }, [params.libid, form, libraryYearStatus?.year]);
 
   // Load Electronic Books Purchased Volume Total from Form 10 (Electronic Books)
   useEffect(() => {
     const loadEBookVolumes = async () => {
       try {
         const libraryId = Number(params.libid);
-        const currentYear = new Date().getFullYear();
+        const surveyYear = libraryYearStatus?.year;
+        if (!surveyYear) return;
 
-        const response = await fetch(`/api/electronic-books/purchased-volumes/${libraryId}/${currentYear}`);
+        const response = await fetch(`/api/electronic-books/purchased-volumes/${libraryId}/${surveyYear}`);
         if (response.ok) {
           const data = await response.json();
           const total = data.total || 0;
@@ -207,10 +209,10 @@ export default function VolumeHoldingsForm() {
       }
     };
 
-    if (params.libid) {
+    if (params.libid && libraryYearStatus?.year) {
       loadEBookVolumes();
     }
-  }, [params.libid]);
+  }, [params.libid, libraryYearStatus?.year]);
 
   async function onSubmit(values: FormData) {
     try {

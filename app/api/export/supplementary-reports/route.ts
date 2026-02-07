@@ -7,11 +7,46 @@ import archiver from 'archiver';
 
 const prisma = db;
 
+interface UserContext {
+  isAdminOrEditor: boolean;
+  libraryId: number | null;
+}
+
+async function getUserContext(): Promise<UserContext> {
+  const cookieStore = await cookies();
+  const rawEmail = cookieStore.get('uinf')?.value;
+  const roleData = cookieStore.get('role')?.value;
+
+  const userEmail = rawEmail ? decodeURIComponent(rawEmail).toLowerCase() : undefined;
+
+  let roleIds: string[] = [];
+  try {
+    roleIds = roleData ? JSON.parse(roleData) : [];
+  } catch {
+    roleIds = [];
+  }
+
+  // Role "1" = super admin, "3" = e-resource editor
+  const isAdminOrEditor = roleIds.includes('1') || roleIds.includes('3');
+
+  let libraryId: number | null = null;
+  if (!isAdminOrEditor && userEmail) {
+    const user = await prisma.user.findFirst({
+      where: { username: { equals: userEmail, mode: 'insensitive' } },
+      include: { User_Library: true }
+    });
+    if (user?.User_Library && user.User_Library.length > 0) {
+      libraryId = user.User_Library[0].library_id;
+    }
+  }
+
+  return { isAdminOrEditor, libraryId };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const userEmail = cookieStore.get('uinf')?.value;
-    const roleData = cookieStore.get('role')?.value;
 
     if (!userEmail) {
       return NextResponse.json(
@@ -32,9 +67,10 @@ export async function GET(request: NextRequest) {
     }
 
     const yearNum = parseInt(year);
+    const userCtx = await getUserContext();
 
     if (reportType === 'batch') {
-      return await exportBatchReports(yearNum);
+      return await exportBatchReports(yearNum, userCtx);
     }
 
     if (!reportType) {
@@ -44,7 +80,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return await exportSingleReport(reportType, yearNum);
+    return await exportSingleReport(reportType, yearNum, userCtx);
   } catch (error) {
     console.error('Export error:', error);
     return NextResponse.json(
@@ -54,7 +90,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function exportSingleReport(reportType: string, year: number) {
+async function exportSingleReport(reportType: string, year: number, userCtx: UserContext) {
   let buffer: Buffer;
   let filename: string;
 
@@ -64,15 +100,15 @@ async function exportSingleReport(reportType: string, year: number) {
       filename = `Organizational_Structure-${year}.xlsx`;
       break;
     case 'av':
-      buffer = await generateAVDatabaseReport(year);
+      buffer = await generateAVDatabaseReport(year, userCtx);
       filename = `AudioVisual_Database-${year}.xlsx`;
       break;
     case 'ebook':
-      buffer = await generateEBookDatabaseReport(year);
+      buffer = await generateEBookDatabaseReport(year, userCtx);
       filename = `EBook_Database-${year}.xlsx`;
       break;
     case 'ejournal':
-      buffer = await generateEJournalDatabaseReport(year);
+      buffer = await generateEJournalDatabaseReport(year, userCtx);
       filename = `EJournal_Database-${year}.xlsx`;
       break;
     default:
@@ -92,10 +128,10 @@ async function exportSingleReport(reportType: string, year: number) {
   });
 }
 
-async function exportBatchReports(year: number) {
-  const av = await generateAVDatabaseReport(year);
-  const ebook = await generateEBookDatabaseReport(year);
-  const ejournal = await generateEJournalDatabaseReport(year);
+async function exportBatchReports(year: number, userCtx: UserContext) {
+  const av = await generateAVDatabaseReport(year, userCtx);
+  const ebook = await generateEBookDatabaseReport(year, userCtx);
+  const ejournal = await generateEJournalDatabaseReport(year, userCtx);
 
   const archive = archiver('zip', { zlib: { level: 9 } });
   const chunks: Buffer[] = [];
@@ -118,7 +154,7 @@ async function exportBatchReports(year: number) {
   return new NextResponse(uint8Array, {
     headers: {
       'Content-Type': 'application/zip',
-      'Content-Disposition': `attachment; filename="Global_Survey_Reports_${year}.zip"`
+      'Content-Disposition': `attachment; filename="Database_Collection_Reports_${year}.zip"`
     }
   });
 }
@@ -291,7 +327,7 @@ async function generateOrganizationalStructureReport(year: number): Promise<Buff
   return Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
 }
 
-async function generateAVDatabaseReport(year: number): Promise<Buffer> {
+async function generateAVDatabaseReport(year: number, userCtx: UserContext): Promise<Buffer> {
   const avRecords = await prisma.list_AV.findMany({
     where: {
       is_global: true,
@@ -437,11 +473,126 @@ async function generateAVDatabaseReport(year: number): Promise<Buffer> {
     { width: 20 }
   ];
 
+  // --- Sheet 2: Individual Selections by Library ---
+  // Admin/editor: all institutions; member: only their own institution
+  const avSubWhere: any = {
+    Library_Year: {
+      year: year,
+      is_active: true,
+      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
+    }
+  };
+  const avSubscriptions = await prisma.libraryYear_ListAV.findMany({
+    where: avSubWhere,
+    include: {
+      Library_Year: {
+        include: {
+          Library: { select: { library_name: true } }
+        }
+      },
+      List_AV: {
+        include: {
+          List_AV_Counts: {
+            where: { year: year, ishidden: false }
+          },
+          List_AV_Language: {
+            include: { Language: true }
+          }
+        }
+      }
+    },
+    orderBy: {
+      Library_Year: {
+        Library: { library_name: 'asc' }
+      }
+    }
+  });
+
+  if (avSubscriptions.length > 0) {
+    const indSheet = workbook.addWorksheet('Individual Selections');
+
+    const indTitleRow = indSheet.addRow([`Individual AV Database Selections by Library, ${year}`]);
+    indTitleRow.font = { bold: true, size: 12 };
+    indTitleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    indSheet.mergeCells(1, 1, 1, 9);
+    indTitleRow.height = 25;
+
+    const indHeaders = [
+      'Library',
+      'Title',
+      'CJK Title',
+      'Subtitle',
+      'Publisher',
+      'Type',
+      'Language',
+      'AV Titles',
+      'Notes'
+    ];
+
+    const indHeaderRow = indSheet.addRow(indHeaders);
+    indHeaderRow.font = { bold: true, size: 10 };
+    indHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+    indHeaderRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    indHeaderRow.height = 30;
+    indHeaderRow.eachCell((cell) => {
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    });
+
+    // Group subscriptions by library
+    const byLibrary = new Map<string, typeof avSubscriptions>();
+    avSubscriptions.forEach(sub => {
+      const libName = sub.Library_Year?.Library?.library_name || 'Unknown';
+      if (!byLibrary.has(libName)) byLibrary.set(libName, []);
+      byLibrary.get(libName)!.push(sub);
+    });
+
+    // Sort libraries alphabetically
+    const sortedLibraries = [...byLibrary.keys()].sort();
+
+    sortedLibraries.forEach(libName => {
+      const subs = byLibrary.get(libName)!;
+      subs.forEach(sub => {
+        const av = sub.List_AV;
+        if (!av) return;
+        const languages = av.List_AV_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
+        const titles = av.List_AV_Counts[0]?.titles || 0;
+
+        const row = indSheet.addRow([
+          libName,
+          av.title || '',
+          av.cjk_title || '',
+          av.subtitle || '',
+          av.publisher || '',
+          av.type || '',
+          languages,
+          titles,
+          av.notes || ''
+        ]);
+        row.alignment = { vertical: 'top', wrapText: true };
+        row.eachCell((cell) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+      });
+    });
+
+    indSheet.columns = [
+      { width: 30 },
+      { width: 30 },
+      { width: 25 },
+      { width: 25 },
+      { width: 25 },
+      { width: 20 },
+      { width: 15 },
+      { width: 12 },
+      { width: 30 }
+    ];
+  }
+
   const data = await workbook.xlsx.writeBuffer();
   return Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
 }
 
-async function generateEBookDatabaseReport(year: number): Promise<Buffer> {
+async function generateEBookDatabaseReport(year: number, userCtx: UserContext): Promise<Buffer> {
   const ebookRecords = await prisma.list_EBook.findMany({
     where: {
       is_global: true,
@@ -590,11 +741,128 @@ async function generateEBookDatabaseReport(year: number): Promise<Buffer> {
     { width: 20 }
   ];
 
+  // --- Sheet 2: Individual Selections by Library ---
+  // Admin/editor: all institutions; member: only their own institution
+  const ebookSubWhere: any = {
+    Library_Year: {
+      year: year,
+      is_active: true,
+      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
+    }
+  };
+  const ebookSubscriptions = await prisma.libraryYear_ListEBook.findMany({
+    where: ebookSubWhere,
+    include: {
+      Library_Year: {
+        include: {
+          Library: { select: { library_name: true } }
+        }
+      },
+      List_EBook: {
+        include: {
+          List_EBook_Counts: {
+            where: { year: year, ishidden: false }
+          },
+          List_EBook_Language: {
+            include: { Language: true }
+          }
+        }
+      }
+    },
+    orderBy: {
+      Library_Year: {
+        Library: { library_name: 'asc' }
+      }
+    }
+  });
+
+  if (ebookSubscriptions.length > 0) {
+    const indSheet = workbook.addWorksheet('Individual Selections');
+
+    const indTitleRow = indSheet.addRow([`Individual E-Book Database Selections by Library, ${year}`]);
+    indTitleRow.font = { bold: true, size: 12 };
+    indTitleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    indSheet.mergeCells(1, 1, 1, 10);
+    indTitleRow.height = 25;
+
+    const indHeaders = [
+      'Library',
+      'Title',
+      'CJK Title',
+      'Subtitle',
+      'Publisher',
+      'Language',
+      'Sub-series Number',
+      'E-Book Titles',
+      'E-Book Volumes',
+      'Notes'
+    ];
+
+    const indHeaderRow = indSheet.addRow(indHeaders);
+    indHeaderRow.font = { bold: true, size: 10 };
+    indHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+    indHeaderRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    indHeaderRow.height = 30;
+    indHeaderRow.eachCell((cell) => {
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    });
+
+    const byLibrary = new Map<string, typeof ebookSubscriptions>();
+    ebookSubscriptions.forEach(sub => {
+      const libName = sub.Library_Year?.Library?.library_name || 'Unknown';
+      if (!byLibrary.has(libName)) byLibrary.set(libName, []);
+      byLibrary.get(libName)!.push(sub);
+    });
+
+    const sortedLibraries = [...byLibrary.keys()].sort();
+
+    sortedLibraries.forEach(libName => {
+      const subs = byLibrary.get(libName)!;
+      subs.forEach(sub => {
+        const eb = sub.List_EBook;
+        if (!eb) return;
+        const languages = eb.List_EBook_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
+        const titles = eb.List_EBook_Counts[0]?.titles || 0;
+        const volumes = eb.List_EBook_Counts[0]?.volumes || 0;
+
+        const row = indSheet.addRow([
+          libName,
+          eb.title || '',
+          eb.cjk_title || '',
+          eb.subtitle || '',
+          eb.publisher || '',
+          languages,
+          eb.sub_series_number || '',
+          titles,
+          volumes,
+          eb.notes || ''
+        ]);
+        row.alignment = { vertical: 'top', wrapText: true };
+        row.eachCell((cell) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+      });
+    });
+
+    indSheet.columns = [
+      { width: 30 },
+      { width: 30 },
+      { width: 25 },
+      { width: 25 },
+      { width: 25 },
+      { width: 15 },
+      { width: 18 },
+      { width: 12 },
+      { width: 14 },
+      { width: 30 }
+    ];
+  }
+
   const data = await workbook.xlsx.writeBuffer();
   return Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);
 }
 
-async function generateEJournalDatabaseReport(year: number): Promise<Buffer> {
+async function generateEJournalDatabaseReport(year: number, userCtx: UserContext): Promise<Buffer> {
   const ejournalRecords = await prisma.list_EJournal.findMany({
     where: {
       is_global: true,
@@ -748,6 +1016,126 @@ async function generateEJournalDatabaseReport(year: number): Promise<Buffer> {
     { width: 12 },
     { width: 20 }
   ];
+
+  // --- Sheet 2: Individual Selections by Library ---
+  // Admin/editor: all institutions; member: only their own institution
+  const ejSubWhere: any = {
+    Library_Year: {
+      year: year,
+      is_active: true,
+      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
+    }
+  };
+  const ejournalSubscriptions = await prisma.libraryYear_ListEJournal.findMany({
+    where: ejSubWhere,
+    include: {
+      Library_Year: {
+        include: {
+          Library: { select: { library_name: true } }
+        }
+      },
+      List_EJournal: {
+        include: {
+          List_EJournal_Counts: {
+            where: { year: year, ishidden: false }
+          },
+          List_EJournal_Language: {
+            include: { Language: true }
+          }
+        }
+      }
+    },
+    orderBy: {
+      Library_Year: {
+        Library: { library_name: 'asc' }
+      }
+    }
+  });
+
+  if (ejournalSubscriptions.length > 0) {
+    const indSheet = workbook.addWorksheet('Individual Selections');
+
+    const indTitleRow = indSheet.addRow([`Individual E-Journal Database Selections by Library, ${year}`]);
+    indTitleRow.font = { bold: true, size: 12 };
+    indTitleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+    indSheet.mergeCells(1, 1, 1, 11);
+    indTitleRow.height = 25;
+
+    const indHeaders = [
+      'Library',
+      'Title',
+      'CJK Title',
+      'Subtitle',
+      'Series',
+      'Vendor',
+      'Publisher',
+      'Language',
+      'Current E-Journal Titles',
+      'E-Journal Databases',
+      'Notes'
+    ];
+
+    const indHeaderRow = indSheet.addRow(indHeaders);
+    indHeaderRow.font = { bold: true, size: 10 };
+    indHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+    indHeaderRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    indHeaderRow.height = 30;
+    indHeaderRow.eachCell((cell) => {
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+    });
+
+    const byLibrary = new Map<string, typeof ejournalSubscriptions>();
+    ejournalSubscriptions.forEach(sub => {
+      const libName = sub.Library_Year?.Library?.library_name || 'Unknown';
+      if (!byLibrary.has(libName)) byLibrary.set(libName, []);
+      byLibrary.get(libName)!.push(sub);
+    });
+
+    const sortedLibraries = [...byLibrary.keys()].sort();
+
+    sortedLibraries.forEach(libName => {
+      const subs = byLibrary.get(libName)!;
+      subs.forEach(sub => {
+        const ej = sub.List_EJournal;
+        if (!ej) return;
+        const languages = ej.List_EJournal_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
+        const journals = ej.List_EJournal_Counts[0]?.journals || 0;
+        const dbs = ej.List_EJournal_Counts[0]?.dbs || 0;
+
+        const row = indSheet.addRow([
+          libName,
+          ej.title || '',
+          ej.cjk_title || '',
+          ej.subtitle || '',
+          ej.series || '',
+          ej.vendor || '',
+          ej.publisher || '',
+          languages,
+          journals,
+          dbs,
+          ej.notes || ''
+        ]);
+        row.alignment = { vertical: 'top', wrapText: true };
+        row.eachCell((cell) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+      });
+    });
+
+    indSheet.columns = [
+      { width: 30 },
+      { width: 30 },
+      { width: 25 },
+      { width: 25 },
+      { width: 20 },
+      { width: 20 },
+      { width: 25 },
+      { width: 15 },
+      { width: 18 },
+      { width: 16 },
+      { width: 30 }
+    ];
+  }
 
   const data = await workbook.xlsx.writeBuffer();
   return Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer);

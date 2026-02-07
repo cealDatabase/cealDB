@@ -52,6 +52,8 @@ function calculateFormFields(formType: string, record: any): any {
       const vhWith = calculated.vhwithdrawn_subtotal ?? 0;
       const allVhNull = calculated.vhprevious_year_subtotal === null && calculated.vhadded_gross_subtotal === null && calculated.vhwithdrawn_subtotal === null;
       calculated.vhgrandtotal = allVhNull ? null : (vhPrev + vhAdded - vhWith);
+      // Recalculate overall grand total: physical + ebook purchased volumes
+      calculated.vhoverall_grand_total = sumWithNull(calculated.vhgrandtotal, record.vhebooks_purchased_volume_total);
       break;
       
     case 'serials':

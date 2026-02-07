@@ -315,7 +315,7 @@ export default function ReportsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Global_Survey_Reports_${selectedSurveyYear}.zip`;
+      a.download = `Database_Collection_Reports_${selectedSurveyYear}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -323,7 +323,7 @@ export default function ReportsPage() {
 
       setExportedSurveys(new Set(SURVEY_REPORTS.map(r => r.id)));
 
-      sonnerToast.success(`All survey reports exported successfully for year ${selectedSurveyYear}`);
+      sonnerToast.success(`All database collection reports exported successfully for year ${selectedSurveyYear}`);
     } catch (error) {
       console.error('Export error:', error);
       sonnerToast.error(error instanceof Error ? error.message : 'Failed to export reports');
@@ -507,10 +507,10 @@ export default function ReportsPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <FileSpreadsheet className="w-5 h-5" />
-                  <CardTitle>Global Survey Reports</CardTitle>
+                  <CardTitle>Database Collection Reports</CardTitle>
                 </div>
                 <CardDescription>
-                  Export global collection data from AV, E-Book, and E-Journal databases with aggregated totals
+                  Export AV, E-Book, and E-Journal database reports with global totals and individual member selections
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -601,7 +601,7 @@ export default function ReportsPage() {
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  All exports in .xlsx format with UTF-8 encoding. Batch creates ZIP with all 3 reports.
+                  All exports in .xlsx format with UTF-8 encoding. Each report includes global databases and individual member selections. Batch creates ZIP with all 3 reports.
                 </p>
               </CardContent>
             </Card>
