@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -62,12 +64,23 @@ export async function POST(req: Request) {
     const currentYear = new Date().getFullYear();
 
     // Check if Library_Year exists and is open for editing
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -76,27 +89,19 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if editing is allowed (super admins can bypass this)
     if (!libraryYear.is_open_for_editing) {
-      return NextResponse.json(
-        { error: "Form is not avilable at this time" },
-        { status: 403 }
-      );
+      const superAdmin = await isSuperAdmin();
+      if (!superAdmin) {
+        return NextResponse.json(
+          { error: "Form is not available at this time" },
+          { status: 403 }
+        );
+      }
+      console.log("Super admin bypassing is_open_for_editing check");
     }
 
-    // Find the Library_Year record to get the libraryyear ID
-    const libraryYearRecord = await db.library_Year.findFirst({
-      where: {
-        library: libraryId,
-        year: currentYear,
-      },
-    });
-
-    if (!libraryYearRecord) {
-      return NextResponse.json(
-        { error: "Library year record not found" },
-        { status: 400 }
-      );
-    }
+    const libraryYearRecord = libraryYear;
 
     // Check if record already exists
     const existingRecord = await db.fiscal_Support.findFirst({
@@ -163,6 +168,18 @@ export async function POST(req: Request) {
         data: fiscalData,
       });
     }
+
+    // Audit log the modification
+    await logPostCollectionEdit({
+      tableName: 'Fiscal_Support',
+      recordId: result.id,
+      oldValues: existingRecord,
+      newValues: result,
+      academicYear: libraryYear.year,
+      libraryId: libraryId,
+      formType: 'fiscal',
+      request: req,
+    });
 
     if (finalSubmit) {
       await markEntryStatus(libraryYearRecord.id, 'fiscal');

@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -51,21 +53,30 @@ export async function POST(req: Request) {
     console.log(`Looking for Library_Year with library: ${libraryId}, year: ${currentYear}`);
 
     // Find Library_Year record for current year and library
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
     });
 
-    console.log("Found Library_Year:", libraryYear);
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        console.log("Super admin: current year not found, falling back to most recent year");
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+        });
+      }
+    }
 
     if (!libraryYear) {
-      console.log("No Library_Year record found");
       return NextResponse.json(
-        { 
-          error: "Library year record not found", 
-          message: "No library_year record exists for this library and year. Please contact the administrator to set up the library year record." 
+        {
+          error: "Library year record not found",
+          message: "No library_year record exists for this library and year. Please contact the administrator to set up the library year record."
         },
         { status: 404 }
       );
@@ -73,19 +84,28 @@ export async function POST(req: Request) {
 
     console.log(`Library_Year ID: ${libraryYear.id}, is_open_for_editing: ${libraryYear.is_open_for_editing}`);
 
-    // Check if editing is allowed
+    // Check if editing is allowed (super admins can bypass this)
     if (!libraryYear.is_open_for_editing) {
-      console.log("Form is not avilable at this time");
-      return NextResponse.json(
-        { 
-          error: "Form submission not allowed", 
-          message: "This Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help." 
-        },
-        { status: 403 }
-      );
+      const superAdmin = await isSuperAdmin();
+      if (!superAdmin) {
+        console.log("Form is not available at this time");
+        return NextResponse.json(
+          {
+            error: "Form submission not allowed",
+            message: "This Form is not available at this time. Please contact the CEAL Statistics Committee Chair for help."
+          },
+          { status: 403 }
+        );
+      }
+      console.log("Super admin bypassing is_open_for_editing check");
     }
 
     console.log("Processing monographic record with Library_Year ID:", libraryYear.id);
+
+    // Fetch existing record for audit logging (old values)
+    const oldRecord = await db.monographic_Acquisitions.findFirst({
+      where: { libraryyear: libraryYear.id },
+    });
 
     // Use upsert to handle both create and update scenarios while preserving original ID
     const monographicRecord = await db.monographic_Acquisitions.upsert({
@@ -146,6 +166,18 @@ export async function POST(req: Request) {
     });
 
     console.log("Successfully processed monographic record with ID:", monographicRecord.id);
+
+    // Audit log the modification
+    await logPostCollectionEdit({
+      tableName: 'Monographic_Acquisitions',
+      recordId: monographicRecord.id,
+      oldValues: oldRecord,
+      newValues: monographicRecord,
+      academicYear: libraryYear.year,
+      libraryId: libraryId,
+      formType: 'monographic',
+      request: req,
+    });
 
     // If final submit, mark Entry_Status for this library year
     if (finalSubmit) {

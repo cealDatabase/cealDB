@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -33,12 +35,23 @@ export async function POST(req: Request) {
     const currentYear = new Date().getFullYear();
 
     // Check if Library_Year exists and is open for editing
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -47,11 +60,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if editing is allowed (super admins can bypass this)
     if (!libraryYear.is_open_for_editing) {
-      return NextResponse.json(
-        { error: "Form is not avilable at this time" },
-        { status: 403 }
-      );
+      const superAdmin = await isSuperAdmin();
+      if (!superAdmin) {
+        return NextResponse.json(
+          { error: "Form is not available at this time" },
+          { status: 403 }
+        );
+      }
+      console.log("Super admin bypassing is_open_for_editing check");
     }
 
     // Check if record already exists
@@ -88,6 +106,18 @@ export async function POST(req: Request) {
         data: publicServicesData,
       });
     }
+
+    // Audit log the modification
+    await logPostCollectionEdit({
+      tableName: 'Public_Services',
+      recordId: result.id,
+      oldValues: existingRecord,
+      newValues: result,
+      academicYear: libraryYear.year,
+      libraryId: libraryId,
+      formType: 'public-services',
+      request: req,
+    });
 
     if (finalSubmit) {
       await markEntryStatus(libraryYear.id, 'public-services');

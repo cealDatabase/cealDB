@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -21,12 +23,23 @@ export async function POST(req: Request) {
     const currentYear = new Date().getFullYear();
 
     // Find Library_Year record for current year and library
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -35,11 +48,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if editing is allowed (super admins can bypass this)
     if (!libraryYear.is_open_for_editing) {
-      return NextResponse.json(
-        { error: "Form is not avilable at this time. Please contact the CEAL Statistics Committee Chair for help." },
-        { status: 403 }
-      );
+      const superAdmin = await isSuperAdmin();
+      if (!superAdmin) {
+        return NextResponse.json(
+          { error: "Form is not available at this time. Please contact the CEAL Statistics Committee Chair for help." },
+          { status: 403 }
+        );
+      }
+      console.log("Super admin bypassing is_open_for_editing check");
     }
 
     // Calculate subtotals
@@ -144,6 +162,11 @@ export async function POST(req: Request) {
 
     console.log("Data to upsert for Volume Holdings:", dataToUpsert);
 
+    // Fetch existing record for audit logging
+    const oldRecord = await db.volume_Holdings.findFirst({
+      where: { libraryyear: libraryYear.id },
+    });
+
     // Upsert Volume_Holdings record
     const volumeHoldings = await db.volume_Holdings.upsert({
       where: {
@@ -154,6 +177,18 @@ export async function POST(req: Request) {
     });
 
     console.log("Volume Holdings upsert result:", volumeHoldings);
+
+    // Audit log the modification
+    await logPostCollectionEdit({
+      tableName: 'Volume_Holdings',
+      recordId: volumeHoldings.id,
+      oldValues: oldRecord,
+      newValues: volumeHoldings,
+      academicYear: libraryYear.year,
+      libraryId: libraryId,
+      formType: 'volumeHoldings',
+      request: req,
+    });
 
     if (finalSubmit) {
       await markEntryStatus(libraryYear.id, 'volumeHoldings');
