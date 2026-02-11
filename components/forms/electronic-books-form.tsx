@@ -298,9 +298,9 @@ export default function ElectronicBooksForm() {
   const importSubscriptionTitles = async () => {
     try {
       const libraryId = Number(params.libid);
-      const currentYear = new Date().getFullYear();
+      const yearToUse = libraryYearStatus?.year || new Date().getFullYear();
 
-      const response = await fetch(`/api/electronic-books/import-subscription-titles/${libraryId}/${currentYear}`);
+      const response = await fetch(`/api/electronic-books/import-subscription-titles/${libraryId}/${yearToUse}`);
       if (response.ok) {
         const data = await response.json();
         form.setValue('ebooks_subscription_titles_chinese', data.chinese || 0, { shouldValidate: false });
@@ -322,9 +322,9 @@ export default function ElectronicBooksForm() {
   const importSubscriptionVolumes = async () => {
     try {
       const libraryId = Number(params.libid);
-      const currentYear = new Date().getFullYear();
+      const yearToUse = libraryYearStatus?.year || new Date().getFullYear();
 
-      const response = await fetch(`/api/electronic-books/import-subscription-volumes/${libraryId}/${currentYear}`);
+      const response = await fetch(`/api/electronic-books/import-subscription-volumes/${libraryId}/${yearToUse}`);
       if (response.ok) {
         const data = await response.json();
         form.setValue('ebooks_subscription_volumes_chinese', data.chinese || 0, { shouldValidate: false });
@@ -683,7 +683,7 @@ export default function ElectronicBooksForm() {
             onClick={importSubscriptionTitles}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isReadOnly}
+            disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
             Import from &quot;E-Book Databases&quot;
@@ -931,7 +931,7 @@ export default function ElectronicBooksForm() {
             onClick={importSubscriptionVolumes}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isReadOnly}
+            disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
             Import from E-Book Databases

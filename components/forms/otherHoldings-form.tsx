@@ -239,9 +239,9 @@ export default function OtherHoldingsForm() {
       setIsImporting(true);
 
       const libraryId = Number(params.libid);
-      const currentYear = new Date().getFullYear();
+      const yearToUse = libraryYearStatus?.year || new Date().getFullYear();
 
-      const response = await fetch(`/api/otherHoldings/import-av/${libraryId}/${currentYear}`);
+      const response = await fetch(`/api/otherHoldings/import-av/${libraryId}/${yearToUse}`);
       
       if (response.ok) {
         const result = await response.json();
@@ -588,7 +588,7 @@ export default function OtherHoldingsForm() {
             onClick={importAVData}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isImporting || isReadOnly}
+            disabled={isImporting || (isReadOnly && !isPrivilegedPostClosing)}
           >
             {isImporting ? (
               <>

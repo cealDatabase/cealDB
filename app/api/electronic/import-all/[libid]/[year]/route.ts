@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { filterEBookSubscriptions, filterEJournalSubscriptions, filterAVSubscriptions } from "@/lib/subscription-filter";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 export async function GET(
   req: Request,
@@ -21,13 +23,25 @@ export async function GET(
     const currentYear = Number(year);
 
     // Find Library_Year record for the library and year
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
-      select: { id: true }
+      select: { id: true, year: true }
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+          select: { id: true, year: true }
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -35,6 +49,8 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    const resolvedYear = libraryYear.year;
 
     // Initialize aggregated counts
     const countsByLanguage = {
@@ -59,7 +75,7 @@ export async function GET(
             },
             List_EBook_Counts: {
               where: {
-                year: currentYear,
+                year: resolvedYear,
               },
             },
           },
@@ -126,7 +142,7 @@ export async function GET(
             },
             List_EJournal_Counts: {
               where: {
-                year: currentYear,
+                year: resolvedYear,
               },
             },
           },
@@ -189,7 +205,7 @@ export async function GET(
             },
             List_AV_Counts: {
               where: {
-                year: currentYear,
+                year: resolvedYear,
               },
             },
           },
@@ -237,13 +253,27 @@ export async function GET(
       }
     }
 
-    console.log(`[Import All] Library ${libraryId}, Year ${currentYear}`);
+    console.log(`[Import All] Library ${libraryId}, Year ${resolvedYear}`);
     console.log(`[Import All] Access counts:`, {
       ebooks: filteredEBooks.length,
       ejournals: filteredEJournals.length,
       avs: filteredAVs.length,
     });
     console.log(`[Import All] Counts by language:`, countsByLanguage);
+
+    // Audit log the import operation
+    await logAuditEvent({
+      action: 'IMPORT',
+      tableName: 'Electronic',
+      newValues: { countsByLanguage, breakdown: { ebooks: filteredEBooks.length, ejournals: filteredEJournals.length, avs: filteredAVs.length } },
+      success: true,
+      metadata: {
+        academicYear: resolvedYear,
+        libraryId: libraryId,
+        formType: 'electronic',
+        changeReason: 'Import from AV, E-Book, and E-Journal Databases',
+      }
+    }, req);
 
     return NextResponse.json({
       success: true,

@@ -279,9 +279,9 @@ export default function ElectronicForm() {
   const importAllData = async () => {
     try {
       const libraryId = Number(params.libid);
-      const currentYear = new Date().getFullYear();
+      const yearToUse = libraryYearStatus?.year || new Date().getFullYear();
 
-      const response = await fetch(`/api/electronic/import-all/${libraryId}/${currentYear}`);
+      const response = await fetch(`/api/electronic/import-all/${libraryId}/${yearToUse}`);
       if (response.ok) {
         const result = await response.json();
         const data = result.data;
@@ -1129,7 +1129,7 @@ export default function ElectronicForm() {
             onClick={importAllData}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isReadOnly}
+            disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
             Import from "Audio/Visual Databases", "E-Book Databases" and

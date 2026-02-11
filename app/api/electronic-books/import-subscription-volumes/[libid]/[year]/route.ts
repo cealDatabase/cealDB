@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { filterEBookSubscriptions } from '@/lib/subscription-filter';
+import { isSuperAdmin } from '@/lib/libraryYearHelper';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 export async function GET(
   request: Request,
@@ -19,13 +21,25 @@ export async function GET(
     }
 
     // Find Library_Year record for the library and year
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: year,
       },
-      select: { id: true }
+      select: { id: true, year: true }
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+          select: { id: true, year: true }
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -33,6 +47,8 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    const resolvedYear = libraryYear.year;
 
     // Fetch E-Book subscriptions for this library and year (ONLY subscribed items)
     const ebookSubscriptions = await db.libraryYear_ListEBook.findMany({
@@ -49,7 +65,7 @@ export async function GET(
             },
             List_EBook_Counts: {
               where: {
-                year: year,
+                year: resolvedYear,
               },
             },
           },
@@ -90,6 +106,20 @@ export async function GET(
         }
       }
     }
+
+    // Audit log the import operation
+    await logAuditEvent({
+      action: 'IMPORT',
+      tableName: 'Electronic_Books',
+      newValues: countsByLanguage,
+      success: true,
+      metadata: {
+        academicYear: resolvedYear,
+        libraryId: libraryId,
+        formType: 'electronicBooks',
+        changeReason: 'Import subscription volumes from E-Book Databases',
+      }
+    }, request);
 
     return NextResponse.json({
       chinese: countsByLanguage.chinese,

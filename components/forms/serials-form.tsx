@@ -157,9 +157,9 @@ export default function SerialsForm() {
   const importEJournalData = async () => {
     try {
       const libraryId = Number(params.libid);
-      const currentYear = new Date().getFullYear();
+      const yearToUse = libraryYearStatus?.year || new Date().getFullYear();
 
-      const response = await fetch(`/api/serials/import-ejournal/${libraryId}/${currentYear}`);
+      const response = await fetch(`/api/serials/import-ejournal/${libraryId}/${yearToUse}`);
       if (response.ok) {
         const result = await response.json();
         const data = result.data;
@@ -346,7 +346,7 @@ export default function SerialsForm() {
             onClick={importEJournalData}
             className='flex items-center gap-2'
             variant='default'
-            disabled={isReadOnly}
+            disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
             Import from &quot;E-Journal Databases&quot;

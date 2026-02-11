@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { filterAVSubscriptions } from "@/lib/subscription-filter";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 export async function GET(
   req: Request,
@@ -21,13 +23,25 @@ export async function GET(
     const currentYear = Number(year);
 
     // Find Library_Year record for the library and year
-    const libraryYear = await db.library_Year.findFirst({
+    let libraryYear = await db.library_Year.findFirst({
       where: {
         library: libraryId,
         year: currentYear,
       },
-      select: { id: true }
+      select: { id: true, year: true }
     });
+
+    // Super admin: fall back to most recent year if current year not found
+    if (!libraryYear) {
+      const superAdmin = await isSuperAdmin();
+      if (superAdmin) {
+        libraryYear = await db.library_Year.findFirst({
+          where: { library: libraryId },
+          orderBy: { year: 'desc' },
+          select: { id: true, year: true }
+        });
+      }
+    }
 
     if (!libraryYear) {
       return NextResponse.json(
@@ -35,6 +49,8 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    const resolvedYear = libraryYear.year;
 
     // Fetch AV subscriptions for this library and year (ONLY subscribed items)
     // Include language information
@@ -52,7 +68,7 @@ export async function GET(
             },
             List_AV_Counts: {
               where: {
-                year: currentYear,
+                year: resolvedYear,
               },
             },
           },
@@ -99,6 +115,20 @@ export async function GET(
         }
       }
     }
+
+    // Audit log the import operation
+    await logAuditEvent({
+      action: 'IMPORT',
+      tableName: 'Other_Holdings',
+      newValues: countsByType,
+      success: true,
+      metadata: {
+        academicYear: resolvedYear,
+        libraryId: libraryId,
+        formType: 'otherHoldings',
+        changeReason: 'Import from Audio/Video Databases',
+      }
+    }, req);
 
     return NextResponse.json({
       success: true,
