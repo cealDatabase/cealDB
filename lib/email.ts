@@ -92,7 +92,7 @@ export async function sendPasswordResetEmail(
         </head>
         <body>
           <div class="container">
-            <div class="header">
+            <div class="header" style="color: #fff3cd">
               <h1>CEAL Statistics Database System</h1>
               <h2>${isInitialSetup ? 'Set Up Your Password' : 'Password Reset Required'}</h2>
             </div>
