@@ -137,7 +137,7 @@ function PublishedPDFs() {
 
         <section className="flex flex-col">
           <Accordion type="single" collapsible className="w-full" defaultValue="2020-current">
-            {groupYearsByDecade(generateYears(1998, 2022).reverse()).map((group) => (
+            {groupYearsByDecade(generateYears(1998, new Date().getFullYear() - 3).reverse()).map((group) => (
               <AccordionItem key={group.value} value={group.value} className="border rounded-lg mb-4 px-4">
                 <AccordionTrigger className="text-lg font-bold hover:no-underline">
                   <div className="flex items-center gap-2">

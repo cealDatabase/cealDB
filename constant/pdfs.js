@@ -1,5 +1,24 @@
 export const pdfs = [
   {
+    yearValue: "2023-2024",
+    linkValue: [
+      {
+        link: "https://scholarsarchive.byu.edu/jeal/vol2025/iss180/2",
+        title:
+          "Council on East Asian Libraries Statistics 2023-2024: For North American Institutions.",
+        journal: "Journal of East Asian Libraries, ",
+        appendix: "2025: no. 180, Article 2.",
+      },
+      {
+        link: "https://scholarsarchive.byu.edu/jeal/vol2025/iss180/3",
+        title:
+          "Lists of Selected Full-text Databases by Subscription in East Asian Studies.",
+        journal: "Journal of East Asian Libraries, ",
+        appendix: "2025: no. 180, Article 3.",
+      },
+    ],
+  },
+  {
     yearValue: "2022-2023",
     linkValue: [
       {

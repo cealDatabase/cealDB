@@ -21,7 +21,7 @@ const YearStatPDF = () => {
               <dt className="text-gray-500 font-medium">2020 - Present</dt>
               <dd className="mt-1 leading-6 sm:col-span-2 sm:mt-0">
                 <div className="grid grid-cols-4 gap-6">
-                  {generateYears(2020, 2023).map((year) => (
+                  {generateYears(2020, 2024).map((year) => (
                     <Link href="" key={year}>
                       {year}
                     </Link>

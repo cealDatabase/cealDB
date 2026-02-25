@@ -1,8 +1,8 @@
 import { PrismaClient } from '@/prisma/generated/client/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
 
-// Initialize Prisma client with PostgreSQL adapter (required for Prisma 7)
+const { Pool } = require('pg');
+const { PrismaPg } = require('@prisma/adapter-pg');
+
 const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/dummy';
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);

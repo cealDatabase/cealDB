@@ -127,9 +127,9 @@ export default async function Index() {
             {/* Decorative Line */}
             <div className="flex items-center gap-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent to-border" />
-              <div className="w-2 h-2 bg-primary rounded-full" />
               <div className="w-2 h-2 bg-secondary rounded-full" />
-              <div className="w-2 h-2 bg-accent rounded-full" />
+              <div className="w-2 h-2 bg-secondary rounded-full" />
+              <div className="w-2 h-2 bg-secondary rounded-full" />
               <div className="flex-1 h-px bg-gradient-to-l from-transparent to-border" />
             </div>
 
