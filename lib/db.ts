@@ -7,7 +7,12 @@ const { PrismaPg } = require("@prisma/adapter-pg");
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/dummy';
   
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({ 
+    connectionString,
+    ssl: {
+      rejectUnauthorized: true, // Enforce SSL certificate validation
+    }
+  });
   const adapter = new PrismaPg(pool);
   
   return new PrismaClient({
