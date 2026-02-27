@@ -55,6 +55,53 @@ function getNestedValue(obj: any, path: string): any {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 }
 
+// Build a set of library_year IDs that have a specific form submitted,
+// based on the Entry_Status table (the authoritative participation tracker).
+async function fetchParticipationSets(year: number): Promise<Record<string, Set<number>>> {
+  const entries = await prisma.library_Year.findMany({
+    where: { year, is_active: true },
+    select: { id: true, Entry_Status: true },
+  });
+
+  const sets: Record<string, Set<number>> = {
+    monographic_acquisitions: new Set(),
+    volume_holdings: new Set(),
+    serials: new Set(),
+    other_holdings: new Set(),
+    unprocessed_backlog_materials: new Set(),
+    fiscal_support: new Set(),
+    personnel_support_fte: new Set(),
+    public_services: new Set(),
+    electronic: new Set(),
+    electronic_books: new Set(),
+  };
+
+  for (const ly of entries) {
+    const es = ly.Entry_Status;
+    if (!es) continue;
+    if (es.monographic_acquisitions) sets.monographic_acquisitions.add(ly.id);
+    if (es.volume_holdings) sets.volume_holdings.add(ly.id);
+    if (es.serials) sets.serials.add(ly.id);
+    if (es.other_holdings) sets.other_holdings.add(ly.id);
+    if (es.unprocessed_backlog_materials) sets.unprocessed_backlog_materials.add(ly.id);
+    if (es.fiscal_support) sets.fiscal_support.add(ly.id);
+    if (es.personnel_support_fte) sets.personnel_support_fte.add(ly.id);
+    if (es.public_services) sets.public_services.add(ly.id);
+    if (es.electronic) sets.electronic.add(ly.id);
+    if (es.electronic_books) sets.electronic_books.add(ly.id);
+  }
+
+  return sets;
+}
+
+// Filter form data to only include institutions whose Entry_Status has that form flagged
+function filterByParticipation(data: any[], participatingIds: Set<number>): any[] {
+  return data.filter(record => {
+    const lyId = record.Library_Year?.id;
+    return lyId && participatingIds.has(lyId);
+  });
+}
+
 // =============================================================================
 // Data fetching functions
 // =============================================================================
@@ -556,19 +603,21 @@ export async function GET(request: NextRequest) {
 
     const yearNum = parseInt(year);
 
-    // Fetch all data in parallel
+    // Fetch participation status (Entry_Status) and all form data in parallel
     const [
-      monographicData,
-      volumeHoldingsData,
-      serialsData,
-      otherHoldingsData,
-      unprocessedData,
-      fiscalData,
-      personnelData,
-      publicServicesData,
-      electronicData,
-      electronicBooksData,
+      participation,
+      monographicDataRaw,
+      volumeHoldingsDataRaw,
+      serialsDataRaw,
+      otherHoldingsDataRaw,
+      unprocessedDataRaw,
+      fiscalDataRaw,
+      personnelDataRaw,
+      publicServicesDataRaw,
+      electronicDataRaw,
+      electronicBooksDataRaw,
     ] = await Promise.all([
+      fetchParticipationSets(yearNum),
       fetchMonographicData(yearNum),
       fetchVolumeHoldingsData(yearNum),
       fetchSerialsData(yearNum),
@@ -581,7 +630,20 @@ export async function GET(request: NextRequest) {
       fetchElectronicBooksData(yearNum),
     ]);
 
-    // Assemble Table 5 composite data
+    // Filter ALL datasets to only include institutions that actually participated
+    // (based on Entry_Status, the authoritative participation tracker)
+    const monographicData = filterByParticipation(monographicDataRaw, participation.monographic_acquisitions);
+    const volumeHoldingsData = filterByParticipation(volumeHoldingsDataRaw, participation.volume_holdings);
+    const serialsData = filterByParticipation(serialsDataRaw, participation.serials);
+    const otherHoldingsData = filterByParticipation(otherHoldingsDataRaw, participation.other_holdings);
+    const unprocessedData = filterByParticipation(unprocessedDataRaw, participation.unprocessed_backlog_materials);
+    const fiscalData = filterByParticipation(fiscalDataRaw, participation.fiscal_support);
+    const personnelData = filterByParticipation(personnelDataRaw, participation.personnel_support_fte);
+    const publicServicesData = filterByParticipation(publicServicesDataRaw, participation.public_services);
+    const electronicData = filterByParticipation(electronicDataRaw, participation.electronic);
+    const electronicBooksData = filterByParticipation(electronicBooksDataRaw, participation.electronic_books);
+
+    // Assemble Table 5 composite data (uses already-filtered data)
     const table5Data = assembleTable5Data(
       volumeHoldingsData,
       otherHoldingsData,
@@ -594,82 +656,82 @@ export async function GET(request: NextRequest) {
 
     // Table 1 — Monograph Additions
     if (monographicData.length > 0) {
-      exporter.addTable({ ...getTable1Config(yearNum), data: monographicData });
+      exporter.addTable({ ...getTable1Config(yearNum), data: monographicData, skipFilter: true });
     }
 
     // Table 2 — Total Volumes in Library
     if (volumeHoldingsData.length > 0) {
-      exporter.addTable({ ...getTable2Config(yearNum), data: volumeHoldingsData });
+      exporter.addTable({ ...getTable2Config(yearNum), data: volumeHoldingsData, skipFilter: true });
     }
 
     // Table 3-1 — Serials (Purchased & Non-Purchased)
     if (serialsData.length > 0) {
-      exporter.addTable({ ...getTable3_1Config(yearNum), data: serialsData, totalInstitutions: serialsData.length, skipNotes: true });
+      exporter.addTable({ ...getTable3_1Config(yearNum), data: serialsData, skipNotes: true, skipFilter: true });
     }
 
     // Table 3-2 — Serials (Totals) — notes go here (last part)
     if (serialsData.length > 0) {
-      exporter.addTable({ ...getTable3_2Config(yearNum), data: serialsData, totalInstitutions: serialsData.length });
+      exporter.addTable({ ...getTable3_2Config(yearNum), data: serialsData, skipFilter: true });
     }
 
     // Table 4-1 — Other Holdings Physical
     if (otherHoldingsData.length > 0) {
-      exporter.addTable({ ...getTable4_1Config(yearNum), data: otherHoldingsData, totalInstitutions: otherHoldingsData.length, skipNotes: true });
+      exporter.addTable({ ...getTable4_1Config(yearNum), data: otherHoldingsData, skipNotes: true, skipFilter: true });
     }
 
     // Table 4-2 — Other Holdings Online
     if (otherHoldingsData.length > 0) {
-      exporter.addTable({ ...getTable4_2Config(yearNum), data: otherHoldingsData, totalInstitutions: otherHoldingsData.length, skipNotes: true });
+      exporter.addTable({ ...getTable4_2Config(yearNum), data: otherHoldingsData, skipNotes: true, skipFilter: true });
     }
 
     // Table 4-3 — Other Holdings Custom + Total — notes go here (last part)
     if (otherHoldingsData.length > 0) {
-      exporter.addTable({ ...getTable4_3Config(yearNum), data: otherHoldingsData, totalInstitutions: otherHoldingsData.length });
+      exporter.addTable({ ...getTable4_3Config(yearNum), data: otherHoldingsData, skipFilter: true });
     }
 
     // Table 5 — Total East Asian Collections
     if (table5Data.length > 0) {
-      exporter.addTable({ ...getTable5Config(yearNum), data: table5Data });
+      exporter.addTable({ ...getTable5Config(yearNum), data: table5Data, skipFilter: true });
     }
 
     // Table 6-1 — Fiscal Appropriations
     if (fiscalData.length > 0) {
-      exporter.addTable({ ...getTable6_1Config(yearNum), data: fiscalData, totalInstitutions: fiscalData.length, skipNotes: true });
+      exporter.addTable({ ...getTable6_1Config(yearNum), data: fiscalData, skipNotes: true, skipFilter: true });
     }
 
     // Table 6-2 — Fiscal Other Funding — notes go here (last part)
     if (fiscalData.length > 0) {
-      exporter.addTable({ ...getTable6_2Config(yearNum), data: fiscalData, totalInstitutions: fiscalData.length });
+      exporter.addTable({ ...getTable6_2Config(yearNum), data: fiscalData, skipFilter: true });
     }
 
     // Table 7 — Personnel Support
     if (personnelData.length > 0) {
-      exporter.addTable({ ...getTable7Config(yearNum), data: personnelData });
+      exporter.addTable({ ...getTable7Config(yearNum), data: personnelData, skipFilter: true });
     }
 
     // Table 8 — Public Services
     if (publicServicesData.length > 0) {
-      exporter.addTable({ ...getTable8Config(yearNum), data: publicServicesData });
+      exporter.addTable({ ...getTable8Config(yearNum), data: publicServicesData, skipFilter: true });
     }
 
     // Table 9-1 — Electronic Computer Files
     if (electronicData.length > 0) {
-      exporter.addTable({ ...getTable9_1Config(yearNum), data: electronicData, totalInstitutions: electronicData.length, skipNotes: true });
+      exporter.addTable({ ...getTable9_1Config(yearNum), data: electronicData, skipNotes: true, skipFilter: true });
     }
 
     // Table 9-2 — Electronic Databases & Serials — notes go here (last part)
     if (electronicData.length > 0) {
-      exporter.addTable({ ...getTable9_2Config(yearNum), data: electronicData, totalInstitutions: electronicData.length });
+      exporter.addTable({ ...getTable9_2Config(yearNum), data: electronicData, skipFilter: true });
     }
 
     // Table 10-1 — Electronic Books Titles
     if (electronicBooksData.length > 0) {
-      exporter.addTable({ ...getTable10_1Config(yearNum), data: electronicBooksData, totalInstitutions: electronicBooksData.length, skipNotes: true });
+      exporter.addTable({ ...getTable10_1Config(yearNum), data: electronicBooksData, skipNotes: true, skipFilter: true });
     }
 
     // Table 10-2 — Electronic Books Volumes — notes go here (last part)
     if (electronicBooksData.length > 0) {
-      exporter.addTable({ ...getTable10_2Config(yearNum), data: electronicBooksData, totalInstitutions: electronicBooksData.length });
+      exporter.addTable({ ...getTable10_2Config(yearNum), data: electronicBooksData, skipFilter: true });
     }
 
     const buffer = await exporter.generateBuffer();

@@ -28,6 +28,7 @@ export interface PdfTableConfig {
   fiscalYear: number;        // the selected year
   totalInstitutions?: number; // override institution count for split tables
   skipNotes?: boolean;        // true to suppress notes (used on non-last parts of split tables)
+  skipFilter?: boolean;       // true to skip filtering (show all institutions, used for split tables)
 }
 
 export interface HeaderTier {
@@ -77,7 +78,8 @@ export class PdfExporter {
 
     // Filter out institutions that have NO data for this form
     // (all numeric fields are null/undefined/empty)
-    const data = rawData.filter(record => {
+    // For split tables (skipFilter=true), show all institutions to keep counts consistent
+    const data = config.skipFilter ? rawData : rawData.filter(record => {
       for (let i = 1; i < fieldKeys.length; i++) {
         const val = getNestedValue(record, fieldKeys[i]);
         if (val !== null && val !== undefined && val !== '' && val !== 0) {
