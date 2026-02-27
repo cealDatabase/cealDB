@@ -57,9 +57,11 @@ function getNestedValue(obj: any, path: string): any {
 
 // Build a set of library_year IDs that have a specific form submitted,
 // based on the Entry_Status table (the authoritative participation tracker).
+// For older years without Entry_Status records, sets will be empty → filterByParticipation
+// will fall back to returning all data.
 async function fetchParticipationSets(year: number): Promise<Record<string, Set<number>>> {
   const entries = await prisma.library_Year.findMany({
-    where: { year, is_active: true },
+    where: { year },
     select: { id: true, Entry_Status: true },
   });
 
@@ -94,8 +96,10 @@ async function fetchParticipationSets(year: number): Promise<Record<string, Set<
   return sets;
 }
 
-// Filter form data to only include institutions whose Entry_Status has that form flagged
+// Filter form data to only include institutions whose Entry_Status has that form flagged.
+// If participatingIds is empty (older years without Entry_Status), return all data as-is.
 function filterByParticipation(data: any[], participatingIds: Set<number>): any[] {
+  if (participatingIds.size === 0) return data;
   return data.filter(record => {
     const lyId = record.Library_Year?.id;
     return lyId && participatingIds.has(lyId);
