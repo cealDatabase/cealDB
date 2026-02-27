@@ -157,8 +157,8 @@ export function getTable3_2Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: '', colspan: 1, rowspan: 2 },
-          { label: '(1.1+2.1 = 3.1) Total Electronic', colspan: 5 },
-          { label: '(1.2+2.2 = 3.2) Total Print and Other Formats', colspan: 5 },
+          { label: '3.1 Total Electronic (1.1+2.1)', colspan: 5 },
+          { label: '3.2 Total Print and Other Formats (1.2+2.2)', colspan: 5 },
           { label: '3.3 Total Number of Serials Held', colspan: 5 },
         ],
       },
@@ -540,7 +540,7 @@ export function getTable9_1Config(year: number): Omit<PdfTableConfig, 'data'> {
     headerTiers: [
       {
         cells: [
-          { label: '', colspan: 1, rowspan: 2 },
+          { label: '', colspan: 1, rowspan: 3 },
           { label: 'Computer Files (one time monographic purchase)', colspan: 5 },
           { label: 'Accompanied Computer Files', colspan: 5 },
           { label: 'One Time Gift Computer Files', colspan: 5 },
@@ -551,6 +551,16 @@ export function getTable9_1Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: 'Institutions', colspan: 1 },
+          { label: 'Titles', colspan: 5 },
+          { label: 'Titles', colspan: 5 },
+          { label: 'Titles', colspan: 5 },
+          { label: 'Titles', colspan: 5 },
+          { label: 'Titles', colspan: 5 },
+        ],
+      },
+      {
+        cells: [
+          { label: '', colspan: 1 },
           ...cjkNonCjkSubtotalHeaders(), ...cjkNonCjkSubtotalHeaders(), ...cjkNonCjkSubtotalHeaders(),
           ...cjkNonCjkSubtotalHeaders(), ...cjkNonCjkSubtotalHeaders(),
         ],
@@ -580,22 +590,30 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
     headerTiers: [
       {
         cells: [
-          { label: '', colspan: 1, rowspan: 2 },
+          { label: '', colspan: 1, rowspan: 3 },
           { label: 'Grand Total Computer Files', colspan: 10 },
-          { label: 'Electronic Indexes and Reference Tools (opt.)', colspan: 5 },
-          { label: 'Electronic Full Text Periodicals (opt.)', colspan: 5 },
-          { label: 'Electronic Subscriptions Total', colspan: 5 },
-          { label: 'Total Electronic Resources Expenditure', colspan: 1 },
+          { label: 'Electronic Indexes and Reference Tools (opt.)', colspan: 5, rowspan: 2 },
+          { label: 'Electronic Full Text Periodicals (opt.)', colspan: 5, rowspan: 2 },
+          { label: 'Electronic Subscriptions Total', colspan: 5, rowspan: 2 },
+          { label: 'Total Electronic Resources Expenditure', colspan: 1, rowspan: 3 },
         ],
       },
       {
         cells: [
           { label: 'Institutions', colspan: 1 },
-          { label: 'CHN', colspan: 1 }, { label: 'CDs', colspan: 1 },
-          { label: 'JPN', colspan: 1 }, { label: 'CDs', colspan: 1 },
-          { label: 'KOR', colspan: 1 }, { label: 'CDs', colspan: 1 },
-          { label: 'N-CJK', colspan: 1 }, { label: 'CDs', colspan: 1 },
-          { label: 'Total', colspan: 1 }, { label: 'CDs', colspan: 1 },
+          { label: 'Titles', colspan: 5 },
+          { label: 'CDs', colspan: 5 },
+          ...cjkSubHeaders(),
+          ...cjkSubHeaders(),
+          ...cjkSubHeaders(),
+          { label: '', colspan: 1 },
+        ],
+      },
+      {
+        cells: [
+          { label: '', colspan: 1 },
+          ...cjkSubHeaders(),
+          ...cjkSubHeaders(),
           ...cjkSubHeaders(),
           ...cjkSubHeaders(),
           ...cjkSubHeaders(),
@@ -605,11 +623,8 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
     ],
     fieldKeys: [
       'Library_Year.Library.library_name',
-      'egrand_total_title_chinese', 'egrand_total_cd_chinese',
-      'egrand_total_title_japanese', 'egrand_total_cd_japanese',
-      'egrand_total_title_korean', 'egrand_total_cd_korean',
-      'egrand_total_title_noncjk', 'egrand_total_cd_noncjk',
-      'egrand_total_title_subtotal', 'egrand_total_cd_subtotal',
+      'egrand_total_title_chinese', 'egrand_total_title_japanese', 'egrand_total_title_korean', 'egrand_total_title_noncjk', 'egrand_total_title_subtotal',
+      'egrand_total_cd_chinese', 'egrand_total_cd_japanese', 'egrand_total_cd_korean', 'egrand_total_cd_noncjk', 'egrand_total_cd_subtotal',
       'eindex_electronic_title_chinese', 'eindex_electronic_title_japanese', 'eindex_electronic_title_korean', 'eindex_electronic_title_noncjk', 'eindex_electronic_title_subtotal',
       'efulltext_electronic_title_chinese', 'efulltext_electronic_title_japanese', 'efulltext_electronic_title_korean', 'efulltext_electronic_title_noncjk', 'efulltext_electronic_title_subtotal',
       'etotal_electronic_title_chinese', 'etotal_electronic_title_japanese', 'etotal_electronic_title_korean', 'etotal_electronic_title_noncjk', 'etotal_electronic_title_subtotal',
