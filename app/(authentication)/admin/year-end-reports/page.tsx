@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileSpreadsheet, Download, Loader2, CheckCircle2 } from 'lucide-react';
+import { FileSpreadsheet, FileText, Download, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const forms = [
@@ -98,6 +98,61 @@ export default function YearEndReportsPage() {
     }
   };
 
+  const handleExportPdf = async () => {
+    if (!selectedYear) {
+      toast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingForm('pdf');
+
+    try {
+      const response = await fetch(
+        `/api/export/year-end-pdf?year=${selectedYear}`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'PDF export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'PDF export failed';
+        } else {
+          if (response.status === 401) {
+            errorMessage = 'Unauthorized - Please sign in again';
+          } else if (response.status === 403) {
+            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
+          } else {
+            errorMessage = `Server error (${response.status})`;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CEAL_Statistics_${selectedYear}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success(`PDF report exported successfully for year ${selectedYear}`);
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export PDF report');
+    } finally {
+      setLoadingForm(null);
+    }
+  };
+
   const handleExportAll = async () => {
     if (!selectedYear) {
       toast.error('Please select a year first');
@@ -166,7 +221,7 @@ export default function YearEndReportsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Year-End Reports</h1>
           <p className="text-muted-foreground">
-            Generate annual statistics in Excel format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status. 
+            Generate annual statistics in Excel or PDF format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status. 
           </p>
         </div>
 
@@ -204,7 +259,26 @@ export default function YearEndReportsPage() {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Export All Forms (Batch)
+                    Export All Forms (Excel)
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleExportPdf}
+                disabled={!selectedYear || loadingForm !== null}
+                size="lg"
+                variant="outline"
+                className="gap-2"
+              >
+                {loadingForm === 'pdf' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4" />
+                    Export PDF Report
                   </>
                 )}
               </Button>
@@ -277,11 +351,12 @@ export default function YearEndReportsPage() {
               <div className="space-y-2">
                 <p className="font-medium text-blue-900">Export Information</p>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• All exports are in Excel (.xlsx) format with UTF-8 encoding</li>
+                  <li>• Individual form exports are in Excel (.xlsx) format with UTF-8 encoding</li>
                   <li>• Each export includes institution names, all data fields, and notes</li>
-                  <li>• Batch export creates a single file with all 10 forms as separate worksheets</li>
+                  <li>• Excel batch export creates a single file with all 10 forms as separate worksheets</li>
+                  <li>• PDF report generates all tables in a single landscape PDF with totals and footnotes</li>
                   <li>• Data is sorted alphabetically by institution name</li>
-                  <li>• Empty fields are displayed as blank cells in the Excel file</li>
+                  <li>• Empty fields are displayed as blank cells</li>
                 </ul>
               </div>
             </div>
