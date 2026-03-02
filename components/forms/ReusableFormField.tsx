@@ -68,7 +68,13 @@ export function ReusableFormField<T extends FieldValues>({
                 {...field}
                 value={field.value ?? 0}
                 onChange={(e) => {
-                  const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0
+                  // Strip leading zeros: "058" -> 58, "0" -> 0
+                  const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10) || 0
+                  field.onChange(value)
+                }}
+                onBlur={(e) => {
+                  // Ensure value is normalized on blur
+                  const value = parseInt(e.target.value, 10) || 0
                   field.onChange(value)
                 }}
                 onFocus={(e) => {
@@ -136,9 +142,17 @@ export function ReusableNumberFormField<T extends FieldValues>({
               {...field}
               value={field.value ?? 0}
               onChange={(e) => {
+                // Strip leading zeros for both integers and floats
                 const value = useFloat 
                   ? (parseFloat(e.target.value) || 0)
-                  : (parseInt(e.target.value) || 0)
+                  : (parseInt(e.target.value, 10) || 0)
+                field.onChange(value)
+              }}
+              onBlur={(e) => {
+                // Ensure value is normalized on blur
+                const value = useFloat 
+                  ? (parseFloat(e.target.value) || 0)
+                  : (parseInt(e.target.value, 10) || 0)
                 field.onChange(value)
               }}
             />
