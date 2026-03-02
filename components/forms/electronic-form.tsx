@@ -1120,8 +1120,8 @@ export default function ElectronicForm() {
         <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
           <p className='text-sm text-yellow-800 mb-2'>
             <strong>BEFORE using the import feature</strong>, please fill out or
-            update the &quot;Audio/Visual Databases&quot;, &quot;E-Book
-            Databases&quot;, and &quot;E-Journal Databases&quot; in order for
+            update the &quot;Audio/Visual Databases Lists&quot;, &quot;E-Book
+            Databases Lists&quot;, and &quot;E-Journal Databases Lists&quot; in order for
             the system to provide the corresponding numbers automatically.
           </p>
           <Button
@@ -1132,8 +1132,8 @@ export default function ElectronicForm() {
             disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
-            Import from "Audio/Visual Databases", "E-Book Databases" and
-            "E-Journal Databases"
+            Import from "Audio/Visual Databases Lists", "E-Book Databases Lists" and
+            "E-Journal Databases Lists"
           </Button>
         </div>
 

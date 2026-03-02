@@ -598,7 +598,7 @@ export default function OtherHoldingsForm() {
             ) : (
               <>
                 <Download className='h-4 w-4' />
-                Import from &quot;Audio/Video Databases&quot;
+                Import from &quot;Audio/Video Databases Lists&quot;
               </>
             )}
           </Button>

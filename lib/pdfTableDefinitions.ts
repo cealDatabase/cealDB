@@ -349,11 +349,11 @@ export function getTable6_1Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: '', colspan: 1, rowspan: 3 },
-          { label: 'Chinese', colspan: 5 },
-          { label: 'Japanese', colspan: 5 },
-          { label: 'Korean', colspan: 5 },
-          { label: 'N-CJK', colspan: 5 },
-          { label: 'Total Appropriations (US$)', colspan: 1 },
+          { label: 'Chinese', colspan: 5, rowspan: 2 },
+          { label: 'Japanese', colspan: 5, rowspan: 2 },
+          { label: 'Korean', colspan: 5, rowspan: 2 },
+          { label: 'N-CJK', colspan: 5, rowspan: 2 },
+          { label: 'Total Appropriations (US$)', colspan: 1, rowspan: 3, fontSize: 4 },
         ],
       },
       {
@@ -584,7 +584,7 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
   return {
     tableNumber: 'Table 9-2',
     title: `Electronic Resources of East Asian Materials ${asOfDate(year)}`,
-    subtitle: 'Electronic Databases & Serials',
+    subtitle: 'Electronic Indexes and Reference Tools (opt.), Electronic Full Text Periodicals (opt.), and Electronic Subscriptions Total',
     fiscalYear: year,
     notesField: 'enotes',
     headerTiers: [

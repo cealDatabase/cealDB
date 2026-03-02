@@ -349,7 +349,7 @@ export default function SerialsForm() {
             disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
-            Import from &quot;E-Journal Databases&quot;
+            Import from E-Journal Databases Lists
           </Button>
         </div>
 

@@ -307,14 +307,14 @@ export default function ElectronicBooksForm() {
         form.setValue('ebooks_subscription_titles_japanese', data.japanese || 0, { shouldValidate: false });
         form.setValue('ebooks_subscription_titles_korean', data.korean || 0, { shouldValidate: false });
         form.setValue('ebooks_subscription_titles_noncjk', data.noncjk || 0, { shouldValidate: false });
-        toast.success('Subscription titles imported successfully!');
+        toast.success('E-Book titles imported successfully!');
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to import subscription titles');
+        toast.error(errorData.error || 'Failed to import E-Book titles');
       }
     } catch (error) {
       console.error('Import error:', error);
-      toast.error('Failed to import subscription titles');
+      toast.error('Failed to import E-Book titles');
     }
   };
 
@@ -331,14 +331,14 @@ export default function ElectronicBooksForm() {
         form.setValue('ebooks_subscription_volumes_japanese', data.japanese || 0, { shouldValidate: false });
         form.setValue('ebooks_subscription_volumes_korean', data.korean || 0, { shouldValidate: false });
         form.setValue('ebooks_subscription_volumes_noncjk', data.noncjk || 0, { shouldValidate: false });
-        toast.success('Subscription volumes imported successfully!');
+        toast.success('E-Book Databases List imported successfully!');
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to import subscription volumes');
+        toast.error(errorData.error || 'Failed to import E-Book Databases List');
       }
     } catch (error) {
       console.error('Import error:', error);
-      toast.error('Failed to import subscription volumes');
+      toast.error('Failed to import E-Book Databases List');
     }
   };
 
@@ -670,12 +670,12 @@ export default function ElectronicBooksForm() {
       {/* Subscription Titles */}
       <FormSection
         title='Titles from Electronic Resources'
-        description="Use the 'Import from E-Book Database lists' feature after updating your subscription list."
+        description="Use the 'Import from E-Book Database Lists' feature after updating your subscription list."
       >
         <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
           <p className='text-sm text-yellow-800 mb-2'>
             <strong>Note:</strong> Title subscriptions do not count towards
-            total titles. Please maintain &quot;E-Book Databases&quot; before
+            total titles. Please maintain &quot;E-Book Databases Lists&quot; before
             using the import feature.
           </p>
           <Button
@@ -686,7 +686,7 @@ export default function ElectronicBooksForm() {
             disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
-            Import from &quot;E-Book Databases&quot;
+            Import from &quot;E-Book Databases Lists&quot;
           </Button>
         </div>
         <LanguageFieldGroup
@@ -918,12 +918,12 @@ export default function ElectronicBooksForm() {
       {/* Subscription Volumes */}
       <FormSection
         title='Volumes from Electronic Resources'
-        description="Use the 'Import from E-Book Database lists' feature after updating your subscription list."
+        description="Use the 'Import from E-Book Database Lists' feature after updating your subscription list."
       >
         <div className='mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
           <p className='text-sm text-yellow-800 mb-2'>
             <strong>Note:</strong> Volume subscriptions do not count towards
-            total volumes. Please maintain &quot;E-Book Databases&quot; before
+            total volumes. Please maintain &quot;E-Book Databases Lists&quot; before
             using the import feature.
           </p>
           <Button
@@ -934,7 +934,7 @@ export default function ElectronicBooksForm() {
             disabled={isReadOnly && !isPrivilegedPostClosing}
           >
             <Download className='h-4 w-4' />
-            Import from E-Book Databases
+            Import from E-Book Database Lists
           </Button>
         </div>
         <LanguageFieldGroup

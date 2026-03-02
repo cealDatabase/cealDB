@@ -147,7 +147,7 @@ export default function YearEndReportsPage() {
       toast.success(`PDF report exported successfully for year ${selectedYear}`);
     } catch (error) {
       console.error('PDF export error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to export PDF report');
+      toast.error(error instanceof Error ? error.message : 'Failed to export PDF report (publication-ready for JEAL) ');
     } finally {
       setLoadingForm(null);
     }
@@ -278,7 +278,7 @@ export default function YearEndReportsPage() {
                 ) : (
                   <>
                     <FileText className="w-4 h-4" />
-                    Export PDF Report
+                    Export PDF report (publication-ready for JEAL) 
                   </>
                 )}
               </Button>

@@ -39,6 +39,7 @@ export interface HeaderCell {
   label: string;
   colspan: number;
   rowspan?: number;
+  fontSize?: number;  // optional custom font size for this cell
 }
 
 function getNestedValue(obj: any, path: string): any {
@@ -140,6 +141,7 @@ export class PdfExporter {
           alignment: 'center',
           colSpan: cell.colspan > 1 ? cell.colspan : undefined,
           rowSpan: cell.rowspan && cell.rowspan > 1 ? cell.rowspan : undefined,
+          fontSize: cell.fontSize,  // apply custom fontSize if provided
         };
         row.push(headerCell);
         // Add empty cells for colspan

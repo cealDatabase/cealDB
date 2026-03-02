@@ -315,23 +315,43 @@ async function fetchFiscalData(year: number) {
     Object.keys(r).forEach(k => { r[k] = toNum(r[k]); });
     r.Library_Year = record.Library_Year;
 
+    // Calculate auto-totals from individual fields
     const fsChinese = sumWithNull(r.fschinese_appropriations_monographic, r.fschinese_appropriations_serial, r.fschinese_appropriations_other_material, r.fschinese_appropriations_electronic);
-    r.fschinese_appropriations_subtotal = fsChinese !== null ? round2(fsChinese) : null;
+    const fsChineseCalc = fsChinese !== null ? round2(fsChinese) : null;
     const fsJapanese = sumWithNull(r.fsjapanese_appropriations_monographic, r.fsjapanese_appropriations_serial, r.fsjapanese_appropriations_other_material, r.fsjapanese_appropriations_electronic);
-    r.fsjapanese_appropriations_subtotal = fsJapanese !== null ? round2(fsJapanese) : null;
+    const fsJapaneseCalc = fsJapanese !== null ? round2(fsJapanese) : null;
     const fsKorean = sumWithNull(r.fskorean_appropriations_monographic, r.fskorean_appropriations_serial, r.fskorean_appropriations_other_material, r.fskorean_appropriations_electronic);
-    r.fskorean_appropriations_subtotal = fsKorean !== null ? round2(fsKorean) : null;
+    const fsKoreanCalc = fsKorean !== null ? round2(fsKorean) : null;
     const fsNonCjk = sumWithNull(r.fsnoncjk_appropriations_monographic, r.fsnoncjk_appropriations_serial, r.fsnoncjk_appropriations_other_material, r.fsnoncjk_appropriations_electronic);
-    r.fsnoncjk_appropriations_subtotal = fsNonCjk !== null ? round2(fsNonCjk) : null;
-    const fsTotalApprop = sumWithNull(r.fschinese_appropriations_subtotal, r.fsjapanese_appropriations_subtotal, r.fskorean_appropriations_subtotal, r.fsnoncjk_appropriations_subtotal);
-    r.fstotal_appropriations = fsTotalApprop !== null ? round2(fsTotalApprop) : null;
+    const fsNonCjkCalc = fsNonCjk !== null ? round2(fsNonCjk) : null;
 
-    const fsEndow = sumWithNull(r.fsendowments_chinese, r.fsendowments_japanese, r.fsendowments_korean, r.fsendowments_noncjk);
-    r.fsendowments_subtotal = fsEndow !== null ? round2(fsEndow) : null;
-    const fsGrants = sumWithNull(r.fsgrants_chinese, r.fsgrants_japanese, r.fsgrants_korean, r.fsgrants_noncjk);
-    r.fsgrants_subtotal = fsGrants !== null ? round2(fsGrants) : null;
-    const fsEAProgram = sumWithNull(r.fseast_asian_program_support_chinese, r.fseast_asian_program_support_japanese, r.fseast_asian_program_support_korean, r.fseast_asian_program_support_noncjk);
-    r.fseast_asian_program_support_subtotal = fsEAProgram !== null ? round2(fsEAProgram) : null;
+    // Prioritize manual subtotals over calculated (manual = Field*a, higher priority)
+    r.fschinese_appropriations_subtotal = r.fschinese_appropriations_subtotal_manual ?? fsChineseCalc;
+    r.fsjapanese_appropriations_subtotal = r.fsjapanese_appropriations_subtotal_manual ?? fsJapaneseCalc;
+    r.fskorean_appropriations_subtotal = r.fskorean_appropriations_subtotal_manual ?? fsKoreanCalc;
+    r.fsnoncjk_appropriations_subtotal = r.fsnoncjk_appropriations_subtotal_manual ?? fsNonCjkCalc;
+
+    const fsTotalAppropCalc = sumWithNull(r.fschinese_appropriations_subtotal, r.fsjapanese_appropriations_subtotal, r.fskorean_appropriations_subtotal, r.fsnoncjk_appropriations_subtotal);
+    const fsTotalAppropCalcRounded = fsTotalAppropCalc !== null ? round2(fsTotalAppropCalc) : null;
+    
+    // Field21a (manual) prioritized over Field21 (calculated)
+    r.fstotal_appropriations = r.fstotal_appropriations_manual ?? fsTotalAppropCalcRounded;
+
+    const fsEndowCalc = sumWithNull(r.fsendowments_chinese, r.fsendowments_japanese, r.fsendowments_korean, r.fsendowments_noncjk);
+    const fsEndowCalcRounded = fsEndowCalc !== null ? round2(fsEndowCalc) : null;
+    // Field26a (manual) prioritized over Field26 (calculated)
+    r.fsendowments_subtotal = r.fsendowments_subtotal_manual ?? fsEndowCalcRounded;
+
+    const fsGrantsCalc = sumWithNull(r.fsgrants_chinese, r.fsgrants_japanese, r.fsgrants_korean, r.fsgrants_noncjk);
+    const fsGrantsCalcRounded = fsGrantsCalc !== null ? round2(fsGrantsCalc) : null;
+    // Field31a (manual) prioritized over Field31 (calculated)
+    r.fsgrants_subtotal = r.fsgrants_subtotal_manual ?? fsGrantsCalcRounded;
+
+    const fsEAProgramCalc = sumWithNull(r.fseast_asian_program_support_chinese, r.fseast_asian_program_support_japanese, r.fseast_asian_program_support_korean, r.fseast_asian_program_support_noncjk);
+    const fsEAProgramCalcRounded = fsEAProgramCalc !== null ? round2(fsEAProgramCalc) : null;
+    // Field36a (manual) prioritized over Field36 (calculated)
+    r.fseast_asian_program_support_subtotal = r.fseast_asian_program_support_subtotal_manual ?? fsEAProgramCalcRounded;
+
     const fsTotalBudget = sumWithNull(r.fstotal_appropriations, r.fsendowments_subtotal, r.fsgrants_subtotal, r.fseast_asian_program_support_subtotal);
     r.fstotal_acquisition_budget = fsTotalBudget !== null ? round2(fsTotalBudget) : null;
 
