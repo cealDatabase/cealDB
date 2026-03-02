@@ -17,6 +17,7 @@ import { useFormStatusChecker } from "@/hooks/useFormStatusChecker"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatSimpleDate } from "@/lib/dateFormatting"
 import { PostCollectionWarning } from "@/components/forms/PostCollectionWarning"
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher"
 import {
   FormWrapper,
   FormSection,
@@ -166,14 +167,18 @@ const UnprocessedForm = () => {
   }
 
   return (
-    <FormWrapper
-      form={form}
-      onSubmit={onSubmit}
-      isLoading={isLoading}
-      libraryYearStatus={libraryYearStatus}
-      isReadOnly={isReadOnly}
-      readOnlyReason={formPermission?.reason}
-    >
+    <>
+      <InstitutionSwitcher 
+        currentYear={libraryYearStatus?.year}
+      />
+      <FormWrapper
+        form={form}
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        libraryYearStatus={libraryYearStatus}
+        isReadOnly={isReadOnly}
+        readOnlyReason={formPermission?.reason}
+      >
       {/* Unprocessed Backlog Materials */}
       <FormSection
         title="Unprocessed Backlog Materials"
@@ -226,7 +231,8 @@ const UnprocessedForm = () => {
       ) : (
         <p className="text-muted-foreground text-xs text-right translate-y-[-20px]">You can keep editing this form until {closingDateText}</p>
       )}
-    </FormWrapper>
+      </FormWrapper>
+    </>
   )
 }
 
