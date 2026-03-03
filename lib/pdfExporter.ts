@@ -48,6 +48,10 @@ function getNestedValue(obj: any, path: string): any {
 
 function formatValue(value: any, asCurrency: boolean = false): string {
   if (value === null || value === undefined || value === '') return '';
+  // Convert boolean to yes/no
+  if (typeof value === 'boolean') {
+    return value ? 'yes' : 'no';
+  }
   if (asCurrency && typeof value === 'number') {
     return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -56,7 +60,8 @@ function formatValue(value: any, asCurrency: boolean = false): string {
     if (!Number.isInteger(value)) {
       return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-    return value.toLocaleString('en-US');
+    // Remove thousand separators to save space in wide tables
+    return String(value);
   }
   return String(value);
 }
@@ -200,7 +205,7 @@ export class PdfExporter {
     }
 
     // Calculate column widths - explicit numeric widths to guarantee fit
-    const padH = numCols > 20 ? 1 : 2; // Reduce horizontal padding for wide tables
+    const padH = numCols > 25 ? 0.2 : numCols > 20 ? 0.5 : 1; // Reduce horizontal padding for wide tables
     const colWidths = this.calculateColumnWidths(numCols, padH);
 
     // Assemble table body
@@ -218,7 +223,7 @@ export class PdfExporter {
           if (i === headerTiers.length || i === node.table.body.length - 1 || i === node.table.body.length) return 0.5;
           return 0.25;
         },
-        vLineWidth: () => 0.25,
+        vLineWidth: () => 0.2,
         hLineColor: (i: number, node: any) => {
           if (i === headerTiers.length || i === node.table.body.length - 1 || i === node.table.body.length) return '#000000';
           return '#CCCCCC';
@@ -288,17 +293,17 @@ export class PdfExporter {
   private calculateColumnWidths(numCols: number, padH: number): (string | number)[] {
     if (numCols <= 1) return ['*'];
 
-    // Landscape Letter: 792pt width - 20pt left margin - 20pt right margin = 752pt
-    // Subtract vertical line widths: (numCols + 1) * 0.25pt
-    const lineWidth = 0.25;
-    const pageContentWidth = 752 - (numCols + 1) * lineWidth;
+    // Landscape Letter: 792pt width - 10pt left margin - 10pt right margin = 772pt
+    // Subtract vertical line widths: (numCols + 1) * 0.2pt
+    const lineWidth = 0.2;
+    const pageContentWidth = 772 - (numCols + 1) * lineWidth;
     // Subtract cell padding: numCols * (padH left + padH right)
     const usableWidth = pageContentWidth - numCols * padH * 2;
 
     // Institution column: give it proportionally more space
     // For tables with many columns, institution gets less; for few columns, more
-    const instRatio = numCols <= 10 ? 0.20 : numCols <= 20 ? 0.14 : numCols <= 26 ? 0.11 : 0.09;
-    const instWidth = Math.max(40, Math.floor(usableWidth * instRatio));
+    const instRatio = numCols <= 10 ? 0.20 : numCols <= 20 ? 0.14 : numCols <= 26 ? 0.08 : 0.06;
+    const instWidth = Math.max(28, Math.floor(usableWidth * instRatio));
     const dataColWidth = Math.floor((usableWidth - instWidth) / (numCols - 1));
 
     const widths: number[] = [instWidth];
@@ -314,7 +319,7 @@ export class PdfExporter {
     const docDefinition: TDocumentDefinitions = {
       pageSize: 'LETTER',
       pageOrientation: 'landscape',
-      pageMargins: [20, 20, 20, 20],
+      pageMargins: [10, 20, 10, 20],
       defaultStyle: {
         font: 'Roboto',
         fontSize: 5,
@@ -334,18 +339,18 @@ export class PdfExporter {
           bold: true,
         },
         headerCell: {
-          fontSize: 4.5,
+          fontSize: 3.8,
           bold: true,
           fillColor: '#E8E8E8',
         },
         institutionCell: {
-          fontSize: 4.5,
+          fontSize: 3.8,
         },
         dataCell: {
-          fontSize: 4.5,
+          fontSize: 3.8,
         },
         totalsCell: {
-          fontSize: 4.5,
+          fontSize: 3.8,
           bold: true,
         },
         noteText: {
