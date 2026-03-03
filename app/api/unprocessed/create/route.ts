@@ -3,6 +3,7 @@ import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
+import { hasValidUnprocessedData } from "@/lib/formValidation";
 
 export async function POST(req: Request) {
   try {
@@ -108,7 +109,19 @@ export async function POST(req: Request) {
     });
 
     if (finalSubmit) {
-      await markEntryStatus(libraryYear.id, 'unprocessed');
+      // Only mark as participated if the form has meaningful data (not all zeros)
+      const hasValidData = hasValidUnprocessedData(result);
+      if (hasValidData) {
+        await markEntryStatus(libraryYear.id, 'unprocessed');
+      } else {
+        // If all zeros, ensure Entry_Status is set to false
+        await db.entry_Status.upsert({
+          where: { libraryyear: libraryYear.id },
+          update: { unprocessed_backlog_materials: false },
+          create: { libraryyear: libraryYear.id, unprocessed_backlog_materials: false },
+        });
+        console.log("Form submitted with all zeros - not marking as participated");
+      }
     }
 
     return NextResponse.json({

@@ -5,6 +5,18 @@ import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 import archiver from 'archiver';
 import { Readable } from 'stream';
+import {
+  hasValidFiscalData,
+  hasValidMonographicData,
+  hasValidOtherHoldingsData,
+  hasValidPersonnelData,
+  hasValidPublicServicesData,
+  hasValidSerialsData,
+  hasValidUnprocessedData,
+  hasValidVolumeHoldingsData,
+  hasValidElectronicData,
+  hasValidElectronicBooksData
+} from '@/lib/formValidation';
 
 const prisma = db;
 
@@ -328,18 +340,30 @@ async function generateStatisticsCompletionReport(year: number): Promise<Buffer>
   });
 
   libraryYears.forEach((ly) => {
+    // Check if forms have meaningful data (not all zeros)
+    const hasFiscal = ly.Fiscal_Support && hasValidFiscalData(ly.Fiscal_Support);
+    const hasMonographic = ly.Monographic_Acquisitions && hasValidMonographicData(ly.Monographic_Acquisitions);
+    const hasOtherHoldings = ly.Other_Holdings && hasValidOtherHoldingsData(ly.Other_Holdings);
+    const hasPersonnel = ly.Personnel_Support && hasValidPersonnelData(ly.Personnel_Support);
+    const hasPublicServices = ly.Public_Services && hasValidPublicServicesData(ly.Public_Services);
+    const hasSerials = ly.Serials && hasValidSerialsData(ly.Serials);
+    const hasUnprocessed = ly.Unprocessed_Backlog_Materials && hasValidUnprocessedData(ly.Unprocessed_Backlog_Materials);
+    const hasVolumeHoldings = ly.Volume_Holdings && hasValidVolumeHoldingsData(ly.Volume_Holdings);
+    const hasElectronic = ly.Electronic && hasValidElectronicData(ly.Electronic);
+    const hasElectronicBooks = ly.Electronic_Books && hasValidElectronicBooksData(ly.Electronic_Books);
+
     const rowData = [
       ly.Library?.library_name || '',
-      ly.Fiscal_Support ? 'Yes' : '',
-      ly.Monographic_Acquisitions ? 'Yes' : '',
-      ly.Other_Holdings ? 'Yes' : '',
-      ly.Personnel_Support ? 'Yes' : '',
-      ly.Public_Services ? 'Yes' : '',
-      ly.Serials ? 'Yes' : '',
-      ly.Unprocessed_Backlog_Materials ? 'Yes' : '',
-      ly.Volume_Holdings ? 'Yes' : '',
-      ly.Electronic ? 'Yes' : '',
-      ly.Electronic_Books ? 'Yes' : ''
+      hasFiscal ? 'Yes' : '',
+      hasMonographic ? 'Yes' : '',
+      hasOtherHoldings ? 'Yes' : '',
+      hasPersonnel ? 'Yes' : '',
+      hasPublicServices ? 'Yes' : '',
+      hasSerials ? 'Yes' : '',
+      hasUnprocessed ? 'Yes' : '',
+      hasVolumeHoldings ? 'Yes' : '',
+      hasElectronic ? 'Yes' : '',
+      hasElectronicBooks ? 'Yes' : ''
     ];
 
     const row = worksheet.addRow(rowData);

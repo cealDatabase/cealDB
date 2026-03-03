@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
+import { hasValidElectronicBooksData } from "@/lib/formValidation";
 
 export async function POST(req: Request) {
   try {
@@ -109,7 +110,19 @@ export async function POST(req: Request) {
     });
 
     if (finalSubmit) {
-      await markEntryStatus(libraryYear.id, 'electronicBooks');
+      // Only mark as participated if the form has meaningful data (not all zeros)
+      const hasValidData = hasValidElectronicBooksData(result);
+      if (hasValidData) {
+        await markEntryStatus(libraryYear.id, 'electronicBooks');
+      } else {
+        // If all zeros, ensure Entry_Status is set to false
+        await db.entry_Status.upsert({
+          where: { libraryyear: libraryYear.id },
+          update: { electronic_books: false },
+          create: { libraryyear: libraryYear.id, electronic_books: false },
+        });
+        console.log("Form submitted with all zeros - not marking as participated");
+      }
     }
 
     return NextResponse.json({

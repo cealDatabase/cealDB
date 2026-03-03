@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
+import { hasValidMonographicData } from "@/lib/formValidation";
 
 export async function POST(req: Request) {
   try {
@@ -181,7 +182,19 @@ export async function POST(req: Request) {
 
     // If final submit, mark Entry_Status for this library year
     if (finalSubmit) {
-      await markEntryStatus(libraryYear.id, 'monographic');
+      // Only mark as participated if the form has meaningful data (not all zeros)
+      const hasValidData = hasValidMonographicData(monographicRecord);
+      if (hasValidData) {
+        await markEntryStatus(libraryYear.id, 'monographic');
+      } else {
+        // If all zeros, ensure Entry_Status is set to false
+        await db.entry_Status.upsert({
+          where: { libraryyear: libraryYear.id },
+          update: { monographic_acquisitions: false },
+          create: { libraryyear: libraryYear.id, monographic_acquisitions: false },
+        });
+        console.log("Form submitted with all zeros - not marking as participated");
+      }
     }
 
     // Update Library_Year is_active to true after successful form submission
