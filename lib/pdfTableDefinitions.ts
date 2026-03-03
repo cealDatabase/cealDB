@@ -584,7 +584,7 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
   return {
     tableNumber: 'Table 9-2',
     title: `Electronic Resources of East Asian Materials ${asOfDate(year)}`,
-    subtitle: 'Electronic Indexes and Reference Tools (opt.), Electronic Full Text Periodicals (opt.), and Electronic Subscriptions Total',
+    subtitle: 'Electronic Databases & Serials',
     fiscalYear: year,
     notesField: 'enotes',
     headerTiers: [
@@ -592,20 +592,18 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
         cells: [
           { label: '', colspan: 1, rowspan: 3 },
           { label: 'Grand Total Computer Files', colspan: 10 },
-          { label: 'Electronic Indexes and Reference Tools (opt.)', colspan: 5, rowspan: 2 },
-          { label: 'Electronic Full Text Periodicals (opt.)', colspan: 5, rowspan: 2 },
-          { label: 'Electronic Subscriptions Total', colspan: 5, rowspan: 2 },
-          { label: 'Total Electronic Resources Expenditure', colspan: 1, rowspan: 3 },
+          { label: 'Electronic Databases & Serials', colspan: 15 },
+          { label: 'Total Electronic Resources', colspan: 1, rowspan: 3 },
         ],
       },
       {
         cells: [
-          { label: 'Institutions', colspan: 1 },
+          { label: '', colspan: 1 },
           { label: 'Titles', colspan: 5 },
           { label: 'CDs', colspan: 5 },
-          ...cjkSubHeaders(),
-          ...cjkSubHeaders(),
-          ...cjkSubHeaders(),
+          { label: 'Electronic Indexes and Reference Tools (opt.)', colspan: 5 },
+          { label: 'Electronic Full Text Periodicals (opt.)', colspan: 5 },
+          { label: 'Electronic Subscriptions Total', colspan: 5 },
           { label: '', colspan: 1 },
         ],
       },
