@@ -23,6 +23,9 @@ import {
 
 const prisma = db;
 
+// Increase function timeout for PDF generation (Vercel limits: Hobby=10s, Pro=60s, Enterprise=300s)
+export const maxDuration = 60; // seconds
+
 // Helper function for calculations - treats null as 0 for math operations
 function parseNum(value: any): number {
   if (value === null || value === undefined || value === '') return 0;
