@@ -584,7 +584,7 @@ export function getTable9_2Config(year: number): Omit<PdfTableConfig, 'data'> {
   return {
     tableNumber: 'Table 9-2',
     title: `Electronic Resources of East Asian Materials ${asOfDate(year)}`,
-    subtitle: 'Electronic Databases & Serials',
+    subtitle: 'Computer Files (cont.) and Electronic Databases & Serials',
     fiscalYear: year,
     notesField: 'enotes',
     headerTiers: [
