@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileSpreadsheet, Download, Loader2, CheckCircle2 } from 'lucide-react';
+import { Download, Loader2, CheckCircle2, FileSpreadsheet, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const reports = [
@@ -80,6 +80,119 @@ export default function ParticipationReportsPage() {
     } catch (error) {
       console.error('Export error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to export report');
+    } finally {
+      setLoadingReport(null);
+    }
+  };
+
+  const handleExportWord = async (reportId: string, reportFilename: string) => {
+    if (!selectedYear) {
+      toast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingReport(`word-${reportId}`);
+
+    try {
+      const response = await fetch(
+        `/api/export/participation-reports-word?year=${selectedYear}&reportType=${reportId}`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Word export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'Word export failed';
+        } else {
+          if (response.status === 401) {
+            errorMessage = 'Unauthorized - Please sign in again';
+          } else if (response.status === 403) {
+            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
+          } else {
+            errorMessage = `Server error (${response.status})`;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportFilename}-${selectedYear}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setExportedReports(prev => new Set([...prev, reportId]));
+      toast.success(`${reportFilename} exported to Word successfully`);
+    } catch (error) {
+      console.error('Word export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export Word document');
+    } finally {
+      setLoadingReport(null);
+    }
+  };
+
+  const handleExportBatchWord = async () => {
+    if (!selectedYear) {
+      toast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingReport('batch-word');
+
+    try {
+      const response = await fetch(
+        `/api/export/participation-reports-word?year=${selectedYear}&reportType=batch`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'Export failed';
+        } else {
+          if (response.status === 401) {
+            errorMessage = 'Unauthorized - Please sign in again';
+          } else if (response.status === 403) {
+            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
+          } else {
+            errorMessage = `Server error (${response.status})`;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Participation_Reports_Word_${selectedYear}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setExportedReports(new Set(reports.map(r => r.id)));
+
+      toast.success(`Both reports exported to Word successfully for year ${selectedYear}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export Word reports');
     } finally {
       setLoadingReport(null);
     }
@@ -180,12 +293,31 @@ export default function ParticipationReportsPage() {
                 {loadingReport === 'batch' ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Exporting Batch...
+                    Exporting...
                   </>
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Export Both Reports (Zip)
+                    Excel (Zip)
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleExportBatchWord}
+                disabled={!selectedYear || loadingReport !== null}
+                size="lg"
+                variant="secondary"
+                className="gap-2"
+              >
+                {loadingReport === 'batch-word' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4" />
+                    Word (Zip)
                   </>
                 )}
               </Button>
@@ -197,7 +329,7 @@ export default function ParticipationReportsPage() {
           <CardHeader>
             <CardTitle>Export Individual Reports</CardTitle>
             <CardDescription>
-              Export each report separately. All exports are in .xlsx format with UTF-8 encoding.
+              Export each report separately in Excel (.xlsx) or Word (.docx) format with landscape orientation.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -236,7 +368,25 @@ export default function ParticipationReportsPage() {
                       ) : (
                         <>
                           <Download className="w-4 h-4 mr-2" />
-                          Export
+                          Excel
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleExportWord(report.id, report.filename)}
+                      disabled={!selectedYear || loadingReport !== null}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      {loadingReport === `word-${report.id}` ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Exporting...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Word
                         </>
                       )}
                     </Button>
@@ -258,8 +408,9 @@ export default function ParticipationReportsPage() {
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• <strong>Library Characteristics:</strong> Contact information and institutional details</li>
                   <li>• <strong>Statistics Completion:</strong> Form submission status across all categories</li>
-                  <li>• Batch export creates a ZIP file containing both reports</li>
-                  <li>• All exports are in .xlsx format with UTF-8 encoding</li>
+                  <li>• Exports available in Excel (.xlsx) and Word (.docx) formats</li>
+                  <li>• Word exports use landscape orientation for better data visibility</li>
+                  <li>• Batch export creates a ZIP file containing both reports in selected format</li>
                   <li>• Reports include total library count at the end</li>
                 </ul>
               </div>

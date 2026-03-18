@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet } from "lucide-react";
+import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet, FileText } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from 'sonner';
@@ -281,6 +281,107 @@ export default function ReportsPage() {
     }
   };
 
+  const handleExportSurveyWord = async (reportId: string, reportFilename: string) => {
+    if (!selectedSurveyYear) {
+      sonnerToast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingSurvey(`word-${reportId}`);
+
+    try {
+      const response = await fetch(
+        `/api/export/supplementary-reports-word?year=${selectedSurveyYear}&reportType=${reportId}`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Word export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'Word export failed';
+        } else {
+          errorMessage = `Server error (${response.status})`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportFilename}-${selectedSurveyYear}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setExportedSurveys(prev => new Set([...prev, reportId]));
+      sonnerToast.success(`${reportFilename} exported to Word successfully`);
+    } catch (error) {
+      console.error('Word export error:', error);
+      sonnerToast.error(error instanceof Error ? error.message : 'Failed to export Word document');
+    } finally {
+      setLoadingSurvey(null);
+    }
+  };
+
+  const handleExportAllSurveysWord = async () => {
+    if (!selectedSurveyYear) {
+      sonnerToast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingSurvey('batch-word');
+
+    try {
+      const response = await fetch(
+        `/api/export/supplementary-reports-word?year=${selectedSurveyYear}&reportType=batch`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'Export failed';
+        } else {
+          errorMessage = `Server error (${response.status})`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Database_Collection_Reports_Word_${selectedSurveyYear}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setExportedSurveys(new Set(SURVEY_REPORTS.map(r => r.id)));
+
+      sonnerToast.success(`All database collection reports (Word) exported successfully for year ${selectedSurveyYear}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      sonnerToast.error(error instanceof Error ? error.message : 'Failed to export Word reports');
+    } finally {
+      setLoadingSurvey(null);
+    }
+  };
+
   const handleExportAllSurveys = async () => {
     if (!selectedSurveyYear) {
       sonnerToast.error('Please select a year first');
@@ -532,7 +633,7 @@ export default function ReportsPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="pt-8">
+                    <div className="pt-8 flex gap-2">
                       <Button
                         onClick={handleExportAllSurveys}
                         disabled={!selectedSurveyYear || loadingSurvey !== null}
@@ -542,12 +643,31 @@ export default function ReportsPage() {
                         {loadingSurvey === 'batch' ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Exporting All...
+                            Exporting...
                           </>
                         ) : (
                           <>
                             <Download className="w-4 h-4" />
-                            Export All 3 Reports (Zip)
+                            Excel (Zip)
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={handleExportAllSurveysWord}
+                        disabled={!selectedSurveyYear || loadingSurvey !== null}
+                        size="lg"
+                        variant="secondary"
+                        className="gap-2"
+                      >
+                        {loadingSurvey === 'batch-word' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Exporting...
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-4 h-4" />
+                            Word (Zip)
                           </>
                         )}
                       </Button>
@@ -590,7 +710,25 @@ export default function ReportsPage() {
                             ) : (
                               <>
                                 <Download className="w-4 h-4 mr-2" />
-                                Export
+                                Excel
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            onClick={() => handleExportSurveyWord(report.id, report.filename)}
+                            disabled={!selectedSurveyYear || loadingSurvey !== null}
+                            variant="secondary"
+                            size="sm"
+                          >
+                            {loadingSurvey === `word-${report.id}` ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                Exporting...
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="w-4 h-4 mr-2" />
+                                Word
                               </>
                             )}
                           </Button>
@@ -601,7 +739,7 @@ export default function ReportsPage() {
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  All exports in .xlsx format with UTF-8 encoding. Each report includes global databases and individual member selections. Batch creates ZIP with all 3 reports.
+                  Exports available in Excel (.xlsx) and Word (.docx) formats. Each report includes global databases and individual member selections. Batch ZIP includes all 3 reports in selected format with landscape orientation.
                 </p>
               </CardContent>
             </Card>

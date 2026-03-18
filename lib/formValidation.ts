@@ -5,6 +5,10 @@
  */
 
 export function isFormAllZeros(data: Record<string, any>): boolean {
+  if (!data || typeof data !== 'object') {
+    return true;
+  }
+  
   const numericFields = Object.entries(data).filter(([key, value]) => {
     // Skip non-numeric fields like notes, labels, IDs, etc.
     if (
@@ -40,6 +44,7 @@ export function isFormAllZeros(data: Record<string, any>): boolean {
  * Check if Other Holdings form has meaningful data
  */
 export function hasValidOtherHoldingsData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -47,6 +52,7 @@ export function hasValidOtherHoldingsData(data: any): boolean {
  * Check if Monographic Acquisitions form has meaningful data
  */
 export function hasValidMonographicData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -54,6 +60,7 @@ export function hasValidMonographicData(data: any): boolean {
  * Check if Volume Holdings form has meaningful data
  */
 export function hasValidVolumeHoldingsData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -61,6 +68,7 @@ export function hasValidVolumeHoldingsData(data: any): boolean {
  * Check if Serials form has meaningful data
  */
 export function hasValidSerialsData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -68,6 +76,7 @@ export function hasValidSerialsData(data: any): boolean {
  * Check if Unprocessed Backlog form has meaningful data
  */
 export function hasValidUnprocessedData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -75,6 +84,7 @@ export function hasValidUnprocessedData(data: any): boolean {
  * Check if Fiscal Support form has meaningful data
  */
 export function hasValidFiscalData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -82,6 +92,7 @@ export function hasValidFiscalData(data: any): boolean {
  * Check if Personnel Support form has meaningful data
  */
 export function hasValidPersonnelData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -89,6 +100,7 @@ export function hasValidPersonnelData(data: any): boolean {
  * Check if Public Services form has meaningful data
  */
 export function hasValidPublicServicesData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -96,6 +108,7 @@ export function hasValidPublicServicesData(data: any): boolean {
  * Check if Electronic form has meaningful data
  */
 export function hasValidElectronicData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
 
@@ -103,5 +116,6 @@ export function hasValidElectronicData(data: any): boolean {
  * Check if Electronic Books form has meaningful data
  */
 export function hasValidElectronicBooksData(data: any): boolean {
+  if (!data) return false;
   return !isFormAllZeros(data);
 }
