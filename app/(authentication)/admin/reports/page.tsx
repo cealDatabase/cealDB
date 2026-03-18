@@ -688,7 +688,7 @@ export default function ReportsPage() {
                           <div>
                             <p className="font-medium">{report.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {report.filename}-{selectedSurveyYear}.xlsx
+                              {report.filename}-{selectedSurveyYear} (.xlsx/.docx)
                             </p>
                           </div>
                         </div>

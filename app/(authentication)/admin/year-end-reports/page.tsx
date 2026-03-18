@@ -154,6 +154,61 @@ export default function YearEndReportsPage() {
     }
   };
 
+  const handleExportAllWord = async () => {
+    if (!selectedYear) {
+      toast.error('Please select a year first');
+      return;
+    }
+
+    setLoadingForm('all-word');
+
+    try {
+      const response = await fetch(
+        `/api/export/year-end-reports-word?year=${selectedYear}&formType=all`,
+        {
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Word export failed';
+        
+        if (contentType?.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error || 'Word export failed';
+        } else {
+          if (response.status === 401) {
+            errorMessage = 'Unauthorized - Please sign in again';
+          } else if (response.status === 403) {
+            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
+          } else {
+            errorMessage = `Server error (${response.status})`;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CEAL_Statistics_All_Forms_${selectedYear}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success(`All forms exported to Word successfully for year ${selectedYear}`);
+    } catch (error) {
+      console.error('Word export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export Word document');
+    } finally {
+      setLoadingForm(null);
+    }
+  };
+
   const handleExportPdf = async () => {
     if (!selectedYear) {
       toast.error('Please select a year first');
@@ -305,6 +360,7 @@ export default function YearEndReportsPage() {
                 onClick={handleExportAll}
                 disabled={!selectedYear || loadingForm !== null}
                 size="lg"
+                variant="outline"
                 className="gap-2"
               >
                 {loadingForm === 'all' ? (
@@ -316,6 +372,25 @@ export default function YearEndReportsPage() {
                   <>
                     <Download className="w-4 h-4" />
                     Export All Forms (Excel)
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleExportAllWord}
+                disabled={!selectedYear || loadingForm !== null}
+                size="lg"
+                variant="outline"
+                className="gap-2"
+              >
+                {loadingForm === 'all-word' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Exporting All Forms...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4" />
+                    Export All Forms (Word)
                   </>
                 )}
               </Button>
@@ -364,7 +439,7 @@ export default function YearEndReportsPage() {
                     <div>
                       <p className="font-medium">{form.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {form.filename}-{selectedYear}.xlsx
+                        {form.filename}-{selectedYear} (.xlsx/.docx)
                       </p>
                     </div>
                   </div>

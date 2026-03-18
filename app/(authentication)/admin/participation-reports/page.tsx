@@ -346,7 +346,7 @@ export default function ParticipationReportsPage() {
                     <div>
                       <p className="font-medium">{report.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {report.filename}-{selectedYear}.xlsx
+                        {report.filename}-{selectedYear} (.xlsx/.docx)
                       </p>
                     </div>
                   </div>

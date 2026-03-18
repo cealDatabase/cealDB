@@ -215,14 +215,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!formType || formType === 'all') {
+    const yearNum = parseInt(year);
+    
+    if (formType === 'all') {
+      return await exportAllFormsWord(yearNum);
+    }
+
+    if (!formType) {
       return NextResponse.json(
-        { error: 'Form type parameter is required for Word export. Please export individual forms.' },
+        { error: 'Form type parameter is required' },
         { status: 400 }
       );
     }
 
-    const yearNum = parseInt(year);
     return await exportSingleFormWord(formType, yearNum);
   } catch (error) {
     console.error('Word export error:', error);
@@ -553,6 +558,7 @@ async function exportSingleFormWord(formType: string, year: number) {
   }
 
   await exporter.createDocument(wordConfig);
+  exporter.finalize();
 
   const buffer = await exporter.generateBuffer();
   const uint8Array = new Uint8Array(buffer);
@@ -561,6 +567,318 @@ async function exportSingleFormWord(formType: string, year: number) {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'Content-Disposition': `attachment; filename="${title}-${year}.docx"`
+    }
+  });
+}
+
+async function exportAllFormsWord(year: number) {
+  const exporter = new WordExporter();
+  
+  const formTypes = ['monographic', 'volumeHoldings', 'serials', 'otherHoldings', 'unprocessed', 'fiscal', 'personnel', 'publicServices', 'electronic', 'electronicBooks'];
+  
+  // Process each form and add to the same document
+  for (const formType of formTypes) {
+    const formConfigs: any = {
+      monographic: {
+        title: '1_Monographs',
+        fullTitle: 'Monographic Acquisitions',
+        groupedHeaders: [
+          { label: 'Institutions', colspan: 1 },
+          { label: 'Purchased Titles', colspan: 5 },
+          { label: 'Purchased Volumes', colspan: 5 },
+          { label: 'Non-Purchased Titles', colspan: 5 },
+          { label: 'Non-Purchased Volumes', colspan: 5 },
+          { label: 'Totals', colspan: 2 }
+        ]
+      },
+      volumeHoldings: {
+        title: '2_VolumeHoldings',
+        fullTitle: 'Physical Volume Holdings',
+        multiTierHeaders: {
+          tier1: [
+            { label: 'Institution', colspan: 1 },
+            { label: 'Physical Volumes', colspan: 15 },
+            { label: 'Totals', colspan: 3 }
+          ],
+          tier2: [
+            { label: '', colspan: 1 },
+            { label: 'From Last Year', colspan: 5 },
+            { label: 'Added This Year', colspan: 5 },
+            { label: 'Withdrawn This Year', colspan: 5 },
+            { label: 'Physical Total', colspan: 1 },
+            { label: 'E-Books', colspan: 1 },
+            { label: 'Grand Total', colspan: 1 }
+          ]
+        }
+      },
+      serials: {
+        title: '3_Serials',
+        fullTitle: 'Current Serials (Print and Electronic)',
+        groupedHeaders: [
+          { label: 'Institutions', colspan: 1 },
+          { label: 'ELECTRONIC: Purchased', colspan: 5 },
+          { label: 'PRINT: Purchased', colspan: 5 },
+          { label: 'ELECTRONIC: Non-Purchased', colspan: 5 },
+          { label: 'PRINT: Non-Purchased', colspan: 5 },
+          { label: 'ELECTRONIC: Totals', colspan: 5 },
+          { label: 'PRINT: Totals', colspan: 5 },
+          { label: 'Overall Total', colspan: 1 }
+        ]
+      },
+      otherHoldings: {
+        title: '4_OtherHoldings',
+        fullTitle: 'Holdings of Other Materials',
+        multiTierHeaders: {
+          tier1: [
+            { label: 'Institution', colspan: 1 },
+            { label: 'Physical Materials', colspan: 25 },
+            { label: 'Online Materials', colspan: 25 },
+            { label: 'Total', colspan: 1 }
+          ],
+          tier2: [
+            { label: '', colspan: 1 },
+            { label: 'Microforms', colspan: 5 },
+            { label: 'Cartographic & Graphic', colspan: 5 },
+            { label: 'Audio', colspan: 5 },
+            { label: 'Video', colspan: 5 },
+            { label: 'DVD', colspan: 5 },
+            { label: 'Map', colspan: 5 },
+            { label: 'Image/Photo', colspan: 5 },
+            { label: 'Audio/Music', colspan: 5 },
+            { label: 'Film/Video', colspan: 5 },
+            { label: 'Custom', colspan: 5 },
+            { label: '', colspan: 1 }
+          ]
+        }
+      },
+      unprocessed: {
+        title: '5_GrandTotalHolding',
+        fullTitle: 'Unprocessed Backlog Materials',
+        groupedHeaders: [
+          { label: 'Institutions', colspan: 1 },
+          { label: 'Backlog', colspan: 5 }
+        ]
+      },
+      fiscal: {
+        title: '6_FiscalAppropriations',
+        fullTitle: 'Fiscal Support',
+        multiTierHeaders: {
+          tier1: [
+            { label: 'Institution', colspan: 1 },
+            { label: 'Appropriations by Language', colspan: 24 },
+            { label: 'Total Approp.', colspan: 2 },
+            { label: 'Other Funding Sources', colspan: 18 },
+            { label: 'Total Budget', colspan: 1 }
+          ],
+          tier2: [
+            { label: '', colspan: 1 },
+            { label: 'Chinese', colspan: 6 },
+            { label: 'Japanese', colspan: 6 },
+            { label: 'Korean', colspan: 6 },
+            { label: 'Non-CJK', colspan: 6 },
+            { label: '', colspan: 2 },
+            { label: 'Endowments', colspan: 6 },
+            { label: 'Grants', colspan: 6 },
+            { label: 'East Asian Program Support', colspan: 6 },
+            { label: '', colspan: 1 }
+          ]
+        }
+      },
+      personnel: {
+        title: '7_PersonnelSupport',
+        fullTitle: 'Personnel Support',
+        groupedHeaders: [
+          { label: 'Institutions', colspan: 1 },
+          { label: 'Professional', colspan: 5 },
+          { label: 'Support Staff', colspan: 5 },
+          { label: 'Student Assistants', colspan: 5 },
+          { label: 'Others & Total', colspan: 2 },
+          { label: 'Outsourcing', colspan: 2 }
+        ]
+      },
+      publicServices: {
+        title: '8_PublicServices',
+        fullTitle: 'Public Services',
+        groupedHeaders: [
+          { label: 'Institutions', colspan: 1 },
+          { label: 'Presentations & Participants', colspan: 2 },
+          { label: 'Reference & Circulation', colspan: 2 },
+          { label: 'Inter-Library Loan', colspan: 4 }
+        ]
+      },
+      electronic: {
+        title: '9_Electronic',
+        fullTitle: 'Electronic Resources',
+        multiTierHeaders: {
+          tier1: [
+            { label: 'Institution', colspan: 1 },
+            { label: '1. Computer Files (CD-ROMs)', colspan: 60 },
+            { label: '2. Electronic Resources', colspan: 15 },
+            { label: '3. Expenditure', colspan: 1 }
+          ],
+          tier2: [
+            { label: '', colspan: 1 },
+            { label: '1.1 One-time Purchases', colspan: 10 },
+            { label: '1.2 Accompanied Materials', colspan: 10 },
+            { label: '1.3 Gifts', colspan: 10 },
+            { label: '1.4 Total Current Year', colspan: 10 },
+            { label: '1.5 Previous Year', colspan: 10 },
+            { label: '1.6 Grand Total', colspan: 10 },
+            { label: '2.1 Electronic Indexes', colspan: 5 },
+            { label: '2.2 Full-text Database', colspan: 5 },
+            { label: '2.3 Total Electronic', colspan: 5 },
+            { label: '', colspan: 1 }
+          ]
+        }
+      },
+      electronicBooks: {
+        title: '10_ElectronicBooks',
+        fullTitle: 'Electronic Books Statistics',
+        multiTierHeaders: {
+          tier1: [
+            { label: 'Institution', colspan: 1 },
+            { label: 'TITLES', colspan: 25 },
+            { label: 'VOLUMES', colspan: 25 },
+            { label: 'Totals', colspan: 2 },
+            { label: 'Expenditure', colspan: 1 },
+            { label: 'Grand Total', colspan: 2 }
+          ],
+          tier2: [
+            { label: '', colspan: 1 },
+            { label: 'Purchased', colspan: 15 },
+            { label: 'Non-Purchased', colspan: 5 },
+            { label: 'Subscription', colspan: 5 },
+            { label: 'Purchased', colspan: 15 },
+            { label: 'Non-Purchased', colspan: 5 },
+            { label: 'Subscription', colspan: 5 },
+            { label: '', colspan: 2 },
+            { label: '', colspan: 1 },
+            { label: 'Physical Vol.', colspan: 1 },
+            { label: 'Grand Total', colspan: 1 }
+          ]
+        }
+      }
+    };
+
+    const config = formConfigs[formType];
+    const fieldMapping = (formFieldMappings as any)[formType];
+    
+    const prismaQueries: any = {
+      monographic: () => prisma.monographic_Acquisitions.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      volumeHoldings: () => prisma.volume_Holdings.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      serials: () => prisma.serials.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      otherHoldings: () => prisma.other_Holdings.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      unprocessed: () => prisma.unprocessed_Backlog_Materials.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      fiscal: () => prisma.fiscal_Support.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      personnel: () => prisma.personnel_Support.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      publicServices: () => prisma.public_Services.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      electronic: () => prisma.electronic.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      }),
+      electronicBooks: () => prisma.electronic_Books.findMany({
+        where: { Library_Year: { year } },
+        include: { Library_Year: { include: { Library: true } } },
+        orderBy: { Library_Year: { Library: { library_name: 'asc' } } }
+      })
+    };
+
+    const data = await prismaQueries[formType]();
+    
+    if (data.length > 0) {
+      const needsDecimalRounding = formType === 'fiscal' || formType === 'personnel';
+      
+      const transformedData = data.map((record: any) => {
+        const transformed: any = {};
+        
+        Object.keys(fieldMapping).forEach(field => {
+          let value = getNestedValue(record, field);
+          
+          if (value !== null && value !== undefined && typeof value === 'object' && 'toNumber' in value) {
+            value = value.toNumber();
+          }
+          
+          if (needsDecimalRounding && typeof value === 'number' && !isNaN(value)) {
+            value = round2(value);
+          }
+          
+          transformed[field] = value;
+        });
+        
+        const calculatedFields = calculateFormFields(formType, record);
+        Object.assign(transformed, calculatedFields);
+        
+        const notesFieldName = (notesFields as any)[formType];
+        if (notesFieldName) {
+          transformed[notesFieldName] = record[notesFieldName];
+        }
+        
+        return transformed;
+      });
+
+      const headers = Object.values(fieldMapping) as string[];
+
+      const wordConfig: any = {
+        title: config.title,
+        fullTitle: config.fullTitle,
+        year: year,
+        headers: headers,
+        data: transformedData,
+        fieldMapping: fieldMapping,
+        notesField: (notesFields as any)[formType]
+      };
+
+      if (config.multiTierHeaders) {
+        wordConfig.multiTierHeaders = config.multiTierHeaders;
+      } else if (config.groupedHeaders && config.groupedHeaders.length > 0) {
+        wordConfig.groupedHeaders = config.groupedHeaders;
+      }
+
+      await exporter.createDocument(wordConfig);
+    }
+  }
+
+  exporter.finalize();
+  const buffer = await exporter.generateBuffer();
+  const uint8Array = new Uint8Array(buffer);
+
+  return new NextResponse(uint8Array, {
+    headers: {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': `attachment; filename="CEAL_Statistics_All_Forms_${year}.docx"`
     }
   });
 }
