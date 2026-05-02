@@ -24,12 +24,11 @@ export function LocalDateTime({ dateString, className, dateOnly = false }: Local
         return;
       }
       
-      // Format with UTC timezone
+      // Format with browser's local timezone
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',
-        timeZone: 'UTC',
       };
       
       // Add time components if not dateOnly
