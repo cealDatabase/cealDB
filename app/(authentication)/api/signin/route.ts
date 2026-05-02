@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
-import { logDebug } from '@/app/api/debug-logs/route';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,9 +26,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`\n🚀 ARGON2ID SIGNIN ATTEMPT for email: "${email}"`);
-    console.log(`📊 Request timestamp: ${new Date().toISOString()}`);
-
     // Find user by email (treating username as email) - case insensitive
     const user = await db.user.findFirst({
       where: {
@@ -50,7 +46,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      console.log(`❌ USER NOT FOUND: "${email}"`);
       return NextResponse.json(
         {
           success: false,
@@ -67,11 +62,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ USER FOUND: "${user.username}" (ID: ${user.id})`);
-    
     // Check if user account is active
     if (!user.isactive) {
-      console.log(`❌ INACTIVE ACCOUNT: "${email}"`);
       return NextResponse.json(
         { 
           success: false, 
@@ -89,9 +81,6 @@ export async function POST(request: NextRequest) {
 
     // Check if user needs password reset (password is null or requires_password_reset is true)
     if (!user.password || user.requires_password_reset) {
-      console.log(`🔄 PASSWORD RESET REQUIRED for user: "${email}"`);
-      console.log(`Password hash exists: ${!!user.password}, Requires reset: ${user.requires_password_reset}`);
-      
       // Generate password reset token
       const resetToken = generateResetToken();
       const resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
@@ -116,8 +105,6 @@ export async function POST(request: NextRequest) {
         resetToken,
         isInitialSetup
       );
-
-      console.log(`📧 ${isInitialSetup ? 'Initial password setup' : 'Password reset'} email sent to ${user.username}: ${emailSent}`);
 
       return NextResponse.json(
         {
@@ -147,7 +134,6 @@ export async function POST(request: NextRequest) {
       if (!isValidPassword) {
         // Check if this is due to old password format  
         if (!user.password!.startsWith('$argon2id$')) {
-          console.log(`🔄 PASSWORD MIGRATION REQUIRED for user: "${email}"`);
           return NextResponse.json(
             { 
               success: false, 
@@ -164,7 +150,6 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        console.log(`❌ INVALID CREDENTIALS for user: "${email}"`);
         return NextResponse.json(
           { 
             success: false, 
@@ -180,8 +165,6 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
-
-      console.log(`🎉 SUCCESSFUL ARGON2ID SIGNIN for user: "${email}"`);
 
       // Get user role and library information
       const userLibrary = await db.user_Library.findFirst({
@@ -208,14 +191,6 @@ export async function POST(request: NextRequest) {
       const token = generateJWTToken({
         userId: user.id,
         username: user.username,
-      });
-
-      console.log(`🎉 SUCCESSFUL ARGON2ID SIGNIN for user: "${email}"`);
-      console.log(`📋 Session User:`, {
-        id: sessionUser.id,
-        username: sessionUser.username,
-        role: sessionUser.role,
-        library: sessionUser.library
       });
 
       // Create response with cookies set in headers (Vercel compatible)
@@ -260,10 +235,6 @@ export async function POST(request: NextRequest) {
         response.cookies.set('library', sessionUser.library.toString(), cookieOptions);
       }
 
-      console.log(`✅ Login successful: ${email}`);
-      console.log(`🍪 Cookies set: session, uinf, role, library`);
-      console.log(`🔧 Cookie options:`, cookieOptions);
-      console.log(`📋 Response headers:`, response.headers.get('set-cookie'));
       return response;
 
     } catch (authError) {
