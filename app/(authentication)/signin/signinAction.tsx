@@ -39,6 +39,7 @@ export default async function signinAction(
         password: true,
         firstname: true,
         lastname: true,
+        lastlogin_at: true,
         User_Roles: {
           select: {
             Role: {
@@ -172,7 +173,10 @@ export default async function signinAction(
     cookieStore.set('role', JSON.stringify(userRoleIds), clientCookieOptions);
     cookieStore.set('library', userLibraryId, clientCookieOptions);
 
-    // Update user's last login time
+    // Save previous login time before overwriting, then update to now
+    if (user.lastlogin_at) {
+      cookieStore.set('lastlogin', user.lastlogin_at.toISOString(), cookieOptions);
+    }
     await db.user.update({
       where: { id: user.id },
       data: { lastlogin_at: new Date() }

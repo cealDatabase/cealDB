@@ -104,6 +104,7 @@ async function UserLoggedInPage() {
   const rawCookieValue = cookieStore.get("uinf")?.value;
   const userCookie = rawCookieValue ? decodeURIComponent(rawCookieValue).toLowerCase() : undefined;
   const roleIds = cookieStore.get("role")?.value;
+  const lastLoginCookie = cookieStore.get("lastlogin")?.value;
 
   let userRoleIds: string[] = [];
   try {
@@ -155,7 +156,7 @@ async function UserLoggedInPage() {
               user={userData.user}
               roles={userData.roles || []}
               library={userData.library}
-              lastLogin={userData.lastLogin || undefined}
+              lastLogin={lastLoginCookie || undefined}
             />
           </div>
 
