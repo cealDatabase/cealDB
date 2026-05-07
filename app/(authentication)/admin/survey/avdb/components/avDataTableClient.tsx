@@ -5,7 +5,7 @@ import { listAVWithSelection } from "./getAVList";
 import { getColumns } from "./columns";
 import { DataTable } from "@/components/data-table/DataTable";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -65,72 +65,98 @@ export default function AVDataTableClient({
     setSelectionData(map);
   }, [data]);
 
-  // Handle selection change
-  const handleSelectionChange = useCallback((id: number, selected: boolean) => {
-    setSelectionData((prev) => {
-      const newMap = new Map(prev);
-      const existing = newMap.get(id);
-      newMap.set(id, {
-        is_selected: selected,
-        custom_count: existing?.custom_count ?? null,
-      });
-      return newMap;
-    });
-  }, []);
-
-  // Handle custom count change
-  const handleCustomCountChange = useCallback((id: number, count: number | null) => {
-    setSelectionData((prev) => {
-      const newMap = new Map(prev);
-      const existing = newMap.get(id);
-      newMap.set(id, {
-        is_selected: existing?.is_selected ?? false,
-        custom_count: count,
-      });
-      return newMap;
-    });
-  }, []);
-
-  // Save selections to server
-  const handleSaveSelections = useCallback(async () => {
-    if (!libid) {
-      toast.error("Library ID is required to save selections");
-      return;
-    }
-
-    // Build selections array from Map
-    const selections = Array.from(selectionData.entries()).map(([listId, state]) => ({
-      listId,
-      isSelected: state.is_selected,
-      customCount: state.custom_count,
-    }));
-
-    setIsSaving(true);
-    try {
-      const response = await fetch("/api/survey/av/save-selections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          year,
-          libraryId: libid,
-          selections,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to save selections");
+  // Persist a single row to the server. Used by auto-save on
+  // checkbox toggle and (debounced) custom count edits.
+  const persistOne = useCallback(
+    async (
+      listId: number,
+      isSelected: boolean,
+      customCount: number | null
+    ) => {
+      if (!libid) return;
+      try {
+        const response = await fetch("/api/survey/av/save-selections", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            year,
+            libraryId: libid,
+            selections: [{ listId, isSelected, customCount }],
+          }),
+        });
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${response.status}`);
+        }
+      } catch (error: any) {
+        console.error("Auto-save error:", error);
+        toast.error(`Save failed: ${error.message || "Unknown error"}`);
       }
+    },
+    [libid, year]
+  );
 
-      const result = await response.json();
-      toast.success(`Saved ${result.savedCount} selections successfully!`);
-    } catch (error: any) {
-      console.error("Save error:", error);
-      toast.error(error.message || "Failed to save selections");
-    } finally {
-      setIsSaving(false);
-    }
-  }, [selectionData, libid, year]);
+  // Debounce timers per row id, used for custom count typing
+  const countDebounceRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(
+    new Map()
+  );
+
+  // Handle selection change (auto-save immediately)
+  const handleSelectionChange = useCallback(
+    (id: number, selected: boolean) => {
+      let nextCount: number | null = null;
+      setSelectionData((prev) => {
+        const newMap = new Map(prev);
+        const existing = newMap.get(id);
+        nextCount = existing?.custom_count ?? null;
+        newMap.set(id, { is_selected: selected, custom_count: nextCount });
+        return newMap;
+      });
+      if (libid) {
+        setIsSaving(true);
+        void persistOne(id, selected, nextCount).finally(() =>
+          setIsSaving(false)
+        );
+      }
+    },
+    [libid, persistOne]
+  );
+
+  // Handle custom count change (auto-save debounced 600ms)
+  const handleCustomCountChange = useCallback(
+    (id: number, count: number | null) => {
+      let nextSelected = false;
+      setSelectionData((prev) => {
+        const newMap = new Map(prev);
+        const existing = newMap.get(id);
+        nextSelected = existing?.is_selected ?? false;
+        newMap.set(id, { is_selected: nextSelected, custom_count: count });
+        return newMap;
+      });
+      if (!libid) return;
+      // Reset debounce for this row
+      const timers = countDebounceRef.current;
+      const existingTimer = timers.get(id);
+      if (existingTimer) clearTimeout(existingTimer);
+      const timer = setTimeout(() => {
+        setIsSaving(true);
+        void persistOne(id, nextSelected, count).finally(() => {
+          setIsSaving(false);
+          timers.delete(id);
+        });
+      }, 600);
+      timers.set(id, timer);
+    },
+    [libid, persistOne]
+  );
+
+  // Cleanup debounce timers on unmount
+  useEffect(() => {
+    return () => {
+      countDebounceRef.current.forEach((t) => clearTimeout(t));
+      countDebounceRef.current.clear();
+    };
+  }, []);
 
   // Get columns with callbacks
   const columns = useMemo(
@@ -162,21 +188,17 @@ export default function AVDataTableClient({
     return { pageIndex, pageSize };
   }, [data, newRecordId]);
 
-  // Extended toolbar with save button
+  // Toolbar with auto-save status indicator (no manual save button)
   const ToolbarWithLib = (props: any) => (
     <div className="space-y-2">
       <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
       {libid && (
-        <div className="flex items-center gap-2 px-1">
-          <button
-            onClick={handleSaveSelections}
-            disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-          >
-            {isSaving ? "Saving..." : "Save Survey Selections"}
-          </button>
-          <span className="text-sm text-muted-foreground">
-            {Array.from(selectionData.values()).filter(s => s.is_selected).length} items selected
+        <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
+          <span>
+            {Array.from(selectionData.values()).filter((s) => s.is_selected).length} items selected
+          </span>
+          <span aria-live="polite" className="text-xs">
+            {isSaving ? "Saving…" : "All changes saved"}
           </span>
         </div>
       )}
