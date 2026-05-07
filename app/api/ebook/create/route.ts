@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { handleP2002WithSequenceFix, SEQUENCE_TABLES } from "@/lib/sequenceFixer";
+import { isSuperAdmin } from "@/lib/libraryYearHelper";
 
 export async function POST(req: Request) {
   try {
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
             year: year,
             library: Number(library_id)
           },
-          select: { id: true }
+          select: { id: true, is_open_for_editing: true }
         });
 
         if (!libraryYearRecord) {
@@ -55,12 +56,28 @@ export async function POST(req: Request) {
             { status: 404 }
           );
         }
+
+        // Check if editing is allowed (super admins can bypass this)
+        if (!libraryYearRecord.is_open_for_editing) {
+          const superAdmin = await isSuperAdmin();
+          if (!superAdmin) {
+            return NextResponse.json(
+              { 
+                error: "Form submission not allowed", 
+                message: "This survey is currently closed. Please contact the administrator for assistance." 
+              },
+              { status: 403 }
+            );
+          }
+          console.log("[EBook Create] Super Admin bypassing is_open_for_editing check");
+        }
+
         libraryYearId = libraryYearRecord.id;
       } else {
         // Admin-created entry: find any Library_Year by year
         const libraryYearRecord = await db.library_Year.findFirst({
           where: { year: year },
-          select: { id: true }
+          select: { id: true, is_open_for_editing: true }
         });
 
         if (!libraryYearRecord) {
@@ -69,6 +86,22 @@ export async function POST(req: Request) {
             { status: 404 }
           );
         }
+
+        // Check if editing is allowed (super admins can bypass this)
+        if (!libraryYearRecord.is_open_for_editing) {
+          const superAdmin = await isSuperAdmin();
+          if (!superAdmin) {
+            return NextResponse.json(
+              { 
+                error: "Form submission not allowed", 
+                message: "This survey is currently closed. Please contact the administrator for assistance." 
+              },
+              { status: 403 }
+            );
+          }
+          console.log("[EBook Create] Super Admin bypassing is_open_for_editing check");
+        }
+
         libraryYearId = libraryYearRecord.id;
       }
     }
