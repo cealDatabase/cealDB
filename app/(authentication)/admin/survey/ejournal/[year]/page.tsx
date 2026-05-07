@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { GetEJournalList } from "../components/getEJournalList";
+import { GetEJournalList, GetEJournalListWithUserSelections } from "../components/getEJournalList";
 import EJournalDataTableClient from "../components/ejDataTableClient";
 import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
@@ -15,7 +15,10 @@ async function EJournalSinglePage(
     initialSearch?: string,
     newRecordId?: number
 ) {
-    const tasks = (await GetEJournalList(yearPassIn)).sort((a, b) => a.id - b.id);
+    // Use GetEJournalListWithUserSelections if libid is available, otherwise fallback to GetEJournalList
+    const tasks = libid
+        ? (await GetEJournalListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
+        : (await GetEJournalList(yearPassIn)).sort((a, b) => a.id - b.id);
     return (
         <EJournalDataTableClient
             data={tasks}

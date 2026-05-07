@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { GetEBookList } from "../components/getEBookList";
+import { GetEBookList, GetEBookListWithUserSelections } from "../components/getEBookList";
 import EBookDataTableClient from "../components/ebDataTableClient";
 import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
@@ -15,7 +15,10 @@ async function EbookSinglePage(
     initialSearch?: string,
     newRecordId?: number
 ) {
-    const tasks = (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
+    // Use GetEBookListWithUserSelections if libid is available, otherwise fallback to GetEBookList
+    const tasks = libid
+        ? (await GetEBookListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
+        : (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
     return (
         <EBookDataTableClient
             data={tasks}

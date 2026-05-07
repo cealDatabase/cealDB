@@ -29,26 +29,37 @@ export type AggregateLibraryYear_ListEJournal = {
 export type LibraryYear_ListEJournalAvgAggregateOutputType = {
   libraryyear_id: number | null
   listejournal_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListEJournalSumAggregateOutputType = {
   libraryyear_id: number | null
   listejournal_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListEJournalMinAggregateOutputType = {
   libraryyear_id: number | null
   listejournal_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListEJournalMaxAggregateOutputType = {
   libraryyear_id: number | null
   listejournal_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListEJournalCountAggregateOutputType = {
   libraryyear_id: number
   listejournal_id: number
+  is_selected: number
+  custom_count: number
+  updated_at: number
   _all: number
 }
 
@@ -56,26 +67,37 @@ export type LibraryYear_ListEJournalCountAggregateOutputType = {
 export type LibraryYear_ListEJournalAvgAggregateInputType = {
   libraryyear_id?: true
   listejournal_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListEJournalSumAggregateInputType = {
   libraryyear_id?: true
   listejournal_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListEJournalMinAggregateInputType = {
   libraryyear_id?: true
   listejournal_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListEJournalMaxAggregateInputType = {
   libraryyear_id?: true
   listejournal_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListEJournalCountAggregateInputType = {
   libraryyear_id?: true
   listejournal_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -168,6 +190,9 @@ export type LibraryYear_ListEJournalGroupByArgs<ExtArgs extends runtime.Types.Ex
 export type LibraryYear_ListEJournalGroupByOutputType = {
   libraryyear_id: number
   listejournal_id: number
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
   _count: LibraryYear_ListEJournalCountAggregateOutputType | null
   _avg: LibraryYear_ListEJournalAvgAggregateOutputType | null
   _sum: LibraryYear_ListEJournalSumAggregateOutputType | null
@@ -196,6 +221,9 @@ export type LibraryYear_ListEJournalWhereInput = {
   NOT?: Prisma.LibraryYear_ListEJournalWhereInput | Prisma.LibraryYear_ListEJournalWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
   listejournal_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEJournal"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEJournal"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEJournal"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_EJournal?: Prisma.XOR<Prisma.List_EJournalScalarRelationFilter, Prisma.List_EJournalWhereInput>
 }
@@ -203,6 +231,9 @@ export type LibraryYear_ListEJournalWhereInput = {
 export type LibraryYear_ListEJournalOrderByWithRelationInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   Library_Year?: Prisma.Library_YearOrderByWithRelationInput
   List_EJournal?: Prisma.List_EJournalOrderByWithRelationInput
 }
@@ -214,6 +245,9 @@ export type LibraryYear_ListEJournalWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LibraryYear_ListEJournalWhereInput | Prisma.LibraryYear_ListEJournalWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
   listejournal_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEJournal"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEJournal"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEJournal"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_EJournal?: Prisma.XOR<Prisma.List_EJournalScalarRelationFilter, Prisma.List_EJournalWhereInput>
 }, "libraryyear_id_listejournal_id">
@@ -221,6 +255,9 @@ export type LibraryYear_ListEJournalWhereUniqueInput = Prisma.AtLeast<{
 export type LibraryYear_ListEJournalOrderByWithAggregationInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LibraryYear_ListEJournalCountOrderByAggregateInput
   _avg?: Prisma.LibraryYear_ListEJournalAvgOrderByAggregateInput
   _max?: Prisma.LibraryYear_ListEJournalMaxOrderByAggregateInput
@@ -234,9 +271,15 @@ export type LibraryYear_ListEJournalScalarWhereWithAggregatesInput = {
   NOT?: Prisma.LibraryYear_ListEJournalScalarWhereWithAggregatesInput | Prisma.LibraryYear_ListEJournalScalarWhereWithAggregatesInput[]
   libraryyear_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListEJournal"> | number
   listejournal_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListEJournal"> | number
+  is_selected?: Prisma.BoolNullableWithAggregatesFilter<"LibraryYear_ListEJournal"> | boolean | null
+  custom_count?: Prisma.IntNullableWithAggregatesFilter<"LibraryYear_ListEJournal"> | number | null
+  updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"LibraryYear_ListEJournal"> | Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListEJournalInput
   List_EJournal: Prisma.List_EJournalCreateNestedOneWithoutLibraryYear_ListEJournalInput
 }
@@ -244,9 +287,15 @@ export type LibraryYear_ListEJournalCreateInput = {
 export type LibraryYear_ListEJournalUncheckedCreateInput = {
   libraryyear_id: number
   listejournal_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalUpdateInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListEJournalNestedInput
   List_EJournal?: Prisma.List_EJournalUpdateOneRequiredWithoutLibraryYear_ListEJournalNestedInput
 }
@@ -254,20 +303,31 @@ export type LibraryYear_ListEJournalUpdateInput = {
 export type LibraryYear_ListEJournalUncheckedUpdateInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listejournal_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateManyInput = {
   libraryyear_id: number
   listejournal_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalUpdateManyMutationInput = {
-
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalUncheckedUpdateManyInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listejournal_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalLibraryyear_idListejournal_idCompoundUniqueInput = {
@@ -278,26 +338,37 @@ export type LibraryYear_ListEJournalLibraryyear_idListejournal_idCompoundUniqueI
 export type LibraryYear_ListEJournalCountOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEJournalAvgOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEJournalMaxOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEJournalMinOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEJournalSumOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listejournal_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEJournalListRelationFilter = {
@@ -395,11 +466,17 @@ export type LibraryYear_ListEJournalUncheckedUpdateManyWithoutLibrary_YearNested
 }
 
 export type LibraryYear_ListEJournalCreateWithoutList_EJournalInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListEJournalInput
 }
 
 export type LibraryYear_ListEJournalUncheckedCreateWithoutList_EJournalInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateOrConnectWithoutList_EJournalInput = {
@@ -434,14 +511,23 @@ export type LibraryYear_ListEJournalScalarWhereInput = {
   NOT?: Prisma.LibraryYear_ListEJournalScalarWhereInput | Prisma.LibraryYear_ListEJournalScalarWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
   listejournal_id?: Prisma.IntFilter<"LibraryYear_ListEJournal"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEJournal"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEJournal"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEJournal"> | Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateWithoutLibrary_YearInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   List_EJournal: Prisma.List_EJournalCreateNestedOneWithoutLibraryYear_ListEJournalInput
 }
 
 export type LibraryYear_ListEJournalUncheckedCreateWithoutLibrary_YearInput = {
   listejournal_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateOrConnectWithoutLibrary_YearInput = {
@@ -472,34 +558,58 @@ export type LibraryYear_ListEJournalUpdateManyWithWhereWithoutLibrary_YearInput 
 
 export type LibraryYear_ListEJournalCreateManyList_EJournalInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalUpdateWithoutList_EJournalInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListEJournalNestedInput
 }
 
 export type LibraryYear_ListEJournalUncheckedUpdateWithoutList_EJournalInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalUncheckedUpdateManyWithoutList_EJournalInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalCreateManyLibrary_YearInput = {
   listejournal_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEJournalUpdateWithoutLibrary_YearInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   List_EJournal?: Prisma.List_EJournalUpdateOneRequiredWithoutLibraryYear_ListEJournalNestedInput
 }
 
 export type LibraryYear_ListEJournalUncheckedUpdateWithoutLibrary_YearInput = {
   listejournal_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEJournalUncheckedUpdateManyWithoutLibrary_YearInput = {
   listejournal_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -507,6 +617,9 @@ export type LibraryYear_ListEJournalUncheckedUpdateManyWithoutLibrary_YearInput 
 export type LibraryYear_ListEJournalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listejournal_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EJournal?: boolean | Prisma.List_EJournalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEJournal"]>
@@ -514,6 +627,9 @@ export type LibraryYear_ListEJournalSelect<ExtArgs extends runtime.Types.Extensi
 export type LibraryYear_ListEJournalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listejournal_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EJournal?: boolean | Prisma.List_EJournalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEJournal"]>
@@ -521,6 +637,9 @@ export type LibraryYear_ListEJournalSelectCreateManyAndReturn<ExtArgs extends ru
 export type LibraryYear_ListEJournalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listejournal_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EJournal?: boolean | Prisma.List_EJournalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEJournal"]>
@@ -528,9 +647,12 @@ export type LibraryYear_ListEJournalSelectUpdateManyAndReturn<ExtArgs extends ru
 export type LibraryYear_ListEJournalSelectScalar = {
   libraryyear_id?: boolean
   listejournal_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
 }
 
-export type LibraryYear_ListEJournalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listejournal_id", ExtArgs["result"]["libraryYear_ListEJournal"]>
+export type LibraryYear_ListEJournalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listejournal_id" | "is_selected" | "custom_count" | "updated_at", ExtArgs["result"]["libraryYear_ListEJournal"]>
 export type LibraryYear_ListEJournalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EJournal?: boolean | Prisma.List_EJournalDefaultArgs<ExtArgs>
@@ -553,6 +675,9 @@ export type $LibraryYear_ListEJournalPayload<ExtArgs extends runtime.Types.Exten
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     libraryyear_id: number
     listejournal_id: number
+    is_selected: boolean | null
+    custom_count: number | null
+    updated_at: Date | null
   }, ExtArgs["result"]["libraryYear_ListEJournal"]>
   composites: {}
 }
@@ -980,6 +1105,9 @@ export interface Prisma__LibraryYear_ListEJournalClient<T, Null = never, ExtArgs
 export interface LibraryYear_ListEJournalFieldRefs {
   readonly libraryyear_id: Prisma.FieldRef<"LibraryYear_ListEJournal", 'Int'>
   readonly listejournal_id: Prisma.FieldRef<"LibraryYear_ListEJournal", 'Int'>
+  readonly is_selected: Prisma.FieldRef<"LibraryYear_ListEJournal", 'Boolean'>
+  readonly custom_count: Prisma.FieldRef<"LibraryYear_ListEJournal", 'Int'>
+  readonly updated_at: Prisma.FieldRef<"LibraryYear_ListEJournal", 'DateTime'>
 }
     
 

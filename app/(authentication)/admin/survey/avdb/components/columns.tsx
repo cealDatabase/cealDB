@@ -1,7 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import dynamic from "next/dynamic"
 import { type } from "../data/data"
 import { listAV } from "../data/schema"
+import { listAVWithSelection } from "./getAVList"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
@@ -10,6 +13,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+
+// Dynamic import for client-only components to avoid hydration mismatch
+const ClientDataTableRowActions = dynamic(
+  () => import("./data-table-row-actions").then((mod) => mod.DataTableRowActions),
+  { ssr: false }
+)
 
 // Expandable text component using Popover from Shadcn UI
 // Utility to render text or list with popover capability
@@ -184,7 +193,13 @@ const ExpandableNotes = ({ content }: { content: string | null }) => {
     </Popover>
   )
 };
-export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listAV>[] {
+export function getColumns(
+  year: number, 
+  roleIdPassIn?: string,
+  onSelectionChange?: (id: number, selected: boolean) => void,
+  onCustomCountChange?: (id: number, count: number | null) => void,
+  selectionData?: Map<number, { is_selected: boolean; custom_count: number | null }>
+): ColumnDef<listAV | listAVWithSelection>[] {
   // Parse role cookie (can be JSON array or single value)
   let userRoles: string[] = [];
   if (roleIdPassIn) {
@@ -195,41 +210,97 @@ export function getColumns(year: number, roleIdPassIn?: string): ColumnDef<listA
       userRoles = [roleIdPassIn];
     }
   }
+
+  // Helper to get selection state for a row
+  const getSelectionState = (id: number) => {
+    if (selectionData?.has(id)) {
+      return selectionData.get(id)!;
+    }
+    return { is_selected: false, custom_count: null };
+  };
   
   // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
   // Show Actions for admins, super admins, or users with multiple roles
   const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
 
   return [
+    // User selection checkbox column (new)
     {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label='Select all'
-          className='translate-y-[2px]'
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label='Select row'
-          className='translate-y-[2px]'
-        />
-      ),
+      id: "user_selection",
+      header: ({ table }) => {
+        const rows = table.getRowModel().rows;
+        const allSelected = rows.length > 0 && rows.every(row => {
+          const state = getSelectionState((row.original as any).id);
+          return state.is_selected;
+        });
+        const someSelected = rows.some(row => {
+          const state = getSelectionState((row.original as any).id);
+          return state.is_selected;
+        });
+        
+        return (
+          <Checkbox
+            checked={allSelected || (someSelected && "indeterminate")}
+            onCheckedChange={(value) => {
+              rows.forEach(row => {
+                onSelectionChange?.((row.original as any).id, !!value);
+              });
+            }}
+            aria-label='Select all for survey'
+            className='translate-y-[2px]'
+          />
+        );
+      },
+      cell: ({ row }) => {
+        const id = (row.original as any).id as number;
+        const { is_selected } = getSelectionState(id);
+        
+        return (
+          <Checkbox
+            checked={is_selected}
+            onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
+            aria-label='Select for survey'
+            className='translate-y-[2px]'
+          />
+        );
+      },
       enableSorting: false,
       enableHiding: false,
+      size: 50,
+    },
+    // Custom count input column (new)
+    {
+      id: "custom_count",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={<>Custom<br />Count</>} />
+      ),
+      cell: ({ row }) => {
+        const id = (row.original as any).id as number;
+        const { custom_count } = getSelectionState(id);
+        
+        return (
+          <Input
+            type="number"
+            value={custom_count ?? ""}
+            onChange={(e) => {
+              const value = e.target.value === "" ? null : parseInt(e.target.value, 10);
+              onCustomCountChange?.(id, value);
+            }}
+            placeholder="-"
+            className="w-[80px] h-8 text-center"
+            min={0}
+          />
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+      size: 100,
     },
     ...(shouldShowActions
       ? [{
           id: "actions",
           header: "Actions",
-          cell: ({ row }: { row: any }) => <DataTableRowActions row={row} year={year} userRoles={userRoles} />,
+          cell: ({ row }: { row: any }) => <ClientDataTableRowActions row={row} year={year} userRoles={userRoles} />,
         } as ColumnDef<listAV>]
       : []),
     {

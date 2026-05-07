@@ -29,26 +29,37 @@ export type AggregateLibraryYear_ListEBook = {
 export type LibraryYear_ListEBookAvgAggregateOutputType = {
   libraryyear_id: number | null
   listebook_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListEBookSumAggregateOutputType = {
   libraryyear_id: number | null
   listebook_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListEBookMinAggregateOutputType = {
   libraryyear_id: number | null
   listebook_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListEBookMaxAggregateOutputType = {
   libraryyear_id: number | null
   listebook_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListEBookCountAggregateOutputType = {
   libraryyear_id: number
   listebook_id: number
+  is_selected: number
+  custom_count: number
+  updated_at: number
   _all: number
 }
 
@@ -56,26 +67,37 @@ export type LibraryYear_ListEBookCountAggregateOutputType = {
 export type LibraryYear_ListEBookAvgAggregateInputType = {
   libraryyear_id?: true
   listebook_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListEBookSumAggregateInputType = {
   libraryyear_id?: true
   listebook_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListEBookMinAggregateInputType = {
   libraryyear_id?: true
   listebook_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListEBookMaxAggregateInputType = {
   libraryyear_id?: true
   listebook_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListEBookCountAggregateInputType = {
   libraryyear_id?: true
   listebook_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -168,6 +190,9 @@ export type LibraryYear_ListEBookGroupByArgs<ExtArgs extends runtime.Types.Exten
 export type LibraryYear_ListEBookGroupByOutputType = {
   libraryyear_id: number
   listebook_id: number
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
   _count: LibraryYear_ListEBookCountAggregateOutputType | null
   _avg: LibraryYear_ListEBookAvgAggregateOutputType | null
   _sum: LibraryYear_ListEBookSumAggregateOutputType | null
@@ -196,6 +221,9 @@ export type LibraryYear_ListEBookWhereInput = {
   NOT?: Prisma.LibraryYear_ListEBookWhereInput | Prisma.LibraryYear_ListEBookWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
   listebook_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEBook"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEBook"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEBook"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_EBook?: Prisma.XOR<Prisma.List_EBookScalarRelationFilter, Prisma.List_EBookWhereInput>
 }
@@ -203,6 +231,9 @@ export type LibraryYear_ListEBookWhereInput = {
 export type LibraryYear_ListEBookOrderByWithRelationInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   Library_Year?: Prisma.Library_YearOrderByWithRelationInput
   List_EBook?: Prisma.List_EBookOrderByWithRelationInput
 }
@@ -214,6 +245,9 @@ export type LibraryYear_ListEBookWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LibraryYear_ListEBookWhereInput | Prisma.LibraryYear_ListEBookWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
   listebook_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEBook"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEBook"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEBook"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_EBook?: Prisma.XOR<Prisma.List_EBookScalarRelationFilter, Prisma.List_EBookWhereInput>
 }, "libraryyear_id_listebook_id">
@@ -221,6 +255,9 @@ export type LibraryYear_ListEBookWhereUniqueInput = Prisma.AtLeast<{
 export type LibraryYear_ListEBookOrderByWithAggregationInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LibraryYear_ListEBookCountOrderByAggregateInput
   _avg?: Prisma.LibraryYear_ListEBookAvgOrderByAggregateInput
   _max?: Prisma.LibraryYear_ListEBookMaxOrderByAggregateInput
@@ -234,9 +271,15 @@ export type LibraryYear_ListEBookScalarWhereWithAggregatesInput = {
   NOT?: Prisma.LibraryYear_ListEBookScalarWhereWithAggregatesInput | Prisma.LibraryYear_ListEBookScalarWhereWithAggregatesInput[]
   libraryyear_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListEBook"> | number
   listebook_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListEBook"> | number
+  is_selected?: Prisma.BoolNullableWithAggregatesFilter<"LibraryYear_ListEBook"> | boolean | null
+  custom_count?: Prisma.IntNullableWithAggregatesFilter<"LibraryYear_ListEBook"> | number | null
+  updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"LibraryYear_ListEBook"> | Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListEBookInput
   List_EBook: Prisma.List_EBookCreateNestedOneWithoutLibraryYear_ListEBookInput
 }
@@ -244,9 +287,15 @@ export type LibraryYear_ListEBookCreateInput = {
 export type LibraryYear_ListEBookUncheckedCreateInput = {
   libraryyear_id: number
   listebook_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookUpdateInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListEBookNestedInput
   List_EBook?: Prisma.List_EBookUpdateOneRequiredWithoutLibraryYear_ListEBookNestedInput
 }
@@ -254,20 +303,31 @@ export type LibraryYear_ListEBookUpdateInput = {
 export type LibraryYear_ListEBookUncheckedUpdateInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listebook_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateManyInput = {
   libraryyear_id: number
   listebook_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookUpdateManyMutationInput = {
-
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookUncheckedUpdateManyInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listebook_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookLibraryyear_idListebook_idCompoundUniqueInput = {
@@ -278,26 +338,37 @@ export type LibraryYear_ListEBookLibraryyear_idListebook_idCompoundUniqueInput =
 export type LibraryYear_ListEBookCountOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEBookAvgOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEBookMaxOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEBookMinOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEBookSumOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listebook_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListEBookListRelationFilter = {
@@ -395,11 +466,17 @@ export type LibraryYear_ListEBookUncheckedUpdateManyWithoutLibrary_YearNestedInp
 }
 
 export type LibraryYear_ListEBookCreateWithoutList_EBookInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListEBookInput
 }
 
 export type LibraryYear_ListEBookUncheckedCreateWithoutList_EBookInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateOrConnectWithoutList_EBookInput = {
@@ -434,14 +511,23 @@ export type LibraryYear_ListEBookScalarWhereInput = {
   NOT?: Prisma.LibraryYear_ListEBookScalarWhereInput | Prisma.LibraryYear_ListEBookScalarWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
   listebook_id?: Prisma.IntFilter<"LibraryYear_ListEBook"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListEBook"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListEBook"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListEBook"> | Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateWithoutLibrary_YearInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   List_EBook: Prisma.List_EBookCreateNestedOneWithoutLibraryYear_ListEBookInput
 }
 
 export type LibraryYear_ListEBookUncheckedCreateWithoutLibrary_YearInput = {
   listebook_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateOrConnectWithoutLibrary_YearInput = {
@@ -472,34 +558,58 @@ export type LibraryYear_ListEBookUpdateManyWithWhereWithoutLibrary_YearInput = {
 
 export type LibraryYear_ListEBookCreateManyList_EBookInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookUpdateWithoutList_EBookInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListEBookNestedInput
 }
 
 export type LibraryYear_ListEBookUncheckedUpdateWithoutList_EBookInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookUncheckedUpdateManyWithoutList_EBookInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookCreateManyLibrary_YearInput = {
   listebook_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListEBookUpdateWithoutLibrary_YearInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   List_EBook?: Prisma.List_EBookUpdateOneRequiredWithoutLibraryYear_ListEBookNestedInput
 }
 
 export type LibraryYear_ListEBookUncheckedUpdateWithoutLibrary_YearInput = {
   listebook_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListEBookUncheckedUpdateManyWithoutLibrary_YearInput = {
   listebook_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -507,6 +617,9 @@ export type LibraryYear_ListEBookUncheckedUpdateManyWithoutLibrary_YearInput = {
 export type LibraryYear_ListEBookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listebook_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EBook?: boolean | Prisma.List_EBookDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEBook"]>
@@ -514,6 +627,9 @@ export type LibraryYear_ListEBookSelect<ExtArgs extends runtime.Types.Extensions
 export type LibraryYear_ListEBookSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listebook_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EBook?: boolean | Prisma.List_EBookDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEBook"]>
@@ -521,6 +637,9 @@ export type LibraryYear_ListEBookSelectCreateManyAndReturn<ExtArgs extends runti
 export type LibraryYear_ListEBookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listebook_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EBook?: boolean | Prisma.List_EBookDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListEBook"]>
@@ -528,9 +647,12 @@ export type LibraryYear_ListEBookSelectUpdateManyAndReturn<ExtArgs extends runti
 export type LibraryYear_ListEBookSelectScalar = {
   libraryyear_id?: boolean
   listebook_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
 }
 
-export type LibraryYear_ListEBookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listebook_id", ExtArgs["result"]["libraryYear_ListEBook"]>
+export type LibraryYear_ListEBookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listebook_id" | "is_selected" | "custom_count" | "updated_at", ExtArgs["result"]["libraryYear_ListEBook"]>
 export type LibraryYear_ListEBookInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_EBook?: boolean | Prisma.List_EBookDefaultArgs<ExtArgs>
@@ -553,6 +675,9 @@ export type $LibraryYear_ListEBookPayload<ExtArgs extends runtime.Types.Extensio
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     libraryyear_id: number
     listebook_id: number
+    is_selected: boolean | null
+    custom_count: number | null
+    updated_at: Date | null
   }, ExtArgs["result"]["libraryYear_ListEBook"]>
   composites: {}
 }
@@ -980,6 +1105,9 @@ export interface Prisma__LibraryYear_ListEBookClient<T, Null = never, ExtArgs ex
 export interface LibraryYear_ListEBookFieldRefs {
   readonly libraryyear_id: Prisma.FieldRef<"LibraryYear_ListEBook", 'Int'>
   readonly listebook_id: Prisma.FieldRef<"LibraryYear_ListEBook", 'Int'>
+  readonly is_selected: Prisma.FieldRef<"LibraryYear_ListEBook", 'Boolean'>
+  readonly custom_count: Prisma.FieldRef<"LibraryYear_ListEBook", 'Int'>
+  readonly updated_at: Prisma.FieldRef<"LibraryYear_ListEBook", 'DateTime'>
 }
     
 

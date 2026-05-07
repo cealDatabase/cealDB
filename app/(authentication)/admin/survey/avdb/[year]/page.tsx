@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { GetAVList } from "../components/getAVList";
+import { GetAVList, GetAVListWithUserSelections } from "../components/getAVList";
 import AVDataTableClient from "../components/avDataTableClient";
 import { Container } from "@/components/Container";
 import SelectYear from "../components/selectYear";
@@ -20,7 +20,11 @@ async function AVSinglePage(
   initialSearch?: string,
   newRecordId?: number
 ) {
-  const tasks = (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+  // Use GetAVListWithUserSelections if libid is available, otherwise fallback to GetAVList
+  const tasks = libid 
+    ? (await GetAVListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
+    : (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+  
   return (
     <AVDataTableClient
       data={tasks}

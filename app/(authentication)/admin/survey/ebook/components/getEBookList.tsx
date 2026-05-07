@@ -5,9 +5,11 @@ import {
   getSubscriberIdByListEBookId,
   getLibraryById,
   getLanguageById,
+  getLibYearByLibIdAndYear,
 } from "@/data/fetchPrisma";
 import { z } from "zod";
 import { listEBookSchema } from "../data/schema";
+import db from "@/lib/db";
 
 /** ⬇️ allow volumes/chapters on each row (local-only, no schema migration) */
 const listEBookRowSchema = listEBookSchema.extend({
@@ -117,4 +119,62 @@ export async function GetEBookList(userSelectedYear: number) {
   const data = await getEBookListByYear(userSelectedYear);
   /** ⬇️ parse with the extended schema so volumes/chapters are preserved */
   return z.array(listEBookRowSchema).parse(data || []);
+}
+
+// Extended schema with user selections
+const listEBookWithSelectionSchema = listEBookRowSchema.extend({
+  is_selected: z.boolean().optional(),
+  custom_count: z.number().nullable().optional(),
+});
+
+export type listEBookWithSelection = z.infer<typeof listEBookWithSelectionSchema>;
+
+/**
+ * Get EBook list with user selections for a specific library
+ */
+export async function GetEBookListWithUserSelections(
+  userSelectedYear: number,
+  libraryId: number
+) {
+  // Get library_year record and extract id
+  const libraryYearRecords = await getLibYearByLibIdAndYear(libraryId, userSelectedYear);
+  const libraryYearId = libraryYearRecords && libraryYearRecords.length > 0 
+    ? libraryYearRecords[0].id 
+    : null;
+  
+  // Get base EBook list
+  const baseData = await getEBookListByYear(userSelectedYear);
+  
+  // Get user selections if libraryYear exists
+  let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
+  
+  if (libraryYearId) {
+    const selections = await db.libraryYear_ListEBook.findMany({
+      where: { libraryyear_id: libraryYearId },
+      select: {
+        listebook_id: true,
+        is_selected: true,
+        custom_count: true,
+      },
+    });
+    
+    selections.forEach((sel) => {
+      userSelections.set(sel.listebook_id, {
+        is_selected: sel.is_selected ?? false,
+        custom_count: sel.custom_count,
+      });
+    });
+  }
+  
+  // Merge user selections with base data
+  const mergedData = baseData.map((item) => {
+    const selection = userSelections.get(item.id);
+    return {
+      ...item,
+      is_selected: selection?.is_selected ?? false,
+      custom_count: selection?.custom_count ?? null,
+    };
+  });
+  
+  return z.array(listEBookWithSelectionSchema).parse(mergedData || []);
 }

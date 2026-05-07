@@ -4,10 +4,12 @@ import {
   getLanguageIdByListAvId,
   getSubscriberIdByListAvId,
   getLibraryById,
-  getLanguageById
+  getLanguageById,
+  getLibYearByLibIdAndYear,
 } from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
+import db from "@/lib/db";
 
 const getAVListByYear = async (userSelectedYear: number) => {
   const listAVCountsByYear = await getListAVCountsByYear(userSelectedYear);
@@ -103,4 +105,62 @@ const getAVListByYear = async (userSelectedYear: number) => {
 export async function GetAVList(userSelectedYear: number) {
   const data = await getAVListByYear(userSelectedYear);
   return z.array(listAVSchema).parse(data || []);
+}
+
+// Extended schema with user selections
+const listAVWithSelectionSchema = listAVSchema.extend({
+  is_selected: z.boolean().optional(),
+  custom_count: z.number().nullable().optional(),
+});
+
+export type listAVWithSelection = z.infer<typeof listAVWithSelectionSchema>;
+
+/**
+ * Get AV list with user selections for a specific library
+ */
+export async function GetAVListWithUserSelections(
+  userSelectedYear: number,
+  libraryId: number
+) {
+  // Get library_year record and extract id
+  const libraryYearRecords = await getLibYearByLibIdAndYear(libraryId, userSelectedYear);
+  const libraryYearId = libraryYearRecords && libraryYearRecords.length > 0 
+    ? libraryYearRecords[0].id 
+    : null;
+  
+  // Get base AV list
+  const baseData = await getAVListByYear(userSelectedYear);
+  
+  // Get user selections if libraryYear exists
+  let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
+  
+  if (libraryYearId) {
+    const selections = await db.libraryYear_ListAV.findMany({
+      where: { libraryyear_id: libraryYearId },
+      select: {
+        listav_id: true,
+        is_selected: true,
+        custom_count: true,
+      },
+    });
+    
+    selections.forEach((sel) => {
+      userSelections.set(sel.listav_id, {
+        is_selected: sel.is_selected ?? false,
+        custom_count: sel.custom_count,
+      });
+    });
+  }
+  
+  // Merge user selections with base data
+  const mergedData = baseData.map((item) => {
+    const selection = userSelections.get(item.id);
+    return {
+      ...item,
+      is_selected: selection?.is_selected ?? false,
+      custom_count: selection?.custom_count ?? null,
+    };
+  });
+  
+  return z.array(listAVWithSelectionSchema).parse(mergedData || []);
 }
