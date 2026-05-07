@@ -1399,7 +1399,7 @@ export type ElectronicGroupByOutputType = {
   _max: ElectronicMaxAggregateOutputType | null
 }
 
-type GetElectronicGroupByPayload<T extends ElectronicGroupByArgs> = Prisma.PrismaPromise<
+export type GetElectronicGroupByPayload<T extends ElectronicGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ElectronicGroupByOutputType, T['by']> &
       {
@@ -5387,6 +5387,11 @@ export type ElectronicFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Electronics.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Electronics.
+   */
   distinct?: Prisma.ElectronicScalarFieldEnum | Prisma.ElectronicScalarFieldEnum[]
 }
 

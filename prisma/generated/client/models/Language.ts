@@ -178,7 +178,7 @@ export type LanguageGroupByOutputType = {
   _max: LanguageMaxAggregateOutputType | null
 }
 
-type GetLanguageGroupByPayload<T extends LanguageGroupByArgs> = Prisma.PrismaPromise<
+export type GetLanguageGroupByPayload<T extends LanguageGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LanguageGroupByOutputType, T['by']> &
       {
@@ -1231,6 +1231,11 @@ export type LanguageFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Languages.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Languages.
+   */
   distinct?: Prisma.LanguageScalarFieldEnum | Prisma.LanguageScalarFieldEnum[]
 }
 

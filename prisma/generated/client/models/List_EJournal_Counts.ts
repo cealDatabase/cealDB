@@ -222,7 +222,7 @@ export type List_EJournal_CountsGroupByOutputType = {
   _max: List_EJournal_CountsMaxAggregateOutputType | null
 }
 
-type GetList_EJournal_CountsGroupByPayload<T extends List_EJournal_CountsGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_EJournal_CountsGroupByPayload<T extends List_EJournal_CountsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_EJournal_CountsGroupByOutputType, T['by']> &
       {
@@ -1255,6 +1255,11 @@ export type List_EJournal_CountsFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` List_EJournal_Counts.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_EJournal_Counts.
+   */
   distinct?: Prisma.List_EJournal_CountsScalarFieldEnum | Prisma.List_EJournal_CountsScalarFieldEnum[]
 }
 

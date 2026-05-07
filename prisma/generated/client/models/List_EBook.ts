@@ -252,7 +252,7 @@ export type List_EBookGroupByOutputType = {
   _max: List_EBookMaxAggregateOutputType | null
 }
 
-type GetList_EBookGroupByPayload<T extends List_EBookGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_EBookGroupByPayload<T extends List_EBookGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_EBookGroupByOutputType, T['by']> &
       {
@@ -1853,6 +1853,11 @@ export type List_EBookFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` List_EBooks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_EBooks.
+   */
   distinct?: Prisma.List_EBookScalarFieldEnum | Prisma.List_EBookScalarFieldEnum[]
 }
 

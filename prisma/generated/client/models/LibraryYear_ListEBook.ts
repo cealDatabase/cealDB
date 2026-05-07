@@ -175,7 +175,7 @@ export type LibraryYear_ListEBookGroupByOutputType = {
   _max: LibraryYear_ListEBookMaxAggregateOutputType | null
 }
 
-type GetLibraryYear_ListEBookGroupByPayload<T extends LibraryYear_ListEBookGroupByArgs> = Prisma.PrismaPromise<
+export type GetLibraryYear_ListEBookGroupByPayload<T extends LibraryYear_ListEBookGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LibraryYear_ListEBookGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type LibraryYear_ListEBookFindManyArgs<ExtArgs extends runtime.Types.Exte
    * Skip the first `n` LibraryYear_ListEBooks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LibraryYear_ListEBooks.
+   */
   distinct?: Prisma.LibraryYear_ListEBookScalarFieldEnum | Prisma.LibraryYear_ListEBookScalarFieldEnum[]
 }
 

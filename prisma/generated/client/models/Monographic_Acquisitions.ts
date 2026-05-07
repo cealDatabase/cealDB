@@ -431,7 +431,7 @@ export type Monographic_AcquisitionsGroupByOutputType = {
   _max: Monographic_AcquisitionsMaxAggregateOutputType | null
 }
 
-type GetMonographic_AcquisitionsGroupByPayload<T extends Monographic_AcquisitionsGroupByArgs> = Prisma.PrismaPromise<
+export type GetMonographic_AcquisitionsGroupByPayload<T extends Monographic_AcquisitionsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Monographic_AcquisitionsGroupByOutputType, T['by']> &
       {
@@ -1921,6 +1921,11 @@ export type Monographic_AcquisitionsFindManyArgs<ExtArgs extends runtime.Types.E
    * Skip the first `n` Monographic_Acquisitions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Monographic_Acquisitions.
+   */
   distinct?: Prisma.Monographic_AcquisitionsScalarFieldEnum | Prisma.Monographic_AcquisitionsScalarFieldEnum[]
 }
 

@@ -175,7 +175,7 @@ export type List_EJournal_LanguageGroupByOutputType = {
   _max: List_EJournal_LanguageMaxAggregateOutputType | null
 }
 
-type GetList_EJournal_LanguageGroupByPayload<T extends List_EJournal_LanguageGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_EJournal_LanguageGroupByPayload<T extends List_EJournal_LanguageGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_EJournal_LanguageGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type List_EJournal_LanguageFindManyArgs<ExtArgs extends runtime.Types.Ext
    * Skip the first `n` List_EJournal_Languages.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_EJournal_Languages.
+   */
   distinct?: Prisma.List_EJournal_LanguageScalarFieldEnum | Prisma.List_EJournal_LanguageScalarFieldEnum[]
 }
 

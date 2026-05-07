@@ -235,7 +235,7 @@ export type ScheduledEventGroupByOutputType = {
   _max: ScheduledEventMaxAggregateOutputType | null
 }
 
-type GetScheduledEventGroupByPayload<T extends ScheduledEventGroupByArgs> = Prisma.PrismaPromise<
+export type GetScheduledEventGroupByPayload<T extends ScheduledEventGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ScheduledEventGroupByOutputType, T['by']> &
       {
@@ -1147,6 +1147,11 @@ export type ScheduledEventFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` ScheduledEvents.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ScheduledEvents.
+   */
   distinct?: Prisma.ScheduledEventScalarFieldEnum | Prisma.ScheduledEventScalarFieldEnum[]
 }
 
