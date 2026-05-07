@@ -175,7 +175,7 @@ export type LibraryYear_ListEJournalGroupByOutputType = {
   _max: LibraryYear_ListEJournalMaxAggregateOutputType | null
 }
 
-type GetLibraryYear_ListEJournalGroupByPayload<T extends LibraryYear_ListEJournalGroupByArgs> = Prisma.PrismaPromise<
+export type GetLibraryYear_ListEJournalGroupByPayload<T extends LibraryYear_ListEJournalGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LibraryYear_ListEJournalGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type LibraryYear_ListEJournalFindManyArgs<ExtArgs extends runtime.Types.E
    * Skip the first `n` LibraryYear_ListEJournals.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LibraryYear_ListEJournals.
+   */
   distinct?: Prisma.LibraryYear_ListEJournalScalarFieldEnum | Prisma.LibraryYear_ListEJournalScalarFieldEnum[]
 }
 

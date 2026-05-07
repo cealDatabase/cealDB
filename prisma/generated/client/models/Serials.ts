@@ -739,7 +739,7 @@ export type SerialsGroupByOutputType = {
   _max: SerialsMaxAggregateOutputType | null
 }
 
-type GetSerialsGroupByPayload<T extends SerialsGroupByArgs> = Prisma.PrismaPromise<
+export type GetSerialsGroupByPayload<T extends SerialsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SerialsGroupByOutputType, T['by']> &
       {
@@ -2985,6 +2985,11 @@ export type SerialsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` Serials.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Serials.
+   */
   distinct?: Prisma.SerialsScalarFieldEnum | Prisma.SerialsScalarFieldEnum[]
 }
 

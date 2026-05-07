@@ -171,7 +171,7 @@ export type ReflibrarytypeGroupByOutputType = {
   _max: ReflibrarytypeMaxAggregateOutputType | null
 }
 
-type GetReflibrarytypeGroupByPayload<T extends ReflibrarytypeGroupByArgs> = Prisma.PrismaPromise<
+export type GetReflibrarytypeGroupByPayload<T extends ReflibrarytypeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ReflibrarytypeGroupByOutputType, T['by']> &
       {
@@ -1031,6 +1031,11 @@ export type ReflibrarytypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` Reflibrarytypes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Reflibrarytypes.
+   */
   distinct?: Prisma.ReflibrarytypeScalarFieldEnum | Prisma.ReflibrarytypeScalarFieldEnum[]
 }
 

@@ -164,7 +164,7 @@ export type Exclude_YearGroupByOutputType = {
   _max: Exclude_YearMaxAggregateOutputType | null
 }
 
-type GetExclude_YearGroupByPayload<T extends Exclude_YearGroupByArgs> = Prisma.PrismaPromise<
+export type GetExclude_YearGroupByPayload<T extends Exclude_YearGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Exclude_YearGroupByOutputType, T['by']> &
       {
@@ -886,6 +886,11 @@ export type Exclude_YearFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` Exclude_Years.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Exclude_Years.
+   */
   distinct?: Prisma.Exclude_YearScalarFieldEnum | Prisma.Exclude_YearScalarFieldEnum[]
 }
 

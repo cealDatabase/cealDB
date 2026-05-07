@@ -175,7 +175,7 @@ export type LibraryYear_ListAVGroupByOutputType = {
   _max: LibraryYear_ListAVMaxAggregateOutputType | null
 }
 
-type GetLibraryYear_ListAVGroupByPayload<T extends LibraryYear_ListAVGroupByArgs> = Prisma.PrismaPromise<
+export type GetLibraryYear_ListAVGroupByPayload<T extends LibraryYear_ListAVGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LibraryYear_ListAVGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type LibraryYear_ListAVFindManyArgs<ExtArgs extends runtime.Types.Extensi
    * Skip the first `n` LibraryYear_ListAVS.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LibraryYear_ListAVS.
+   */
   distinct?: Prisma.LibraryYear_ListAVScalarFieldEnum | Prisma.LibraryYear_ListAVScalarFieldEnum[]
 }
 

@@ -277,7 +277,7 @@ export type Public_ServicesGroupByOutputType = {
   _max: Public_ServicesMaxAggregateOutputType | null
 }
 
-type GetPublic_ServicesGroupByPayload<T extends Public_ServicesGroupByArgs> = Prisma.PrismaPromise<
+export type GetPublic_ServicesGroupByPayload<T extends Public_ServicesGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Public_ServicesGroupByOutputType, T['by']> &
       {
@@ -1389,6 +1389,11 @@ export type Public_ServicesFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` Public_Services.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Public_Services.
+   */
   distinct?: Prisma.Public_ServicesScalarFieldEnum | Prisma.Public_ServicesScalarFieldEnum[]
 }
 

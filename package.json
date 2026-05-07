@@ -7,19 +7,15 @@
   "scripts": {
     "start": "next start",
     "dev": "next dev --turbo",
-    "build": "prisma generate --schema=./prisma/schema && next build",
-    "db:push": "prisma db push --schema=./prisma/schema",
-    "db:reset": "prisma db push --force-reset --schema=./prisma/schema && prisma db seed && node scripts/fix-all-sequences.js",
+    "build": "prisma generate && next build",
+    "db:push": "prisma db push",
+    "db:reset": "prisma db push --force-reset && prisma db seed && node scripts/fix-all-sequences.js",
     "db:seed": "prisma db seed && node scripts/fix-all-sequences.js",
     "db:check": "node scripts/pre-deploy-checks.js",
     "db:verify": "node scripts/post-deploy-verify.js",
-    "db:migrate": "prisma migrate dev --schema=./prisma/schema",
-    "prisma:studio": "prisma studio --schema=./prisma/schema",
+    "db:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
     "lint": "next lint"
-  },
-  "prisma": {
-    "schema": "./prisma/schema",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.3.0",

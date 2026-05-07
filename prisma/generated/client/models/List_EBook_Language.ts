@@ -175,7 +175,7 @@ export type List_EBook_LanguageGroupByOutputType = {
   _max: List_EBook_LanguageMaxAggregateOutputType | null
 }
 
-type GetList_EBook_LanguageGroupByPayload<T extends List_EBook_LanguageGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_EBook_LanguageGroupByPayload<T extends List_EBook_LanguageGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_EBook_LanguageGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type List_EBook_LanguageFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Skip the first `n` List_EBook_Languages.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_EBook_Languages.
+   */
   distinct?: Prisma.List_EBook_LanguageScalarFieldEnum | Prisma.List_EBook_LanguageScalarFieldEnum[]
 }
 

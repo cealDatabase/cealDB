@@ -456,7 +456,7 @@ export type LibraryGroupByOutputType = {
   _max: LibraryMaxAggregateOutputType | null
 }
 
-type GetLibraryGroupByPayload<T extends LibraryGroupByArgs> = Prisma.PrismaPromise<
+export type GetLibraryGroupByPayload<T extends LibraryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LibraryGroupByOutputType, T['by']> &
       {
@@ -3287,6 +3287,11 @@ export type LibraryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` Libraries.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Libraries.
+   */
   distinct?: Prisma.LibraryScalarFieldEnum | Prisma.LibraryScalarFieldEnum[]
 }
 

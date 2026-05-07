@@ -235,7 +235,7 @@ export type SurveySessionGroupByOutputType = {
   _max: SurveySessionMaxAggregateOutputType | null
 }
 
-type GetSurveySessionGroupByPayload<T extends SurveySessionGroupByArgs> = Prisma.PrismaPromise<
+export type GetSurveySessionGroupByPayload<T extends SurveySessionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SurveySessionGroupByOutputType, T['by']> &
       {
@@ -1147,6 +1147,11 @@ export type SurveySessionFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` SurveySessions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of SurveySessions.
+   */
   distinct?: Prisma.SurveySessionScalarFieldEnum | Prisma.SurveySessionScalarFieldEnum[]
 }
 

@@ -175,7 +175,7 @@ export type List_AV_LanguageGroupByOutputType = {
   _max: List_AV_LanguageMaxAggregateOutputType | null
 }
 
-type GetList_AV_LanguageGroupByPayload<T extends List_AV_LanguageGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_AV_LanguageGroupByPayload<T extends List_AV_LanguageGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_AV_LanguageGroupByOutputType, T['by']> &
       {
@@ -1176,6 +1176,11 @@ export type List_AV_LanguageFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` List_AV_Languages.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_AV_Languages.
+   */
   distinct?: Prisma.List_AV_LanguageScalarFieldEnum | Prisma.List_AV_LanguageScalarFieldEnum[]
 }
 

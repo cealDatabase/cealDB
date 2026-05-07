@@ -519,7 +519,7 @@ export type Volume_HoldingsGroupByOutputType = {
   _max: Volume_HoldingsMaxAggregateOutputType | null
 }
 
-type GetVolume_HoldingsGroupByPayload<T extends Volume_HoldingsGroupByArgs> = Prisma.PrismaPromise<
+export type GetVolume_HoldingsGroupByPayload<T extends Volume_HoldingsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Volume_HoldingsGroupByOutputType, T['by']> &
       {
@@ -2225,6 +2225,11 @@ export type Volume_HoldingsFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` Volume_Holdings.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Volume_Holdings.
+   */
   distinct?: Prisma.Volume_HoldingsScalarFieldEnum | Prisma.Volume_HoldingsScalarFieldEnum[]
 }
 

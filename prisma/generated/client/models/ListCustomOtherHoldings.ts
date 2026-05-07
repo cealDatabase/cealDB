@@ -171,7 +171,7 @@ export type ListCustomOtherHoldingsGroupByOutputType = {
   _max: ListCustomOtherHoldingsMaxAggregateOutputType | null
 }
 
-type GetListCustomOtherHoldingsGroupByPayload<T extends ListCustomOtherHoldingsGroupByArgs> = Prisma.PrismaPromise<
+export type GetListCustomOtherHoldingsGroupByPayload<T extends ListCustomOtherHoldingsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ListCustomOtherHoldingsGroupByOutputType, T['by']> &
       {
@@ -911,6 +911,11 @@ export type ListCustomOtherHoldingsFindManyArgs<ExtArgs extends runtime.Types.Ex
    * Skip the first `n` ListCustomOtherHoldings.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ListCustomOtherHoldings.
+   */
   distinct?: Prisma.ListCustomOtherHoldingsScalarFieldEnum | Prisma.ListCustomOtherHoldingsScalarFieldEnum[]
 }
 

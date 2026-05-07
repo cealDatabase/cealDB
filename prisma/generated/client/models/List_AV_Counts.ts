@@ -211,7 +211,7 @@ export type List_AV_CountsGroupByOutputType = {
   _max: List_AV_CountsMaxAggregateOutputType | null
 }
 
-type GetList_AV_CountsGroupByPayload<T extends List_AV_CountsGroupByArgs> = Prisma.PrismaPromise<
+export type GetList_AV_CountsGroupByPayload<T extends List_AV_CountsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<List_AV_CountsGroupByOutputType, T['by']> &
       {
@@ -1220,6 +1220,11 @@ export type List_AV_CountsFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` List_AV_Counts.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of List_AV_Counts.
+   */
   distinct?: Prisma.List_AV_CountsScalarFieldEnum | Prisma.List_AV_CountsScalarFieldEnum[]
 }
 

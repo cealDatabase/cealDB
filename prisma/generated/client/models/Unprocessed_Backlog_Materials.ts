@@ -288,7 +288,7 @@ export type Unprocessed_Backlog_MaterialsGroupByOutputType = {
   _max: Unprocessed_Backlog_MaterialsMaxAggregateOutputType | null
 }
 
-type GetUnprocessed_Backlog_MaterialsGroupByPayload<T extends Unprocessed_Backlog_MaterialsGroupByArgs> = Prisma.PrismaPromise<
+export type GetUnprocessed_Backlog_MaterialsGroupByPayload<T extends Unprocessed_Backlog_MaterialsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Unprocessed_Backlog_MaterialsGroupByOutputType, T['by']> &
       {
@@ -1427,6 +1427,11 @@ export type Unprocessed_Backlog_MaterialsFindManyArgs<ExtArgs extends runtime.Ty
    * Skip the first `n` Unprocessed_Backlog_Materials.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Unprocessed_Backlog_Materials.
+   */
   distinct?: Prisma.Unprocessed_Backlog_MaterialsScalarFieldEnum | Prisma.Unprocessed_Backlog_MaterialsScalarFieldEnum[]
 }
 

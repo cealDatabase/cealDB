@@ -256,7 +256,7 @@ export type Library_YearGroupByOutputType = {
   _max: Library_YearMaxAggregateOutputType | null
 }
 
-type GetLibrary_YearGroupByPayload<T extends Library_YearGroupByArgs> = Prisma.PrismaPromise<
+export type GetLibrary_YearGroupByPayload<T extends Library_YearGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Library_YearGroupByOutputType, T['by']> &
       {
@@ -4474,6 +4474,11 @@ export type Library_YearFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` Library_Years.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Library_Years.
+   */
   distinct?: Prisma.Library_YearScalarFieldEnum | Prisma.Library_YearScalarFieldEnum[]
 }
 

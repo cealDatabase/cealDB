@@ -684,7 +684,7 @@ export type Fiscal_SupportGroupByOutputType = {
   _max: Fiscal_SupportMaxAggregateOutputType | null
 }
 
-type GetFiscal_SupportGroupByPayload<T extends Fiscal_SupportGroupByArgs> = Prisma.PrismaPromise<
+export type GetFiscal_SupportGroupByPayload<T extends Fiscal_SupportGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Fiscal_SupportGroupByOutputType, T['by']> &
       {
@@ -2795,6 +2795,11 @@ export type Fiscal_SupportFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` Fiscal_Supports.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Fiscal_Supports.
+   */
   distinct?: Prisma.Fiscal_SupportScalarFieldEnum | Prisma.Fiscal_SupportScalarFieldEnum[]
 }
 
