@@ -6,6 +6,7 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import db from "@/lib/db";
 
 // Force dynamic rendering - disable all caching
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,18 @@ async function AVSinglePage(
   const tasks = libid 
     ? (await GetAVListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
     : (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
-  
+
+  // Fetch survey gate status for this library_year so we can disable
+  // editing for non-super-admins when the survey is closed.
+  let isOpenForEditing = true;
+  if (libid) {
+    const ly = await db.library_Year.findFirst({
+      where: { library: libid, year: yearPassIn },
+      select: { is_open_for_editing: true },
+    });
+    isOpenForEditing = ly?.is_open_for_editing ?? false;
+  }
+
   return (
     <AVDataTableClient
       data={tasks}
@@ -34,6 +46,7 @@ async function AVSinglePage(
       userRoles={userRoles}
       initialSearch={initialSearch}
       newRecordId={newRecordId}
+      isOpenForEditing={isOpenForEditing}
     />
   );
 }

@@ -6,6 +6,7 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import db from "@/lib/db";
 
 async function EbookSinglePage(
     yearPassIn: number,
@@ -19,6 +20,16 @@ async function EbookSinglePage(
     const tasks = libid
         ? (await GetEBookListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
         : (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
+
+    let isOpenForEditing = true;
+    if (libid) {
+        const ly = await db.library_Year.findFirst({
+            where: { library: libid, year: yearPassIn },
+            select: { is_open_for_editing: true },
+        });
+        isOpenForEditing = ly?.is_open_for_editing ?? false;
+    }
+
     return (
         <EBookDataTableClient
             data={tasks}
@@ -28,6 +39,7 @@ async function EbookSinglePage(
             userRoles={userRoles}
             initialSearch={initialSearch}
             newRecordId={newRecordId}
+            isOpenForEditing={isOpenForEditing}
         />
     );
 }

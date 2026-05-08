@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import dynamic from "next/dynamic";
 import { listEBook } from "../data/schema";
 import { listEBookWithSelection } from "./getEBookList";
@@ -223,8 +222,8 @@ export function getColumns(
   year: number,
   roleIdPassIn?: string,
   onSelectionChange?: (id: number, selected: boolean) => void,
-  onCustomCountChange?: (id: number, count: number | null) => void,
-  selectionData?: Map<number, { is_selected: boolean; custom_count: number | null }>
+  selectionData?: Map<number, { is_selected: boolean; custom_count: number | null }>,
+  canEdit: boolean = true
 ): ColumnDef<listEBook | listEBookWithSelection>[] {
   // Parse role cookie (can be JSON array or single value)
   let userRoles: string[] = [];
@@ -272,6 +271,7 @@ export function getColumns(
                 onSelectionChange?.((row.original as any).id, !!value);
               });
             }}
+            disabled={!canEdit}
             aria-label='Select all for survey'
             className='translate-y-[2px]'
           />
@@ -285,6 +285,7 @@ export function getColumns(
           <Checkbox
             checked={is_selected}
             onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
+            disabled={!canEdit}
             aria-label='Select for survey'
             className='translate-y-[2px]'
           />
@@ -293,34 +294,6 @@ export function getColumns(
       enableSorting: false,
       enableHiding: false,
       size: 50,
-    },
-    // Custom count input column (new)
-    {
-      id: "custom_count",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={<>Custom<br />Count</>} />
-      ),
-      cell: ({ row }) => {
-        const id = (row.original as any).id as number;
-        const { custom_count } = getSelectionState(id);
-        
-        return (
-          <Input
-            type="number"
-            value={custom_count ?? ""}
-            onChange={(e) => {
-              const value = e.target.value === "" ? null : parseInt(e.target.value, 10);
-              onCustomCountChange?.(id, value);
-            }}
-            placeholder="-"
-            className="w-[80px] h-8 text-center"
-            min={0}
-          />
-        );
-      },
-      enableSorting: false,
-      enableHiding: false,
-      size: 100,
     },
     ...(shouldShowActions
       ? [{

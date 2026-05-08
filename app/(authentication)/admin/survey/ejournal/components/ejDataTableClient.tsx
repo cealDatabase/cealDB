@@ -5,7 +5,7 @@ import { listEJournalWithSelection } from "./getEJournalList";
 import { getColumns } from "./columns";
 import { DataTable } from "@/components/data-table/DataTable";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ export default function EJournalDataTableClient({
   userRoles,
   initialSearch,
   newRecordId,
+  isOpenForEditing = true,
 }: {
   data: listEJournal[] | listEJournalWithSelection[];
   year: number;
@@ -25,7 +26,11 @@ export default function EJournalDataTableClient({
   userRoles?: string[] | null;
   initialSearch?: string;
   newRecordId?: number;
+  isOpenForEditing?: boolean;
 }) {
+  const isSuperAdmin = (userRoles ?? []).includes("1");
+  const canEdit = isOpenForEditing || isSuperAdmin;
+  const showSuperAdminWarning = !isOpenForEditing && isSuperAdmin && !!libid;
   const router = useRouter();
   const [highlightId, setHighlightId] = useState(newRecordId);
   const [isSaving, setIsSaving] = useState(false);
@@ -95,69 +100,33 @@ export default function EJournalDataTableClient({
     [libid, year]
   );
 
-  const countDebounceRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(
-    new Map()
-  );
-
   // Handle selection change (auto-save immediately)
   const handleSelectionChange = useCallback(
     (id: number, selected: boolean) => {
-      let nextCount: number | null = null;
+      if (!canEdit) {
+        toast.error("Survey is closed. Editing is disabled.");
+        return;
+      }
       setSelectionData((prev) => {
         const newMap = new Map(prev);
         const existing = newMap.get(id);
-        nextCount = existing?.custom_count ?? null;
-        newMap.set(id, { is_selected: selected, custom_count: nextCount });
+        newMap.set(id, { is_selected: selected, custom_count: existing?.custom_count ?? null });
         return newMap;
       });
       if (libid) {
         setIsSaving(true);
-        void persistOne(id, selected, nextCount).finally(() =>
+        void persistOne(id, selected, null).finally(() =>
           setIsSaving(false)
         );
       }
     },
-    [libid, persistOne]
+    [canEdit, libid, persistOne]
   );
-
-  // Handle custom count change (auto-save debounced 600ms)
-  const handleCustomCountChange = useCallback(
-    (id: number, count: number | null) => {
-      let nextSelected = false;
-      setSelectionData((prev) => {
-        const newMap = new Map(prev);
-        const existing = newMap.get(id);
-        nextSelected = existing?.is_selected ?? false;
-        newMap.set(id, { is_selected: nextSelected, custom_count: count });
-        return newMap;
-      });
-      if (!libid) return;
-      const timers = countDebounceRef.current;
-      const existingTimer = timers.get(id);
-      if (existingTimer) clearTimeout(existingTimer);
-      const timer = setTimeout(() => {
-        setIsSaving(true);
-        void persistOne(id, nextSelected, count).finally(() => {
-          setIsSaving(false);
-          timers.delete(id);
-        });
-      }, 600);
-      timers.set(id, timer);
-    },
-    [libid, persistOne]
-  );
-
-  useEffect(() => {
-    return () => {
-      countDebounceRef.current.forEach((t) => clearTimeout(t));
-      countDebounceRef.current.clear();
-    };
-  }, []);
 
   // Get columns with callbacks
   const columns = useMemo(
-    () => getColumns(year, roleIdPassIn, handleSelectionChange, handleCustomCountChange, selectionData),
-    [year, roleIdPassIn, handleSelectionChange, handleCustomCountChange, selectionData]
+    () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit),
+    [year, roleIdPassIn, handleSelectionChange, selectionData, canEdit]
   );
 
   // Clean up URL and remove highlight after 3 seconds
@@ -188,13 +157,24 @@ export default function EJournalDataTableClient({
   const ToolbarWithLib = (props: any) => (
     <div className="space-y-2">
       <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
+      {showSuperAdminWarning && (
+        <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          ⚠️ Survey is currently <strong>closed</strong> for this library/year.
+          As Super Admin you can still edit, and your changes <strong>will be persisted</strong> to the database.
+        </div>
+      )}
+      {!canEdit && libid && (
+        <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          🔒 Survey is closed. Selections are read-only.
+        </div>
+      )}
       {libid && (
         <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
           <span>
             {Array.from(selectionData.values()).filter((s) => s.is_selected).length} items selected
           </span>
           <span aria-live="polite" className="text-xs">
-            {isSaving ? "Saving…" : "All changes saved"}
+            {isSaving ? "Saving…" : canEdit ? "All changes saved" : ""}
           </span>
         </div>
       )}

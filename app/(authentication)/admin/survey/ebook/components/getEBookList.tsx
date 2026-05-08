@@ -175,6 +175,46 @@ export async function GetEBookListWithUserSelections(
       custom_count: selection?.custom_count ?? null,
     };
   });
-  
-  return z.array(listEBookWithSelectionSchema).parse(mergedData || []);
+
+  // Dedup global-vs-library-specific twins for this user's library so the
+  // user only sees one row per resource. Carry over selection state from
+  // any deduped twin to avoid losing prior input.
+  let displayData = mergedData;
+  if (libraryYearId) {
+    const groupKey = (it: any) =>
+      `${(it.title ?? "").toLowerCase()}_${(it.publisher ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}`;
+    const groups = new Map<string, typeof mergedData>();
+    for (const item of mergedData) {
+      const k = groupKey(item);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k)!.push(item);
+    }
+    const kept: typeof mergedData = [];
+    for (const group of groups.values()) {
+      if (group.length === 1) {
+        kept.push(group[0]);
+        continue;
+      }
+      const mine = group.find(
+        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
+      );
+      if (mine) {
+        const twinWithState = group.find(
+          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
+        );
+        if (twinWithState) {
+          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
+          if ((mine as any).custom_count == null) {
+            (mine as any).custom_count = (twinWithState as any).custom_count;
+          }
+        }
+        kept.push(mine);
+      } else {
+        kept.push(...group);
+      }
+    }
+    displayData = kept;
+  }
+
+  return z.array(listEBookWithSelectionSchema).parse(displayData || []);
 }

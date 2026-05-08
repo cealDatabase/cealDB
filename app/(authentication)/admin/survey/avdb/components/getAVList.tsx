@@ -161,6 +161,51 @@ export async function GetAVListWithUserSelections(
       custom_count: selection?.custom_count ?? null,
     };
   });
-  
-  return z.array(listAVWithSelectionSchema).parse(mergedData || []);
+
+  // Dedup global-vs-library-specific twins. When the user's library has its
+  // own version of a resource (List_AV.libraryyear === their library_year id),
+  // hide any matching global record so the user only ever sees one row per
+  // resource and edits don't go to the wrong junction record.
+  // Records that don't have a library-specific twin pass through untouched.
+  let displayData = mergedData;
+  if (libraryYearId) {
+    const groupKey = (it: any) =>
+      `${(it.title ?? "").toLowerCase()}_${(it.type ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}`;
+    const groups = new Map<string, typeof mergedData>();
+    for (const item of mergedData) {
+      const k = groupKey(item);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k)!.push(item);
+    }
+    const kept: typeof mergedData = [];
+    for (const group of groups.values()) {
+      if (group.length === 1) {
+        kept.push(group[0]);
+        continue;
+      }
+      const mine = group.find(
+        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
+      );
+      if (mine) {
+        // Carry over selection state from any deduped twin so the user's
+        // existing checks/custom_count don't get lost visually.
+        const twinWithState = group.find(
+          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
+        );
+        if (twinWithState) {
+          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
+          if ((mine as any).custom_count == null) {
+            (mine as any).custom_count = (twinWithState as any).custom_count;
+          }
+        }
+        kept.push(mine);
+      } else {
+        // No library-specific twin from this user's library: keep them all.
+        kept.push(...group);
+      }
+    }
+    displayData = kept;
+  }
+
+  return z.array(listAVWithSelectionSchema).parse(displayData || []);
 }
