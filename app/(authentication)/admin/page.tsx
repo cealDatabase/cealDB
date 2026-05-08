@@ -178,12 +178,12 @@ async function UserLoggedInPage() {
             <Card className="border-2 border-primary/20">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <FileText className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">Statistics Forms</CardTitle>
-                    <CardDescription>View and manage statistics forms and submissions.</CardDescription>
+                    <CardDescription>Access and complete statistics forms, including selecting and customizing database lists for your institution and entering statistical data across all categories.</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -211,12 +211,12 @@ async function UserLoggedInPage() {
             <Card className="border-2 border-primary/20">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <FileBarChart className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">Statistics Reports</CardTitle>
-                    <CardDescription>Export institutional and global survey reports</CardDescription>
+                    <CardDescription>Access cross-year statistics reports for individual institutions, with the ability to select specific years and reporting categories.</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -248,11 +248,36 @@ async function UserLoggedInPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground mb-2">E-Resource Editor Section</h2>
-                <p className="text-muted-foreground">Access forms to manage database lists and review annual reports.</p>
+                <p className="text-muted-foreground">Statistics Committee members use this section to manage e-resource database lists, review data submitted by participating institutions, and prepare the annual statistics reports.</p>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                {eResourceActions.map((action, index) => {
+                {eResourceActions.slice(0, 3).map((action, index) => {
+                  const IconComponent = action.icon;
+                  return (
+                    <Card key={index} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                            <IconComponent className={`w-5 h-5 ${action.iconColor}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-primary mb-1">{action.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {action.description}
+                            </p>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={action.href}>Access</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+                {eResourceActions.slice(3).map((action, index) => {
                   const IconComponent = action.icon;
                   return (
                     <Card key={index} className="hover:shadow-md transition-shadow">
@@ -302,9 +327,16 @@ async function UserLoggedInPage() {
                               <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
                                 {action.description}
                               </p>
-                              <Button variant="outline" size="sm" asChild>
-                                <Link href={action.href}>Access</Link>
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" asChild>
+                                  <Link href={action.href}>Access</Link>
+                                </Button>
+                                {action.secondaryHref && (
+                                  <Button variant="outline" size="sm" asChild>
+                                    <Link href={action.secondaryHref}>{action.secondaryLabel}</Link>
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </CardContent>

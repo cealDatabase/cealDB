@@ -7,13 +7,13 @@ import {
   Users,
   BookOpen,
   Settings,
-  Plus,
   CheckCircle,
   BarChart3,
   Shield,
   Calendar,
   Mail,
   FileSpreadsheet,
+  FileBarChart,
 } from "lucide-react";
 
 export const forms = [
@@ -160,7 +160,7 @@ export const eResourceActions = [
       icon: Database,
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
-      description: 'Create, update, or remove database records and their associated data.',
+      description: 'Edit the title, description, and associated data for each audio/visual database entry.',
     },
     {
       title: 'E-Book Databases',
@@ -168,7 +168,7 @@ export const eResourceActions = [
       icon: BookOpen,
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
-      description: 'Create, update, or remove database records and their associated data.',
+      description: 'Edit the title, description, and associated data for each e-book database entry.',
     },
     {
       title: 'E-Journal Databases',
@@ -176,23 +176,23 @@ export const eResourceActions = [
       icon: BarChart3,
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
-      description: 'Create, update, or remove database records and their associated data.',
+      description: 'Edit the title, description, and associated data for each e-journal database entry.',
     },
     {
       title: 'Year-End Reports',
       href: '/admin/year-end-reports',
-      icon: FileSpreadsheet,
+      icon: FileBarChart,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-100',
-      description: 'Generate annual statistics in Excel format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status.',
+      description: 'Access and export annual statistics by category. Each form contains aggregated data from all participating institutions for the selected year.',
     },
     {
       title: 'Participation Reports',
       href: '/admin/participation-reports',
-      icon: BarChart3,
+      icon: FileBarChart,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-100',
-      description: 'Export library participation, contact information, and statistics completion reports.',
+      description: 'Access and export reports on participating library characteristics and contact information, and statistics table completion status for the selected year.',
     },
   ]
 
@@ -230,16 +230,10 @@ export const superAdminActions = [
       description: 'Edit user roles and permissions. Assign users as super admins, assistant admins, e-resource editors, or member institution users.',
     },
     {
-      title: 'Create New Library',
-      href: '/create',
-      icon: Plus,
-      iconColor: 'text-sky-600',
-      iconBg: 'bg-sky-100',
-      description: 'Add a new library institution to the database. New libraries can then participate in annual surveys.',
-    },
-    {
-      title: 'Publish Institutions',
+      title: 'Manage Participant Institutions',
       href: '/libraries',
+      secondaryHref: '/create',
+      secondaryLabel: 'Create New Library',
       icon: Database,
       iconColor: 'text-sky-600',
       iconBg: 'bg-sky-100',
