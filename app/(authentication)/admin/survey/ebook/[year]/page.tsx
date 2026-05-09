@@ -84,7 +84,7 @@ export default async function EbookListPage(
     return (
         <main>
             <Container className="bg-white pb-12 max-w-full">
-                <SurveyBreadcrumb surveyType="ebook" year={params.year} />
+                <SurveyBreadcrumb surveyType="ebook" year={params.year} libid={libid} />
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold tracking-tight text-start">
