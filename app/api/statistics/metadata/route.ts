@@ -97,11 +97,11 @@ export async function GET(request: NextRequest) {
     ];
 
     return NextResponse.json({
-      libraries: libraries.map(lib => ({
+      libraries: libraries.map((lib) => ({
         value: lib.id,
         label: lib.library_name,
       })),
-      years: years.map(y => y.year),
+      years: years.map((y) => y.year).filter((y) => y !== 1900),
       dataTables,
     });
   } catch (error) {

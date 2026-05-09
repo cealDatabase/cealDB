@@ -37,9 +37,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const yearParam = searchParams.get("year");
     const year = yearParam ? parseInt(yearParam) : 2024;
+    const institutionsParam = searchParams.get("institutions");
+    const institutionIds = institutionsParam
+      ? institutionsParam
+          .split(",")
+          .map((id) => parseInt(id))
+          .filter(Boolean)
+      : [];
 
     // Fetch all libraries with their data for the specified year
     const libraries = await prisma.library.findMany({
+      where:
+        institutionIds.length > 0 ? { id: { in: institutionIds } } : undefined,
       select: {
         id: true,
         library_name: true,
