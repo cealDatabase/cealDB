@@ -15,9 +15,10 @@ import {
 interface SurveyBreadcrumbProps {
   surveyType: "avdb" | "ebook" | "ejournal";
   year: string;
+  libid?: number;
 }
 
-export function SurveyBreadcrumb({ surveyType, year }: SurveyBreadcrumbProps) {
+export function SurveyBreadcrumb({ surveyType, year, libid }: SurveyBreadcrumbProps) {
   const pathname = usePathname()
   
   // Survey type display names
@@ -26,9 +27,21 @@ export function SurveyBreadcrumb({ surveyType, year }: SurveyBreadcrumbProps) {
     ebook: "E-Book Databases", 
     ejournal: "E-Journal Databases"
   }
+
+  // Access management edit paths per survey type
+  const editPaths = {
+    avdb: "avdbedit",
+    ebook: "ebookedit",
+    ejournal: "ejournaledit"
+  }
   
   // Check if we're on create page
   const isCreatePage = pathname.includes('/create')
+
+  // Link back to library-specific Access Management page when libid is available
+  const accessManagementHref = libid
+    ? `/admin/forms/${libid}/${editPaths[surveyType]}?year=${year}`
+    : "/admin"
 
   return (
     <div className="m-8 ">
@@ -54,10 +67,12 @@ export function SurveyBreadcrumb({ surveyType, year }: SurveyBreadcrumbProps) {
             <SlashIcon />
           </BreadcrumbSeparator>
 
-          {/* Survey Management */}
+          {/* Manage Access (links to library-specific page if libid available) */}
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/admin" className="no-underline">Survey Management</Link>
+              <Link href={accessManagementHref} className="no-underline">
+                {libid ? "Manage Access" : "Survey Management"}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator>

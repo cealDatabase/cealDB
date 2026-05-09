@@ -29,7 +29,7 @@ async function CreateAVContent({
   return (
     <div className='p-6'>
       <Container>
-        <SurveyBreadcrumb surveyType="avdb" year={selectedYear.toString()} />
+        <SurveyBreadcrumb surveyType="avdb" year={selectedYear.toString()} libid={libraryId ? Number(libraryId) : undefined} />
         <h1 className='text-2xl font-semibold mb-4'>
           Create New AV Entry for {selectedYear}
         </h1>

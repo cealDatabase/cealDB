@@ -29,7 +29,7 @@ async function CreateEJournalContent({
   return (
     <div className='p-6'>
       <Container>
-        <SurveyBreadcrumb surveyType="ejournal" year={selectedYear.toString()} />
+        <SurveyBreadcrumb surveyType="ejournal" year={selectedYear.toString()} libid={libraryId ? Number(libraryId) : undefined} />
         <h1 className='text-2xl font-semibold mb-4'>
           Create New E-Journal Entry for {selectedYear}
         </h1>
