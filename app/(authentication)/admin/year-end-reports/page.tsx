@@ -98,117 +98,6 @@ export default function YearEndReportsPage() {
     }
   };
 
-  const handleExportWord = async (formType: string, formName: string) => {
-    if (!selectedYear) {
-      toast.error('Please select a year first');
-      return;
-    }
-
-    setLoadingForm(`word-${formType}`);
-
-    try {
-      const response = await fetch(
-        `/api/export/year-end-reports-word?year=${selectedYear}&formType=${formType}`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorMessage = 'Word export failed';
-        
-        if (contentType?.includes('application/json')) {
-          const error = await response.json();
-          errorMessage = error.error || 'Word export failed';
-        } else {
-          if (response.status === 401) {
-            errorMessage = 'Unauthorized - Please sign in again';
-          } else if (response.status === 403) {
-            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
-          } else {
-            errorMessage = `Server error (${response.status})`;
-          }
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${formName}-${selectedYear}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      setExportedForms(prev => new Set([...prev, formType]));
-      toast.success(`${formName} exported to Word successfully`);
-    } catch (error) {
-      console.error('Word export error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to export Word document');
-    } finally {
-      setLoadingForm(null);
-    }
-  };
-
-  const handleExportAllWord = async () => {
-    if (!selectedYear) {
-      toast.error('Please select a year first');
-      return;
-    }
-
-    setLoadingForm('all-word');
-
-    try {
-      const response = await fetch(
-        `/api/export/year-end-reports-word?year=${selectedYear}&formType=all`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorMessage = 'Word export failed';
-        
-        if (contentType?.includes('application/json')) {
-          const error = await response.json();
-          errorMessage = error.error || 'Word export failed';
-        } else {
-          if (response.status === 401) {
-            errorMessage = 'Unauthorized - Please sign in again';
-          } else if (response.status === 403) {
-            errorMessage = 'Access denied - Super Admin or E-Resource Editor role required';
-          } else {
-            errorMessage = `Server error (${response.status})`;
-          }
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `CEAL_Statistics_All_Forms_${selectedYear}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast.success(`All forms exported to Word successfully for year ${selectedYear}`);
-    } catch (error) {
-      console.error('Word export error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to export Word document');
-    } finally {
-      setLoadingForm(null);
-    }
-  };
-
   const handleExportPdf = async () => {
     if (!selectedYear) {
       toast.error('Please select a year first');
@@ -332,7 +221,7 @@ export default function YearEndReportsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Year-End Reports</h1>
           <p className="text-muted-foreground">
-            Generate annual statistics in Excel or PDF format across multiple years and all categories, including data from all participating institutions for the selected year regardless of final submission status. 
+            Access and export annual statistics by category. Each form contains aggregated data from all participating institutions for the selected year for the selected year. 
           </p>
         </div>
 
@@ -372,25 +261,6 @@ export default function YearEndReportsPage() {
                   <>
                     <Download className="w-4 h-4" />
                     Export All Forms (Excel)
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={handleExportAllWord}
-                disabled={!selectedYear || loadingForm !== null}
-                size="lg"
-                variant="outline"
-                className="gap-2"
-              >
-                {loadingForm === 'all-word' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Exporting All Forms...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-4 h-4" />
-                    Export All Forms (Word)
                   </>
                 )}
               </Button>
@@ -439,7 +309,7 @@ export default function YearEndReportsPage() {
                     <div>
                       <p className="font-medium">{form.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {form.filename}-{selectedYear} (.xlsx/.docx)
+                        {form.filename}-{selectedYear} (.xlsx)
                       </p>
                     </div>
                   </div>
@@ -465,24 +335,6 @@ export default function YearEndReportsPage() {
                         </>
                       )}
                     </Button>
-                    <Button
-                      onClick={() => handleExportWord(form.id, form.filename)}
-                      disabled={!selectedYear || loadingForm !== null}
-                      variant="secondary"
-                      size="sm"
-                    >
-                      {loadingForm === `word-${form.id}` ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Exporting...
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="w-4 h-4 mr-2" />
-                          Word
-                        </>
-                      )}
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -500,8 +352,7 @@ export default function YearEndReportsPage() {
               <div className="space-y-2">
                 <p className="font-medium text-blue-900">Export Information</p>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Individual form exports are available in Excel (.xlsx) and Word (.docx) formats</li>
-                  <li>• Word exports use landscape orientation for better data visibility</li>
+                  <li>• Individual form exports are available in Excel (.xlsx) format</li>
                   <li>• Each export includes institution names, all data fields, and notes</li>
                   <li>• Excel batch export creates a single file with all 10 forms as separate worksheets</li>
                   <li>• PDF report generates all tables in a single landscape PDF with totals and footnotes</li>

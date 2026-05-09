@@ -214,8 +214,8 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   return (
     <div className="space-y-4">
       {Toolbar && <Toolbar table={table} />}
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border" suppressHydrationWarning>
+        <Table suppressHydrationWarning>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

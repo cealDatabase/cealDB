@@ -19,6 +19,8 @@ interface EBookSubscriptionManagementClientProps {
   subscriptions: Array<{
     libraryyear_id: number;
     listebook_id: number;
+    is_selected?: boolean | null;
+    custom_count?: number | null;
     List_EBook: {
       id: number;
       title: string | null;
@@ -92,10 +94,14 @@ export default function EBookSubscriptionManagementClient({
     );
   };
 
-  // Convert subscription data to table format
+  // Convert subscription data to table format. Per-library `custom_count`
+  // (entered in the survey big table) overrides the global titles count.
   const data = subscriptions
     .filter(sub => !removedIds.has(sub.listebook_id))
-    .map((sub) => ({
+    .map((sub) => {
+      const globalTitles = sub.List_EBook.List_EBook_Counts?.[0]?.titles ?? 0;
+      const hasCustom = sub.custom_count != null;
+      return {
       id: sub.List_EBook.id,
       title: sub.List_EBook.title ?? "",
       sub_series_number: sub.List_EBook.sub_series_number ?? "",
@@ -108,11 +114,14 @@ export default function EBookSubscriptionManagementClient({
       data_source: sub.List_EBook.data_source ?? "",
       is_global: !!sub.List_EBook.is_global,
       updated_at: sub.List_EBook.updated_at.toISOString(),
-      titles: sub.List_EBook.List_EBook_Counts?.[0]?.titles ?? 0,
+      titles: hasCustom ? (sub.custom_count as number) : globalTitles,
+      is_custom_count: hasCustom,
+      global_titles: globalTitles,
       volumes: sub.List_EBook.List_EBook_Counts?.[0]?.volumes ?? 0,
       chapters: sub.List_EBook.List_EBook_Counts?.[0]?.chapters ?? 0,
       language: sub.List_EBook.List_EBook_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
-    }));
+      };
+    });
 
   const handleEdit = (record: any) => {
     setEditingRecord(record);
@@ -225,7 +234,24 @@ export default function EBookSubscriptionManagementClient({
       header: "Titles",
       cell: ({ row }: any) => {
         const count = row.getValue("titles") as number;
-        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+        const isCustom = row.original.is_custom_count as boolean;
+        const globalCount = row.original.global_titles as number;
+        return (
+          <div className="text-center font-medium">
+            <div className="flex items-center justify-center gap-1.5">
+              <span>{count > 0 ? count.toLocaleString() : "-"}</span>
+              {isCustom && (
+                <Badge
+                  variant="outline"
+                  className="border-blue-300 bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0"
+                  title={`Library override. Global default: ${globalCount.toLocaleString()}`}
+                >
+                  Custom
+                </Badge>
+              )}
+            </div>
+          </div>
+        );
       },
     },
     {

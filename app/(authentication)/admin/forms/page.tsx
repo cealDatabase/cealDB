@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { Container } from "@/components/Container"
 import Link from "next/link"
 import { forms, instructionGroup } from "@/constant/form"
-import { OctagonAlert, BadgeQuestionMark, ClipboardType } from "lucide-react"
+import { OctagonAlert, BadgeQuestionMark, ClipboardType, Clock, Calendar, CheckCircle, XCircle } from "lucide-react"
 import { getLibraryById } from "@/data/fetchPrisma"
 import { AdminBreadcrumb } from "@/components/AdminBreadcrumb"
 import { getFormattedSurveyDates } from "@/data/fetchSurveyDates"
@@ -138,33 +138,80 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
     timeZone: "America/Los_Angeles"
   })
 
-  // Check if closing date has passed
-  const now = new Date()
-  const closingDateTime = new Date(surveyDates.fullClosingDate)
-  const hasClosed = now > closingDateTime
-  
-  // Check if dates are set in database or using defaults
-  const areDatesSet = surveyDates.isStoredInDatabase
-  
-  // Show gray badge if: dates not set OR period has closed
-  // Show green badge only if: dates are set AND period is still open
-  const shouldShowGray = !areDatesSet || hasClosed
+  // Three-state status from surveyDates
+  const { status, daysUntilOpening, daysUntilClosing, daysSinceClosed } = surveyDates
 
-  // Create dynamic FAQ with correct dates
+  // Status badge configuration
+  const statusConfig = {
+    not_set: {
+      text: "To Be Determined",
+      bgColor: "bg-gray-100",
+      textColor: "text-gray-600",
+      icon: Clock,
+      pulse: false,
+    },
+    scheduled: {
+      text: daysUntilOpening 
+        ? `Opens in ${daysUntilOpening} day${daysUntilOpening !== 1 ? 's' : ''} (${openingDate})`
+        : `Scheduled to Open`,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-700",
+      icon: Calendar,
+      pulse: false,
+    },
+    open: {
+      text: daysUntilClosing
+        ? `Open - Closes in ${daysUntilClosing} day${daysUntilClosing !== 1 ? 's' : ''}`
+        : `Open until ${closingDate}`,
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-700",
+      icon: CheckCircle,
+      pulse: true,
+    },
+    closed: {
+      text: daysSinceClosed
+        ? `Closed ${daysSinceClosed} day${daysSinceClosed !== 1 ? 's' : ''} ago`
+        : `Survey Period Closed`,
+      bgColor: "bg-red-50",
+      textColor: "text-red-700",
+      icon: XCircle,
+      pulse: false,
+    },
+  }[status]
+
+  // Create dynamic FAQ with correct dates based on status
+  const getTimeFrameAnswer = () => {
+    switch (status) {
+      case 'not_set':
+        return `The ${previousYear} - ${currentYear} Online Survey input/edit dates are to be determined.`
+      case 'scheduled':
+        return `The ${previousYear} - ${currentYear} Online Survey will open on ${openingDate} (12:00 AM ET) and close on ${closingDate} (11:59 PM PT). ${daysUntilOpening ? `Opening in ${daysUntilOpening} days.` : ''}`
+      case 'open':
+        return `The ${previousYear} - ${currentYear} Online Survey is currently open for editing. Input/edit time frame: ${openingDate} to ${closingDate} (11:59 pm Pacific Time). ${daysUntilClosing ? `Closes in ${daysUntilClosing} days.` : ''}`
+      case 'closed':
+        return `The ${previousYear} - ${currentYear} Online Survey closed on ${closingDate}. Survey period has ended.`
+    }
+  }
+
+  const getPublicationAnswer = () => {
+    switch (status) {
+      case 'not_set':
+        return `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in ${currentYear + 1}.`
+      default:
+        return `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`
+    }
+  }
+
   const dynamicInstructionGroup = {
     ...instructionGroup,
     "Survey Time Frame and Publication": [
       {
         question: "Input/Edit Time Frame",
-        answer: areDatesSet 
-          ? `The ${previousYear} - ${currentYear} Online Survey input/edit time frame is from ${openingDate} to ${closingDate} (11:59 pm Pacific Time)`
-          : `The ${previousYear} - ${currentYear} Online Survey input/edit dates are to be determined.`,
+        answer: getTimeFrameAnswer(),
       },
       {
         question: "Publication Date",
-        answer: areDatesSet
-          ? `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in the ${surveyDates.publicationMonth} online issue of the <i>Journal of East Asian Libraries</i>.`
-          : `The ${previousYear} - ${currentYear} CEAL annual statistics will be published in ${currentYear + 1}.`,
+        answer: getPublicationAnswer(),
       },
     ],
   }
@@ -176,17 +223,10 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
           <AdminBreadcrumb libraryName={libraryName} />
           <div className='pt-12'>
             <h1>Statistics Forms</h1>
-            {shouldShowGray ? (
-              <div className='mt-4 inline-flex items-center px-3 py-1 rounded-full bg-gray-400/90 text-gray-50 text-sm font-medium'>
-                <div className='w-2 h-2 bg-gray-700 rounded-full mr-2'></div>
-                {hasClosed ? `Survey Period Closed: ${openingDate} - ${closingDate}` : 'Active Survey Period: To Be Determined'}
-              </div>
-            ) : (
-              <div className='mt-4 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/90 text-emerald-50 text-sm font-medium'>
-                <div className='w-2 h-2 bg-emerald-800 rounded-full mr-2 animate-pulse'></div>
-                Active Survey Period: {openingDate} - {closingDate}
-              </div>
-            )}
+            <div className={`mt-4 inline-flex items-center px-3 py-1 rounded-full ${statusConfig.bgColor} ${statusConfig.textColor} text-sm font-medium border`}>
+              <statusConfig.icon className={`w-4 h-4 mr-2 ${statusConfig.pulse ? 'animate-pulse' : ''}`} />
+              {statusConfig.text}
+            </div>
           </div>
         </Container>
       </div>
@@ -209,13 +249,30 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
             </div>
 
             <div className='prose prose-gray max-w-none'>
-              {hasClosed ? (
-                <div className='mb-6 p-4 bg-amber-50 border border-amber-300 rounded-lg'>
-                  <p className='text-amber-900 font-semibold mb-2'>
-                    ⚠️ The {previousYear}-{currentYear} survey period has closed.
+              {status === 'closed' ? (
+                <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg'>
+                  <p className='text-red-900 font-semibold mb-2'>
+                    <XCircle className='inline w-5 h-5 mr-1' />
+                    The {previousYear}-{currentYear} survey period has closed.
                   </p>
-                  <p className='text-amber-800'>
+                  <p className='text-red-800'>
+                    {daysSinceClosed 
+                      ? `Survey closed ${daysSinceClosed} days ago. `
+                      : ''}
                     The {currentYear}-{nextYear} survey dates will be announced soon. Please check back for updates.
+                  </p>
+                </div>
+              ) : status === 'scheduled' ? (
+                <div className='mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+                  <p className='text-blue-900 font-semibold mb-2'>
+                    <Calendar className='inline w-5 h-5 mr-1' />
+                    The {previousYear}-{currentYear} survey will open soon.
+                  </p>
+                  <p className='text-blue-800'>
+                    {daysUntilOpening 
+                      ? `Opening in ${daysUntilOpening} days (${openingDate}). `
+                      : ''}
+                    Please prepare your data for submission.
                   </p>
                 </div>
               ) : null}
@@ -225,7 +282,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                 <span className='font-semibold text-emerald-700'>
                   {previousYear}-{currentYear} CEAL Statistics Online Survey
                 </span>{" "}
-                input/edit period is {areDatesSet ? (
+                input/edit period is {status !== 'not_set' ? (
                   <>
                     from{" "}
                     <span className='font-semibold text-orange-600'>
@@ -236,7 +293,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                   <span className='font-semibold text-orange-600'>to be determined</span>
                 )}
                 , with the results published in{" "}
-                {areDatesSet ? (
+                {status !== 'not_set' ? (
                   <>
                     the{" "}
                     <span className='font-semibold text-blue-600'>

@@ -185,10 +185,21 @@ export default async function Page({ params, searchParams }: PageProps) {
       });
     }
 
-    // Get all current E-Journal subscriptions for this library and year with counts
+    // Get current E-Journal subscriptions selected by the user (is_selected=true
+    // OR a custom_count override has been entered).
     const subscriptions = await db.libraryYear_ListEJournal.findMany({
-      where: { libraryyear_id: libraryYearRecord!.id },
-      include: { 
+      where: {
+        libraryyear_id: libraryYearRecord!.id,
+        OR: [
+          { is_selected: true },
+          { custom_count: { not: null } },
+        ],
+      },
+      select: {
+        libraryyear_id: true,
+        listejournal_id: true,
+        is_selected: true,
+        custom_count: true,
         List_EJournal: {
           include: {
             List_EJournal_Counts: {
@@ -224,10 +235,34 @@ export default async function Page({ params, searchParams }: PageProps) {
       return librarySpecific || group[0]; // fallback to first if all are global
     });
     
-    // Filter original subscriptions to match filtered EJournals
-    const filteredEJournalIds = new Set(filteredEJournals.map(ejournal => ejournal.id));
-    const filteredSubscriptions = subscriptions.filter(sub => 
-      filteredEJournalIds.has(sub.List_EJournal.id)
+    // Filter original subscriptions to match filtered EJournals. Merge state
+    // (custom_count, is_selected) from any deduped twin so the kept row's
+    // display reflects the user's actual input.
+    const filteredEJournalIds = new Set(filteredEJournals.map((ejournal) => ejournal.id));
+    const groupOfEJournalId = new Map<number, string>();
+    for (const [key, group] of recordsByIdentifier) {
+      group.forEach((ej) => groupOfEJournalId.set(ej.id, key));
+    }
+    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
+    for (const sub of subscriptions) {
+      const key = groupOfEJournalId.get(sub.List_EJournal.id);
+      if (!key) continue;
+      const keptEJ = filteredEJournals.find((ej) => groupOfEJournalId.get(ej.id) === key);
+      if (!keptEJ) continue;
+      if (!consolidatedByKept.has(keptEJ.id)) {
+        const own = subscriptions.find((s) => s.List_EJournal.id === keptEJ.id);
+        consolidatedByKept.set(keptEJ.id, { ...(own ?? sub), List_EJournal: keptEJ as any });
+      }
+      const target = consolidatedByKept.get(keptEJ.id)!;
+      if (target.custom_count == null && sub.custom_count != null) {
+        target.custom_count = sub.custom_count;
+      }
+      if (!target.is_selected && sub.is_selected) {
+        target.is_selected = sub.is_selected;
+      }
+    }
+    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
+      (sub) => filteredEJournalIds.has(sub.List_EJournal.id)
     );
     
     if (filteredEJournals.length === 0) {

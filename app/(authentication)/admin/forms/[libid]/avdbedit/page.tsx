@@ -131,11 +131,24 @@ export default async function Page({ params, searchParams }: PageProps) {
       });
     }
 
-    // Get all current subscriptions for this library and year with counts
-    // At this point libraryYearRecord is guaranteed to exist (either found or created)
+    // Get all current subscriptions for this library and year with counts.
+    // Junction table provides per-library state (is_selected, custom_count);
+    // List_AV_Counts provides the global title count fallback.
+    // Filter to only show items the user actually selected in the survey
+    // (is_selected=true OR has a custom_count).
     const subscriptions = await db.libraryYear_ListAV.findMany({
-      where: { libraryyear_id: libraryYearRecord!.id },
-      include: { 
+      where: {
+        libraryyear_id: libraryYearRecord!.id,
+        OR: [
+          { is_selected: true },
+          { custom_count: { not: null } },
+        ],
+      },
+      select: {
+        libraryyear_id: true,
+        listav_id: true,
+        is_selected: true,
+        custom_count: true,
         List_AV: {
           include: {
             List_AV_Counts: {
@@ -171,10 +184,39 @@ export default async function Page({ params, searchParams }: PageProps) {
       return librarySpecific || group[0]; // fallback to first if all are global
     });
     
-    // Filter original subscriptions to match filtered AVs
-    const filteredAVIds = new Set(filteredAVs.map(av => av.id));
-    const filteredSubscriptions = subscriptions.filter(sub => 
-      filteredAVIds.has(sub.List_AV.id)
+    // Filter original subscriptions to match filtered AVs.
+    // If a global twin's junction row has custom_count or is_selected set
+    // (legacy/orphaned data from before dedup), merge that state into the
+    // library-specific row that survives the dedup so the display reflects
+    // the user's intent.
+    const filteredAVIds = new Set(filteredAVs.map((av) => av.id));
+    const groupOfAVId = new Map<number, string>();
+    for (const [key, group] of recordsByIdentifier) {
+      group.forEach((av) => groupOfAVId.set(av.id, key));
+    }
+    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
+    for (const sub of subscriptions) {
+      const key = groupOfAVId.get(sub.List_AV.id);
+      if (!key) continue;
+      const keptAv = filteredAVs.find((av) => groupOfAVId.get(av.id) === key);
+      if (!keptAv) continue;
+      const existing = consolidatedByKept.get(keptAv.id);
+      if (!existing) {
+        // Start with the kept-row's own subscription (if present) or the twin
+        const own = subscriptions.find((s) => s.List_AV.id === keptAv.id);
+        consolidatedByKept.set(keptAv.id, { ...(own ?? sub), List_AV: keptAv as any });
+      }
+      const target = consolidatedByKept.get(keptAv.id)!;
+      // Merge state: prefer non-null custom_count, OR is_selected
+      if (target.custom_count == null && sub.custom_count != null) {
+        target.custom_count = sub.custom_count;
+      }
+      if (!target.is_selected && sub.is_selected) {
+        target.is_selected = sub.is_selected;
+      }
+    }
+    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
+      (sub) => filteredAVIds.has(sub.List_AV.id)
     );
     
     if (filteredAVs.length === 0) {

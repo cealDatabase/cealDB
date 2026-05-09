@@ -29,26 +29,37 @@ export type AggregateLibraryYear_ListAV = {
 export type LibraryYear_ListAVAvgAggregateOutputType = {
   libraryyear_id: number | null
   listav_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListAVSumAggregateOutputType = {
   libraryyear_id: number | null
   listav_id: number | null
+  custom_count: number | null
 }
 
 export type LibraryYear_ListAVMinAggregateOutputType = {
   libraryyear_id: number | null
   listav_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListAVMaxAggregateOutputType = {
   libraryyear_id: number | null
   listav_id: number | null
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
 }
 
 export type LibraryYear_ListAVCountAggregateOutputType = {
   libraryyear_id: number
   listav_id: number
+  is_selected: number
+  custom_count: number
+  updated_at: number
   _all: number
 }
 
@@ -56,26 +67,37 @@ export type LibraryYear_ListAVCountAggregateOutputType = {
 export type LibraryYear_ListAVAvgAggregateInputType = {
   libraryyear_id?: true
   listav_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListAVSumAggregateInputType = {
   libraryyear_id?: true
   listav_id?: true
+  custom_count?: true
 }
 
 export type LibraryYear_ListAVMinAggregateInputType = {
   libraryyear_id?: true
   listav_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListAVMaxAggregateInputType = {
   libraryyear_id?: true
   listav_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
 }
 
 export type LibraryYear_ListAVCountAggregateInputType = {
   libraryyear_id?: true
   listav_id?: true
+  is_selected?: true
+  custom_count?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -168,6 +190,9 @@ export type LibraryYear_ListAVGroupByArgs<ExtArgs extends runtime.Types.Extensio
 export type LibraryYear_ListAVGroupByOutputType = {
   libraryyear_id: number
   listav_id: number
+  is_selected: boolean | null
+  custom_count: number | null
+  updated_at: Date | null
   _count: LibraryYear_ListAVCountAggregateOutputType | null
   _avg: LibraryYear_ListAVAvgAggregateOutputType | null
   _sum: LibraryYear_ListAVSumAggregateOutputType | null
@@ -196,6 +221,9 @@ export type LibraryYear_ListAVWhereInput = {
   NOT?: Prisma.LibraryYear_ListAVWhereInput | Prisma.LibraryYear_ListAVWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
   listav_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListAV"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListAV"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListAV"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_AV?: Prisma.XOR<Prisma.List_AVScalarRelationFilter, Prisma.List_AVWhereInput>
 }
@@ -203,6 +231,9 @@ export type LibraryYear_ListAVWhereInput = {
 export type LibraryYear_ListAVOrderByWithRelationInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   Library_Year?: Prisma.Library_YearOrderByWithRelationInput
   List_AV?: Prisma.List_AVOrderByWithRelationInput
 }
@@ -214,6 +245,9 @@ export type LibraryYear_ListAVWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LibraryYear_ListAVWhereInput | Prisma.LibraryYear_ListAVWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
   listav_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListAV"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListAV"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListAV"> | Date | string | null
   Library_Year?: Prisma.XOR<Prisma.Library_YearScalarRelationFilter, Prisma.Library_YearWhereInput>
   List_AV?: Prisma.XOR<Prisma.List_AVScalarRelationFilter, Prisma.List_AVWhereInput>
 }, "libraryyear_id_listav_id">
@@ -221,6 +255,9 @@ export type LibraryYear_ListAVWhereUniqueInput = Prisma.AtLeast<{
 export type LibraryYear_ListAVOrderByWithAggregationInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrderInput | Prisma.SortOrder
+  custom_count?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LibraryYear_ListAVCountOrderByAggregateInput
   _avg?: Prisma.LibraryYear_ListAVAvgOrderByAggregateInput
   _max?: Prisma.LibraryYear_ListAVMaxOrderByAggregateInput
@@ -234,9 +271,15 @@ export type LibraryYear_ListAVScalarWhereWithAggregatesInput = {
   NOT?: Prisma.LibraryYear_ListAVScalarWhereWithAggregatesInput | Prisma.LibraryYear_ListAVScalarWhereWithAggregatesInput[]
   libraryyear_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListAV"> | number
   listav_id?: Prisma.IntWithAggregatesFilter<"LibraryYear_ListAV"> | number
+  is_selected?: Prisma.BoolNullableWithAggregatesFilter<"LibraryYear_ListAV"> | boolean | null
+  custom_count?: Prisma.IntNullableWithAggregatesFilter<"LibraryYear_ListAV"> | number | null
+  updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"LibraryYear_ListAV"> | Date | string | null
 }
 
 export type LibraryYear_ListAVCreateInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListAVInput
   List_AV: Prisma.List_AVCreateNestedOneWithoutLibraryYear_ListAVInput
 }
@@ -244,9 +287,15 @@ export type LibraryYear_ListAVCreateInput = {
 export type LibraryYear_ListAVUncheckedCreateInput = {
   libraryyear_id: number
   listav_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVUpdateInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListAVNestedInput
   List_AV?: Prisma.List_AVUpdateOneRequiredWithoutLibraryYear_ListAVNestedInput
 }
@@ -254,20 +303,31 @@ export type LibraryYear_ListAVUpdateInput = {
 export type LibraryYear_ListAVUncheckedUpdateInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listav_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVCreateManyInput = {
   libraryyear_id: number
   listav_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVUpdateManyMutationInput = {
-
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVUncheckedUpdateManyInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
   listav_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVLibraryyear_idListav_idCompoundUniqueInput = {
@@ -278,26 +338,37 @@ export type LibraryYear_ListAVLibraryyear_idListav_idCompoundUniqueInput = {
 export type LibraryYear_ListAVCountOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListAVAvgOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListAVMaxOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListAVMinOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  is_selected?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListAVSumOrderByAggregateInput = {
   libraryyear_id?: Prisma.SortOrder
   listav_id?: Prisma.SortOrder
+  custom_count?: Prisma.SortOrder
 }
 
 export type LibraryYear_ListAVListRelationFilter = {
@@ -395,11 +466,17 @@ export type LibraryYear_ListAVUncheckedUpdateManyWithoutLibrary_YearNestedInput 
 }
 
 export type LibraryYear_ListAVCreateWithoutList_AVInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   Library_Year: Prisma.Library_YearCreateNestedOneWithoutLibraryYear_ListAVInput
 }
 
 export type LibraryYear_ListAVUncheckedCreateWithoutList_AVInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVCreateOrConnectWithoutList_AVInput = {
@@ -434,14 +511,23 @@ export type LibraryYear_ListAVScalarWhereInput = {
   NOT?: Prisma.LibraryYear_ListAVScalarWhereInput | Prisma.LibraryYear_ListAVScalarWhereInput[]
   libraryyear_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
   listav_id?: Prisma.IntFilter<"LibraryYear_ListAV"> | number
+  is_selected?: Prisma.BoolNullableFilter<"LibraryYear_ListAV"> | boolean | null
+  custom_count?: Prisma.IntNullableFilter<"LibraryYear_ListAV"> | number | null
+  updated_at?: Prisma.DateTimeNullableFilter<"LibraryYear_ListAV"> | Date | string | null
 }
 
 export type LibraryYear_ListAVCreateWithoutLibrary_YearInput = {
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
   List_AV: Prisma.List_AVCreateNestedOneWithoutLibraryYear_ListAVInput
 }
 
 export type LibraryYear_ListAVUncheckedCreateWithoutLibrary_YearInput = {
   listav_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVCreateOrConnectWithoutLibrary_YearInput = {
@@ -472,34 +558,58 @@ export type LibraryYear_ListAVUpdateManyWithWhereWithoutLibrary_YearInput = {
 
 export type LibraryYear_ListAVCreateManyList_AVInput = {
   libraryyear_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVUpdateWithoutList_AVInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   Library_Year?: Prisma.Library_YearUpdateOneRequiredWithoutLibraryYear_ListAVNestedInput
 }
 
 export type LibraryYear_ListAVUncheckedUpdateWithoutList_AVInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVUncheckedUpdateManyWithoutList_AVInput = {
   libraryyear_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVCreateManyLibrary_YearInput = {
   listav_id: number
+  is_selected?: boolean | null
+  custom_count?: number | null
+  updated_at?: Date | string | null
 }
 
 export type LibraryYear_ListAVUpdateWithoutLibrary_YearInput = {
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   List_AV?: Prisma.List_AVUpdateOneRequiredWithoutLibraryYear_ListAVNestedInput
 }
 
 export type LibraryYear_ListAVUncheckedUpdateWithoutLibrary_YearInput = {
   listav_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LibraryYear_ListAVUncheckedUpdateManyWithoutLibrary_YearInput = {
   listav_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_selected?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  custom_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -507,6 +617,9 @@ export type LibraryYear_ListAVUncheckedUpdateManyWithoutLibrary_YearInput = {
 export type LibraryYear_ListAVSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listav_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_AV?: boolean | Prisma.List_AVDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListAV"]>
@@ -514,6 +627,9 @@ export type LibraryYear_ListAVSelect<ExtArgs extends runtime.Types.Extensions.In
 export type LibraryYear_ListAVSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listav_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_AV?: boolean | Prisma.List_AVDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListAV"]>
@@ -521,6 +637,9 @@ export type LibraryYear_ListAVSelectCreateManyAndReturn<ExtArgs extends runtime.
 export type LibraryYear_ListAVSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   libraryyear_id?: boolean
   listav_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_AV?: boolean | Prisma.List_AVDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["libraryYear_ListAV"]>
@@ -528,9 +647,12 @@ export type LibraryYear_ListAVSelectUpdateManyAndReturn<ExtArgs extends runtime.
 export type LibraryYear_ListAVSelectScalar = {
   libraryyear_id?: boolean
   listav_id?: boolean
+  is_selected?: boolean
+  custom_count?: boolean
+  updated_at?: boolean
 }
 
-export type LibraryYear_ListAVOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listav_id", ExtArgs["result"]["libraryYear_ListAV"]>
+export type LibraryYear_ListAVOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"libraryyear_id" | "listav_id" | "is_selected" | "custom_count" | "updated_at", ExtArgs["result"]["libraryYear_ListAV"]>
 export type LibraryYear_ListAVInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Library_Year?: boolean | Prisma.Library_YearDefaultArgs<ExtArgs>
   List_AV?: boolean | Prisma.List_AVDefaultArgs<ExtArgs>
@@ -553,6 +675,9 @@ export type $LibraryYear_ListAVPayload<ExtArgs extends runtime.Types.Extensions.
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     libraryyear_id: number
     listav_id: number
+    is_selected: boolean | null
+    custom_count: number | null
+    updated_at: Date | null
   }, ExtArgs["result"]["libraryYear_ListAV"]>
   composites: {}
 }
@@ -980,6 +1105,9 @@ export interface Prisma__LibraryYear_ListAVClient<T, Null = never, ExtArgs exten
 export interface LibraryYear_ListAVFieldRefs {
   readonly libraryyear_id: Prisma.FieldRef<"LibraryYear_ListAV", 'Int'>
   readonly listav_id: Prisma.FieldRef<"LibraryYear_ListAV", 'Int'>
+  readonly is_selected: Prisma.FieldRef<"LibraryYear_ListAV", 'Boolean'>
+  readonly custom_count: Prisma.FieldRef<"LibraryYear_ListAV", 'Int'>
+  readonly updated_at: Prisma.FieldRef<"LibraryYear_ListAV", 'DateTime'>
 }
     
 

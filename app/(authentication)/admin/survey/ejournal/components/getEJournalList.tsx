@@ -5,9 +5,11 @@ import {
   getSubscriberIdByListEJournalId,
   getLibraryById,
   getLanguageById,
+  getLibYearByLibIdAndYear,
 } from "@/data/fetchPrisma";
 import { z } from "zod";
 import { listEJournalSchema } from "../data/schema";
+import db from "@/lib/db";
 
 /** Extend base schema so we keep per-year fields */
 // ⬇️ extend: keep legacy `counts` but make it optional + default
@@ -118,4 +120,101 @@ export async function GetEJournalList(userSelectedYear: number) {
   const data = await getEJournalListByYear(userSelectedYear);
   // Use the extended schema so journals/dbs are preserved
   return z.array(listEJournalRowSchema).parse(data || []);
+}
+
+// Extended schema with user selections
+const listEJournalWithSelectionSchema = listEJournalRowSchema.extend({
+  is_selected: z.boolean().optional(),
+  custom_count: z.number().nullable().optional(),
+});
+
+export type listEJournalWithSelection = z.infer<typeof listEJournalWithSelectionSchema>;
+
+/**
+ * Get EJournal list with user selections for a specific library
+ */
+export async function GetEJournalListWithUserSelections(
+  userSelectedYear: number,
+  libraryId: number
+) {
+  // Get library_year record and extract id
+  const libraryYearRecords = await getLibYearByLibIdAndYear(libraryId, userSelectedYear);
+  const libraryYearId = libraryYearRecords && libraryYearRecords.length > 0 
+    ? libraryYearRecords[0].id 
+    : null;
+  
+  // Get base EJournal list
+  const baseData = await getEJournalListByYear(userSelectedYear);
+  
+  // Get user selections if libraryYear exists
+  let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
+  
+  if (libraryYearId) {
+    const selections = await db.libraryYear_ListEJournal.findMany({
+      where: { libraryyear_id: libraryYearId },
+      select: {
+        listejournal_id: true,
+        is_selected: true,
+        custom_count: true,
+      },
+    });
+    
+    selections.forEach((sel) => {
+      userSelections.set(sel.listejournal_id, {
+        is_selected: sel.is_selected ?? false,
+        custom_count: sel.custom_count,
+      });
+    });
+  }
+  
+  // Merge user selections with base data
+  const mergedData = baseData.map((item) => {
+    const selection = userSelections.get(item.id);
+    return {
+      ...item,
+      is_selected: selection?.is_selected ?? false,
+      custom_count: selection?.custom_count ?? null,
+    };
+  });
+
+  // Dedup global-vs-library-specific twins for this user's library so the
+  // user only sees one row per resource. Carry over selection state.
+  let displayData = mergedData;
+  if (libraryYearId) {
+    const groupKey = (it: any) =>
+      `${(it.title ?? "").toLowerCase()}_${(it.publisher ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}_${(it.series ?? "").toLowerCase()}`;
+    const groups = new Map<string, typeof mergedData>();
+    for (const item of mergedData) {
+      const k = groupKey(item);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k)!.push(item);
+    }
+    const kept: typeof mergedData = [];
+    for (const group of groups.values()) {
+      if (group.length === 1) {
+        kept.push(group[0]);
+        continue;
+      }
+      const mine = group.find(
+        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
+      );
+      if (mine) {
+        const twinWithState = group.find(
+          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
+        );
+        if (twinWithState) {
+          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
+          if ((mine as any).custom_count == null) {
+            (mine as any).custom_count = (twinWithState as any).custom_count;
+          }
+        }
+        kept.push(mine);
+      } else {
+        kept.push(...group);
+      }
+    }
+    displayData = kept;
+  }
+
+  return z.array(listEJournalWithSelectionSchema).parse(displayData || []);
 }

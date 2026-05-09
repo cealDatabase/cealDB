@@ -446,8 +446,8 @@ export default function ReportsPage() {
                 <FileBarChart className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground text-start py-2">Statistics Reports</h1>
-                <p className="text-muted-foreground">Export institutional and survey reports</p>
+                <h1 className="text-3xl font-bold text-foreground text-start py-2">Statistics Reports for Institution Participants</h1>
+                <p className="text-muted-foreground">Cross-year statistics reports for individual institutions, with the ability to select specific years and reporting categories.</p>
               </div>
             </div>
           </div>

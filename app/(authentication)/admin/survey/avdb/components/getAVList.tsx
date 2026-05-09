@@ -4,10 +4,12 @@ import {
   getLanguageIdByListAvId,
   getSubscriberIdByListAvId,
   getLibraryById,
-  getLanguageById
+  getLanguageById,
+  getLibYearByLibIdAndYear,
 } from "@/data/fetchPrisma";
 import { z } from "zod"
 import { listAVSchema } from "../data/schema"
+import db from "@/lib/db";
 
 const getAVListByYear = async (userSelectedYear: number) => {
   const listAVCountsByYear = await getListAVCountsByYear(userSelectedYear);
@@ -103,4 +105,107 @@ const getAVListByYear = async (userSelectedYear: number) => {
 export async function GetAVList(userSelectedYear: number) {
   const data = await getAVListByYear(userSelectedYear);
   return z.array(listAVSchema).parse(data || []);
+}
+
+// Extended schema with user selections
+const listAVWithSelectionSchema = listAVSchema.extend({
+  is_selected: z.boolean().optional(),
+  custom_count: z.number().nullable().optional(),
+});
+
+export type listAVWithSelection = z.infer<typeof listAVWithSelectionSchema>;
+
+/**
+ * Get AV list with user selections for a specific library
+ */
+export async function GetAVListWithUserSelections(
+  userSelectedYear: number,
+  libraryId: number
+) {
+  // Get library_year record and extract id
+  const libraryYearRecords = await getLibYearByLibIdAndYear(libraryId, userSelectedYear);
+  const libraryYearId = libraryYearRecords && libraryYearRecords.length > 0 
+    ? libraryYearRecords[0].id 
+    : null;
+  
+  // Get base AV list
+  const baseData = await getAVListByYear(userSelectedYear);
+  
+  // Get user selections if libraryYear exists
+  let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
+  
+  if (libraryYearId) {
+    const selections = await db.libraryYear_ListAV.findMany({
+      where: { libraryyear_id: libraryYearId },
+      select: {
+        listav_id: true,
+        is_selected: true,
+        custom_count: true,
+      },
+    });
+    
+    selections.forEach((sel) => {
+      userSelections.set(sel.listav_id, {
+        is_selected: sel.is_selected ?? false,
+        custom_count: sel.custom_count,
+      });
+    });
+  }
+  
+  // Merge user selections with base data
+  const mergedData = baseData.map((item) => {
+    const selection = userSelections.get(item.id);
+    return {
+      ...item,
+      is_selected: selection?.is_selected ?? false,
+      custom_count: selection?.custom_count ?? null,
+    };
+  });
+
+  // Dedup global-vs-library-specific twins. When the user's library has its
+  // own version of a resource (List_AV.libraryyear === their library_year id),
+  // hide any matching global record so the user only ever sees one row per
+  // resource and edits don't go to the wrong junction record.
+  // Records that don't have a library-specific twin pass through untouched.
+  let displayData = mergedData;
+  if (libraryYearId) {
+    const groupKey = (it: any) =>
+      `${(it.title ?? "").toLowerCase()}_${(it.type ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}`;
+    const groups = new Map<string, typeof mergedData>();
+    for (const item of mergedData) {
+      const k = groupKey(item);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k)!.push(item);
+    }
+    const kept: typeof mergedData = [];
+    for (const group of groups.values()) {
+      if (group.length === 1) {
+        kept.push(group[0]);
+        continue;
+      }
+      const mine = group.find(
+        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
+      );
+      if (mine) {
+        // Carry over selection state from any deduped twin so the user's
+        // existing checks/custom_count don't get lost visually.
+        const twinWithState = group.find(
+          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
+        );
+        if (twinWithState) {
+          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
+          if ((mine as any).custom_count == null) {
+            (mine as any).custom_count = (twinWithState as any).custom_count;
+          }
+        }
+        kept.push(mine);
+      } else {
+        // No library-specific twin from this user's library: keep them all.
+        kept.push(...group);
+      }
+    }
+    displayData = kept;
+  }
+
+  return z.array(listAVWithSelectionSchema).parse(displayData || []);
 }

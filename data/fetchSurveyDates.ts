@@ -12,6 +12,11 @@ export interface FormattedSurveyDates {
   publicationMonth: string; // "February 2026"
   isStoredInDatabase: boolean;
   isCurrentlyOpen: boolean;
+  // Three-state status system
+  status: 'not_set' | 'scheduled' | 'open' | 'closed';
+  daysUntilOpening: number | null;
+  daysUntilClosing: number | null;
+  daysSinceClosed: number | null;
 }
 
 /**
@@ -40,6 +45,35 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
       libraryYear?.closing_date
     );
 
+    // Calculate three-state status and countdowns
+    const now = new Date();
+    const openingDateTime = surveyDates.openingDate ? new Date(surveyDates.openingDate) : null;
+    const closingDateTime = surveyDates.closingDate ? new Date(surveyDates.closingDate) : null;
+    const isStoredInDatabase = !!(libraryYear?.opening_date && libraryYear?.closing_date);
+    const isCurrentlyOpen = libraryYear?.is_open_for_editing || false;
+
+    let status: 'not_set' | 'scheduled' | 'open' | 'closed' = 'not_set';
+    let daysUntilOpening: number | null = null;
+    let daysUntilClosing: number | null = null;
+    let daysSinceClosed: number | null = null;
+
+    if (!isStoredInDatabase) {
+      status = 'not_set';
+    } else if (isCurrentlyOpen) {
+      status = 'open';
+      if (closingDateTime) {
+        daysUntilClosing = Math.ceil((closingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      }
+    } else if (openingDateTime && now < openingDateTime) {
+      status = 'scheduled';
+      daysUntilOpening = Math.ceil((openingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    } else {
+      status = 'closed';
+      if (closingDateTime) {
+        daysSinceClosed = Math.floor((now.getTime() - closingDateTime.getTime()) / (1000 * 60 * 60 * 24));
+      }
+    }
+
     return {
       year: currentYear,
       shortDateRange: getShortDateRange(currentYear, libraryYear?.opening_date, libraryYear?.closing_date),
@@ -47,8 +81,12 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
       fullClosingDate: formatSurveyDate(surveyDates.closingDate, false),
       fiscalYearPeriod: formatFiscalYear(currentYear),
       publicationMonth: formatPublicationDate(currentYear),
-      isStoredInDatabase: !!(libraryYear?.opening_date && libraryYear?.closing_date),
-      isCurrentlyOpen: libraryYear?.is_open_for_editing || false,
+      isStoredInDatabase,
+      isCurrentlyOpen,
+      status,
+      daysUntilOpening,
+      daysUntilClosing,
+      daysSinceClosed,
     };
 
   } catch (error) {
@@ -66,5 +104,9 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
       publicationMonth: formatPublicationDate(currentYear),
       isStoredInDatabase: false,
       isCurrentlyOpen: false,
+      status: 'not_set' as const,
+      daysUntilOpening: null,
+      daysUntilClosing: null,
+      daysSinceClosed: null,
     };}
 }

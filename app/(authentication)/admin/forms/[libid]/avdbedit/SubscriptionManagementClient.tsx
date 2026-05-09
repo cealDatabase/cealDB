@@ -19,6 +19,8 @@ interface SubscriptionManagementClientProps {
   subscriptions: Array<{
     libraryyear_id: number;
     listav_id: number;
+    is_selected?: boolean | null;
+    custom_count?: number | null;
     List_AV: {
       id: number;
       title: string | null;
@@ -91,26 +93,35 @@ export default function SubscriptionManagementClient({
     );
   };
 
-  // Convert subscription data to table format
+  // Convert subscription data to table format.
+  // Per-library `custom_count` (entered in the survey big table) overrides the
+  // global titles count. We track which value is the override so the UI can
+  // distinguish library-specific counts from the global default.
   const data = subscriptions
     .filter(sub => !removedIds.has(sub.listav_id))
-    .map((sub) => ({
-      id: sub.List_AV.id,
-      title: sub.List_AV.title ?? "",
-      subtitle: sub.List_AV.subtitle ?? "",
-      cjk_title: sub.List_AV.cjk_title ?? "",
-      romanized_title: sub.List_AV.romanized_title ?? "",
-      description: sub.List_AV.description ?? "",
-      notes: sub.List_AV.notes ?? "",
-      publisher: sub.List_AV.publisher ?? "",
-      data_source: sub.List_AV.data_source ?? "",
-      type: sub.List_AV.type ?? "",
-      counts: sub.List_AV.List_AV_Counts?.[0]?.titles ?? 0,
-      language: sub.List_AV.List_AV_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
-      is_global: !!sub.List_AV.is_global,
-      subscribers: [],
-      updated_at: sub.List_AV.updated_at.toISOString(),
-    }));
+    .map((sub) => {
+      const globalCount = sub.List_AV.List_AV_Counts?.[0]?.titles ?? 0;
+      const hasCustom = sub.custom_count != null;
+      return {
+        id: sub.List_AV.id,
+        title: sub.List_AV.title ?? "",
+        subtitle: sub.List_AV.subtitle ?? "",
+        cjk_title: sub.List_AV.cjk_title ?? "",
+        romanized_title: sub.List_AV.romanized_title ?? "",
+        description: sub.List_AV.description ?? "",
+        notes: sub.List_AV.notes ?? "",
+        publisher: sub.List_AV.publisher ?? "",
+        data_source: sub.List_AV.data_source ?? "",
+        type: sub.List_AV.type ?? "",
+        counts: hasCustom ? (sub.custom_count as number) : globalCount,
+        is_custom_count: hasCustom,
+        global_count: globalCount,
+        language: sub.List_AV.List_AV_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
+        is_global: !!sub.List_AV.is_global,
+        subscribers: [],
+        updated_at: sub.List_AV.updated_at.toISOString(),
+      };
+    });
 
   const handleEdit = (record: any) => {
     setEditingRecord(record);
@@ -219,7 +230,24 @@ export default function SubscriptionManagementClient({
       header: "Titles",
       cell: ({ row }: any) => {
         const count = row.getValue("counts") as number;
-        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+        const isCustom = row.original.is_custom_count as boolean;
+        const globalCount = row.original.global_count as number;
+        return (
+          <div className="text-center font-medium">
+            <div className="flex items-center justify-center gap-1.5">
+              <span>{count > 0 ? count.toLocaleString() : "-"}</span>
+              {isCustom && (
+                <Badge
+                  variant="outline"
+                  className="border-blue-300 bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0"
+                  title={`Library override. Global default: ${globalCount.toLocaleString()}`}
+                >
+                  Custom
+                </Badge>
+              )}
+            </div>
+          </div>
+        );
       },
     },
   ];

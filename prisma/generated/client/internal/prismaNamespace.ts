@@ -3677,7 +3677,10 @@ export type LibraryScalarFieldEnum = (typeof LibraryScalarFieldEnum)[keyof typeo
 
 export const LibraryYear_ListAVScalarFieldEnum = {
   libraryyear_id: 'libraryyear_id',
-  listav_id: 'listav_id'
+  listav_id: 'listav_id',
+  is_selected: 'is_selected',
+  custom_count: 'custom_count',
+  updated_at: 'updated_at'
 } as const
 
 export type LibraryYear_ListAVScalarFieldEnum = (typeof LibraryYear_ListAVScalarFieldEnum)[keyof typeof LibraryYear_ListAVScalarFieldEnum]
@@ -3685,7 +3688,10 @@ export type LibraryYear_ListAVScalarFieldEnum = (typeof LibraryYear_ListAVScalar
 
 export const LibraryYear_ListEBookScalarFieldEnum = {
   libraryyear_id: 'libraryyear_id',
-  listebook_id: 'listebook_id'
+  listebook_id: 'listebook_id',
+  is_selected: 'is_selected',
+  custom_count: 'custom_count',
+  updated_at: 'updated_at'
 } as const
 
 export type LibraryYear_ListEBookScalarFieldEnum = (typeof LibraryYear_ListEBookScalarFieldEnum)[keyof typeof LibraryYear_ListEBookScalarFieldEnum]
@@ -3693,7 +3699,10 @@ export type LibraryYear_ListEBookScalarFieldEnum = (typeof LibraryYear_ListEBook
 
 export const LibraryYear_ListEJournalScalarFieldEnum = {
   libraryyear_id: 'libraryyear_id',
-  listejournal_id: 'listejournal_id'
+  listejournal_id: 'listejournal_id',
+  is_selected: 'is_selected',
+  custom_count: 'custom_count',
+  updated_at: 'updated_at'
 } as const
 
 export type LibraryYear_ListEJournalScalarFieldEnum = (typeof LibraryYear_ListEJournalScalarFieldEnum)[keyof typeof LibraryYear_ListEJournalScalarFieldEnum]

@@ -1,0 +1,952 @@
+model Electronic {
+  id                                        Int           @id @default(autoincrement())
+  libraryyear                               Int?          @unique
+  entryid                                   String?
+  eaccompanied_computer_cd_chinese          Float?
+  eaccompanied_computer_cd_japanese         Float?
+  eaccompanied_computer_cd_korean           Float?
+  eaccompanied_computer_cd_noncjk           Float?
+  eaccompanied_computer_cd_subtotal         Float?
+  eaccompanied_computer_memo                String?
+  eaccompanied_computer_title_chinese       Float?
+  eaccompanied_computer_title_japanese      Float?
+  eaccompanied_computer_title_korean        Float?
+  eaccompanied_computer_title_noncjk        Float?
+  eaccompanied_computer_title_subtotal      Float?
+  efulltext_electronic_expenditure_chinese  Decimal?
+  efulltext_electronic_expenditure_japanese Decimal?
+  efulltext_electronic_expenditure_korean   Decimal?
+  efulltext_electronic_expenditure_noncjk   Decimal?
+  efulltext_electronic_expenditure_subtotal Decimal?
+  efulltext_electronic_memo                 String?
+  efulltext_electronic_title_chinese        Float?
+  efulltext_electronic_title_japanese       Float?
+  efulltext_electronic_title_korean         Float?
+  efulltext_electronic_title_noncjk         Float?
+  efulltext_electronic_title_subtotal       Float?
+  egift_computer_cd_chinese                 Float?
+  egift_computer_cd_japanese                Float?
+  egift_computer_cd_korean                  Float?
+  egift_computer_cd_noncjk                  Float?
+  egift_computer_cd_subtotal                Float?
+  egift_computer_memo                       String?
+  egift_computer_title_chinese              Float?
+  egift_computer_title_japanese             Float?
+  egift_computer_title_korean               Float?
+  egift_computer_title_noncjk               Float?
+  egift_computer_title_subtotal             Float?
+  egrand_memo                               String?
+  egrand_total_cd_chinese                   Int?
+  egrand_total_cd_japanese                  Int?
+  egrand_total_cd_korean                    Int?
+  egrand_total_cd_noncjk                    Int?
+  egrand_total_cd_subtotal                  Int?
+  egrand_total_title_chinese                Float?
+  egrand_total_title_japanese               Float?
+  egrand_total_title_korean                 Float?
+  egrand_total_title_noncjk                 Float?
+  egrand_total_title_subtotal               Float?
+  egrandtotal_memo                          String?
+  eindex_electronic_expenditure_chinese     Decimal?
+  eindex_electronic_expenditure_japanese    Decimal?
+  eindex_electronic_expenditure_korean      Decimal?
+  eindex_electronic_expenditure_noncjk      Decimal?
+  eindex_electronic_expenditure_subtotal    Decimal?
+  eindex_electronic_memo                    String?
+  eindex_electronic_title_chinese           Float?
+  eindex_electronic_title_japanese          Float?
+  eindex_electronic_title_korean            Float?
+  eindex_electronic_title_noncjk            Float?
+  eindex_electronic_title_subtotal          Float?
+  enotes                                    String?
+  eonetime_computer_cd_chinese              Float?
+  eonetime_computer_cd_japanese             Float?
+  eonetime_computer_cd_korean               Float?
+  eonetime_computer_cd_noncjk               Float?
+  eonetime_computer_cd_subtotal             Float?
+  eonetime_computer_expenditure_chinese     Decimal?
+  eonetime_computer_expenditure_japanese    Decimal?
+  eonetime_computer_expenditure_korean      Decimal?
+  eonetime_computer_expenditure_noncjk      Decimal?
+  eonetime_computer_expenditure_subtotal    Decimal?
+  eonetime_computer_memo                    String?
+  eonetime_computer_title_chinese           Float?
+  eonetime_computer_title_japanese          Float?
+  eonetime_computer_title_korean            Float?
+  eonetime_computer_title_noncjk            Float?
+  eonetime_computer_title_subtotal          Float?
+  eprevious_memo                            String?
+  eprevious_total_cd_chinese                Float?
+  eprevious_total_cd_japanese               Float?
+  eprevious_total_cd_korean                 Float?
+  eprevious_total_cd_noncjk                 Float?
+  eprevious_total_cd_subtotal               Float?
+  eprevious_total_title_chinese             Float?
+  eprevious_total_title_japanese            Float?
+  eprevious_total_title_korean              Float?
+  eprevious_total_title_noncjk              Float?
+  eprevious_total_title_subtotal            Float?
+  etotal_computer_cd_chinese                Float?
+  etotal_computer_cd_japanese               Float?
+  etotal_computer_cd_korean                 Float?
+  etotal_computer_cd_noncjk                 Float?
+  etotal_computer_cd_subtotal               Float?
+  etotal_computer_expenditure_chinese       Float?
+  etotal_computer_expenditure_japanese      Float?
+  etotal_computer_expenditure_korean        Float?
+  etotal_computer_expenditure_noncjk        Float?
+  etotal_computer_expenditure_subtotal      Float?
+  etotal_computer_memo                      String?
+  etotal_computer_title_chinese             Float?
+  etotal_computer_title_japanese            Float?
+  etotal_computer_title_korean              Float?
+  etotal_computer_title_noncjk              Float?
+  etotal_computer_title_subtotal            Float?
+  etotal_electronic_expenditure_chinese     Decimal?
+  etotal_electronic_expenditure_japanese    Decimal?
+  etotal_electronic_expenditure_korean      Decimal?
+  etotal_electronic_expenditure_noncjk      Decimal?
+  etotal_electronic_expenditure_subtotal    Decimal?
+  etotal_electronic_memo                    String?
+  etotal_electronic_title_chinese           Float?
+  etotal_electronic_title_japanese          Float?
+  etotal_electronic_title_korean            Float?
+  etotal_electronic_title_noncjk            Float?
+  etotal_electronic_title_subtotal          Float?
+  etotal_expenditure_grandtotal             Decimal?
+  etotal_expenditure_memo                   String?
+  etotal_expenditure_onetime                Decimal?
+  etotal_expenditure_ongoing                Decimal?
+  Library_Year                              Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Electronic_Books {
+  id                                     Int           @id @default(autoincrement())
+  libraryyear                            Int?          @unique
+  ebooks_purchased_volumes_chinese       Int?
+  ebooks_purchased_volumes_japanese      Int?
+  ebooks_purchased_volumes_korean        Int?
+  ebooks_purchased_volumes_noncjk        Int?
+  ebooks_purchased_volumes_subtotal      Int?
+  ebooks_purchased_titles_chinese        Int?
+  ebooks_purchased_titles_japanese       Int?
+  ebooks_purchased_titles_korean         Int?
+  ebooks_purchased_titles_noncjk         Int?
+  ebooks_purchased_titles_subtotal       Int?
+  ebooks_nonpurchased_volumes_chinese    Int?
+  ebooks_nonpurchased_volumes_japanese   Int?
+  ebooks_nonpurchased_volumes_korean     Int?
+  ebooks_nonpurchased_volumes_noncjk     Int?
+  ebooks_nonpurchased_volumes_subtotal   Int?
+  ebooks_nonpurchased_titles_chinese     Int?
+  ebooks_nonpurchased_titles_japanese    Int?
+  ebooks_nonpurchased_titles_korean      Int?
+  ebooks_nonpurchased_titles_noncjk      Int?
+  ebooks_nonpurchased_titles_subtotal    Int?
+  ebooks_subscription_volumes_chinese    Int?
+  ebooks_subscription_volumes_japanese   Int?
+  ebooks_subscription_volumes_korean     Int?
+  ebooks_subscription_volumes_noncjk     Int?
+  ebooks_subscription_volumes_subtotal   Int?
+  ebooks_subscription_titles_chinese     Int?
+  ebooks_subscription_titles_japanese    Int?
+  ebooks_subscription_titles_korean      Int?
+  ebooks_subscription_titles_noncjk      Int?
+  ebooks_subscription_titles_subtotal    Int?
+  ebooks_total_volumes                   Int?
+  ebooks_total_titles                    Int?
+  ebooks_expenditure_grandtotal          Decimal?
+  ebooks_notes                           String?
+  ebooks_purchased_prev_titles_chinese   Int?
+  ebooks_purchased_prev_titles_japanese  Int?
+  ebooks_purchased_prev_titles_korean    Int?
+  ebooks_purchased_prev_titles_noncjk    Int?
+  ebooks_purchased_prev_titles_subtotal  Int?
+  ebooks_purchased_add_titles_chinese    Int?
+  ebooks_purchased_add_titles_japanese   Int?
+  ebooks_purchased_add_titles_korean     Int?
+  ebooks_purchased_add_titles_noncjk     Int?
+  ebooks_purchased_add_titles_subtotal   Int?
+  ebooks_purchased_prev_volumes_chinese  Int?
+  ebooks_purchased_prev_volumes_japanese Int?
+  ebooks_purchased_prev_volumes_korean   Int?
+  ebooks_purchased_prev_volumes_noncjk   Int?
+  ebooks_purchased_prev_volumes_subtotal Int?
+  ebooks_purchased_add_volumes_chinese   Int?
+  ebooks_purchased_add_volumes_japanese  Int?
+  ebooks_purchased_add_volumes_korean    Int?
+  ebooks_purchased_add_volumes_noncjk    Int?
+  ebooks_purchased_add_volumes_subtotal  Int?
+  Library_Year                           Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Entry_Status {
+  id                                  Int           @id @default(autoincrement())
+  fiscal_support                      Boolean?      @default(false)
+  monographic_acquisitions            Boolean?      @default(false)
+  other_holdings                      Boolean?      @default(false)
+  participating_libraries_information Boolean?      @default(false)
+  personnel_support_fte               Boolean?      @default(false)
+  public_services                     Boolean?      @default(false)
+  serials                             Boolean?      @default(false)
+  unprocessed_backlog_materials       Boolean?      @default(false)
+  volume_holdings                     Boolean?      @default(false)
+  electronic                          Boolean?      @default(false)
+  electronic_books                    Boolean?      @default(false)
+  espublished                         Boolean       @default(false)
+  libraryyear                         Int?          @unique
+  Library_Year                        Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Fiscal_Support {
+  id                                           Int           @id @default(autoincrement())
+  entryid                                      String?
+  fschinese_appropriations_monographic         Decimal?
+  fschinese_appropriations_serial              Decimal?
+  fschinese_appropriations_other_material      Decimal?
+  fschinese_appropriations_electronic          Decimal?
+  fschinese_appropriations_subtotal            Decimal?
+  fsjapanese_appropriations_monographic        Decimal?
+  fsjapanese_appropriations_serial             Decimal?
+  fsjapanese_appropriations_other_material     Decimal?
+  fsjapanese_appropriations_electronic         Decimal?
+  fsjapanese_appropriations_subtotal           Decimal?
+  fskorean_appropriations_monographic          Decimal?
+  fskorean_appropriations_serial               Decimal?
+  fskorean_appropriations_other_material       Decimal?
+  fskorean_appropriations_electronic           Decimal?
+  fskorean_appropriations_subtotal             Decimal?
+  fsnoncjk_appropriations_monographic          Decimal?
+  fsnoncjk_appropriations_serial               Decimal?
+  fsnoncjk_appropriations_other_material       Decimal?
+  fsnoncjk_appropriations_electronic           Decimal?
+  fsnoncjk_appropriations_subtotal             Decimal?
+  fstotal_appropriations                       Decimal?
+  fsendowments_chinese                         Decimal?
+  fsendowments_japanese                        Decimal?
+  fsendowments_korean                          Decimal?
+  fsendowments_subtotal                        Decimal?
+  fsgrants_chinese                             Decimal?
+  fsgrants_japanese                            Decimal?
+  fsgrants_korean                              Decimal?
+  fsgrants_subtotal                            Decimal?
+  fseast_asian_program_support_chinese         Decimal?
+  fseast_asian_program_support_japanese        Decimal?
+  fseast_asian_program_support_korean          Decimal?
+  fseast_asian_program_support_subtotal        Decimal?
+  fstotal_acquisition_budget                   Decimal?
+  fschinese_appropriations_subtotal_manual     Decimal?
+  fsjapanese_appropriations_subtotal_manual    Decimal?
+  fskorean_appropriations_subtotal_manual      Decimal?
+  fsnoncjk_appropriations_subtotal_manual      Decimal?
+  fstotal_appropriations_manual                Decimal?
+  fsendowments_subtotal_manual                 Decimal?
+  fsgrants_subtotal_manual                     Decimal?
+  fseast_asian_program_support_subtotal_manual Decimal?
+  fsnotes                                      String?
+  libraryyear                                  Int?          @unique
+  fsendowments_noncjk                          Decimal?
+  fsgrants_noncjk                              Decimal?
+  fseast_asian_program_support_noncjk          Decimal?
+  Library_Year                                 Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Library {
+  id                             Int               @id @default(autoincrement())
+  type                           Int
+  library_name                   String
+  plilaw                         Boolean
+  plimed                         Boolean
+  plisubmitter_first_name        String?
+  plisubmitter_last_name         String?
+  pliposition_title              String?
+  pliwork_phone                  String?
+  plie_mail                      String
+  plifax_number                  String?
+  pliinput_as_of_date            DateTime?
+  password                       String?
+  plibibliographic               String?
+  pliconsortia                   String?
+  plisystem_vendor               String?
+  pliopac                        Boolean?
+  plihome_page                   String?
+  plionline_catalog              String?
+  pliunique                      Boolean?
+  pliestablishedyear             String?
+  library_number                 Int
+  pliregion                      Int?
+  collection_title               String?
+  collection_incharge_title      String?
+  collection_organized_under     String?
+  collection_head_reports_to     String?
+  collection_top_department      String?
+  collection_next_position_title String?
+  collection_other_departments   String?
+  collection_librarians_groups   String?
+  collection_type                String?
+  shelving_type                  String?
+  consultation_type              String?
+  teaching_type                  String?
+  acquisition_type               String?
+  cataloging_type                String?
+  circulation_type               String?
+  date_last_changed              DateTime?
+  notes                          String?
+  hideinlibrarylist              Boolean?
+  libraryRegion                  Reflibraryregion? @relation(fields: [pliregion], references: [id])
+  libraryType                    Reflibrarytype    @relation(fields: [type], references: [id])
+  Library_Year                   Library_Year[]
+  User_Library                   User_Library[]
+}
+
+model LibraryYear_ListAV {
+  libraryyear_id Int
+  listav_id      Int
+
+  // User selection fields
+  is_selected  Boolean?  @default(false) // User has selected this AV entry
+  custom_count Int? // User's custom count (overrides default)
+  updated_at   DateTime? @default(now()) // Last update time
+
+  Library_Year Library_Year @relation(fields: [libraryyear_id], references: [id])
+  List_AV      List_AV      @relation(fields: [listav_id], references: [id])
+
+  @@id([libraryyear_id, listav_id])
+}
+
+model LibraryYear_ListEBook {
+  libraryyear_id Int
+  listebook_id   Int
+
+  // User selection fields
+  is_selected  Boolean?  @default(false)
+  custom_count Int?
+  updated_at   DateTime? @default(now())
+
+  Library_Year Library_Year @relation(fields: [libraryyear_id], references: [id])
+  List_EBook   List_EBook   @relation(fields: [listebook_id], references: [id])
+
+  @@id([libraryyear_id, listebook_id])
+}
+
+model LibraryYear_ListEJournal {
+  libraryyear_id  Int
+  listejournal_id Int
+
+  // User selection fields
+  is_selected  Boolean?  @default(false)
+  custom_count Int?
+  updated_at   DateTime? @default(now())
+
+  Library_Year  Library_Year  @relation(fields: [libraryyear_id], references: [id])
+  List_EJournal List_EJournal @relation(fields: [listejournal_id], references: [id])
+
+  @@id([libraryyear_id, listejournal_id])
+}
+
+model List_AV {
+  id                 Int                  @id @default(autoincrement())
+  type               String?
+  title              String?
+  cjk_title          String?
+  romanized_title    String?
+  subtitle           String?
+  publisher          String?
+  description        String?
+  notes              String?
+  data_source        String?
+  updated_at         DateTime
+  is_global          Boolean?
+  libraryyear        Int?
+  LibraryYear_ListAV LibraryYear_ListAV[]
+  Library_Year       Library_Year?        @relation(fields: [libraryyear], references: [id])
+  List_AV_Counts     List_AV_Counts[]
+  List_AV_Language   List_AV_Language[]
+}
+
+model List_AV_Counts {
+  id        Int      @id @default(autoincrement())
+  titles    Int?
+  year      Int?
+  updatedat DateTime
+  ishidden  Boolean?
+  listav    Int?
+  List_AV   List_AV? @relation(fields: [listav], references: [id])
+
+  @@unique([listav, year], name: "listav_year_unique")
+}
+
+model List_AV_Language {
+  listav_id   Int
+  language_id Int
+  Language    Language @relation(fields: [language_id], references: [id])
+  List_AV     List_AV  @relation(fields: [listav_id], references: [id])
+
+  @@id([listav_id, language_id])
+}
+
+model ListCustomOtherHoldings {
+  id    Int    @id @default(autoincrement())
+  label String
+}
+
+model List_EBook {
+  id                    Int                     @id @default(autoincrement())
+  title                 String?
+  sub_series_number     String?
+  publisher             String?
+  description           String?
+  notes                 String?
+  updated_at            DateTime
+  subtitle              String?
+  cjk_title             String?
+  romanized_title       String?
+  data_source           String?
+  is_global             Boolean?
+  libraryyear           Int?
+  LibraryYear_ListEBook LibraryYear_ListEBook[]
+  Library_Year          Library_Year?           @relation(fields: [libraryyear], references: [id])
+  List_EBook_Counts     List_EBook_Counts[]
+  List_EBook_Language   List_EBook_Language[]
+}
+
+model List_EBook_Counts {
+  id         Int         @id @default(autoincrement())
+  titles     Int?
+  volumes    Int?
+  year       Int?
+  updatedat  DateTime
+  chapters   Int?
+  ishidden   Boolean?
+  listebook  Int?
+  List_EBook List_EBook? @relation(fields: [listebook], references: [id])
+}
+
+model List_EBook_Language {
+  listebook_id Int
+  language_id  Int
+  Language     Language   @relation(fields: [language_id], references: [id])
+  List_EBook   List_EBook @relation(fields: [listebook_id], references: [id])
+
+  @@id([listebook_id, language_id])
+}
+
+model List_EJournal {
+  id                       Int                        @id @default(autoincrement())
+  title                    String?
+  sub_series_number        String?
+  publisher                String?
+  description              String?
+  notes                    String?
+  updated_at               DateTime
+  subtitle                 String?
+  series                   String?
+  vendor                   String?
+  cjk_title                String?
+  romanized_title          String?
+  data_source              String?
+  is_global                Boolean?
+  libraryyear              Int?
+  LibraryYear_ListEJournal LibraryYear_ListEJournal[]
+  Library_Year             Library_Year?              @relation(fields: [libraryyear], references: [id])
+  List_EJournal_Counts     List_EJournal_Counts[]
+  List_EJournal_Language   List_EJournal_Language[]
+}
+
+model List_EJournal_Counts {
+  id            Int            @id @default(autoincrement())
+  journals      Int?
+  dbs           Int?
+  year          Int?
+  updatedat     DateTime
+  ishidden      Boolean?
+  listejournal  Int?
+  List_EJournal List_EJournal? @relation(fields: [listejournal], references: [id])
+}
+
+model List_EJournal_Language {
+  listejournal_id Int
+  language_id     Int
+  Language        Language      @relation(fields: [language_id], references: [id])
+  List_EJournal   List_EJournal @relation(fields: [listejournal_id], references: [id])
+
+  @@id([listejournal_id, language_id])
+}
+
+model Monographic_Acquisitions {
+  id                              Int           @id @default(autoincrement())
+  entryid                         String?
+  mapurchased_titles_chinese      Float?
+  mapurchased_titles_japanese     Float?
+  mapurchased_titles_korean       Float?
+  mapurchased_titles_noncjk       Float?
+  mapurchased_titles_subtotal     Float?
+  mapurchased_volumes_chinese     Float?
+  mapurchased_volumes_japanese    Float?
+  mapurchased_volumes_korean      Float?
+  mapurchased_volumes_noncjk      Float?
+  mapurchased_volumes_subtotal    Float?
+  manonpurchased_titles_chinese   Float?
+  manonpurchased_titles_japanese  Float?
+  manonpurchased_titles_korean    Float?
+  manonpurchased_titles_noncjk    Float?
+  manonpurchased_titles_subtotal  Float?
+  manonpurchased_volumes_chinese  Float?
+  manonpurchased_volumes_japanese Float?
+  manonpurchased_volumes_korean   Float?
+  manonpurchased_volumes_noncjk   Float?
+  manonpurchased_volumes_subtotal Float?
+  matotal_titles                  Float?
+  matotal_volumes                 Float?
+  manotes                         String?
+  libraryyear                     Int?          @unique
+  Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Other_Holdings {
+  id                        Int           @id @default(autoincrement())
+  entryid                   String?
+  libraryyear               Int?          @unique
+  ohaudio_chinese           Float?
+  ohaudio_japanese          Float?
+  ohaudio_korean            Float?
+  ohaudio_noncjk            Float?
+  ohaudio_subtotal          Float?
+  ohcarto_graphic_chinese   Float?
+  ohcarto_graphic_japanese  Float?
+  ohcarto_graphic_korean    Float?
+  ohcarto_graphic_noncjk    Float?
+  ohcarto_graphic_subtotal  Float?
+  ohcomputer_cd_chinese     Float?
+  ohcomputer_cd_japanese    Float?
+  ohcomputer_cd_korean      Float?
+  ohcomputer_cd_noncjk      Float?
+  ohcomputer_cd_subtotal    Float?
+  ohcomputer_files_chinese  Float?
+  ohcomputer_files_japanese Float?
+  ohcomputer_files_korean   Float?
+  ohcomputer_files_noncjk   Float?
+  ohcomputer_files_subtotal Float?
+  ohcustom1_label           String?
+  ohcustom1chinese          Float?
+  ohcustom1japanese         Float?
+  ohcustom1korean           Float?
+  ohcustom1noncjk           Float?
+  ohcustom1subtotal         Float?
+  ohcustom2_label           String?
+  ohcustom2chinese          Float?
+  ohcustom2japanese         Float?
+  ohcustom2korean           Float?
+  ohcustom2noncjk           Float?
+  ohcustom2subtotal         Float?
+  ohcustom3_label           String?
+  ohcustom3chinese          Float?
+  ohcustom3japanese         Float?
+  ohcustom3korean           Float?
+  ohcustom3noncjk           Float?
+  ohcustom3subtotal         Float?
+  ohcustom4_label           String?
+  ohcustom4chinese          Float?
+  ohcustom4japanese         Float?
+  ohcustom4korean           Float?
+  ohcustom4noncjk           Float?
+  ohcustom4subtotal         Float?
+  ohcustomsubtotal          Float?
+  ohdvd_chinese             Float?
+  ohdvd_japanese            Float?
+  ohdvd_korean              Float?
+  ohdvd_noncjk              Float?
+  ohdvd_subtotal            Float?
+  ohfilm_video_chinese      Float?
+  ohfilm_video_japanese     Float?
+  ohfilm_video_korean       Float?
+  ohfilm_video_noncjk       Float?
+  ohfilm_video_subtotal     Float?
+  ohgrandtotal              Float?
+  ohmicroform_chinese       Float?
+  ohmicroform_japanese      Float?
+  ohmicroform_korean        Float?
+  ohmicroform_noncjk        Float?
+  ohmicroform_subtotal      Float?
+  ohnotes                   String?
+  ohonlineimagechinese      Float?
+  ohonlineimagejapanese     Float?
+  ohonlineimagekorean       Float?
+  ohonlineimagenoncjk       Float?
+  ohonlineimagesubtotal     Float?
+  ohonlinemapchinese        Float?
+  ohonlinemapjapanese       Float?
+  ohonlinemapkorean         Float?
+  ohonlinemapnoncjk         Float?
+  ohonlinemapsubtotal       Float?
+  ohotherchinese            Float?
+  ohotherjapanese           Float?
+  ohotherkorean             Float?
+  ohothernoncjk             Float?
+  ohothersubtotal           Float?
+  ohstreamingchinese        Float?
+  ohstreamingjapanese       Float?
+  ohstreamingkorean         Float?
+  ohstreamingnoncjk         Float?
+  ohstreamingsubtotal       Float?
+  ohstreamingvideochinese   Float?
+  ohstreamingvideojapanese  Float?
+  ohstreamingvideokorean    Float?
+  ohstreamingvideononcjk    Float?
+  ohstreamingvideosubtotal  Float?
+  Library_Year              Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Personnel_Support {
+  id                              Int           @id @default(autoincrement())
+  entryid                         String?
+  libraryyear                     Int?          @unique
+  psfnotes                        String?
+  psfosacquisition                Boolean?
+  psfosprocessing                 Boolean?
+  psfothers                       Float?
+  psfprofessional_chinese         Float?
+  psfprofessional_eastasian       Float?
+  psfprofessional_japanese        Float?
+  psfprofessional_korean          Float?
+  psfprofessional_subtotal        Float?
+  psfstudent_assistants_chinese   Float?
+  psfstudent_assistants_eastasian Float?
+  psfstudent_assistants_japanese  Float?
+  psfstudent_assistants_korean    Float?
+  psfstudent_assistants_subtotal  Float?
+  psfsupport_staff_chinese        Float?
+  psfsupport_staff_eastasian      Float?
+  psfsupport_staff_japanese       Float?
+  psfsupport_staff_korean         Float?
+  psfsupport_staff_subtotal       Float?
+  psftotal                        Float?
+  Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Public_Services {
+  id          Int     @id @default(autoincrement())
+  entryid     String?
+  libraryyear Int?    @unique
+
+  // Direct totals - no language breakdown needed
+  pspresentations_subtotal               Int?
+  pspresentation_participants_subtotal   Int?
+  psreference_transactions_subtotal      Int?
+  pstotal_circulations_subtotal          Int?
+  pslending_requests_filled_subtotal     Int?
+  pslending_requests_unfilled_subtotal   Int?
+  psborrowing_requests_filled_subtotal   Int?
+  psborrowing_requests_unfilled_subtotal Int?
+
+  // Notes
+  psnotes String?
+
+  Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Exclude_Year {
+  exyear Int @id
+}
+
+model Reflibrarytype {
+  id          Int       @id @default(autoincrement())
+  librarytype String
+  library     Library[]
+}
+
+model Reflibraryregion {
+  id            Int       @id @default(autoincrement())
+  libraryregion String
+  library       Library[]
+}
+
+model Language {
+  id                     Int                      @id @default(autoincrement())
+  short                  String
+  full                   String
+  List_AV_Language       List_AV_Language[]
+  List_EBook_Language    List_EBook_Language[]
+  List_EJournal_Language List_EJournal_Language[]
+}
+
+model Library_Year {
+  id                            Int                            @id @default(autoincrement())
+  library                       Int?
+  is_open_for_editing           Boolean?                       @default(false)
+  admin_notes                   String?
+  year                          Int
+  updated_at                    DateTime
+  is_active                     Boolean?                       @default(true)
+  opening_date                  DateTime? // Form opening date (default Oct 1)
+  closing_date                  DateTime? // Form closing date (default Dec 1)
+  fiscal_year_start             DateTime? // Fiscal year start (July 1, past year)
+  fiscal_year_end               DateTime? // Fiscal year end (June 30, current year)
+  publication_date              DateTime? // Publication date (February, next year)
+  broadcast_sent                Boolean?                       @default(false) // Track if broadcast email has been sent
+  Electronic                    Electronic?
+  Electronic_Books              Electronic_Books?
+  Entry_Status                  Entry_Status?
+  Fiscal_Support                Fiscal_Support?
+  LibraryYear_ListAV            LibraryYear_ListAV[]
+  LibraryYear_ListEBook         LibraryYear_ListEBook[]
+  LibraryYear_ListEJournal      LibraryYear_ListEJournal[]
+  Library                       Library?                       @relation(fields: [library], references: [id])
+  List_AV                       List_AV[]
+  List_EBook                    List_EBook[]
+  List_EJournal                 List_EJournal[]
+  Monographic_Acquisitions      Monographic_Acquisitions?
+  Other_Holdings                Other_Holdings?
+  Personnel_Support             Personnel_Support?
+  Public_Services               Public_Services?
+  Serials                       Serials?
+  Unprocessed_Backlog_Materials Unprocessed_Backlog_Materials?
+  Volume_Holdings               Volume_Holdings?
+}
+
+model User {
+  id                      Int       @id @default(autoincrement())
+  username                String    @unique // Primary identifier
+  password                String? // New Argon2id hash, null means needs reset
+  firstname               String? // Keep for legacy compatibility
+  lastname                String? // Keep for legacy compatibility
+  isactive                Boolean   @default(true)
+  lastlogin_at            DateTime?
+  requires_password_reset Boolean?  @default(true) // Force password reset on first login
+  password_reset_token    String? // Token for password reset emails
+  password_reset_expires  DateTime? // Expiration for reset token
+  email_verified          Boolean?  @default(false) // Email confirmation status
+  created_at              DateTime? @default(now())
+  updated_at              DateTime? @default(now()) @updatedAt
+
+  // Relations
+  User_Library User_Library[]
+  User_Roles   Users_Roles[]
+  AuditLog     AuditLog[]
+  Session      Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  user_id       Int? // Nullable for system operations or failed logins
+  username      String? // Store username for reference even if user_id is null
+  action        String // CREATE, UPDATE, DELETE, SIGNIN, SIGNOUT, etc.
+  table_name    String? // Which table was affected (null for auth operations)
+  record_id     String? // ID of the affected record (stored as string for flexibility)
+  old_values    Json? // Previous values before change
+  new_values    Json? // New values after change
+  ip_address    String? // Client IP address
+  user_agent    String? // Browser/client info
+  timestamp     DateTime @default(now())
+  success       Boolean  @default(true)
+  error_message String? // Store error details if operation failed
+
+  // Relation to User table
+  User User? @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([action])
+  @@index([table_name])
+  @@index([timestamp])
+}
+
+model User_Library {
+  user_id    Int
+  library_id Int
+  Library    Library @relation(fields: [library_id], references: [id])
+  User       User    @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, library_id])
+}
+
+model Role {
+  id         Int           @id @default(autoincrement())
+  role       String
+  name       String
+  User_Roles Users_Roles[]
+}
+
+model Users_Roles {
+  user_id Int
+  role_id Int
+  Role    Role @relation(fields: [role_id], references: [id])
+  User    User @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, role_id])
+}
+
+// Scheduled events for granular queue management
+model ScheduledEvent {
+  id             Int       @id @default(autoincrement())
+  event_type     String // 'BROADCAST', 'FORM_OPENING', 'FORM_CLOSING'
+  year           Int // Academic year this event is for
+  scheduled_date DateTime // When this event should occur (date only, ignore time)
+  status         String    @default("pending") // 'pending', 'completed', 'cancelled'
+  created_by     Int? // Super admin who created this
+  created_at     DateTime  @default(now())
+  completed_at   DateTime? // When the event was executed
+  cancelled_at   DateTime? // When the event was cancelled
+  notes          String? // Optional notes from admin
+
+  @@index([year])
+  @@index([event_type])
+  @@index([scheduled_date])
+  @@index([status])
+}
+
+model Serials {
+  id                            Int           @id @default(autoincrement())
+  entryid                       String?
+  spurchased_chinese            Float?
+  spurchased_japanese           Float?
+  spurchased_korean             Float?
+  spurchased_noncjk             Float?
+  spurchased_subtotal           Float?
+  snonpurchased_chinese         Float?
+  snonpurchased_japanese        Float?
+  snonpurchased_korean          Float?
+  snonpurchased_noncjk          Float?
+  snonpurchased_subtotal        Float?
+  stotal_chinese                Float?
+  stotal_japanese               Float?
+  stotal_korean                 Float?
+  stotal_noncjk                 Float?
+  s_epurchased_chinese          Float?
+  s_epurchased_japanese         Float?
+  s_epurchased_korean           Float?
+  s_epurchased_noncjk           Float?
+  s_epurchased_subtotal         Float?
+  s_enonpurchased_chinese       Float?
+  s_enonpurchased_japanese      Float?
+  s_enonpurchased_korean        Float?
+  s_enonpurchased_noncjk        Float?
+  s_enonpurchased_subtotal      Float?
+  s_etotal_chinese              Float?
+  s_etotal_japanese             Float?
+  s_etotal_korean               Float?
+  s_etotal_noncjk               Float?
+  speriodical_cur_chinese       Float?
+  speriodical_cur_japanese      Float?
+  speriodical_cur_korean        Float?
+  speriodical_ncur_chinese      Float?
+  speriodical_ncur_japanese     Float?
+  speriodical_ncur_korean       Float?
+  speriodical_subtotal_chinese  Float?
+  speriodical_subtotal_japanese Float?
+  speriodical_subtotal_korean   Float?
+  speriodical_subtotal          Float?
+  snewspaper_cur_chinese        Float?
+  snewspaper_cur_japanese       Float?
+  snewspaper_cur_korean         Float?
+  snewspaper_ncur_chinese       Float?
+  snewspaper_ncur_japanese      Float?
+  snewspaper_ncur_korean        Float?
+  snewspaper_subtotal_chinese   Float?
+  snewspaper_subtotal_japanese  Float?
+  snewspaper_subtotal_korean    Float?
+  snewspaper_subtotal           Float?
+  sgrandtotal                   Float?
+  s_egrandtotal                 Float?
+  snotes                        String?
+  libraryyear                   Int?          @unique
+  Library_Year                  Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+// Survey Session model for automated form scheduling
+model SurveySession {
+  id              Int      @id @default(autoincrement())
+  academicYear    Int
+  openingDate     DateTime
+  closingDate     DateTime
+  isOpen          Boolean  @default(false)
+  notifiedOnOpen  Boolean  @default(false)
+  notifiedOnClose Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       Int? // User ID who created this session
+
+  @@unique([academicYear])
+  @@index([openingDate])
+  @@index([closingDate])
+  @@index([isOpen])
+}
+
+model Unprocessed_Backlog_Materials {
+  id               Int           @id @default(autoincrement())
+  entryid          String?       @db.VarChar(15)
+  ubchinese        Float?
+  ubjapanese       Float?
+  ubkorean         Float?
+  ubnoncjk         Float?
+  ubtotal          Float?
+  ubcatalog_title  Float?
+  ubcatalog_volume Float?
+  ub_title         Float?
+  ub_volume        Float?
+  ubnotes          String?
+  libraryyear      Int?          @unique
+  Library_Year     Library_Year? @relation(fields: [libraryyear], references: [id])
+}
+
+model Volume_Holdings {
+  id                              Int           @id @default(autoincrement())
+  entryid                         String?
+  vhprevious_year_chinese         Float?
+  vhprevious_year_japanese        Float?
+  vhprevious_year_korean          Float?
+  vhprevious_year_noncjk          Float?
+  vhprevious_year_subtotal        Float?
+  vhadded_gross_chinese           Float?
+  vhadded_gross_japanese          Float?
+  vhadded_gross_korean            Float?
+  vhadded_gross_noncjk            Float?
+  vhadded_gross_subtotal          Float?
+  vhwithdrawn_chinese             Float?
+  vhwithdrawn_japanese            Float?
+  vhwithdrawn_korean              Float?
+  vhwithdrawn_noncjk              Float?
+  vhwithdrawn_subtotal            Float?
+  vh_film_chinese                 Float?
+  vh_film_japanese                Float?
+  vh_film_korean                  Float?
+  vh_film_subtotal                Float?
+  vh_fiche_chinese                Float?
+  vh_fiche_japanese               Float?
+  vh_fiche_korean                 Float?
+  vh_fiche_subtotal               Float?
+  vh_film_fiche_chinese           Float?
+  vh_film_fiche_japanese          Float?
+  vh_film_fiche_korean            Float?
+  vh_film_fiche_subtotal          Float?
+  vhgrandtotal                    Float?
+  vhebooks_purchased_volume_total Float?
+  vhoverall_grand_total           Float?
+  vhnotes                         String?
+  libraryyear                     Int?          @unique
+  Library_Year                    Library_Year? @relation(fields: [libraryyear], references: [id])
+}

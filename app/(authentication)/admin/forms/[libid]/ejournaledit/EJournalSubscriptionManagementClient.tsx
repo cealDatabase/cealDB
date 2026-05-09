@@ -19,6 +19,8 @@ interface EJournalSubscriptionManagementClientProps {
   subscriptions: Array<{
     libraryyear_id: number;
     listejournal_id: number;
+    is_selected?: boolean | null;
+    custom_count?: number | null;
     List_EJournal: {
       id: number;
       title: string | null;
@@ -96,6 +98,9 @@ export default function EJournalSubscriptionManagementClient({
   const data = subscriptions
     .filter(sub => !removedIds.has(sub.listejournal_id))
     .map((sub) => {
+      // Per-library `custom_count` overrides the global journals count.
+      const globalJournals = sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0;
+      const hasCustom = sub.custom_count != null;
       return {
         id: sub.List_EJournal.id,
         title: sub.List_EJournal.title ?? "",
@@ -110,7 +115,9 @@ export default function EJournalSubscriptionManagementClient({
         vendor: sub.List_EJournal.vendor ?? "",
         is_global: !!sub.List_EJournal.is_global,
         updated_at: sub.List_EJournal.updated_at.toISOString(),
-        journals: sub.List_EJournal.List_EJournal_Counts?.[0]?.journals ?? 0,
+        journals: hasCustom ? (sub.custom_count as number) : globalJournals,
+        is_custom_count: hasCustom,
+        global_journals: globalJournals,
         dbs: sub.List_EJournal.List_EJournal_Counts?.[0]?.dbs ?? 0,
         language: sub.List_EJournal.List_EJournal_Language?.map(l => l.Language?.short).filter(Boolean) as string[] || [],
       };
@@ -227,7 +234,24 @@ export default function EJournalSubscriptionManagementClient({
       header: "Journals",
       cell: ({ row }: any) => {
         const count = row.getValue("journals") as number;
-        return <div className="text-center font-medium">{count > 0 ? count.toLocaleString() : '-'}</div>;
+        const isCustom = row.original.is_custom_count as boolean;
+        const globalCount = row.original.global_journals as number;
+        return (
+          <div className="text-center font-medium">
+            <div className="flex items-center justify-center gap-1.5">
+              <span>{count > 0 ? count.toLocaleString() : "-"}</span>
+              {isCustom && (
+                <Badge
+                  variant="outline"
+                  className="border-blue-300 bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0"
+                  title={`Library override. Global default: ${globalCount.toLocaleString()}`}
+                >
+                  Custom
+                </Badge>
+              )}
+            </div>
+          </div>
+        );
       },
     },
     {
