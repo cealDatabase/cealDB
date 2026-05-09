@@ -10,7 +10,7 @@ import { languages } from "../data/data";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, FileSpreadsheet } from "lucide-react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -87,6 +87,7 @@ export function DataTableToolbar<TData>({
   };
 
   const isMemberUser = roleId?.trim() === "2";
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
 
   const handleExportCSV = async () => {
     setIsExporting(true);
@@ -116,9 +117,38 @@ export function DataTableToolbar<TData>({
     }
   };
 
+  const handleExportExcel = async () => {
+    setIsExportingExcel(true);
+    try {
+      const response = await fetch(`/api/av/export-excel/${year}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Export failed" }));
+        throw new Error(errorData.error || 'Failed to export Excel');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AV_Database_${year}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Excel exported successfully! Includes your selections.');
+    } catch (error) {
+      console.error('Excel export error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export Excel');
+    } finally {
+      setIsExportingExcel(false);
+    }
+  };
+
   return (
-    <div className='flex items-center justify-between gap-3'>
-      <div className='flex flex-1 items-center space-x-2'>
+    <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-3'>
+      <div className='flex flex-1 items-center space-x-2 flex-wrap gap-y-2'>
         <Input
           placeholder='Search in title, CJK, or romanized...'
           value={(table.getState().globalFilter as string) ?? ""}
@@ -150,40 +180,42 @@ export function DataTableToolbar<TData>({
         )}
       </div>
 
-      {/* Export button visible to all users */}
+      <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
+        {/* Export Excel button visible to all users */}
       <Button
-        onClick={handleExportCSV}
+        onClick={handleExportExcel}
         variant="outline"
         size="sm"
-        className='h-8'
-        disabled={isExporting}
-        title={isExporting ? "Preparing CSV export..." : "Export current year data to CSV"}
+        className='h-8 bg-green-50 hover:bg-green-100 border-green-200'
+        disabled={isExportingExcel}
+        title={isExportingExcel ? "Preparing Excel export..." : "Export to Excel (includes your selections)"}
       >
-        {isExporting ? (
+        {isExportingExcel ? (
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
         ) : (
-          <Download className='mr-2 h-4 w-4' />
+          <FileSpreadsheet className='mr-2 h-4 w-4 text-green-600' />
         )}
-        {isExporting ? "Preparing..." : "Export CSV"}
+        {isExportingExcel ? "Preparing..." : "Export Excel"}
       </Button>
 
-      {/* Action visible only to Super Admin (not role 2) */}
-      {!isMemberUser && (
-        <Button
-          onClick={handleDirectSubscribe}
-          disabled={selectedIds.length === 0 || isSubscribing}
-          className='h-8'
-          title={
-            selectedIds.length === 0
-              ? "Select at least one row"
-              : "Add to My Access"
-          }
-        >
-          {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
-        </Button>
-      )}
+        {/* Action visible only to Super Admin (not role 2) */}
+        {!isMemberUser && (
+          <Button
+            onClick={handleDirectSubscribe}
+            disabled={selectedIds.length === 0 || isSubscribing}
+            className='h-8'
+            title={
+              selectedIds.length === 0
+                ? "Select at least one row"
+                : "Add to My Access"
+            }
+          >
+            {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
+          </Button>
+        )}
 
-      <DataTableViewOptions table={table} />
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   );
 }
