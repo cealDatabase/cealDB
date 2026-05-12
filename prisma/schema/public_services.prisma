@@ -1,20 +1,20 @@
 model Public_Services {
-  id                                    Int           @id @default(autoincrement())
-  entryid                              String?
-  libraryyear                          Int?          @unique
-  
+  id          Int     @id @default(autoincrement())
+  entryid     String?
+  libraryyear Int?    @unique
+
   // Direct totals - no language breakdown needed
-  pspresentations_subtotal             Int?
-  pspresentation_participants_subtotal Int?
-  psreference_transactions_subtotal    Int?
-  pstotal_circulations_subtotal        Int?
-  pslending_requests_filled_subtotal   Int?
-  pslending_requests_unfilled_subtotal Int?
-  psborrowing_requests_filled_subtotal Int?
+  pspresentations_subtotal               Int?
+  pspresentation_participants_subtotal   Int?
+  psreference_transactions_subtotal      Int?
+  pstotal_circulations_subtotal          Int?
+  pslending_requests_filled_subtotal     Int?
+  pslending_requests_unfilled_subtotal   Int?
+  psborrowing_requests_filled_subtotal   Int?
   psborrowing_requests_unfilled_subtotal Int?
-  
+
   // Notes
-  psnotes                              String?
-  
-  Library_Year                         Library_Year? @relation(fields: [libraryyear], references: [id])
+  psnotes String?
+
+  Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }

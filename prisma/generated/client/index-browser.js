@@ -711,6 +711,20 @@ exports.Prisma.Public_ServicesScalarFieldEnum = {
   psnotes: 'psnotes'
 };
 
+exports.Prisma.PublishedReportScalarFieldEnum = {
+  id: 'id',
+  academicYear: 'academicYear',
+  title: 'title',
+  url: 'url',
+  journal: 'journal',
+  appendix: 'appendix',
+  displayOrder: 'displayOrder',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+};
+
 exports.Prisma.Exclude_YearScalarFieldEnum = {
   exyear: 'exyear'
 };
@@ -997,6 +1011,7 @@ exports.Prisma.ModelName = {
   Other_Holdings: 'Other_Holdings',
   Personnel_Support: 'Personnel_Support',
   Public_Services: 'Public_Services',
+  PublishedReport: 'PublishedReport',
   Exclude_Year: 'Exclude_Year',
   Reflibrarytype: 'Reflibrarytype',
   Reflibraryregion: 'Reflibraryregion',

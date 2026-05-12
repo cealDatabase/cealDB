@@ -1,0 +1,30 @@
+// Published statistics reports listed on the public /statistics/pdf page.
+//
+// Each row represents ONE PDF link (one row per linkValue in the legacy
+// constant/pdfs.js). Multiple rows can share the same `academicYear`.
+//
+// - `academicYear` stores the START year (e.g. 2023 for "2023-2024").
+//   The public page derives the "2023-2024" label and the decade bucket
+//   from this single value, so super admins never have to type a label or
+//   maintain "(X years)" counts.
+// - `journal` and `appendix` mirror the legacy structure for citation
+//   rendering: e.g. journal="Journal of East Asian Libraries, ",
+//   appendix="2025: no. 180, Article 2.".
+// - `displayOrder` lets a super admin reorder items within the same year
+//   (e.g. main report first, then sub-list).
+model PublishedReport {
+  id           Int      @id @default(autoincrement())
+  academicYear Int
+  title        String
+  url          String? // nullable: historical years may be placeholders w/o a PDF yet
+  journal      String? // italic citation prefix, may be empty
+  appendix     String? // trailing citation detail (article #, page range, etc.)
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    Int?
+
+  @@index([academicYear])
+  @@index([isPublished])
+}

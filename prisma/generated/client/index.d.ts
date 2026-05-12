@@ -129,6 +129,11 @@ export type Personnel_Support = $Result.DefaultSelection<Prisma.$Personnel_Suppo
  */
 export type Public_Services = $Result.DefaultSelection<Prisma.$Public_ServicesPayload>
 /**
+ * Model PublishedReport
+ * 
+ */
+export type PublishedReport = $Result.DefaultSelection<Prisma.$PublishedReportPayload>
+/**
  * Model Exclude_Year
  * 
  */
@@ -564,6 +569,16 @@ export class PrismaClient<
     * ```
     */
   get public_Services(): Prisma.Public_ServicesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.publishedReport`: Exposes CRUD operations for the **PublishedReport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PublishedReports
+    * const publishedReports = await prisma.publishedReport.findMany()
+    * ```
+    */
+  get publishedReport(): Prisma.PublishedReportDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.exclude_Year`: Exposes CRUD operations for the **Exclude_Year** model.
@@ -1191,6 +1206,7 @@ export namespace Prisma {
     Other_Holdings: 'Other_Holdings',
     Personnel_Support: 'Personnel_Support',
     Public_Services: 'Public_Services',
+    PublishedReport: 'PublishedReport',
     Exclude_Year: 'Exclude_Year',
     Reflibrarytype: 'Reflibrarytype',
     Reflibraryregion: 'Reflibraryregion',
@@ -1223,7 +1239,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "electronic" | "electronic_Books" | "emailTemplate" | "entry_Status" | "fiscal_Support" | "library" | "libraryYear_ListAV" | "libraryYear_ListEBook" | "libraryYear_ListEJournal" | "list_AV" | "list_AV_Counts" | "list_AV_Language" | "listCustomOtherHoldings" | "list_EBook" | "list_EBook_Counts" | "list_EBook_Language" | "list_EJournal" | "list_EJournal_Counts" | "list_EJournal_Language" | "monographic_Acquisitions" | "other_Holdings" | "personnel_Support" | "public_Services" | "exclude_Year" | "reflibrarytype" | "reflibraryregion" | "language" | "library_Year" | "user" | "session" | "verificationToken" | "auditLog" | "user_Library" | "role" | "users_Roles" | "scheduledEvent" | "serials" | "surveySession" | "unprocessed_Backlog_Materials" | "volume_Holdings"
+      modelProps: "electronic" | "electronic_Books" | "emailTemplate" | "entry_Status" | "fiscal_Support" | "library" | "libraryYear_ListAV" | "libraryYear_ListEBook" | "libraryYear_ListEJournal" | "list_AV" | "list_AV_Counts" | "list_AV_Language" | "listCustomOtherHoldings" | "list_EBook" | "list_EBook_Counts" | "list_EBook_Language" | "list_EJournal" | "list_EJournal_Counts" | "list_EJournal_Language" | "monographic_Acquisitions" | "other_Holdings" | "personnel_Support" | "public_Services" | "publishedReport" | "exclude_Year" | "reflibrarytype" | "reflibraryregion" | "language" | "library_Year" | "user" | "session" | "verificationToken" | "auditLog" | "user_Library" | "role" | "users_Roles" | "scheduledEvent" | "serials" | "surveySession" | "unprocessed_Backlog_Materials" | "volume_Holdings"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2929,6 +2945,80 @@ export namespace Prisma {
           }
         }
       }
+      PublishedReport: {
+        payload: Prisma.$PublishedReportPayload<ExtArgs>
+        fields: Prisma.PublishedReportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublishedReportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublishedReportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          findFirst: {
+            args: Prisma.PublishedReportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublishedReportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          findMany: {
+            args: Prisma.PublishedReportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>[]
+          }
+          create: {
+            args: Prisma.PublishedReportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          createMany: {
+            args: Prisma.PublishedReportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PublishedReportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>[]
+          }
+          delete: {
+            args: Prisma.PublishedReportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          update: {
+            args: Prisma.PublishedReportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          deleteMany: {
+            args: Prisma.PublishedReportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublishedReportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PublishedReportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>[]
+          }
+          upsert: {
+            args: Prisma.PublishedReportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublishedReportPayload>
+          }
+          aggregate: {
+            args: Prisma.PublishedReportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublishedReport>
+          }
+          groupBy: {
+            args: Prisma.PublishedReportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublishedReportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublishedReportCountArgs<ExtArgs>
+            result: $Utils.Optional<PublishedReportCountAggregateOutputType> | number
+          }
+        }
+      }
       Exclude_Year: {
         payload: Prisma.$Exclude_YearPayload<ExtArgs>
         fields: Prisma.Exclude_YearFieldRefs
@@ -4318,6 +4408,7 @@ export namespace Prisma {
     other_Holdings?: Other_HoldingsOmit
     personnel_Support?: Personnel_SupportOmit
     public_Services?: Public_ServicesOmit
+    publishedReport?: PublishedReportOmit
     exclude_Year?: Exclude_YearOmit
     reflibrarytype?: ReflibrarytypeOmit
     reflibraryregion?: ReflibraryregionOmit
@@ -37395,6 +37486,1130 @@ export namespace Prisma {
 
 
   /**
+   * Model PublishedReport
+   */
+
+  export type AggregatePublishedReport = {
+    _count: PublishedReportCountAggregateOutputType | null
+    _avg: PublishedReportAvgAggregateOutputType | null
+    _sum: PublishedReportSumAggregateOutputType | null
+    _min: PublishedReportMinAggregateOutputType | null
+    _max: PublishedReportMaxAggregateOutputType | null
+  }
+
+  export type PublishedReportAvgAggregateOutputType = {
+    id: number | null
+    academicYear: number | null
+    displayOrder: number | null
+    createdBy: number | null
+  }
+
+  export type PublishedReportSumAggregateOutputType = {
+    id: number | null
+    academicYear: number | null
+    displayOrder: number | null
+    createdBy: number | null
+  }
+
+  export type PublishedReportMinAggregateOutputType = {
+    id: number | null
+    academicYear: number | null
+    title: string | null
+    url: string | null
+    journal: string | null
+    appendix: string | null
+    displayOrder: number | null
+    isPublished: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    createdBy: number | null
+  }
+
+  export type PublishedReportMaxAggregateOutputType = {
+    id: number | null
+    academicYear: number | null
+    title: string | null
+    url: string | null
+    journal: string | null
+    appendix: string | null
+    displayOrder: number | null
+    isPublished: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    createdBy: number | null
+  }
+
+  export type PublishedReportCountAggregateOutputType = {
+    id: number
+    academicYear: number
+    title: number
+    url: number
+    journal: number
+    appendix: number
+    displayOrder: number
+    isPublished: number
+    createdAt: number
+    updatedAt: number
+    createdBy: number
+    _all: number
+  }
+
+
+  export type PublishedReportAvgAggregateInputType = {
+    id?: true
+    academicYear?: true
+    displayOrder?: true
+    createdBy?: true
+  }
+
+  export type PublishedReportSumAggregateInputType = {
+    id?: true
+    academicYear?: true
+    displayOrder?: true
+    createdBy?: true
+  }
+
+  export type PublishedReportMinAggregateInputType = {
+    id?: true
+    academicYear?: true
+    title?: true
+    url?: true
+    journal?: true
+    appendix?: true
+    displayOrder?: true
+    isPublished?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+  }
+
+  export type PublishedReportMaxAggregateInputType = {
+    id?: true
+    academicYear?: true
+    title?: true
+    url?: true
+    journal?: true
+    appendix?: true
+    displayOrder?: true
+    isPublished?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+  }
+
+  export type PublishedReportCountAggregateInputType = {
+    id?: true
+    academicYear?: true
+    title?: true
+    url?: true
+    journal?: true
+    appendix?: true
+    displayOrder?: true
+    isPublished?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+    _all?: true
+  }
+
+  export type PublishedReportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublishedReport to aggregate.
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublishedReports to fetch.
+     */
+    orderBy?: PublishedReportOrderByWithRelationInput | PublishedReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublishedReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublishedReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublishedReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PublishedReports
+    **/
+    _count?: true | PublishedReportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PublishedReportAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PublishedReportSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublishedReportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublishedReportMaxAggregateInputType
+  }
+
+  export type GetPublishedReportAggregateType<T extends PublishedReportAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublishedReport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublishedReport[P]>
+      : GetScalarType<T[P], AggregatePublishedReport[P]>
+  }
+
+
+
+
+  export type PublishedReportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublishedReportWhereInput
+    orderBy?: PublishedReportOrderByWithAggregationInput | PublishedReportOrderByWithAggregationInput[]
+    by: PublishedReportScalarFieldEnum[] | PublishedReportScalarFieldEnum
+    having?: PublishedReportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublishedReportCountAggregateInputType | true
+    _avg?: PublishedReportAvgAggregateInputType
+    _sum?: PublishedReportSumAggregateInputType
+    _min?: PublishedReportMinAggregateInputType
+    _max?: PublishedReportMaxAggregateInputType
+  }
+
+  export type PublishedReportGroupByOutputType = {
+    id: number
+    academicYear: number
+    title: string
+    url: string | null
+    journal: string | null
+    appendix: string | null
+    displayOrder: number
+    isPublished: boolean
+    createdAt: Date
+    updatedAt: Date
+    createdBy: number | null
+    _count: PublishedReportCountAggregateOutputType | null
+    _avg: PublishedReportAvgAggregateOutputType | null
+    _sum: PublishedReportSumAggregateOutputType | null
+    _min: PublishedReportMinAggregateOutputType | null
+    _max: PublishedReportMaxAggregateOutputType | null
+  }
+
+  type GetPublishedReportGroupByPayload<T extends PublishedReportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublishedReportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublishedReportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublishedReportGroupByOutputType[P]>
+            : GetScalarType<T[P], PublishedReportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublishedReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    academicYear?: boolean
+    title?: boolean
+    url?: boolean
+    journal?: boolean
+    appendix?: boolean
+    displayOrder?: boolean
+    isPublished?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+  }, ExtArgs["result"]["publishedReport"]>
+
+  export type PublishedReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    academicYear?: boolean
+    title?: boolean
+    url?: boolean
+    journal?: boolean
+    appendix?: boolean
+    displayOrder?: boolean
+    isPublished?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+  }, ExtArgs["result"]["publishedReport"]>
+
+  export type PublishedReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    academicYear?: boolean
+    title?: boolean
+    url?: boolean
+    journal?: boolean
+    appendix?: boolean
+    displayOrder?: boolean
+    isPublished?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+  }, ExtArgs["result"]["publishedReport"]>
+
+  export type PublishedReportSelectScalar = {
+    id?: boolean
+    academicYear?: boolean
+    title?: boolean
+    url?: boolean
+    journal?: boolean
+    appendix?: boolean
+    displayOrder?: boolean
+    isPublished?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+  }
+
+  export type PublishedReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "academicYear" | "title" | "url" | "journal" | "appendix" | "displayOrder" | "isPublished" | "createdAt" | "updatedAt" | "createdBy", ExtArgs["result"]["publishedReport"]>
+
+  export type $PublishedReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PublishedReport"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      academicYear: number
+      title: string
+      url: string | null
+      journal: string | null
+      appendix: string | null
+      displayOrder: number
+      isPublished: boolean
+      createdAt: Date
+      updatedAt: Date
+      createdBy: number | null
+    }, ExtArgs["result"]["publishedReport"]>
+    composites: {}
+  }
+
+  type PublishedReportGetPayload<S extends boolean | null | undefined | PublishedReportDefaultArgs> = $Result.GetResult<Prisma.$PublishedReportPayload, S>
+
+  type PublishedReportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublishedReportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublishedReportCountAggregateInputType | true
+    }
+
+  export interface PublishedReportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PublishedReport'], meta: { name: 'PublishedReport' } }
+    /**
+     * Find zero or one PublishedReport that matches the filter.
+     * @param {PublishedReportFindUniqueArgs} args - Arguments to find a PublishedReport
+     * @example
+     * // Get one PublishedReport
+     * const publishedReport = await prisma.publishedReport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublishedReportFindUniqueArgs>(args: SelectSubset<T, PublishedReportFindUniqueArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PublishedReport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublishedReportFindUniqueOrThrowArgs} args - Arguments to find a PublishedReport
+     * @example
+     * // Get one PublishedReport
+     * const publishedReport = await prisma.publishedReport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublishedReportFindUniqueOrThrowArgs>(args: SelectSubset<T, PublishedReportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublishedReport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportFindFirstArgs} args - Arguments to find a PublishedReport
+     * @example
+     * // Get one PublishedReport
+     * const publishedReport = await prisma.publishedReport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublishedReportFindFirstArgs>(args?: SelectSubset<T, PublishedReportFindFirstArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublishedReport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportFindFirstOrThrowArgs} args - Arguments to find a PublishedReport
+     * @example
+     * // Get one PublishedReport
+     * const publishedReport = await prisma.publishedReport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublishedReportFindFirstOrThrowArgs>(args?: SelectSubset<T, PublishedReportFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PublishedReports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PublishedReports
+     * const publishedReports = await prisma.publishedReport.findMany()
+     * 
+     * // Get first 10 PublishedReports
+     * const publishedReports = await prisma.publishedReport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const publishedReportWithIdOnly = await prisma.publishedReport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PublishedReportFindManyArgs>(args?: SelectSubset<T, PublishedReportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PublishedReport.
+     * @param {PublishedReportCreateArgs} args - Arguments to create a PublishedReport.
+     * @example
+     * // Create one PublishedReport
+     * const PublishedReport = await prisma.publishedReport.create({
+     *   data: {
+     *     // ... data to create a PublishedReport
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublishedReportCreateArgs>(args: SelectSubset<T, PublishedReportCreateArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PublishedReports.
+     * @param {PublishedReportCreateManyArgs} args - Arguments to create many PublishedReports.
+     * @example
+     * // Create many PublishedReports
+     * const publishedReport = await prisma.publishedReport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublishedReportCreateManyArgs>(args?: SelectSubset<T, PublishedReportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PublishedReports and returns the data saved in the database.
+     * @param {PublishedReportCreateManyAndReturnArgs} args - Arguments to create many PublishedReports.
+     * @example
+     * // Create many PublishedReports
+     * const publishedReport = await prisma.publishedReport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PublishedReports and only return the `id`
+     * const publishedReportWithIdOnly = await prisma.publishedReport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PublishedReportCreateManyAndReturnArgs>(args?: SelectSubset<T, PublishedReportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PublishedReport.
+     * @param {PublishedReportDeleteArgs} args - Arguments to delete one PublishedReport.
+     * @example
+     * // Delete one PublishedReport
+     * const PublishedReport = await prisma.publishedReport.delete({
+     *   where: {
+     *     // ... filter to delete one PublishedReport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublishedReportDeleteArgs>(args: SelectSubset<T, PublishedReportDeleteArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PublishedReport.
+     * @param {PublishedReportUpdateArgs} args - Arguments to update one PublishedReport.
+     * @example
+     * // Update one PublishedReport
+     * const publishedReport = await prisma.publishedReport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublishedReportUpdateArgs>(args: SelectSubset<T, PublishedReportUpdateArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PublishedReports.
+     * @param {PublishedReportDeleteManyArgs} args - Arguments to filter PublishedReports to delete.
+     * @example
+     * // Delete a few PublishedReports
+     * const { count } = await prisma.publishedReport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublishedReportDeleteManyArgs>(args?: SelectSubset<T, PublishedReportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublishedReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PublishedReports
+     * const publishedReport = await prisma.publishedReport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublishedReportUpdateManyArgs>(args: SelectSubset<T, PublishedReportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublishedReports and returns the data updated in the database.
+     * @param {PublishedReportUpdateManyAndReturnArgs} args - Arguments to update many PublishedReports.
+     * @example
+     * // Update many PublishedReports
+     * const publishedReport = await prisma.publishedReport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PublishedReports and only return the `id`
+     * const publishedReportWithIdOnly = await prisma.publishedReport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PublishedReportUpdateManyAndReturnArgs>(args: SelectSubset<T, PublishedReportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PublishedReport.
+     * @param {PublishedReportUpsertArgs} args - Arguments to update or create a PublishedReport.
+     * @example
+     * // Update or create a PublishedReport
+     * const publishedReport = await prisma.publishedReport.upsert({
+     *   create: {
+     *     // ... data to create a PublishedReport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PublishedReport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublishedReportUpsertArgs>(args: SelectSubset<T, PublishedReportUpsertArgs<ExtArgs>>): Prisma__PublishedReportClient<$Result.GetResult<Prisma.$PublishedReportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PublishedReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportCountArgs} args - Arguments to filter PublishedReports to count.
+     * @example
+     * // Count the number of PublishedReports
+     * const count = await prisma.publishedReport.count({
+     *   where: {
+     *     // ... the filter for the PublishedReports we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublishedReportCountArgs>(
+      args?: Subset<T, PublishedReportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublishedReportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PublishedReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublishedReportAggregateArgs>(args: Subset<T, PublishedReportAggregateArgs>): Prisma.PrismaPromise<GetPublishedReportAggregateType<T>>
+
+    /**
+     * Group by PublishedReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublishedReportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublishedReportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublishedReportGroupByArgs['orderBy'] }
+        : { orderBy?: PublishedReportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublishedReportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublishedReportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PublishedReport model
+   */
+  readonly fields: PublishedReportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PublishedReport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublishedReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PublishedReport model
+   */
+  interface PublishedReportFieldRefs {
+    readonly id: FieldRef<"PublishedReport", 'Int'>
+    readonly academicYear: FieldRef<"PublishedReport", 'Int'>
+    readonly title: FieldRef<"PublishedReport", 'String'>
+    readonly url: FieldRef<"PublishedReport", 'String'>
+    readonly journal: FieldRef<"PublishedReport", 'String'>
+    readonly appendix: FieldRef<"PublishedReport", 'String'>
+    readonly displayOrder: FieldRef<"PublishedReport", 'Int'>
+    readonly isPublished: FieldRef<"PublishedReport", 'Boolean'>
+    readonly createdAt: FieldRef<"PublishedReport", 'DateTime'>
+    readonly updatedAt: FieldRef<"PublishedReport", 'DateTime'>
+    readonly createdBy: FieldRef<"PublishedReport", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PublishedReport findUnique
+   */
+  export type PublishedReportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter, which PublishedReport to fetch.
+     */
+    where: PublishedReportWhereUniqueInput
+  }
+
+  /**
+   * PublishedReport findUniqueOrThrow
+   */
+  export type PublishedReportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter, which PublishedReport to fetch.
+     */
+    where: PublishedReportWhereUniqueInput
+  }
+
+  /**
+   * PublishedReport findFirst
+   */
+  export type PublishedReportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter, which PublishedReport to fetch.
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublishedReports to fetch.
+     */
+    orderBy?: PublishedReportOrderByWithRelationInput | PublishedReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublishedReports.
+     */
+    cursor?: PublishedReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublishedReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublishedReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublishedReports.
+     */
+    distinct?: PublishedReportScalarFieldEnum | PublishedReportScalarFieldEnum[]
+  }
+
+  /**
+   * PublishedReport findFirstOrThrow
+   */
+  export type PublishedReportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter, which PublishedReport to fetch.
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublishedReports to fetch.
+     */
+    orderBy?: PublishedReportOrderByWithRelationInput | PublishedReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublishedReports.
+     */
+    cursor?: PublishedReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublishedReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublishedReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublishedReports.
+     */
+    distinct?: PublishedReportScalarFieldEnum | PublishedReportScalarFieldEnum[]
+  }
+
+  /**
+   * PublishedReport findMany
+   */
+  export type PublishedReportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter, which PublishedReports to fetch.
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublishedReports to fetch.
+     */
+    orderBy?: PublishedReportOrderByWithRelationInput | PublishedReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PublishedReports.
+     */
+    cursor?: PublishedReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublishedReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublishedReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublishedReports.
+     */
+    distinct?: PublishedReportScalarFieldEnum | PublishedReportScalarFieldEnum[]
+  }
+
+  /**
+   * PublishedReport create
+   */
+  export type PublishedReportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PublishedReport.
+     */
+    data: XOR<PublishedReportCreateInput, PublishedReportUncheckedCreateInput>
+  }
+
+  /**
+   * PublishedReport createMany
+   */
+  export type PublishedReportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PublishedReports.
+     */
+    data: PublishedReportCreateManyInput | PublishedReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublishedReport createManyAndReturn
+   */
+  export type PublishedReportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * The data used to create many PublishedReports.
+     */
+    data: PublishedReportCreateManyInput | PublishedReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublishedReport update
+   */
+  export type PublishedReportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PublishedReport.
+     */
+    data: XOR<PublishedReportUpdateInput, PublishedReportUncheckedUpdateInput>
+    /**
+     * Choose, which PublishedReport to update.
+     */
+    where: PublishedReportWhereUniqueInput
+  }
+
+  /**
+   * PublishedReport updateMany
+   */
+  export type PublishedReportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PublishedReports.
+     */
+    data: XOR<PublishedReportUpdateManyMutationInput, PublishedReportUncheckedUpdateManyInput>
+    /**
+     * Filter which PublishedReports to update
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * Limit how many PublishedReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublishedReport updateManyAndReturn
+   */
+  export type PublishedReportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * The data used to update PublishedReports.
+     */
+    data: XOR<PublishedReportUpdateManyMutationInput, PublishedReportUncheckedUpdateManyInput>
+    /**
+     * Filter which PublishedReports to update
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * Limit how many PublishedReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublishedReport upsert
+   */
+  export type PublishedReportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PublishedReport to update in case it exists.
+     */
+    where: PublishedReportWhereUniqueInput
+    /**
+     * In case the PublishedReport found by the `where` argument doesn't exist, create a new PublishedReport with this data.
+     */
+    create: XOR<PublishedReportCreateInput, PublishedReportUncheckedCreateInput>
+    /**
+     * In case the PublishedReport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublishedReportUpdateInput, PublishedReportUncheckedUpdateInput>
+  }
+
+  /**
+   * PublishedReport delete
+   */
+  export type PublishedReportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+    /**
+     * Filter which PublishedReport to delete.
+     */
+    where: PublishedReportWhereUniqueInput
+  }
+
+  /**
+   * PublishedReport deleteMany
+   */
+  export type PublishedReportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublishedReports to delete
+     */
+    where?: PublishedReportWhereInput
+    /**
+     * Limit how many PublishedReports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublishedReport without action
+   */
+  export type PublishedReportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublishedReport
+     */
+    select?: PublishedReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublishedReport
+     */
+    omit?: PublishedReportOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model Exclude_Year
    */
 
@@ -58848,6 +60063,23 @@ export namespace Prisma {
   export type Public_ServicesScalarFieldEnum = (typeof Public_ServicesScalarFieldEnum)[keyof typeof Public_ServicesScalarFieldEnum]
 
 
+  export const PublishedReportScalarFieldEnum: {
+    id: 'id',
+    academicYear: 'academicYear',
+    title: 'title',
+    url: 'url',
+    journal: 'journal',
+    appendix: 'appendix',
+    displayOrder: 'displayOrder',
+    isPublished: 'isPublished',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    createdBy: 'createdBy'
+  };
+
+  export type PublishedReportScalarFieldEnum = (typeof PublishedReportScalarFieldEnum)[keyof typeof PublishedReportScalarFieldEnum]
+
+
   export const Exclude_YearScalarFieldEnum: {
     exyear: 'exyear'
   };
@@ -62673,6 +63905,90 @@ export namespace Prisma {
     psborrowing_requests_filled_subtotal?: IntNullableWithAggregatesFilter<"Public_Services"> | number | null
     psborrowing_requests_unfilled_subtotal?: IntNullableWithAggregatesFilter<"Public_Services"> | number | null
     psnotes?: StringNullableWithAggregatesFilter<"Public_Services"> | string | null
+  }
+
+  export type PublishedReportWhereInput = {
+    AND?: PublishedReportWhereInput | PublishedReportWhereInput[]
+    OR?: PublishedReportWhereInput[]
+    NOT?: PublishedReportWhereInput | PublishedReportWhereInput[]
+    id?: IntFilter<"PublishedReport"> | number
+    academicYear?: IntFilter<"PublishedReport"> | number
+    title?: StringFilter<"PublishedReport"> | string
+    url?: StringNullableFilter<"PublishedReport"> | string | null
+    journal?: StringNullableFilter<"PublishedReport"> | string | null
+    appendix?: StringNullableFilter<"PublishedReport"> | string | null
+    displayOrder?: IntFilter<"PublishedReport"> | number
+    isPublished?: BoolFilter<"PublishedReport"> | boolean
+    createdAt?: DateTimeFilter<"PublishedReport"> | Date | string
+    updatedAt?: DateTimeFilter<"PublishedReport"> | Date | string
+    createdBy?: IntNullableFilter<"PublishedReport"> | number | null
+  }
+
+  export type PublishedReportOrderByWithRelationInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    title?: SortOrder
+    url?: SortOrderInput | SortOrder
+    journal?: SortOrderInput | SortOrder
+    appendix?: SortOrderInput | SortOrder
+    displayOrder?: SortOrder
+    isPublished?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrderInput | SortOrder
+  }
+
+  export type PublishedReportWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PublishedReportWhereInput | PublishedReportWhereInput[]
+    OR?: PublishedReportWhereInput[]
+    NOT?: PublishedReportWhereInput | PublishedReportWhereInput[]
+    academicYear?: IntFilter<"PublishedReport"> | number
+    title?: StringFilter<"PublishedReport"> | string
+    url?: StringNullableFilter<"PublishedReport"> | string | null
+    journal?: StringNullableFilter<"PublishedReport"> | string | null
+    appendix?: StringNullableFilter<"PublishedReport"> | string | null
+    displayOrder?: IntFilter<"PublishedReport"> | number
+    isPublished?: BoolFilter<"PublishedReport"> | boolean
+    createdAt?: DateTimeFilter<"PublishedReport"> | Date | string
+    updatedAt?: DateTimeFilter<"PublishedReport"> | Date | string
+    createdBy?: IntNullableFilter<"PublishedReport"> | number | null
+  }, "id">
+
+  export type PublishedReportOrderByWithAggregationInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    title?: SortOrder
+    url?: SortOrderInput | SortOrder
+    journal?: SortOrderInput | SortOrder
+    appendix?: SortOrderInput | SortOrder
+    displayOrder?: SortOrder
+    isPublished?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    _count?: PublishedReportCountOrderByAggregateInput
+    _avg?: PublishedReportAvgOrderByAggregateInput
+    _max?: PublishedReportMaxOrderByAggregateInput
+    _min?: PublishedReportMinOrderByAggregateInput
+    _sum?: PublishedReportSumOrderByAggregateInput
+  }
+
+  export type PublishedReportScalarWhereWithAggregatesInput = {
+    AND?: PublishedReportScalarWhereWithAggregatesInput | PublishedReportScalarWhereWithAggregatesInput[]
+    OR?: PublishedReportScalarWhereWithAggregatesInput[]
+    NOT?: PublishedReportScalarWhereWithAggregatesInput | PublishedReportScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PublishedReport"> | number
+    academicYear?: IntWithAggregatesFilter<"PublishedReport"> | number
+    title?: StringWithAggregatesFilter<"PublishedReport"> | string
+    url?: StringNullableWithAggregatesFilter<"PublishedReport"> | string | null
+    journal?: StringNullableWithAggregatesFilter<"PublishedReport"> | string | null
+    appendix?: StringNullableWithAggregatesFilter<"PublishedReport"> | string | null
+    displayOrder?: IntWithAggregatesFilter<"PublishedReport"> | number
+    isPublished?: BoolWithAggregatesFilter<"PublishedReport"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"PublishedReport"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PublishedReport"> | Date | string
+    createdBy?: IntNullableWithAggregatesFilter<"PublishedReport"> | number | null
   }
 
   export type Exclude_YearWhereInput = {
@@ -68305,6 +69621,101 @@ export namespace Prisma {
     psnotes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type PublishedReportCreateInput = {
+    academicYear: number
+    title: string
+    url?: string | null
+    journal?: string | null
+    appendix?: string | null
+    displayOrder?: number
+    isPublished?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy?: number | null
+  }
+
+  export type PublishedReportUncheckedCreateInput = {
+    id?: number
+    academicYear: number
+    title: string
+    url?: string | null
+    journal?: string | null
+    appendix?: string | null
+    displayOrder?: number
+    isPublished?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy?: number | null
+  }
+
+  export type PublishedReportUpdateInput = {
+    academicYear?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    journal?: NullableStringFieldUpdateOperationsInput | string | null
+    appendix?: NullableStringFieldUpdateOperationsInput | string | null
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type PublishedReportUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    academicYear?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    journal?: NullableStringFieldUpdateOperationsInput | string | null
+    appendix?: NullableStringFieldUpdateOperationsInput | string | null
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type PublishedReportCreateManyInput = {
+    id?: number
+    academicYear: number
+    title: string
+    url?: string | null
+    journal?: string | null
+    appendix?: string | null
+    displayOrder?: number
+    isPublished?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy?: number | null
+  }
+
+  export type PublishedReportUpdateManyMutationInput = {
+    academicYear?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    journal?: NullableStringFieldUpdateOperationsInput | string | null
+    appendix?: NullableStringFieldUpdateOperationsInput | string | null
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type PublishedReportUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    academicYear?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    journal?: NullableStringFieldUpdateOperationsInput | string | null
+    appendix?: NullableStringFieldUpdateOperationsInput | string | null
+    displayOrder?: IntFieldUpdateOperationsInput | number
+    isPublished?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
   export type Exclude_YearCreateInput = {
     exyear: number
   }
@@ -73156,6 +74567,62 @@ export namespace Prisma {
     pslending_requests_unfilled_subtotal?: SortOrder
     psborrowing_requests_filled_subtotal?: SortOrder
     psborrowing_requests_unfilled_subtotal?: SortOrder
+  }
+
+  export type PublishedReportCountOrderByAggregateInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    title?: SortOrder
+    url?: SortOrder
+    journal?: SortOrder
+    appendix?: SortOrder
+    displayOrder?: SortOrder
+    isPublished?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type PublishedReportAvgOrderByAggregateInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    displayOrder?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type PublishedReportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    title?: SortOrder
+    url?: SortOrder
+    journal?: SortOrder
+    appendix?: SortOrder
+    displayOrder?: SortOrder
+    isPublished?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type PublishedReportMinOrderByAggregateInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    title?: SortOrder
+    url?: SortOrder
+    journal?: SortOrder
+    appendix?: SortOrder
+    displayOrder?: SortOrder
+    isPublished?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type PublishedReportSumOrderByAggregateInput = {
+    id?: SortOrder
+    academicYear?: SortOrder
+    displayOrder?: SortOrder
+    createdBy?: SortOrder
   }
 
   export type Exclude_YearCountOrderByAggregateInput = {

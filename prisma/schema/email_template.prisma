@@ -3,10 +3,10 @@
 model EmailTemplate {
   id          Int      @id @default(autoincrement())
   key         String   @unique // e.g. 'broadcast_open_forms', 'individual_open_forms'
-  name        String   // Friendly name for the admin UI
-  description String?  // What this template is used for
+  name        String // Friendly name for the admin UI
+  description String? // What this template is used for
   subject     String
-  html        String   // Template body with {{placeholder}} substitutions
+  html        String // Template body with {{placeholder}} substitutions
   updated_at  DateTime @default(now()) @updatedAt
-  updated_by  Int?     // user_id of last editor (no FK, for soft tracking)
+  updated_by  Int? // user_id of last editor (no FK, for soft tracking)
 }
