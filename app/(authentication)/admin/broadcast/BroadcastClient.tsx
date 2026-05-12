@@ -498,7 +498,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
 
                   <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
                     <p className="text-sm text-yellow-800">
-                      This email preview is based on the scheduled session above. You cannot edit it. It will be sent to all members in your CEAL broadcast audience when you click "Send Broadcast".
+                      This preview is rendered from the editable broadcast template using the scheduled session dates above.
+                      To change the wording, subject, or layout, open the{' '}
+                      <Link href="/admin/email-templates" className="font-semibold underline text-yellow-900">
+                        Email Templates editor
+                      </Link>
+                      . The placeholders ({'{{year}}'}, {'{{openingDate}}'}, {'{{closingDate}}'}, etc.) automatically fill in from the chosen session.
                     </p>
                   </div>
 

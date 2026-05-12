@@ -4,6 +4,7 @@ import { Resend } from "resend"
 import { logUserAction } from "@/lib/auditLogger"
 import { getSurveyDates } from "@/lib/surveyDates"
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
+import { buildTemplateContext, renderTemplate } from "@/lib/emailTemplate"
 
 const prisma = db
 
@@ -127,74 +128,11 @@ export async function POST(request: NextRequest) {
       day: "numeric",
     })
 
-    const emailTemplate = `
-      <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
-        <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
-        
-        <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
-        
-        <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
-        
-        <div style="margin: 24px 0;">
-          <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
-          <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${Number.parseInt(year) - 1}–${year}</strong>, defined as the most recent 12-month period ending before October 1, ${year}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
-          July 1, ${Number.parseInt(year) - 1} through June 30, ${year}</strong>.</p>
-        </div>
-        
-        <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
-          <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-          <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${formattedOpenDate} through ${formattedCloseDate} (11:59 PM Pacific Time)</strong>.</p>
-        </div>
-        
-        <div style="margin: 24px 0;">
-          <h4 style="color: #374151; margin-top: 0; margin-bottom: 12px;">Accessing the Surveys:</h4>
-          <p style="margin-bottom: 16px;">Visit the CEAL Statistics Database at <a href="https://cealstats.org/" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://cealstats.org/</a> to access the online survey forms and instructions.</p>
-          
-          <div style="background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px; margin: 16px 0;">
-            <p style="margin: 0; font-size: 14px; color: #7f1d1d;"><strong>Please note:</strong> The CEAL Statistics Database has recently been <strong>migrated and rebuilt</strong>. This is our first year using the new platform, which is currently in a "beta" phase. <strong>Some functions from the old site are still under processing (e.g., database search)</strong>. You might experience slower loading times or other minor issues. We sincerely appreciate your patience and understanding as we continue improving the system.</p>
-          </div>
-          
-          <p style="margin-bottom: 12px;">For a quick guide to using the new survey forms, please refer to:</p>
-          <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/docs/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
-          
-          <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
-        </div>
-        
-        <div style="margin: 24px 0;">
-          <h4 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h4>
-          <p style="margin-bottom: 12px;">For questions about specific language resources, please contact:</p>
-          <ul style="margin: 0; padding-left: 20px;">
-            <li style="margin-bottom: 8px;"><strong>Chinese resources:</strong> Jian P. Lee – <a href="mailto:jlee37@uw.edu" style="color: #2563eb; text-decoration: none;">jlee37@uw.edu</a></li>
-            <li style="margin-bottom: 8px;"><strong>Japanese resources:</strong> Michiko Ito – <a href="mailto:mito@ku.edu" style="color: #2563eb; text-decoration: none;">mito@ku.edu</a></li>
-            <li style="margin-bottom: 8px;"><strong>Korean resources:</strong> Ellie Kim – <a href="mailto:eunahkim@hawaii.edu" style="color: #2563eb; text-decoration: none;">eunahkim@hawaii.edu</a></li>
-          </ul>
-          <p style="margin-top: 12px; margin-bottom: 0;">For general questions or technical issues, please contact: <strong>Anlin Yang</strong> – <a href="mailto:anlin.yang@wisc.edu" style="color: #2563eb; text-decoration: none;">anlin.yang@wisc.edu</a></p>
-        </div>
-        
-        <div style="text-align: center; margin: 32px 0;">
-          <a href="https://cealstats.org/" style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">Access Survey Forms</a>
-        </div>
-        
-        <p style="margin-bottom: 8px;">Thank you for your continued participation and support!</p>
-        
-        <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br/>Anlin Yang<br/><em>(on behalf of the CEAL Statistics Committee)</em></p>
-        
-        <div style="background-color: #f9fafb; padding: 16px; border-radius: 6px; margin: 24px 0;">
-          <p style="margin: 0 0 8px 0; font-weight: 600; color: #374151;">Committee Members:</p>
-          <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #6b7280;">
-            <li>Michiko Ito, Japanese Studies Librarian, University of Kansas</li>
-            <li>Ellie Kim, Korean Studies Librarian, University of Hawaiʻi at Mānoa</li>
-            <li>Jian P. Lee, Chinese Language Cataloging and Metadata Librarian, University of Washington</li>
-            <li>Vickie Fu Doll, Advisor, Librarian Emerita, University of Kansas</li>
-          </ul>
-        </div>
-        
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
-        <p style="font-size: 12px; color: #6b7280; text-align: left;">
-          You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
-        </p>
-      </div>
-    `
+    // Load editable template from DB (falls back to built-in default if not customized)
+    const templateCtx = buildTemplateContext(Number.parseInt(year), openDate, closeDate)
+    const rendered = await renderTemplate('broadcast_open_forms', templateCtx)
+    const emailTemplate = rendered.html
+    const emailSubject = rendered.subject
 
     // Get audience ID from environment
     const audienceId = process.env.RESEND_BROADCAST_LIST_ID
@@ -228,7 +166,7 @@ export async function POST(request: NextRequest) {
         broadcast = await resend.broadcasts.create({
           audienceId: audienceId,
           from: "CEAL Statistics Database <noreply@cealstats.org>",
-          subject: `CEAL Statistics Online Surveys Are Now Open`,
+          subject: emailSubject,
           html: emailTemplate,
         })
 
@@ -334,7 +272,7 @@ export async function POST(request: NextRequest) {
         const broadcastOptions: any = {
           audienceId: audienceId,
           from: "CEAL Statistics Database <noreply@cealstats.org>",
-          subject: `CEAL Statistics Online Surveys Are Now Open`,
+          subject: emailSubject,
           html: emailTemplate,
           scheduledAt: openDate.toISOString(), // Resend will automatically send at this time
         }
@@ -539,8 +477,11 @@ export async function GET(request: NextRequest) {
       day: "numeric",
     })
 
-    // Generate preview template with new design
-    const emailTemplate = `
+    // Generate preview template from the editable DB template (falls back to default)
+    const previewCtx = buildTemplateContext(Number.parseInt(year), openDate, closeDate)
+    const renderedPreview = await renderTemplate('broadcast_open_forms', previewCtx)
+    const emailTemplate = renderedPreview.html
+    const _legacyEmailTemplate = `
       <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
         <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
         
@@ -609,9 +550,11 @@ export async function GET(request: NextRequest) {
         </p>
       </div>
     `
+    void _legacyEmailTemplate; // kept for reference; actual preview comes from DB template above
 
     return NextResponse.json({
       template: emailTemplate,
+      subject: renderedPreview.subject,
       preview: {
         year: year,
         openingDate: openDate.toISOString(),

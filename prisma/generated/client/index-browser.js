@@ -300,6 +300,17 @@ exports.Prisma.Electronic_BooksScalarFieldEnum = {
   ebooks_purchased_add_volumes_subtotal: 'ebooks_purchased_add_volumes_subtotal'
 };
 
+exports.Prisma.EmailTemplateScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  subject: 'subject',
+  html: 'html',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+};
+
 exports.Prisma.Entry_StatusScalarFieldEnum = {
   id: 'id',
   fiscal_support: 'fiscal_support',
@@ -875,6 +886,8 @@ exports.Prisma.SurveySessionScalarFieldEnum = {
   isOpen: 'isOpen',
   notifiedOnOpen: 'notifiedOnOpen',
   notifiedOnClose: 'notifiedOnClose',
+  notifiedClosingReminder: 'notifiedClosingReminder',
+  announcementSentAt: 'announcementSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   createdBy: 'createdBy'
@@ -963,6 +976,7 @@ exports.Prisma.JsonNullValueFilter = {
 exports.Prisma.ModelName = {
   Electronic: 'Electronic',
   Electronic_Books: 'Electronic_Books',
+  EmailTemplate: 'EmailTemplate',
   Entry_Status: 'Entry_Status',
   Fiscal_Support: 'Fiscal_Support',
   Library: 'Library',

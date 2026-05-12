@@ -67,14 +67,28 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchUserInfo();
     fetchAvailableYears();
-    
-    const currentYear = new Date().getFullYear() - 1;
-    const years = [];
-    for (let i = 0; i < 20; i++) {
-      years.push(currentYear - i);
-    }
-    setSurveyYears(years);
-    setSelectedSurveyYear(currentYear.toString());
+
+    // Use the centralized "current survey year" helper so this page stays in
+    // sync with /admin/forms and /admin/broadcast. Falls back to calendar-year
+    // math if the API is unavailable.
+    (async () => {
+      let defaultYear: number;
+      try {
+        const res = await fetch('/api/current-survey-year');
+        if (res.ok) {
+          const data = await res.json();
+          defaultYear = Number(data.reporting) || (new Date().getFullYear() - 1);
+        } else {
+          defaultYear = new Date().getFullYear() - 1;
+        }
+      } catch {
+        defaultYear = new Date().getFullYear() - 1;
+      }
+      const years: number[] = [];
+      for (let i = 0; i < 20; i++) years.push(defaultYear - i);
+      setSurveyYears(years);
+      setSelectedSurveyYear(defaultYear.toString());
+    })();
   }, []);
 
   useEffect(() => {

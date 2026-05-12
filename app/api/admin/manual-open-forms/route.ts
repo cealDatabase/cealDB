@@ -42,14 +42,26 @@ export async function POST(request: NextRequest) {
     })
 
     if (session) {
+      // When a super admin manually reopens, treat this as a fresh open:
+      //   - isOpen: true
+      //   - notifiedOnOpen: true   (we are not sending an email here, but the act
+      //                              of manual-open is itself the notification;
+      //                              flipping to true prevents the cron from also
+      //                              sending one for this same opening)
+      //   - notifiedOnClose: false (so when the closing date arrives, the cron
+      //                              will send a fresh "forms closed" admin
+      //                              notification — previously it was stuck true
+      //                              after a previous close cycle)
       await prisma.surveySession.update({
         where: { id: session.id },
         data: {
           isOpen: true,
-          notifiedOnOpen: true
-        }
+          notifiedOnOpen: true,
+          notifiedOnClose: false,
+          notifiedClosingReminder: false, // also reset, in case admin extended closingDate
+        } as any
       })
-      console.log(`✅ Updated SurveySession for year ${year}`)
+      console.log(`✅ Updated SurveySession for year ${year} (reset notifiedOnClose + notifiedClosingReminder for the new close cycle)`)
     }
 
     // Update any pending FORM_OPENING events to completed

@@ -6,6 +6,7 @@ import {
   sendFormsClosedNotification,
   sendAdminFormsClosedNotification
 } from '@/lib/email';
+import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
 import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from '@/lib/userUtils';
 import { logUserAction } from '@/lib/auditLogger';
 import { formatDateRange } from '@/lib/dateFormatting';
@@ -157,92 +158,22 @@ export async function GET(request: NextRequest) {
 
         const session = libraryYears[0];
         const currentYear = new Date().getFullYear();
-        const openDate =  new Date(session.opening_date || `10/1/${currentYear}`).toLocaleDateString('en-US', {
-          timeZone: "America/Los_Angeles"
-        });
-        const closeDate = new Date(session.closing_date || `12/2/${currentYear}`).toLocaleDateString('en-US', {
-          timeZone: "America/Los_Angeles"
-        });
+        const openDateObj = session.opening_date ? new Date(session.opening_date) : new Date(Date.UTC(event.year, 9, 1, 7, 0, 0));
+        const closeDateObj = session.closing_date ? new Date(session.closing_date) : new Date(Date.UTC(event.year, 11, 2, 6, 59, 0));
 
-        // Calculate fiscal year dates
-        const reportingYearEnd = new Date(event.year, 9, 1); // October 1
+        // Load editable template (DB-backed, falls back to built-in default)
+        const _ctx = buildTemplateContext(event.year, openDateObj, closeDateObj);
+        const _rendered = await renderTemplate('broadcast_open_forms', _ctx);
+        const emailTemplate = _rendered.html;
+        const emailSubject = _rendered.subject;
 
-        // Create email template (matching the one in broadcast route)
-        const emailTemplate = `
-          <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333; line-height: 1.6;">
-            <h3 style="color: #1e40af; margin-bottom: 20px;">Dear Coordinators of the CEAL Statistics Survey,</h3>
-            
-            <p style="margin-bottom: 16px;"><strong>Greetings! The annual CEAL Statistics online surveys are now open.</strong></p>
-            
-            <p style="margin-bottom: 16px;"><i>You are receiving this message because you are listed in the CEAL Statistics Database as the primary contact or CEAL statistics coordinator for your institution. If you are no longer serving in this role, please reply to this email with updated contact information for your institution. Thank you for your cooperation.</i></p>
-            
-            <div style="margin: 24px 0;">
-              <p style="color: #1e40af; margin-top: 0; margin-bottom: 12px;">Reporting Period:</p>
-              <p style="margin: 0;">Please report data for <strong>Fiscal Year (FY) ${event.year - 1}–${event.year}</strong>, defined as the most recent 12-month period ending before October 1, ${event.year}, corresponding to your institution's fiscal year. For most institutions, this period covers <strong>
-              July 1, ${event.year - 1} through June 30, ${event.year}
-              </strong>.</p>
-            </div>
-            
-            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
-              <h4 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Data Collection Period:</h4>
-              <p style="margin: 0;">The CEAL Online Survey will be open from <strong>${openDate} to ${closeDate} (11:59 PM Pacific Time)</strong>.</p>
-            </div>
-            
-            <div style="margin: 24px 0;">
-              <h4 style="color: #374151; margin-top: 0; margin-bottom: 12px;">Accessing the Surveys:</h4>
-              <p style="margin-bottom: 16px;">Visit the CEAL Statistics Database at <a href="https://cealstats.org/" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://cealstats.org/</a> to access the online survey forms and instructions.</p>
-              
-              <div style="background-color: #fef2f2; border-left: 3px solid #ef4444; padding: 12px; margin: 16px 0;">
-                <p style="margin: 0; font-size: 14px; color: #7f1d1d;"><strong>Please note:</strong> The CEAL Statistics Database has recently been <strong>migrated and rebuilt</strong>. This is our first year using the new platform, which is currently in a "beta" phase. <strong>Some functions from the old site are still under processing (e.g., database search)</strong>. You might experience slower loading times or other minor issues. We sincerely appreciate your patience and understanding as we continue improving the system.</p>
-              </div>
-              
-              <p style="margin-bottom: 12px;">For a quick guide to using the new survey forms, please refer to:</p>
-              <p style="margin-bottom: 16px;">👉 <a href="https://cealstats.org/docs/user-guide.pdf" style="color: #2563eb; text-decoration: none; font-weight: 600;">CEAL Statistics Database User Guide (PDF)</a></p>
-              
-              <p style="margin: 0;">If you find it difficult to use the new platform, you are welcome to schedule a one-on-one meeting with Anlin Yang via <a href="https://calendly.com/yanganlin/meeting" style="color: #2563eb; text-decoration: none; font-weight: 600;">https://calendly.com/yanganlin/meeting</a>.</p>
-            </div>
-            
-            <div style="margin: 24px 0;">
-              <h4 style="color: #065f46; margin-top: 0; margin-bottom: 12px; font-size: 18px;">Contact Information:</h4>
-              <p style="margin-bottom: 12px;">For questions about specific language resources, please contact:</p>
-              <ul style="margin: 0; padding-left: 20px;">
-                <li style="margin-bottom: 8px;"><strong>Chinese resources:</strong> Jian P. Lee – <a href="mailto:jlee37@uw.edu" style="color: #2563eb; text-decoration: none;">jlee37@uw.edu</a></li>
-                <li style="margin-bottom: 8px;"><strong>Japanese resources:</strong> Michiko Ito – <a href="mailto:mito@ku.edu" style="color: #2563eb; text-decoration: none;">mito@ku.edu</a></li>
-                <li style="margin-bottom: 8px;"><strong>Korean resources:</strong> Ellie Kim – <a href="mailto:eunahkim@hawaii.edu" style="color: #2563eb; text-decoration: none;">eunahkim@hawaii.edu</a></li>
-              </ul>
-              <p style="margin-top: 12px; margin-bottom: 0;">For general questions or technical issues, please contact: <strong>Anlin Yang</strong> – <a href="mailto:anlin.yang@wisc.edu" style="color: #2563eb; text-decoration: none;">anlin.yang@wisc.edu</a></p>
-            </div>
-            
-            <div style="text-align: center; margin: 32px 0;">
-              <a href="https://cealstats.org/" style="background-color: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; font-size: 16px;">Access Survey Forms</a>
-            </div>
-            
-            <p style="margin-bottom: 8px;">Thank you for your continued participation and support!</p>
-            
-            <p style="margin-bottom: 20px;"><strong>Warm regards,</strong><br/>Anlin Yang<br/><em>(on behalf of the CEAL Statistics Committee)</em></p>
-            
-            <div style="background-color: #f9fafb; padding: 16px; border-radius: 6px; margin: 24px 0;">
-              <p style="margin: 0 0 8px 0; font-weight: 600; color: #374151;">Committee Members:</p>
-              <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #6b7280;">
-                <li>Michiko Ito, Japanese Studies Librarian, University of Kansas</li>
-                <li>Ellie Kim, Korean Studies Librarian, University of Hawaiʻi at Mānoa</li>
-                <li>Jian P. Lee, Chinese Language Cataloging and Metadata Librarian, University of Washington</li>
-                <li>Vickie Fu Doll, Advisor, Librarian Emerita, University of Kansas</li>
-              </ul>
-            </div>
-            
-            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;"/>
-            <p style="font-size: 12px; color: #6b7280; text-align: left;">
-              You can unsubscribe from these notifications here: {{{RESEND_UNSUBSCRIBE_URL}}}
-            </p>
-          </div>
-        `;
+        // Legacy hardcoded HTML removed — content now comes from EmailTemplate.broadcast_open_forms (see lib/emailTemplate.ts)
 
         // Send broadcast immediately (Resend didn't send it)
         const broadcast = await resend.broadcasts.create({
           audienceId: audienceId,
           from: 'CEAL Statistics Database <noreply@cealstats.org>',
-          subject: `CEAL Statistics Online Surveys Are Now Open`,
+          subject: emailSubject,
           html: emailTemplate
         });
 
@@ -377,6 +308,92 @@ export async function GET(request: NextRequest) {
         console.error('❌', errorMsg);
         results.errors.push(errorMsg);
       }
+    }
+
+    // ========================================
+    // STEP 2.5: Check for sessions that need the 1-WEEK-BEFORE-CLOSE REMINDER
+    // ========================================
+    // Sends Broadcast 3 (broadcast_closing_reminder) to all CEAL users when
+    // there are 7 days or fewer left before the scheduled closing date.
+    //
+    // DUPLICATE PREVENTION:
+    //   - notifiedClosingReminder=false (set to true after first successful send)
+    //   - Window: closingDate - 7 days <= now < closingDate
+    //     (we still allow it to fire even if there are <7 days left, e.g. if
+    //     cron was skipped, but never after the closing date itself)
+    try {
+      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const reminderTargets = await prisma.surveySession.findMany({
+        where: {
+          isOpen: true,
+          closingDate: { gt: now, lte: sevenDaysFromNow },
+          notifiedClosingReminder: false,
+        } as any,
+      });
+
+      console.log(`⏰ Found ${reminderTargets.length} session(s) needing the 1-week-before-close reminder`);
+
+      if (reminderTargets.length > 0 && !process.env.RESEND_API_KEY) {
+        console.warn('⏰ RESEND_API_KEY missing — skipping closing reminder');
+      } else if (reminderTargets.length > 0 && !process.env.RESEND_BROADCAST_LIST_ID) {
+        console.warn('⏰ RESEND_BROADCAST_LIST_ID missing — skipping closing reminder');
+      } else {
+        const reminderResend = new Resend(process.env.RESEND_API_KEY);
+        const reminderAudience = process.env.RESEND_BROADCAST_LIST_ID!;
+
+        for (const session of reminderTargets) {
+          try {
+            const ctx = buildTemplateContext(
+              session.academicYear,
+              new Date(session.openingDate),
+              new Date(session.closingDate),
+            );
+            const rendered = await renderTemplate('broadcast_closing_reminder', ctx);
+
+            const created = await reminderResend.broadcasts.create({
+              audienceId: reminderAudience,
+              from: 'CEAL Statistics Database <noreply@cealstats.org>',
+              subject: rendered.subject,
+              html: rendered.html,
+            });
+            const bid = created.data?.id;
+            if (!bid) throw new Error('Resend did not return a broadcast id');
+            await reminderResend.broadcasts.send(bid);
+
+            await prisma.surveySession.update({
+              where: { id: session.id },
+              data: { notifiedClosingReminder: true } as any,
+            });
+
+            await logUserAction(
+              'CREATE',
+              'EmailBroadcast',
+              `auto:broadcast_closing_reminder:${session.academicYear}`,
+              null,
+              {
+                templateKey: 'broadcast_closing_reminder',
+                broadcastId: bid,
+                academicYear: session.academicYear,
+                closingDate: session.closingDate.toISOString(),
+              },
+              true,
+              undefined,
+              request,
+            );
+
+            console.log(`✅ Closing reminder sent for year ${session.academicYear} (broadcast ${bid})`);
+            results.broadcasts_sent.push(session.academicYear);
+          } catch (sendErr) {
+            const msg = `Failed to send closing reminder for year ${session.academicYear}: ${sendErr instanceof Error ? sendErr.message : 'Unknown error'}`;
+            console.error('❌', msg);
+            results.errors.push(msg);
+          }
+        }
+      }
+    } catch (err) {
+      const msg = `Closing-reminder step failed: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error('❌', msg);
+      results.errors.push(msg);
     }
 
     // ========================================

@@ -48,4 +48,3 @@ next-env.d.ts
 /tests
 *.test.*
 github-recovery-codes.txt
-/docs
