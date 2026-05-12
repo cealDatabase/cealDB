@@ -9,6 +9,7 @@ import { getFormattedSurveyDates } from "@/data/fetchSurveyDates"
 import { FormStatusBadge } from "@/components/FormStatusBadge"
 import { FormsAvailabilityBadge } from "@/components/FormsAvailabilityBadge"
 import db from "@/lib/db"
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -38,7 +39,9 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
   // Final fallback
   libraryName = libraryName || "your library";
 
-  const currentYear = new Date().getFullYear()
+  // Centralized active-year resolution: prefers the most recent SurveySession,
+  // falls back to the calendar year. Keeps forms/reports/email previews aligned.
+  const currentYear = await getActiveSurveyYear()
   const previousYear = currentYear - 1
   const nextYear = currentYear + 1
 

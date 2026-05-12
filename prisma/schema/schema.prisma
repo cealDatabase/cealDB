@@ -40,11 +40,11 @@ model Library_Year {
   year                          Int
   updated_at                    DateTime
   is_active                     Boolean?                       @default(true)
-  opening_date                  DateTime?                      // Form opening date (default Oct 1)
-  closing_date                  DateTime?                      // Form closing date (default Dec 1)
-  fiscal_year_start             DateTime?                      // Fiscal year start (July 1, past year)
-  fiscal_year_end               DateTime?                      // Fiscal year end (June 30, current year)
-  publication_date              DateTime?                      // Publication date (February, next year)
+  opening_date                  DateTime? // Form opening date (default Oct 1)
+  closing_date                  DateTime? // Form closing date (default Dec 1)
+  fiscal_year_start             DateTime? // Fiscal year start (July 1, past year)
+  fiscal_year_end               DateTime? // Fiscal year end (June 30, current year)
+  publication_date              DateTime? // Publication date (February, next year)
   broadcast_sent                Boolean?                       @default(false) // Track if broadcast email has been sent
   Electronic                    Electronic?
   Electronic_Books              Electronic_Books?
@@ -67,25 +67,25 @@ model Library_Year {
 }
 
 model User {
-  id                        Int            @id @default(autoincrement())
-  username                  String         @unique  // Primary identifier
-  password                  String?        // New Argon2id hash, null means needs reset
-  firstname                 String?        // Keep for legacy compatibility
-  lastname                  String?        // Keep for legacy compatibility
-  isactive                  Boolean        @default(true)
-  lastlogin_at              DateTime?
-  requires_password_reset   Boolean?        @default(true)  // Force password reset on first login
-  password_reset_token      String?        // Token for password reset emails
-  password_reset_expires    DateTime?      // Expiration for reset token
-  email_verified            Boolean?        @default(false) // Email confirmation status
-  created_at                DateTime?       @default(now())
-  updated_at                DateTime?       @default(now()) @updatedAt
-  
+  id                      Int       @id @default(autoincrement())
+  username                String    @unique // Primary identifier
+  password                String? // New Argon2id hash, null means needs reset
+  firstname               String? // Keep for legacy compatibility
+  lastname                String? // Keep for legacy compatibility
+  isactive                Boolean   @default(true)
+  lastlogin_at            DateTime?
+  requires_password_reset Boolean?  @default(true) // Force password reset on first login
+  password_reset_token    String? // Token for password reset emails
+  password_reset_expires  DateTime? // Expiration for reset token
+  email_verified          Boolean?  @default(false) // Email confirmation status
+  created_at              DateTime? @default(now())
+  updated_at              DateTime? @default(now()) @updatedAt
+
   // Relations
-  User_Library              User_Library[]
-  User_Roles                Users_Roles[]
-  AuditLog                  AuditLog[]
-  Session                   Session[]
+  User_Library User_Library[]
+  User_Roles   Users_Roles[]
+  AuditLog     AuditLog[]
+  Session      Session[]
 }
 
 model Session {
@@ -105,23 +105,23 @@ model VerificationToken {
 }
 
 model AuditLog {
-  id             Int      @id @default(autoincrement())
-  user_id        Int?     // Nullable for system operations or failed logins
-  username       String?  // Store username for reference even if user_id is null
-  action         String   // CREATE, UPDATE, DELETE, SIGNIN, SIGNOUT, etc.
-  table_name     String?  // Which table was affected (null for auth operations)
-  record_id      String?  // ID of the affected record (stored as string for flexibility)
-  old_values     Json?    // Previous values before change
-  new_values     Json?    // New values after change
-  ip_address     String?  // Client IP address
-  user_agent     String?  // Browser/client info
-  timestamp      DateTime @default(now())
-  success        Boolean  @default(true)
-  error_message  String?  // Store error details if operation failed
-  
+  id            Int      @id @default(autoincrement())
+  user_id       Int? // Nullable for system operations or failed logins
+  username      String? // Store username for reference even if user_id is null
+  action        String // CREATE, UPDATE, DELETE, SIGNIN, SIGNOUT, etc.
+  table_name    String? // Which table was affected (null for auth operations)
+  record_id     String? // ID of the affected record (stored as string for flexibility)
+  old_values    Json? // Previous values before change
+  new_values    Json? // New values after change
+  ip_address    String? // Client IP address
+  user_agent    String? // Browser/client info
+  timestamp     DateTime @default(now())
+  success       Boolean  @default(true)
+  error_message String? // Store error details if operation failed
+
   // Relation to User table
   User User? @relation(fields: [user_id], references: [id])
-  
+
   @@index([user_id])
   @@index([action])
   @@index([table_name])
@@ -155,17 +155,17 @@ model Users_Roles {
 
 // Scheduled events for granular queue management
 model ScheduledEvent {
-  id              Int       @id @default(autoincrement())
-  event_type      String    // 'BROADCAST', 'FORM_OPENING', 'FORM_CLOSING'
-  year            Int       // Academic year this event is for
-  scheduled_date  DateTime  // When this event should occur (date only, ignore time)
-  status          String    @default("pending") // 'pending', 'completed', 'cancelled'
-  created_by      Int?      // Super admin who created this
-  created_at      DateTime  @default(now())
-  completed_at    DateTime? // When the event was executed
-  cancelled_at    DateTime? // When the event was cancelled
-  notes           String?   // Optional notes from admin
-  
+  id             Int       @id @default(autoincrement())
+  event_type     String // 'BROADCAST', 'FORM_OPENING', 'FORM_CLOSING'
+  year           Int // Academic year this event is for
+  scheduled_date DateTime // When this event should occur (date only, ignore time)
+  status         String    @default("pending") // 'pending', 'completed', 'cancelled'
+  created_by     Int? // Super admin who created this
+  created_at     DateTime  @default(now())
+  completed_at   DateTime? // When the event was executed
+  cancelled_at   DateTime? // When the event was cancelled
+  notes          String? // Optional notes from admin
+
   @@index([year])
   @@index([event_type])
   @@index([scheduled_date])

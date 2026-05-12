@@ -1,16 +1,18 @@
 // Survey Session model for automated form scheduling
 model SurveySession {
-  id                Int       @id @default(autoincrement())
-  academicYear      Int
-  openingDate       DateTime
-  closingDate       DateTime
-  isOpen            Boolean   @default(false)
-  notifiedOnOpen    Boolean   @default(false)
-  notifiedOnClose   Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  createdBy         Int?      // User ID who created this session
-  
+  id                      Int       @id @default(autoincrement())
+  academicYear            Int
+  openingDate             DateTime
+  closingDate             DateTime
+  isOpen                  Boolean   @default(false)
+  notifiedOnOpen          Boolean   @default(false)
+  notifiedOnClose         Boolean   @default(false)
+  notifiedClosingReminder Boolean   @default(false) // 1-week-before-close auto reminder
+  announcementSentAt      DateTime? // when the manual pre-announcement broadcast was sent
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  createdBy               Int? // User ID who created this session
+
   @@unique([academicYear])
   @@index([openingDate])
   @@index([closingDate])

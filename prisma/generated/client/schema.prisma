@@ -180,6 +180,19 @@ model Electronic_Books {
   Library_Year                           Library_Year? @relation(fields: [libraryyear], references: [id])
 }
 
+// Editable email templates for super admin
+// Used by broadcast emails, individual resends, and cron backup sender
+model EmailTemplate {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique // e.g. 'broadcast_open_forms', 'individual_open_forms'
+  name        String // Friendly name for the admin UI
+  description String? // What this template is used for
+  subject     String
+  html        String // Template body with {{placeholder}} substitutions
+  updated_at  DateTime @default(now()) @updatedAt
+  updated_by  Int? // user_id of last editor (no FK, for soft tracking)
+}
+
 model Entry_Status {
   id                                  Int           @id @default(autoincrement())
   fiscal_support                      Boolean?      @default(false)
@@ -645,6 +658,37 @@ model Public_Services {
   Library_Year Library_Year? @relation(fields: [libraryyear], references: [id])
 }
 
+// Published statistics reports listed on the public /statistics/pdf page.
+//
+// Each row represents ONE PDF link (one row per linkValue in the legacy
+// constant/pdfs.js). Multiple rows can share the same `academicYear`.
+//
+// - `academicYear` stores the START year (e.g. 2023 for "2023-2024").
+//   The public page derives the "2023-2024" label and the decade bucket
+//   from this single value, so super admins never have to type a label or
+//   maintain "(X years)" counts.
+// - `journal` and `appendix` mirror the legacy structure for citation
+//   rendering: e.g. journal="Journal of East Asian Libraries, ",
+//   appendix="2025: no. 180, Article 2.".
+// - `displayOrder` lets a super admin reorder items within the same year
+//   (e.g. main report first, then sub-list).
+model PublishedReport {
+  id           Int      @id @default(autoincrement())
+  academicYear Int
+  title        String
+  url          String? // nullable: historical years may be placeholders w/o a PDF yet
+  journal      String? // italic citation prefix, may be empty
+  appendix     String? // trailing citation detail (article #, page range, etc.)
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    Int?
+
+  @@index([academicYear])
+  @@index([isPublished])
+}
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
@@ -879,16 +923,18 @@ model Serials {
 
 // Survey Session model for automated form scheduling
 model SurveySession {
-  id              Int      @id @default(autoincrement())
-  academicYear    Int
-  openingDate     DateTime
-  closingDate     DateTime
-  isOpen          Boolean  @default(false)
-  notifiedOnOpen  Boolean  @default(false)
-  notifiedOnClose Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       Int? // User ID who created this session
+  id                      Int       @id @default(autoincrement())
+  academicYear            Int
+  openingDate             DateTime
+  closingDate             DateTime
+  isOpen                  Boolean   @default(false)
+  notifiedOnOpen          Boolean   @default(false)
+  notifiedOnClose         Boolean   @default(false)
+  notifiedClosingReminder Boolean   @default(false) // 1-week-before-close auto reminder
+  announcementSentAt      DateTime? // when the manual pre-announcement broadcast was sent
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  createdBy               Int? // User ID who created this session
 
   @@unique([academicYear])
   @@index([openingDate])

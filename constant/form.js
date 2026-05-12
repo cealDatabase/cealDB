@@ -12,8 +12,11 @@ import {
   Shield,
   Calendar,
   Mail,
+  MailOpen,
   FileSpreadsheet,
   FileBarChart,
+  FileText,
+  BookMarked,
 } from "lucide-react";
 
 export const forms = [
@@ -196,8 +199,48 @@ export const eResourceActions = [
     },
   ]
 
+// Category color tokens used by the Super Admin Toolkit page.
+// Each card declares a `category`; the page renders cards grouped by category
+// and uses these tokens for the left-border accent and section heading.
+export const superAdminCategories = {
+  survey: {
+    label: 'Survey & Email Template',
+    description: 'Schedule the annual survey cycle and manage the emails that go to coordinators.',
+    accent: 'border-l-green-500',
+    badgeBg: 'bg-green-100',
+    badgeText: 'text-green-800',
+    headingDot: 'bg-green-500',
+  },
+  users: {
+    label: 'Users',
+    description: 'Create accounts and manage roles & permissions.',
+    accent: 'border-l-purple-500',
+    badgeBg: 'bg-purple-100',
+    badgeText: 'text-purple-800',
+    headingDot: 'bg-purple-500',
+  },
+  institutions: {
+    label: 'Institutions',
+    description: 'Manage participating libraries and their publication status.',
+    accent: 'border-l-sky-500',
+    badgeBg: 'bg-sky-100',
+    badgeText: 'text-sky-800',
+    headingDot: 'bg-sky-500',
+  },
+  publish: {
+    label: 'Publish Statistics',
+    description: 'Manage the published PDF reports listed on the public Statistics page.',
+    accent: 'border-l-amber-500',
+    badgeBg: 'bg-amber-100',
+    badgeText: 'text-amber-800',
+    headingDot: 'bg-amber-500',
+  },
+};
+
 export const superAdminActions = [
+    // ── Survey & Email Template ─────────────────────────────────────────────
     {
+      category: 'survey',
       title: 'Survey Dates Management',
       href: '/admin/survey-dates',
       icon: CheckCircle,
@@ -206,6 +249,7 @@ export const superAdminActions = [
       description: `Open forms for year ${currentYear}. Creates new Library_Year records for all libraries, enabling them to submit survey data for the current year.`,
     },
     {
+      category: 'survey',
       title: 'Open/Close Annual Surveys',
       href: '/admin/broadcast',
       icon: Mail,
@@ -214,22 +258,31 @@ export const superAdminActions = [
       description: 'Open or close forms for editing and send broadcast notifications to CEAL members via email.',
     },
     {
-      title: 'Sign Up New User',
-      href: '/signup',
-      icon: Users,
-      iconColor: 'text-purple-600',
-      iconBg: 'bg-purple-100',
-      description: 'Create new user accounts for librarians, e-resource editors, or administrators.',
+      category: 'survey',
+      title: 'Email Templates',
+      href: '/admin/email-templates',
+      icon: MailOpen,
+      iconColor: 'text-green-700',
+      iconBg: 'bg-green-100',
+      description: 'Edit the three broadcast emails (pre-announcement, forms-open, 1-week-before-close reminder) and the individual resend template. Subject, HTML body, and placeholders for opening/closing dates.',
     },
+
+    // ── Users ───────────────────────────────────────────────────────────────
     {
+      category: 'users',
       title: 'Manage Users',
       href: '/admin/users',
+      secondaryHref: '/signup',
+      secondaryLabel: 'Sign Up New User',
       icon: Shield,
       iconColor: 'text-purple-600',
       iconBg: 'bg-purple-100',
-      description: 'Edit user roles and permissions. Assign users as super admins, assistant admins, e-resource editors, or member institution users.',
+      description: 'Edit user roles and permissions. Assign users as super admins, assistant admins, e-resource editors, or member institution users. Use "Sign Up New User" to create a new account.',
     },
+
+    // ── Institutions ────────────────────────────────────────────────────────
     {
+      category: 'institutions',
       title: 'Manage Participant Institutions',
       href: '/libraries',
       secondaryHref: '/create',
@@ -239,12 +292,15 @@ export const superAdminActions = [
       iconBg: 'bg-sky-100',
       description: 'Publish institutions once they have completed surveys, and manage their publication status (in Participation Status tab).',
     },
+
+    // ── Publish Statistics ──────────────────────────────────────────────────
     {
-      title: 'Enter/Edit Current or Past Surveys',
-      href: '/admin/forms',
-      icon: Settings,
-      iconColor: 'text-indigo-600',
-      iconBg: 'bg-indigo-100',
-      description: 'Use this option to modify individual institution survey results. After making changes, record the specific data updated (amount, category), along with the modification date and the name of the person who made the change in the corresponding notes field.',
+      category: 'publish',
+      title: 'Manage Published PDFs',
+      href: '/admin/published-reports',
+      icon: BookMarked,
+      iconColor: 'text-amber-600',
+      iconBg: 'bg-amber-100',
+      description: 'Upload PDF report URLs and configure their publication year. Decade groupings and per-decade counts on the public Statistics page update automatically.',
     },
   ]

@@ -1,67 +1,31 @@
-'use client';
-
 import { Container } from "@/components/Container";
 import Link from "next/link";
-import { pdfs } from "@/constant/pdfs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Calendar } from 'lucide-react';
+import db from "@/lib/db";
+import { groupByDecade, type PublishedReportRow } from "@/lib/publishedReports";
+import PublishedPDFsAccordion from "./PublishedPDFsAccordion";
 
-function generateYears(startYear: number, endYear: number) {
-  const years = [];
-  for (let year = startYear; year <= endYear; year++) {
-    years.push(year.toString() + "-" + (year + 1).toString());
+// Always render with fresh data — super admin edits should appear immediately.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+async function fetchPublishedReports(): Promise<PublishedReportRow[]> {
+  const prisma = db as any;
+  try {
+    const rows = await prisma.publishedReport.findMany({
+      where: { isPublished: true, url: { not: null } },
+      orderBy: [{ academicYear: "desc" }, { displayOrder: "asc" }, { id: "asc" }],
+    });
+    return rows as PublishedReportRow[];
+  } catch (err) {
+    console.error("[statistics/pdf] Failed to load PublishedReport rows:", err);
+    return [];
   }
-  return years;
 }
 
-interface YearGroup {
-  label: string;
-  years: string[];
-  value: string;
-}
+export default async function PublishedPDFs() {
+  const rows = await fetchPublishedReports();
+  const decades = groupByDecade(rows);
 
-function groupYearsByDecade(years: string[]): YearGroup[] {
-  const currentYear = new Date().getFullYear();
-  
-  const groups: YearGroup[] = [
-    {
-      label: `2020 to Current`,
-      years: years.filter(y => {
-        const firstYear = parseInt(y.split('-')[0]);
-        return firstYear >= 2020;
-      }),
-      value: '2020-current'
-    },
-    {
-      label: `2010 - 2019`,
-      years: years.filter(y => {
-        const firstYear = parseInt(y.split('-')[0]);
-        return firstYear >= 2010 && firstYear <= 2019;
-      }),
-      value: '2010-2019'
-    },
-    {
-      label: `2000 - 2009`,
-      years: years.filter(y => {
-        const firstYear = parseInt(y.split('-')[0]);
-        return firstYear >= 2000 && firstYear <= 2009;
-      }),
-      value: '2000-2009'
-    },
-    {
-      label: `Before 2000`,
-      years: years.filter(y => {
-        const firstYear = parseInt(y.split('-')[0]);
-        return firstYear < 2000;
-      }),
-      value: 'before-2000'
-    }
-  ];
-  
-  return groups.filter(group => group.years.length > 0);
-}
-
-function PublishedPDFs() {
   return (
     <main>
       <h1>Published Statistics (PDFs)</h1>
@@ -88,20 +52,10 @@ function PublishedPDFs() {
                 </h4>
                 <div className="h-px flex-auto bg-gray-400" />
               </div>
-              <ul role="list" className="mt-8">
-                <li className="flex gap-x-3">
-                  <Link href="/statistics/pdf/">
-                    CEAL Statistics PDFs (1999-current)
-                  </Link>
-                </li>
-                <li className="flex gap-x-3">
-                  <Link href="/statistics/pdf/year-pdf-version/">
+              <ul role="list" className="mt-4 space-y-2">
+                <li>
+                  <Link href="/statistics/pdf/year-pdf-version" className="text-rose-700 hover:underline">
                     CEAL Statistics PDFs (1957-2019/2020)
-                  </Link>
-                </li>
-                <li className="flex gap-x-3">
-                  <Link href="/statistics/pdf/">
-                    CEAL Statistics publications citation
                   </Link>
                 </li>
               </ul>
@@ -136,55 +90,9 @@ function PublishedPDFs() {
         </section>
 
         <section className="flex flex-col">
-          <Accordion type="single" collapsible className="w-full" defaultValue="2020-current">
-            {groupYearsByDecade(generateYears(1998, new Date().getFullYear() - 3).reverse()).map((group) => (
-              <AccordionItem key={group.value} value={group.value} className="border rounded-lg mb-4 px-4">
-                <AccordionTrigger className="text-lg font-bold hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    {group.label} ({group.years.length} years)
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <ul className="space-y-6 pt-4">
-                    {group.years.map((year) => (
-                      <div key={year} className="border-l-2 border-gray-300 pl-4">
-                        <p className="font-semibold text-lg text-gray-800 mb-2">{year}</p>
-                        <ol className="space-y-2">
-                          {pdfs.map((pdfitem) => {
-                            return pdfitem.linkValue.map((singleItem, idx) => {
-                              if (pdfitem.yearValue === year) {
-                                return (
-                                  <li key={`${pdfitem.yearValue}-${singleItem.title}-${idx}`} className="text-gray-700">
-                                    <Link 
-                                      href={singleItem.link}
-                                      className="text-blue-600 hover:text-blue-800 hover:underline"
-                                    >
-                                      {singleItem.title}
-                                    </Link>{" "}
-                                    <span className="italic text-gray-600">
-                                      {singleItem.journal}{" "}
-                                    </span>
-                                    <span className="text-gray-500">
-                                      {singleItem.appendix}
-                                    </span>
-                                  </li>
-                                );
-                              }
-                            });
-                          })}
-                        </ol>
-                      </div>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <PublishedPDFsAccordion decades={decades} />
         </section>
       </Container>
     </main>
   );
 }
-
-export default PublishedPDFs;

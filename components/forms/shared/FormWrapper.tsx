@@ -9,6 +9,11 @@ interface LibraryYearStatus {
   is_open_for_editing: boolean
   is_active: boolean
   message: string
+  // year of the Library_Year record actually returned by the status API. May
+  // differ from the current calendar year when the API falls back to the most
+  // recent year (super admin / pre-launch scenarios). When it does, we render
+  // a banner so users aren't confused about which year they're viewing.
+  year?: number
 }
 
 interface FormWrapperProps {
@@ -70,8 +75,35 @@ export function FormWrapper({
     )
   }
 
+  // If the status API returned a year older than the calendar year, the user
+  // is viewing fallback data. Surface this clearly so it's not mistaken for
+  // current-year data.
+  const calendarYear = new Date().getFullYear()
+  const showFallbackYearBanner =
+    typeof libraryYearStatus.year === "number" && libraryYearStatus.year < calendarYear
+
   return (
     <div className="space-y-4">
+      {showFallbackYearBanner && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent>
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="text-amber-900 space-y-1">
+                <p className="font-semibold">
+                  Viewing data for survey year {libraryYearStatus.year}
+                </p>
+                <p className="text-sm">
+                  No record exists yet for {calendarYear}. The form is showing the most recent
+                  available year ({libraryYearStatus.year}). Once the {calendarYear} survey is
+                  scheduled, this page will switch to {calendarYear}.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {isReadOnly && (
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="">

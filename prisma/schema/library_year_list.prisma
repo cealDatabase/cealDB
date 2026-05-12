@@ -3,12 +3,12 @@ model LibraryYear_ListAV {
   listav_id      Int
 
   // User selection fields
-  is_selected    Boolean? @default(false)  // User has selected this AV entry
-  custom_count   Int?                      // User's custom count (overrides default)
-  updated_at     DateTime? @default(now()) // Last update time
+  is_selected  Boolean?  @default(false) // User has selected this AV entry
+  custom_count Int? // User's custom count (overrides default)
+  updated_at   DateTime? @default(now()) // Last update time
 
-  Library_Year   Library_Year @relation(fields: [libraryyear_id], references: [id])
-  List_AV        List_AV      @relation(fields: [listav_id], references: [id])
+  Library_Year Library_Year @relation(fields: [libraryyear_id], references: [id])
+  List_AV      List_AV      @relation(fields: [listav_id], references: [id])
 
   @@id([libraryyear_id, listav_id])
 }
@@ -18,12 +18,12 @@ model LibraryYear_ListEBook {
   listebook_id   Int
 
   // User selection fields
-  is_selected    Boolean? @default(false)
-  custom_count   Int?
-  updated_at     DateTime? @default(now())
+  is_selected  Boolean?  @default(false)
+  custom_count Int?
+  updated_at   DateTime? @default(now())
 
-  Library_Year   Library_Year @relation(fields: [libraryyear_id], references: [id])
-  List_EBook     List_EBook   @relation(fields: [listebook_id], references: [id])
+  Library_Year Library_Year @relation(fields: [libraryyear_id], references: [id])
+  List_EBook   List_EBook   @relation(fields: [listebook_id], references: [id])
 
   @@id([libraryyear_id, listebook_id])
 }
@@ -33,12 +33,12 @@ model LibraryYear_ListEJournal {
   listejournal_id Int
 
   // User selection fields
-  is_selected    Boolean? @default(false)
-  custom_count   Int?
-  updated_at     DateTime? @default(now())
+  is_selected  Boolean?  @default(false)
+  custom_count Int?
+  updated_at   DateTime? @default(now())
 
-  Library_Year    Library_Year  @relation(fields: [libraryyear_id], references: [id])
-  List_EJournal   List_EJournal @relation(fields: [listejournal_id], references: [id])
+  Library_Year  Library_Year  @relation(fields: [libraryyear_id], references: [id])
+  List_EJournal List_EJournal @relation(fields: [listejournal_id], references: [id])
 
   @@id([libraryyear_id, listejournal_id])
 }
