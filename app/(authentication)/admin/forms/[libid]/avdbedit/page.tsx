@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -232,6 +233,7 @@ export default async function Page({ params, searchParams }: PageProps) {
               />
             </div>
             <div className='flex-1 flex-col px-8 pb-4 md:flex'>
+              <InstitutionSwitcher currentYear={year} />
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
@@ -274,6 +276,7 @@ export default async function Page({ params, searchParams }: PageProps) {
             />
           </div>
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
+            <InstitutionSwitcher currentYear={year} />
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
                 {libraryName} - AV Access Management
