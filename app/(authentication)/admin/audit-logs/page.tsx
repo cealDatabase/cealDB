@@ -2,7 +2,18 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import * as jose from 'jose';
 import db from '@/lib/db';
+import Link from 'next/link';
 import AuditLogViewer from '../../../../components/AuditLogViewer';
+import { Container } from '@/components/Container';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import { SlashIcon } from 'lucide-react';
 
 async function getAuditLogs(page: number = 1, limit: number = 50, filter?: string) {
   try {
@@ -120,20 +131,48 @@ export default async function AuditLogsPage({
   const { logs, total } = await getAuditLogs(page, 50, filter);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-        <p className="mt-2 text-gray-600">
-          Track all database operations and user activities
-        </p>
-      </div>
+    <main>
+      <Container className="py-8">
+        <div className="mb-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/admin">Admin</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage>Audit Logs</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
 
-      <AuditLogViewer 
-        logs={logs} 
-        total={total} 
-        currentPage={page} 
-        filter={filter} 
-      />
-    </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Audit Logs</h1>
+          <p className="text-muted-foreground">
+            Track all database operations and user activities
+          </p>
+        </div>
+
+        <AuditLogViewer 
+          logs={logs} 
+          total={total} 
+          currentPage={page} 
+          filter={filter} 
+        />
+      </Container>
+    </main>
   );
 }

@@ -12,7 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet, FileText } from "lucide-react";
+import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet, FileText, SlashIcon } from "lucide-react";
+import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from 'sonner';
@@ -451,19 +460,38 @@ export default function ReportsPage() {
   const canSelectLibrary = isSuperAdminOrEditor && libraries.length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-6xl mx-auto">
+          <div className="mb-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/admin">Admin</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Reports</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <FileBarChart className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground text-start py-2">Statistics Reports for Institution Participants</h1>
-                <p className="text-muted-foreground">Cross-year statistics reports for individual institutions, with the ability to select specific years and reporting categories.</p>
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Statistics Reports for Institution Participants</h1>
+            <p className="text-muted-foreground">Cross-year statistics reports for individual institutions, with the ability to select specific years and reporting categories.</p>
           </div>
 
           <div className="space-y-6">
@@ -760,6 +788,6 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

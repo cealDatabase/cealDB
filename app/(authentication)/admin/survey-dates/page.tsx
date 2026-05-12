@@ -1,7 +1,7 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
+import { Button } from '@/components/ui/button'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CheckCircle, AlertTriangle, Calendar, SlashIcon, Info } from 'lucide-react'
@@ -149,7 +149,7 @@ export default function OpenYearPage() {
         <Container>
             <div className="max-w-5xl mx-auto">
                 {/* Breadcrumb */}
-                <div className="my-6">
+                <div className="mb-4 mt-6">
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
@@ -178,9 +178,9 @@ export default function OpenYearPage() {
                 </div>
 
                 {/* Header */}
-                <div className="mb-6">
-                    <h1 className="mb-2">Survey Dates Management</h1>
-                    <p className="text-gray-600">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Survey Dates Management</h1>
+                    <p className="text-muted-foreground">
                         Set opening and closing dates for annual surveys. Creates Library_Year records with scheduled dates for automatic form opening/closing.
                     </p>
                 </div>
@@ -194,9 +194,9 @@ export default function OpenYearPage() {
                                     <Info className="w-6 h-6 text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-emerald-900 mb-3">
+                                    <h2 className="text-lg font-bold text-emerald-900 mb-3">
                                         📅 Currently Active Survey Dates for {currentDates.year}
-                                    </h3>
+                                    </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="bg-white/70 rounded-lg p-4 border border-emerald-200">
                                             <p className="text-xs text-emerald-700 font-semibold mb-1">OPENING DATE</p>
@@ -271,10 +271,11 @@ export default function OpenYearPage() {
                         {/* Year and Date Configuration */}
                         <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="academic-year" className="block text-sm font-medium text-gray-700 mb-2">
                                     Academic Year *
                                 </label>
                                 <input
+                                    id="academic-year"
                                     type="number"
                                     value={year}
                                     onChange={(e) => {
@@ -292,7 +293,7 @@ export default function OpenYearPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="opening-date" className="block text-sm font-medium text-gray-700 mb-2">
                                         Opening Date *
                                         {currentDates?.isStoredInDatabase && currentDates.opening_date && (
                                             <span className="ml-2 text-xs text-emerald-600 font-normal">
@@ -305,6 +306,7 @@ export default function OpenYearPage() {
                                         )}
                                     </label>
                                     <input
+                                        id="opening-date"
                                         type="date"
                                         value={openingDate}
                                         onChange={(e) => setOpeningDate(e.target.value)}
@@ -314,7 +316,7 @@ export default function OpenYearPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="closing-date" className="block text-sm font-medium text-gray-700 mb-2">
                                         Closing Date *
                                         {currentDates?.isStoredInDatabase && currentDates.closing_date && (
                                             <span className="ml-2 text-xs text-blue-600 font-normal">
@@ -327,6 +329,7 @@ export default function OpenYearPage() {
                                         )}
                                     </label>
                                     <input
+                                        id="closing-date"
                                         type="date"
                                         value={closingDate}
                                         onChange={(e) => setClosingDate(e.target.value)}

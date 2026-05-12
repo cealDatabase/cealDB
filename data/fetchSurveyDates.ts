@@ -59,6 +59,10 @@ export async function getFormattedSurveyDates(year?: number): Promise<FormattedS
 
     if (!isStoredInDatabase) {
       status = 'not_set';
+    } else if (isCurrentlyOpen && closingDateTime && now > closingDateTime) {
+      // is_open_for_editing is still true but closing date has passed — treat as closed
+      status = 'closed';
+      daysSinceClosed = Math.floor((now.getTime() - closingDateTime.getTime()) / (1000 * 60 * 60 * 24));
     } else if (isCurrentlyOpen) {
       status = 'open';
       if (closingDateTime) {

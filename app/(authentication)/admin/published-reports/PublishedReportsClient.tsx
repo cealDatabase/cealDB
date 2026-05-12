@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/Container';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/ui/button';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   Loader2,
   Plus,
   RefreshCw,
+  SlashIcon,
   Trash2,
   X,
 } from 'lucide-react';
@@ -23,6 +24,14 @@ import {
   groupByDecade,
   type PublishedReportRow,
 } from '@/lib/publishedReports';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 interface Props {
   userRoles: string[];
@@ -182,12 +191,35 @@ export default function PublishedReportsClient({ userRoles }: Props) {
 
   return (
     <Container className="py-8">
-      <div className="mb-6">
-        <Link href="/admin" className="inline-flex items-center text-sm text-blue-600 hover:underline mb-3">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to admin
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Manage Published PDFs</h1>
-        <p className="text-gray-600 mt-2">
+      <div className="mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin">Admin</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Published Reports</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage Published PDFs</h1>
+        <p className="text-muted-foreground">
           Upload a PDF URL, set its publication year, and it will appear on the public{' '}
           <Link href="/statistics/pdf" className="text-blue-600 hover:underline">Statistics (PDFs)</Link> page.
           Decade groupings (<strong>2020 to Current</strong>, <strong>2010-2019</strong>, etc.) and per-decade counts
@@ -266,7 +298,7 @@ export default function PublishedReportsClient({ userRoles }: Props) {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">PDF URL <span className="text-gray-400">(optional)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">PDF URL <span className="text-gray-500">(optional)</span></label>
             <input
               type="url"
               value={form.url}
@@ -379,7 +411,7 @@ export default function PublishedReportsClient({ userRoles }: Props) {
                               PDF not available
                             </span>
                           )}
-                          <div className="text-xs text-gray-400 mt-0.5">
+                          <div className="text-xs text-gray-500 mt-0.5">
                             order {row.displayOrder} · id #{row.id}
                             {!row.isPublished && ' · hidden'}
                           </div>

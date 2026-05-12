@@ -147,8 +147,9 @@ async function UserLoggedInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
         <div className={`grid grid-cols-1 ${isRegularUserOnly ? 'max-w-4xl mx-auto gap-6' : 'gap-8 lg:grid-cols-3'}`}>
           {/* User Profile Section - Left Column */}
           <div className={isRegularUserOnly ? '' : 'lg:col-span-1'}>
@@ -376,7 +377,7 @@ async function UserLoggedInPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -32,51 +32,44 @@ async function UserManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Container>
-        <div className="max-w-5xl mx-auto">
-          {/* Breadcrumb */}
-          <div className="my-6">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/" className="no-underline">Home</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                  <SlashIcon />
-                </BreadcrumbSeparator>
-                
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/admin" className="no-underline">Admin</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                  <SlashIcon />
-                </BreadcrumbSeparator>
-                
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Manage Users</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+    <main className="min-h-screen bg-background">
+      <Container className="py-8">
+        <div className="mb-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/admin">Admin</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage>Manage Users</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-      </Container>
-      
-      <div className="container mx-auto px-6 py-8">
+
         <div className="mb-8">
-          <h1>User Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
           <p className="text-muted-foreground">
             Manage user roles and permissions across the system
           </p>
         </div>
         
         <UserRoleManager />
-      </div>
-    </div>
+      </Container>
+    </main>
   );
 }
 

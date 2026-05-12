@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/Container';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/ui/button';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,7 +15,16 @@ import {
   RotateCcw,
   Save,
   Send,
+  SlashIcon,
 } from 'lucide-react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 type DeliveryMode =
   | 'manual_broadcast'
@@ -303,14 +312,37 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
   }
 
   return (
-    <Container>
-      <div className="max-w-6xl mx-auto my-8">
-        <div className="mb-6">
-          <Link href="/admin" className="text-sm text-blue-600 no-underline hover:underline inline-flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" /> Admin home
-          </Link>
-          <h1 className="mt-2">Email Templates</h1>
-          <p className="text-gray-600">
+    <Container className="py-8">
+      <div className="mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin">Admin</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Email Templates</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
+      <div className="max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Email Templates</h1>
+          <p className="text-muted-foreground">
             Edit the content of broadcast and individual emails sent from this system. Use the
             placeholders on the right so dates and the year fill in automatically based on the
             currently scheduled session.

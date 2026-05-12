@@ -2,9 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { formatSimpleDate, formatDateWithWeekday } from '@/lib/dateFormatting'
+import { SlashIcon } from 'lucide-react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
 
 interface SurveySession {
   id: number
@@ -167,23 +177,46 @@ export default function SurveySchedulePage() {
 
   return (
     <Container className="py-8">
-      <div className="mb-6">
-        <Link href="/admin/superguide" className="text-blue-600 hover:text-blue-800">
-          ← Back to Admin Guide
-        </Link>
+      <div className="mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin">Admin</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Survey Schedule</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Open/Close Annual Surveys</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Open/Close Annual Surveys</h1>
+        <p className="text-muted-foreground">
           Manage form access for CEAL member libraries and send broadcast notifications via Resend.
         </p>
       </div>
 
       {/* Current Form Status */}
       {formStatus && (
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">📊 Current Form Status</h2>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>📊 Current Form Status</CardTitle>
+          </CardHeader>
+          <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-gray-50 p-4 rounded">
               <div className="text-sm text-gray-600">Academic Year</div>
@@ -205,12 +238,16 @@ export default function SurveySchedulePage() {
           <div className="mt-4 text-sm text-gray-500">
             Last Updated: {formStatus.lastUpdated}
           </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Create New Session */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">📅 Create New Form Session</h2>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>📅 Create New Form Session</CardTitle>
+        </CardHeader>
+        <CardContent>
         
         {message && (
           <div className={`mb-4 p-4 rounded ${
@@ -226,10 +263,11 @@ export default function SurveySchedulePage() {
           {/* Horizontal layout for all three fields */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="schedule-academic-year" className="block text-sm font-medium text-gray-700 mb-2">
                 Academic Year *
               </label>
               <input
+                id="schedule-academic-year"
                 type="number"
                 value={academicYear}
                 onChange={(e) => setAcademicYear(parseInt(e.target.value))}
@@ -241,10 +279,11 @@ export default function SurveySchedulePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="schedule-opening-date" className="block text-sm font-medium text-gray-700 mb-2">
                 Opening Date * <span className="text-xs text-gray-500">(12:00 AM Pacific)</span>
               </label>
               <input
+                id="schedule-opening-date"
                 type="date"
                 value={openingDate}
                 onChange={(e) => setOpeningDate(e.target.value)}
@@ -254,10 +293,11 @@ export default function SurveySchedulePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="schedule-closing-date" className="block text-sm font-medium text-gray-700 mb-2">
                 Closing Date * <span className="text-xs text-gray-500">(11:59 PM Pacific)</span>
               </label>
               <input
+                id="schedule-closing-date"
                 type="date"
                 value={closingDate}
                 onChange={(e) => setClosingDate(e.target.value)}
@@ -275,11 +315,15 @@ export default function SurveySchedulePage() {
             Preview Email & Continue →
           </Button>
         </form>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Existing Sessions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">📋 Scheduled Sessions</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>📋 Scheduled Sessions</CardTitle>
+        </CardHeader>
+        <CardContent>
         
         {sessions.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
@@ -333,6 +377,7 @@ export default function SurveySchedulePage() {
                       <button
                         onClick={() => handleDeleteSession(session.academicYear)}
                         className="text-red-600 hover:text-red-900"
+                        aria-label={`Delete session for year ${session.academicYear}`}
                       >
                         Delete
                       </button>
@@ -343,7 +388,8 @@ export default function SurveySchedulePage() {
             </table>
           </div>
         )}
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Help Text */}
       <div className="mt-8 bg-gray-50 rounded-lg p-6">
@@ -367,6 +413,7 @@ export default function SurveySchedulePage() {
                 <button
                   onClick={() => setShowPreview(false)}
                   className="text-gray-500 hover:text-gray-700 text-2xl"
+                  aria-label="Close preview"
                 >
                   ×
                 </button>

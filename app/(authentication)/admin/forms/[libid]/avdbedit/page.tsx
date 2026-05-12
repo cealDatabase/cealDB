@@ -56,9 +56,9 @@ export default async function Page({ params, searchParams }: PageProps) {
         <main>
           <Container className='bg-white p-12 max-w-full'>
             <div className='flex-1 flex-col p-8 md:flex'>
-              <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+              <h1 className='text-2xl font-bold tracking-tight text-red-600'>
                 Library ID Missing
-              </h2>
+              </h1>
               <p className='text-muted-foreground text-sm mt-2'>
                 Please sign in first. This is required to manage subscriptions.
               </p>
@@ -95,9 +95,9 @@ export default async function Page({ params, searchParams }: PageProps) {
       <main>
         <Container className='bg-white p-12 max-w-full'>
           <div className='flex-1 flex-col p-8 md:flex'>
-            <h2 className='text-2xl font-bold tracking-tight text-red-600'>
+            <h1 className='text-2xl font-bold tracking-tight text-red-600'>
               Invalid Library ID
-            </h2>
+            </h1>
             <p className='text-muted-foreground text-sm mt-2'>
               The library ID could not be determined. Please check your access permissions.
             </p>
