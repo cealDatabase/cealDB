@@ -2,9 +2,17 @@
 
 import React, { useState } from 'react'
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
-import { AlertCircle, Play, CheckCircle, XCircle, Loader2, TestTube, Mail, Calendar, Database } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, Play, CheckCircle, XCircle, Loader2, TestTube, Mail, Calendar, Database, SlashIcon } from 'lucide-react'
 import Link from 'next/link'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
 
 interface TestingDashboardProps {
   userRoles: string[]
@@ -71,18 +79,38 @@ export default function TestingDashboard({ userRoles }: TestingDashboardProps) {
 
   return (
     <Container className="py-8">
+      <div className="mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin">Admin</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <SlashIcon />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Testing</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-2">
-          <TestTube className="w-6 h-6 text-purple-600" />
-          <h1 className="text-2xl font-bold">Super Admin Testing Dashboard</h1>
-        </div>
-        <p className="text-gray-600">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Super Admin Testing Dashboard</h1>
+        <p className="text-muted-foreground">
           Test form opening/closing and email broadcasts without waiting for scheduled cron jobs.
         </p>
-        <Link href="/admin" className="text-blue-600 hover:underline text-sm mt-2 inline-block">
-          ← Back to Admin
-        </Link>
       </div>
 
       {/* Warning Banner */}

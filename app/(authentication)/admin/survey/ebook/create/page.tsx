@@ -30,7 +30,7 @@ async function CreateEBookContent({
     <div className='p-6'>
       <Container>
         <SurveyBreadcrumb surveyType="ebook" year={selectedYear.toString()} libid={libraryId ? Number(libraryId) : undefined} />
-        <h1 className='text-2xl font-semibold mb-4'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>
           Create New EBook Entry for {selectedYear}
         </h1>
         <CreateEBookFormClient 

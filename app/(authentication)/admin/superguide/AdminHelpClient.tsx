@@ -1,9 +1,17 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
 import React from 'react'
 import Link from 'next/link'
+import { SlashIcon } from 'lucide-react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
 
 interface UserInfo {
     userId: number;
@@ -117,9 +125,36 @@ const openNewYearForm = async () => {
 
 export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
     return (
-        <>
-            <h1>Admin Guide</h1>
-            <Container>
+        <Container className="py-8">
+            <div className="mb-4">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href="/">Home</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <SlashIcon />
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href="/admin">Admin</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <SlashIcon />
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Admin Guide</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+            </div>
+
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Guide</h1>
+            </div>
                 <ul>
                     <li><a href="#useradministration">User Adminstration</a></li>
                     <li><a href="#libraryadministration">Library Administration</a></li>
@@ -176,8 +211,6 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
 
                 <h3 id="openingupasurveyforagiventimeperiod">Opening up a survey for a given time period</h3>
 
-                <h3 id="openingupasurveyforagiventimeperiod">Opening up a survey for a given time period</h3>
-
                 <p>You can configure when the surveys will be accessible by your member institutions through the admin settings.</p>
 
 
@@ -193,16 +226,15 @@ export default function AdminHelpClient({ userInfo }: AdminHelpClientProps) {
 
 
 
-                <h3 id="editingothertextonthesite">Adding Files</h3>
+                <h3 id="addingfiles">Adding Files</h3>
 
 
 
-                <h3 id="editingothertextonthesite">Deleting&nbsp;Files</h3>
+                <h3 id="deletingfiles">Deleting&nbsp;Files</h3>
 
 
-                <h3 id="editingothertextonthesite">Linking to Files</h3>
+                <h3 id="linkingtofiles">Linking to Files</h3>
 
-            </Container>
-        </>
+        </Container>
     )
 }

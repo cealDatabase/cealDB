@@ -1,7 +1,8 @@
 'use client'
 
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import React, { useState, useEffect } from 'react'
 import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -323,7 +324,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     <Container>
       <div className="max-w-5xl mx-auto">
         {/* Breadcrumb */}
-        <div className="my-6">
+        <div className="mb-4 mt-6">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -352,20 +353,23 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
         </div>
 
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="mb-2">Open/Close Annual Surveys</h1>
-          <p className="text-gray-600">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Open/Close Annual Surveys</h1>
+          <p className="text-muted-foreground">
             Manage form access for CEAL member libraries and send broadcast notifications via Resend.
           </p>
         </div>
 
         {/* Current Session Status */}
         {currentSession && (
-          <div className="mb-6 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Current Form Status
-            </h2>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Current Form Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <div className="p-3 bg-gray-50 rounded">
                 <div className="text-sm text-gray-600">Year</div>
@@ -438,7 +442,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                 </div>
               )}
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Error Display */}
@@ -461,7 +466,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
         />
 
         {/* Main Content */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <Card>
+          <CardContent className="p-6">
           {/* Email Preview */}
           {step === 'preview' && (
             <div>
@@ -792,7 +798,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
               </div>
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </Container>
   );

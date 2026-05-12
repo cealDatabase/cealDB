@@ -1,11 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Container } from '@/components/Container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Loader2, CheckCircle2, FileSpreadsheet } from 'lucide-react';
+import { Download, Loader2, CheckCircle2, FileSpreadsheet, SlashIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 const reports = [
   { id: 'characteristics', name: 'Participating Library Characteristics and Contact Information', filename: 'Library_Characteristics' },
@@ -143,8 +153,34 @@ export default function ParticipationReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-6 py-8">
+    <main className="min-h-screen bg-background">
+      <Container className="py-8">
+        <div className="mb-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/admin">Admin</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage>Participation Reports</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Participation Reports</h1>
           <p className="text-muted-foreground">
@@ -266,7 +302,7 @@ export default function ParticipationReportsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </main>
   );
 }

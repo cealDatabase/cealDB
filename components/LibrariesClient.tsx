@@ -54,7 +54,7 @@ export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) 
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <h1>Institution Information</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Institution Information</h1>
 
       <Container className="py-8">
         <div className="space-y-6">

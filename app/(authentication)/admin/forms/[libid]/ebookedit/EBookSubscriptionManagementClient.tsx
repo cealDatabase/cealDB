@@ -64,7 +64,7 @@ export default function EBookSubscriptionManagementClient({
   // Expandable text component for truncated cells
   const ExpandableText = ({ content, maxWidth = "200px" }: { content: string; maxWidth?: string }) => {
     if (!content || content.trim().length === 0) {
-      return <span className="text-gray-400">-</span>;
+      return <span className="text-gray-500">-</span>;
     }
 
     const needsPopover = content.length > 30;

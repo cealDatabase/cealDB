@@ -225,7 +225,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
         <Container>
           <AdminBreadcrumb libraryName={libraryName} />
           <div className='pt-12'>
-            <h1>Statistics Forms</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Statistics Forms</h1>
             <div className={`mt-4 inline-flex items-center px-3 py-1 rounded-full ${statusConfig.bgColor} ${statusConfig.textColor} text-sm font-medium border`}>
               <statusConfig.icon className={`w-4 h-4 mr-2 ${statusConfig.pulse ? 'animate-pulse' : ''}`} />
               {statusConfig.text}

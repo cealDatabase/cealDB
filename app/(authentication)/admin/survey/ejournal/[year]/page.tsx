@@ -94,10 +94,10 @@ export default async function EJournalListPage(
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <InstitutionSwitcher currentYear={Number(params.year)} />
                     <div className="space-y-2">
-                        <h1 className="text-2xl font-bold tracking-tight text-start">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
                             E-Journal Databases - {params.year}
                         </h1>
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-muted-foreground">
                             Please check the boxes for each entry your institution holds under each language category Chinese, Japanese, Korean, and Non-CJK.
                             Data in this list are linked to "My Forms."
                             If your institution holds a customized collection or a subset of certain resources,
