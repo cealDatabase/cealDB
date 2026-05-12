@@ -6,6 +6,7 @@ import SelectYear from "../components/selectYear";
 import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import db from "@/lib/db";
 
 async function EbookSinglePage(
@@ -56,13 +57,18 @@ export default async function EbookListPage(
     const cookieStore = await cookies();
     const roleId = cookieStore.get("role")?.value;
 
-    // Prefer libid from query (?libid=56); fall back to cookie if available
+    // Resolve effective libid for impersonation support.
+    // Priority: observe_library cookie (super admin impersonating) > ?libid= query > home library cookie.
     const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
+    const observeLibrary = cookieStore.get("observe_library")?.value;
+    const libidFromObserve = observeLibrary && !isNaN(Number(observeLibrary))
+        ? Number(observeLibrary)
+        : undefined;
     const libidFromCookie = cookieStore.get("library")?.value
         ? Number(cookieStore.get("library")!.value)
         : undefined;
 
-    const libid = libidFromQuery ?? libidFromCookie;
+    const libid = libidFromObserve ?? libidFromQuery ?? libidFromCookie;
     
     // Get search parameter from URL (for highlighting newly created/edited records)
     const initialSearch = sp.search ? decodeURIComponent(sp.search) : undefined;
@@ -86,6 +92,7 @@ export default async function EbookListPage(
             <Container className="bg-white pb-12 max-w-full">
                 <SurveyBreadcrumb surveyType="ebook" year={params.year} libid={libid} />
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
+                    <InstitutionSwitcher currentYear={Number(params.year)} />
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold tracking-tight text-start">
                             E-Book Databases - {params.year}
