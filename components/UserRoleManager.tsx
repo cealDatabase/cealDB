@@ -218,92 +218,94 @@ export function UserRoleManager() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 space-x-4 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredUsers.map((user) => (
                 <div 
                   key={user.id} 
-                  className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex flex-col p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-medium">{getUserDisplayName(user)}</h3>
-                        {!user.isactive && (
-                          <Badge variant="destructive" className="text-xs">
-                            Inactive
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-1 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-3 h-3" />
-                          <span>{user.username}</span>
-                        </div>
-                        
-                        {user.User_Library?.[0]?.Library && (
-                          <div className="flex items-center gap-2">
-                            <Building className="w-3 h-3" />
-                            <span>{user.User_Library[0].Library.library_name}</span>
-                          </div>
-                        )}
-                        
-                        {user.User_Roles.length > 0 && (
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-3 h-3" />
-                            <div className="flex flex-wrap gap-1">
-                              {user.User_Roles.map((userRole) => (
-                                <Badge 
-                                  key={userRole.role_id} 
-                                  variant="secondary" 
-                                  className="text-xs"
-                                >
-                                  {userRole.Role.name}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                  {/* User info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-medium truncate">{getUserDisplayName(user)}</h3>
+                      {!user.isactive && (
+                        <Badge variant="destructive" className="text-xs shrink-0">
+                          Inactive
+                        </Badge>
+                      )}
                     </div>
                     
-                    <div className="flex gap-2 ml-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditRoles(user)}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        <span className="inline md:hidden">Edit</span>
-                        <span className="hidden md:inline">Edit Roles</span>
-                      </Button>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Mail className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{user.username}</span>
+                      </div>
                       
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleSendOpeningEmail(user)}
-                        disabled={sendingUserId === user.id}
-                      >
-                        {sendingUserId === user.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                      </Button>
+                      {user.User_Library?.[0]?.Library && (
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Building className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{user.User_Library[0].Library.library_name}</span>
+                        </div>
+                      )}
                       
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteUser(user)}
-                        disabled={deletingUserId === user.id}
-                      >
-                        {deletingUserId === user.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </Button>
+                      {user.User_Roles.length > 0 && (
+                        <div className="flex items-start gap-2 mt-1">
+                          <Shield className="w-3 h-3 shrink-0 mt-0.5" />
+                          <div className="flex flex-wrap gap-1">
+                            {user.User_Roles.map((userRole) => (
+                              <Badge 
+                                key={userRole.role_id} 
+                                variant="secondary" 
+                                className="text-xs"
+                              >
+                                {userRole.Role.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-2 mt-4 pt-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEditRoles(user)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Roles
+                    </Button>
+                    
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleSendOpeningEmail(user)}
+                      disabled={sendingUserId === user.id}
+                      title="Send opening email"
+                    >
+                      {sendingUserId === user.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteUser(user)}
+                      disabled={deletingUserId === user.id}
+                      title="Delete user"
+                    >
+                      {deletingUserId === user.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
                 </div>
               ))}
