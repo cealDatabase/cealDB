@@ -2,7 +2,8 @@ import { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form } from "@/components/ui/form"
 import { UseFormReturn } from "react-hook-form"
-import { AlertCircle, Lock } from "lucide-react"
+import { Lock } from "lucide-react"
+import { FallbackYearBanner } from "@/components/FallbackYearBanner"
 
 interface LibraryYearStatus {
   exists: boolean
@@ -75,33 +76,10 @@ export function FormWrapper({
     )
   }
 
-  // If the status API returned a year older than the calendar year, the user
-  // is viewing fallback data. Surface this clearly so it's not mistaken for
-  // current-year data.
-  const calendarYear = new Date().getFullYear()
-  const showFallbackYearBanner =
-    typeof libraryYearStatus.year === "number" && libraryYearStatus.year < calendarYear
-
   return (
     <div className="space-y-4">
-      {showFallbackYearBanner && (
-        <Card className="border-amber-300 bg-amber-50">
-          <CardContent>
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-amber-900 space-y-1">
-                <p className="font-semibold">
-                  Viewing data for survey year {libraryYearStatus.year}
-                </p>
-                <p className="text-sm">
-                  No record exists yet for {calendarYear}. The form is showing the most recent
-                  available year ({libraryYearStatus.year}). Once the {calendarYear} survey is
-                  scheduled, this page will switch to {calendarYear}.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {typeof libraryYearStatus.year === "number" && (
+        <FallbackYearBanner year={libraryYearStatus.year} />
       )}
 
       {isReadOnly && (

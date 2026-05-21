@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet, FileText, SlashIcon } from "lucide-react";
+import { Download, Loader2, CheckCircle, XCircle, AlertCircle, FileBarChart, FileSpreadsheet, SlashIcon } from "lucide-react";
 import Link from "next/link";
 import {
   Breadcrumb,
@@ -76,29 +76,18 @@ export default function ReportsPage() {
   useEffect(() => {
     fetchUserInfo();
     fetchAvailableYears();
-
-    // Use the centralized "current survey year" helper so this page stays in
-    // sync with /admin/forms and /admin/broadcast. Falls back to calendar-year
-    // math if the API is unavailable.
-    (async () => {
-      let defaultYear: number;
-      try {
-        const res = await fetch('/api/current-survey-year');
-        if (res.ok) {
-          const data = await res.json();
-          defaultYear = Number(data.reporting) || (new Date().getFullYear() - 1);
-        } else {
-          defaultYear = new Date().getFullYear() - 1;
-        }
-      } catch {
-        defaultYear = new Date().getFullYear() - 1;
-      }
-      const years: number[] = [];
-      for (let i = 0; i < 20; i++) years.push(defaultYear - i);
-      setSurveyYears(years);
-      setSelectedSurveyYear(defaultYear.toString());
-    })();
   }, []);
+
+  // Set survey years whenever availableYears changes
+  useEffect(() => {
+    if (availableYears.length > 0) {
+      // Convert string years to numbers and sort descending
+      const years = availableYears.map(y => parseInt(y)).sort((a, b) => b - a);
+      setSurveyYears(years);
+      // Default to the most recent year
+      setSelectedSurveyYear(years[0].toString());
+    }
+  }, [availableYears]);
 
   useEffect(() => {
     if (userInfo) {
@@ -299,107 +288,6 @@ export default function ReportsPage() {
     } catch (error) {
       console.error('Export error:', error);
       sonnerToast.error(error instanceof Error ? error.message : 'Failed to export report');
-    } finally {
-      setLoadingSurvey(null);
-    }
-  };
-
-  const handleExportSurveyWord = async (reportId: string, reportFilename: string) => {
-    if (!selectedSurveyYear) {
-      sonnerToast.error('Please select a year first');
-      return;
-    }
-
-    setLoadingSurvey(`word-${reportId}`);
-
-    try {
-      const response = await fetch(
-        `/api/export/supplementary-reports-word?year=${selectedSurveyYear}&reportType=${reportId}`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorMessage = 'Word export failed';
-        
-        if (contentType?.includes('application/json')) {
-          const error = await response.json();
-          errorMessage = error.error || 'Word export failed';
-        } else {
-          errorMessage = `Server error (${response.status})`;
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${reportFilename}-${selectedSurveyYear}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      setExportedSurveys(prev => new Set([...prev, reportId]));
-      sonnerToast.success(`${reportFilename} exported to Word successfully`);
-    } catch (error) {
-      console.error('Word export error:', error);
-      sonnerToast.error(error instanceof Error ? error.message : 'Failed to export Word document');
-    } finally {
-      setLoadingSurvey(null);
-    }
-  };
-
-  const handleExportAllSurveysWord = async () => {
-    if (!selectedSurveyYear) {
-      sonnerToast.error('Please select a year first');
-      return;
-    }
-
-    setLoadingSurvey('batch-word');
-
-    try {
-      const response = await fetch(
-        `/api/export/supplementary-reports-word?year=${selectedSurveyYear}&reportType=batch`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorMessage = 'Export failed';
-        
-        if (contentType?.includes('application/json')) {
-          const error = await response.json();
-          errorMessage = error.error || 'Export failed';
-        } else {
-          errorMessage = `Server error (${response.status})`;
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Database_Collection_Reports_Word_${selectedSurveyYear}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      setExportedSurveys(new Set(SURVEY_REPORTS.map(r => r.id)));
-
-      sonnerToast.success(`All database collection reports (Word) exported successfully for year ${selectedSurveyYear}`);
-    } catch (error) {
-      console.error('Export error:', error);
-      sonnerToast.error(error instanceof Error ? error.message : 'Failed to export Word reports');
     } finally {
       setLoadingSurvey(null);
     }
@@ -667,7 +555,7 @@ export default function ReportsPage() {
                           <SelectValue placeholder="Select year" />
                         </SelectTrigger>
                         <SelectContent>
-                          {surveyYears.map(year => (
+                          {surveyYears.map((year: number) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
                             </SelectItem>
@@ -694,25 +582,6 @@ export default function ReportsPage() {
                           </>
                         )}
                       </Button>
-                      <Button
-                        onClick={handleExportAllSurveysWord}
-                        disabled={!selectedSurveyYear || loadingSurvey !== null}
-                        size="lg"
-                        variant="secondary"
-                        className="gap-2"
-                      >
-                        {loadingSurvey === 'batch-word' ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Exporting...
-                          </>
-                        ) : (
-                          <>
-                            <FileText className="w-4 h-4" />
-                            Word (Zip)
-                          </>
-                        )}
-                      </Button>
                     </div>
                   </div>
 
@@ -730,7 +599,7 @@ export default function ReportsPage() {
                           <div>
                             <p className="font-medium">{report.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {report.filename}-{selectedSurveyYear} (.xlsx/.docx)
+                              {report.filename}-{selectedSurveyYear} (.xlsx)
                             </p>
                           </div>
                         </div>
@@ -756,24 +625,6 @@ export default function ReportsPage() {
                               </>
                             )}
                           </Button>
-                          <Button
-                            onClick={() => handleExportSurveyWord(report.id, report.filename)}
-                            disabled={!selectedSurveyYear || loadingSurvey !== null}
-                            variant="secondary"
-                            size="sm"
-                          >
-                            {loadingSurvey === `word-${report.id}` ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                Exporting...
-                              </>
-                            ) : (
-                              <>
-                                <FileText className="w-4 h-4 mr-2" />
-                                Word
-                              </>
-                            )}
-                          </Button>
                         </div>
                       </div>
                     ))}
@@ -781,7 +632,7 @@ export default function ReportsPage() {
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  Exports available in Excel (.xlsx) and Word (.docx) formats. Each report includes global databases and individual member selections. Batch ZIP includes all 3 reports in selected format with landscape orientation.
+                  Exports available in Excel (.xlsx) format. Each report includes global databases and individual member selections. Batch ZIP includes all 3 reports with landscape orientation.
                 </p>
               </CardContent>
             </Card>

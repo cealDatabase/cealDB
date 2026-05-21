@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
+import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -113,7 +114,6 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   // If no ids are provided, show all current subscriptions for this library with delete functionality
   if (ids.length === 0) {
-    console.log("🔍 DEBUG: No IDs provided - showing all current subscriptions for library", libid);
     
     // Find or create Library_Year record
     let libraryYearRecord = await db.library_Year.findFirst({
@@ -234,6 +234,7 @@ export default async function Page({ params, searchParams }: PageProps) {
             </div>
             <div className='flex-1 flex-col px-8 pb-4 md:flex'>
               <InstitutionSwitcher currentYear={year} />
+              <FallbackYearBanner year={year} className="mb-4" />
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
@@ -277,6 +278,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           </div>
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
             <InstitutionSwitcher currentYear={year} />
+            <FallbackYearBanner year={year} className="mb-4" />
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
                 {libraryName} - AV Access Management
@@ -303,7 +305,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
 
   // When IDs are provided, show the subscription editor for adding new subscriptions
-  console.log("🔍 DEBUG: IDs provided - showing subscription editor for", ids.length, "records");
   
   const rows = await db.list_AV.findMany({
     where: { id: { in: ids } },

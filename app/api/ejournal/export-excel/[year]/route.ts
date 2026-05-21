@@ -14,23 +14,33 @@ interface UserContext {
 async function getUserContext(): Promise<UserContext> {
   const cookieStore = await cookies();
   const rawEmail = cookieStore.get('uinf')?.value;
+  const observeLibrary = cookieStore.get('observe_library')?.value;
   const userEmail = rawEmail ? decodeURIComponent(rawEmail).toLowerCase() : undefined;
 
-  let libraryId: number | null = null;
+  let viewingLibraryId: number | null = null;
   let libraryName = '';
 
-  if (userEmail) {
+  if (observeLibrary) {
+    const observed = parseInt(observeLibrary);
+    if (!isNaN(observed)) viewingLibraryId = observed;
+  }
+
+  if (!viewingLibraryId && userEmail) {
     const user = await prisma.user.findFirst({
       where: { username: { equals: userEmail, mode: 'insensitive' } },
-      include: { User_Library: { include: { Library: true } } }
+      include: { User_Library: true }
     });
     if (user?.User_Library && user.User_Library.length > 0) {
-      libraryId = user.User_Library[0].library_id;
-      libraryName = user.User_Library[0].Library?.library_name || '';
+      viewingLibraryId = user.User_Library[0].library_id;
     }
   }
 
-  return { libraryId, libraryName };
+  if (viewingLibraryId) {
+    const library = await prisma.library.findUnique({ where: { id: viewingLibraryId } });
+    libraryName = library?.library_name || '';
+  }
+
+  return { libraryId: viewingLibraryId, libraryName };
 }
 
 export async function GET(
@@ -88,7 +98,7 @@ export async function GET(
       );
     }
 
-    // Get E-Journal details
+    // Get E-Journal details (include is_global / libraryyear for filtering)
     const ejournals = await prisma.list_EJournal.findMany({
       where: { id: { in: listejournalIds } },
       include: {
@@ -98,25 +108,26 @@ export async function GET(
       },
     });
 
-    // Get user selections if library exists
+    // Look up the viewing library's Library_Year id
+    let viewingLibraryYearId: number | null = null;
     let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
     if (userCtx.libraryId) {
       const libraryYearRecords = await prisma.library_Year.findMany({
         where: { library: userCtx.libraryId, year },
         select: { id: true },
       });
-      
+
       if (libraryYearRecords.length > 0) {
-        const libraryYearId = libraryYearRecords[0].id;
+        viewingLibraryYearId = libraryYearRecords[0].id;
         const selections = await prisma.libraryYear_ListEJournal.findMany({
-          where: { libraryyear_id: libraryYearId },
+          where: { libraryyear_id: viewingLibraryYearId },
           select: {
             listejournal_id: true,
             is_selected: true,
             custom_count: true,
           },
         });
-        
+
         selections.forEach((sel) => {
           userSelections.set(sel.listejournal_id, {
             is_selected: sel.is_selected ?? false,
@@ -126,8 +137,14 @@ export async function GET(
       }
     }
 
+    // Drop other institutions' customized records
+    const filteredEjournals = ejournals.filter((ej: any) => {
+      if (ej.is_global !== false) return true;
+      return viewingLibraryYearId !== null && ej.libraryyear === viewingLibraryYearId;
+    });
+
     // Build data array
-    const data = ejournals.map((ejournal) => {
+    const rawData = filteredEjournals.map((ejournal: any) => {
       const counts = countsMap.get(ejournal.id);
       const selection = userSelections.get(ejournal.id);
       const languages = (ejournal as any).List_EJournal_Language
@@ -149,10 +166,46 @@ export async function GET(
         description: ejournal.description || '',
         data_source: ejournal.data_source || '',
         notes: ejournal.notes || '',
+        is_global: ejournal.is_global,
+        libraryyear: ejournal.libraryyear,
         is_selected: selection?.is_selected ?? false,
         custom_count: selection?.custom_count ?? null,
       };
     });
+
+    // Dedup global-vs-library-specific twins
+    let data: any[] = rawData;
+    if (viewingLibraryYearId !== null) {
+      const groupKey = (it: any) =>
+        `${(it.title ?? '').toLowerCase()}_${(it.subtitle ?? '').toLowerCase()}_${(it.publisher ?? '').toLowerCase()}`;
+      const groups = new Map<string, any[]>();
+      for (const item of rawData) {
+        const k = groupKey(item);
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k)!.push(item);
+      }
+      const kept: any[] = [];
+      for (const group of groups.values()) {
+        if (group.length === 1) { kept.push(group[0]); continue; }
+        const mine = group.filter(
+          (g: any) => g.libraryyear === viewingLibraryYearId && g.is_global === false
+        );
+        if (mine.length > 0) {
+          const twinWithState = group.find(
+            (g: any) => !mine.includes(g) && (g.is_selected || g.custom_count != null)
+          );
+          if (twinWithState) {
+            const target = mine.find((m: any) => m.is_selected) ?? mine[0];
+            target.is_selected = target.is_selected || twinWithState.is_selected;
+            if (target.custom_count == null) target.custom_count = twinWithState.custom_count;
+          }
+          kept.push(...mine);
+        } else {
+          kept.push(...group);
+        }
+      }
+      data = kept;
+    }
 
     // Sort by id
     data.sort((a, b) => a.id - b.id);

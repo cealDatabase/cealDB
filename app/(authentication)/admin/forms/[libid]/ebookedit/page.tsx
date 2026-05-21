@@ -10,6 +10,7 @@ import EBookEditClient from "./EBookEditClient";
 import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
+import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 
 // Dynamic import for client component
 const EBookSubscriptionManagementClient = dynamic(
@@ -248,6 +249,7 @@ export default async function Page({ params, searchParams }: PageProps) {
             </div>
             <div className='flex-1 flex-col px-8 pb-4 md:flex'>
               <InstitutionSwitcher currentYear={year} />
+              <FallbackYearBanner year={year} className="mb-4" />
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
@@ -290,6 +292,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           </div>
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
             <InstitutionSwitcher currentYear={year} />
+            <FallbackYearBanner year={year} className="mb-4" />
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
                 {libraryName} - E-Book Access Management
@@ -316,7 +319,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
 
   // When IDs are provided, show the subscription editor for adding new subscriptions
-  console.log("🔍 DEBUG: IDs provided - showing E-Book subscription editor for", ids.length, "records");
   
   const rows = await db.list_EBook.findMany({
     where: { id: { in: ids } }

@@ -10,6 +10,7 @@ import EJournalEditClient from "./EJournalEditClient";
 import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
+import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 
 // Define the component props interface for typing (matching actual database schema)
 interface EJournalSubscriptionManagementClientProps {
@@ -280,6 +281,7 @@ export default async function Page({ params, searchParams }: PageProps) {
             </div>
             <div className='flex-1 flex-col px-8 pb-4 md:flex'>
               <InstitutionSwitcher currentYear={year} />
+              <FallbackYearBanner year={year} className="mb-4" />
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
@@ -322,6 +324,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           </div>
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
             <InstitutionSwitcher currentYear={year} />
+            <FallbackYearBanner year={year} className="mb-4" />
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
                 {libraryName} - E-Journal Access Management
@@ -348,7 +351,6 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
 
   // When IDs are provided, show the subscription editor for adding new subscriptions
-  console.log("🔍 DEBUG: IDs provided - showing E-Journal subscription editor for", ids.length, "records");
   
   const rows = await db.list_EJournal.findMany({
     where: { id: { in: ids } }

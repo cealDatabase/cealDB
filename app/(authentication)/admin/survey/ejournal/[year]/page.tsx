@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
+import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import db from "@/lib/db";
 
 async function EJournalSinglePage(
@@ -93,6 +94,7 @@ export default async function EJournalListPage(
                 <SurveyBreadcrumb surveyType="ejournal" year={params.year} libid={libid} />
                 <div className="flex-1 flex-col px-8 py-4 md:flex">
                     <InstitutionSwitcher currentYear={Number(params.year)} />
+                    <FallbackYearBanner year={Number(params.year)} className="mb-4" />
                     <div className="space-y-2">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">
                             E-Journal Databases - {params.year}

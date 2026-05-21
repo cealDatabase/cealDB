@@ -14,23 +14,35 @@ interface UserContext {
 async function getUserContext(): Promise<UserContext> {
   const cookieStore = await cookies();
   const rawEmail = cookieStore.get('uinf')?.value;
+  const observeLibrary = cookieStore.get('observe_library')?.value;
   const userEmail = rawEmail ? decodeURIComponent(rawEmail).toLowerCase() : undefined;
 
-  let libraryId: number | null = null;
+  let viewingLibraryId: number | null = null;
   let libraryName = '';
 
-  if (userEmail) {
+  // Super-admin impersonation: observe_library takes precedence
+  if (observeLibrary) {
+    const observed = parseInt(observeLibrary);
+    if (!isNaN(observed)) viewingLibraryId = observed;
+  }
+
+  // Otherwise fall back to the user's home library
+  if (!viewingLibraryId && userEmail) {
     const user = await prisma.user.findFirst({
       where: { username: { equals: userEmail, mode: 'insensitive' } },
-      include: { User_Library: { include: { Library: true } } }
+      include: { User_Library: true }
     });
     if (user?.User_Library && user.User_Library.length > 0) {
-      libraryId = user.User_Library[0].library_id;
-      libraryName = user.User_Library[0].Library?.library_name || '';
+      viewingLibraryId = user.User_Library[0].library_id;
     }
   }
 
-  return { libraryId, libraryName };
+  if (viewingLibraryId) {
+    const library = await prisma.library.findUnique({ where: { id: viewingLibraryId } });
+    libraryName = library?.library_name || '';
+  }
+
+  return { libraryId: viewingLibraryId, libraryName };
 }
 
 export async function GET(
@@ -84,7 +96,8 @@ export async function GET(
       );
     }
 
-    // Get AV details
+    // Get AV details (include is_global / libraryyear so we can filter
+    // customized records to only the viewing library's own customs)
     const avs = await prisma.list_AV.findMany({
       where: { id: { in: listavIds } },
       include: {
@@ -94,25 +107,27 @@ export async function GET(
       },
     });
 
-    // Get user selections if library exists
+    // Look up the viewing library's Library_Year id (used both for filtering
+    // their own customized records and for fetching their selections).
+    let viewingLibraryYearId: number | null = null;
     let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
     if (userCtx.libraryId) {
       const libraryYearRecords = await prisma.library_Year.findMany({
         where: { library: userCtx.libraryId, year },
         select: { id: true },
       });
-      
+
       if (libraryYearRecords.length > 0) {
-        const libraryYearId = libraryYearRecords[0].id;
+        viewingLibraryYearId = libraryYearRecords[0].id;
         const selections = await prisma.libraryYear_ListAV.findMany({
-          where: { libraryyear_id: libraryYearId },
+          where: { libraryyear_id: viewingLibraryYearId },
           select: {
             listav_id: true,
             is_selected: true,
             custom_count: true,
           },
         });
-        
+
         selections.forEach((sel) => {
           userSelections.set(sel.listav_id, {
             is_selected: sel.is_selected ?? false,
@@ -122,8 +137,15 @@ export async function GET(
       }
     }
 
+    // Drop other institutions' customized records — keep only globals plus
+    // the viewing library's own customs.
+    const filteredAvs = avs.filter((av: any) => {
+      if (av.is_global !== false) return true; // global or unknown
+      return viewingLibraryYearId !== null && av.libraryyear === viewingLibraryYearId;
+    });
+
     // Build data array
-    const data = avs.map((av) => {
+    const rawData = filteredAvs.map((av: any) => {
       const counts = countsMap.get(av.id);
       const selection = userSelections.get(av.id);
       const languages = (av as any).List_AV_Language
@@ -143,10 +165,52 @@ export async function GET(
         description: av.description || '',
         data_source: av.data_source || '',
         notes: av.notes || '',
+        is_global: av.is_global,
+        libraryyear: av.libraryyear,
         is_selected: selection?.is_selected ?? false,
         custom_count: selection?.custom_count ?? null,
       };
     });
+
+    // Dedup global-vs-library-specific twins (mirrors GetAVListWithUserSelections):
+    // when the viewing library has its own version of a resource, hide the
+    // global twin and carry over any selection state from it.
+    let data: any[] = rawData;
+    if (viewingLibraryYearId !== null) {
+      const groupKey = (it: any) =>
+        `${(it.title ?? '').toLowerCase()}_${(it.type ?? '').toLowerCase()}_${(it.subtitle ?? '').toLowerCase()}`;
+      const groups = new Map<string, any[]>();
+      for (const item of rawData) {
+        const k = groupKey(item);
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k)!.push(item);
+      }
+      const kept: any[] = [];
+      for (const group of groups.values()) {
+        if (group.length === 1) { kept.push(group[0]); continue; }
+        // All customs owned by the viewing library in this group.
+        const mine = group.filter(
+          (g: any) => g.libraryyear === viewingLibraryYearId && g.is_global === false
+        );
+        if (mine.length > 0) {
+          // Carry over any selection state from the global/other twins onto
+          // a customized record so visual cues aren't lost. Prefer to apply
+          // it to a custom that's already selected; otherwise the first one.
+          const twinWithState = group.find(
+            (g: any) => !mine.includes(g) && (g.is_selected || g.custom_count != null)
+          );
+          if (twinWithState) {
+            const target = mine.find((m: any) => m.is_selected) ?? mine[0];
+            target.is_selected = target.is_selected || twinWithState.is_selected;
+            if (target.custom_count == null) target.custom_count = twinWithState.custom_count;
+          }
+          kept.push(...mine);
+        } else {
+          kept.push(...group);
+        }
+      }
+      data = kept;
+    }
 
     // Sort by id
     data.sort((a, b) => a.id - b.id);
