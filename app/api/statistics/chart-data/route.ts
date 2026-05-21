@@ -81,56 +81,34 @@ export async function GET(request: NextRequest) {
 }
 
 function getTableConfig(key: string) {
-  const configs: Record<string, { tableName: string; field: string; label: string }> = {
-    volume_holdings: {
-      tableName: 'volume_Holdings',
-      field: 'vhgrandtotal',
-      label: 'Volume Holdings',
-    },
-    monographic: {
-      tableName: 'monographic_Acquisitions',
-      field: 'matotal_volumes',
-      label: 'Monographic Acquisitions',
-    },
-    serials: {
-      tableName: 'serials',
-      field: 'sgrandtotal',
-      label: 'Serials',
-    },
+  const configs: Record<
+    string,
+    { tableName: string; field: string; label: string }
+  > = {
     fiscal: {
-      tableName: 'fiscal_Support',
-      field: 'fstotal_acquisition_budget',
-      label: 'Fiscal Support',
+      tableName: "fiscal_Support",
+      field: "fstotal_acquisition_budget",
+      label: "Total Fiscal Support",
     },
-    electronic: {
-      tableName: 'electronic',
-      field: 'etotal_expenditure_grandtotal',
-      label: 'Electronic Resources',
-    },
-    electronic_books: {
-      tableName: 'electronic_Books',
-      field: 'ebooks_total_volumes',
-      label: 'Electronic Books',
-    },
-    personnel: {
-      tableName: 'personnel_Support',
-      field: 'psftotal',
-      label: 'Personnel Support',
-    },
-    public_services: {
-      tableName: 'public_Services',
-      field: 'pstotal_circulations_subtotal',
-      label: 'Public Services',
+    volume_holdings: {
+      tableName: "volume_Holdings",
+      field: "vhgrandtotal",
+      label: "Total Physical Volume Holdings",
     },
     other_holdings: {
-      tableName: 'other_Holdings',
-      field: 'ohgrandtotal',
-      label: 'Other Holdings',
+      tableName: "other_Holdings",
+      field: "ohgrandtotal",
+      label: "Total Other Materials Holdings",
     },
-    unprocessed: {
-      tableName: 'unprocessed_Backlog_Materials',
-      field: 'ubtotal',
-      label: 'Unprocessed Backlog Materials',
+    personnel: {
+      tableName: "personnel_Support",
+      field: "psftotal",
+      label: "Total Personnel Support",
+    },
+    serials: {
+      tableName: "serials",
+      field: "sgrandtotal",
+      label: "Total Serial Holdings",
     },
   };
 
