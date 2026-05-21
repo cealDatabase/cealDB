@@ -15,7 +15,7 @@ interface QuickViewData {
   ebook_total: number | null;
   vol_total: number | null;
   serial_titles: number | null;
-  other_materials_pct: number | null;
+  other_materials: number | null;
   personnel_support: number | null;
 }
 
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
           ebook_total: null,
           vol_total: null,
           serial_titles: null,
-          other_materials_pct: null,
+          other_materials: null,
           personnel_support: null,
         };
       }
@@ -168,15 +168,8 @@ export async function GET(request: NextRequest) {
           ? (totalPhysical || 0) + (ebookTotal || 0) + otherMaterials
           : null;
 
-      // Calculate other materials percentage
-      let otherMaterialsPct: number | null = null;
-      if (
-        grandTotalMaterials !== null &&
-        grandTotalMaterials > 0 &&
-        otherMaterials > 0
-      ) {
-        otherMaterialsPct = (otherMaterials / grandTotalMaterials) * 100;
-      }
+      const otherMaterialsVal: number | null =
+        otherHoldings?.ohgrandtotal ?? null;
 
       // Calculate total serial titles (print + electronic)
       const serialTotal = sumNullable(
@@ -196,7 +189,7 @@ export async function GET(request: NextRequest) {
         ebook_total: ebookTotal,
         vol_total: volTotal,
         serial_titles: serialTotal,
-        other_materials_pct: otherMaterialsPct,
+        other_materials: otherMaterialsVal,
         personnel_support: personnel?.psftotal ?? null,
       };
     });
