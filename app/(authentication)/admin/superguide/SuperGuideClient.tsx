@@ -263,10 +263,37 @@ export default function SuperGuideClient({ userInfo }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Container className="py-6">
+    <div
+      data-cealdb-guide
+      className="min-h-screen bg-gray-50 print:bg-white print:min-h-0"
+    >
+      {/* Style fixes: override global `main` flex-center rule from globals.css, and print-only rules */}
+      <style>{`
+        /* Undo globals.css 'main { display:flex; align-items:center; justify-content:center; min-height:80vh }'
+           which squashes guide content into a narrow centered column. Scope to the guide via data attribute. */
+        [data-cealdb-guide] main {
+          display: block !important;
+          min-height: 0 !important;
+          align-items: stretch !important;
+          justify-content: flex-start !important;
+          margin-bottom: 0 !important;
+        }
+        @media print {
+          @page { margin: 0.5in; }
+          html, body { background: #ffffff !important; }
+          body > header, body > footer { display: none !important; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .border-l-4, details, table { break-inside: avoid; page-break-inside: avoid; }
+          h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+        }
+      `}</style>
+
+      <Container className="py-6 print:p-0 print:space-y-0">
         {/* Breadcrumb */}
-        <div className="mb-4">
+        <div className="mb-4 print:hidden">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -348,7 +375,7 @@ export default function SuperGuideClient({ userInfo }: Props) {
         </div>
 
         {/* Grid: sidebar + main */}
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 print:block print:gap-0">
           {/* Sidebar */}
           <aside className="lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] overflow-y-auto rounded-lg border bg-white shadow-sm print:hidden">
             <div className="p-3 border-b sticky top-0 bg-white z-10">
