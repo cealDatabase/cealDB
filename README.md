@@ -1,6 +1,33 @@
-# cealDB - Library Database Management System
+# cealDB — Library Database Management System
 
 A comprehensive library database management system built with Next.js, Prisma, and PostgreSQL. This application provides forms and interfaces for managing various aspects of library collections including monographic acquisitions, serials, electronic resources, and more.
+
+> **🌐 Live site:** <https://cealstats.org>
+> **🏛️ Owner:** CEAL Statistics Committee (a committee of the Association for Asian Studies)
+> **📬 Most recent maintainer:** Meng Qu — qum@miamioh.edu
+
+---
+
+## 📚 Developer documentation (READ FIRST)
+
+If you are a programmer inheriting this codebase, **start here** before
+reading anything else in this README:
+
+- **English (primary):** [`docs/README.md`](./docs/README.md)
+- **中文（次）：** [`docs/zh/README.md`](./docs/zh/README.md)
+
+The `docs/` folder contains 9 chapters covering: system overview,
+getting started, architecture, database schema, the annual survey
+cycle (dates, cron, broadcasts), deployment to Vercel/Neon/Resend,
+maintenance and troubleshooting, infrastructure migration, and a glossary
+with contacts and key URLs.
+
+In-app **user guides** (rendered as bilingual HTML pages, not docs):
+
+- Member User Guide: <https://cealstats.org/help> (`app/help/`)
+- Super Admin Guide: <https://cealstats.org/admin/superguide> — sign-in required (`app/(authentication)/admin/superguide/`)
+
+---
 
 ## 🧭 Overview (for librarians and administrators)
 

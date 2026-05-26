@@ -6,13 +6,11 @@
   "private": true,
   "scripts": {
     "start": "next start",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "build": "prisma generate && next build",
     "db:push": "prisma db push",
     "db:reset": "prisma db push --force-reset && prisma db seed && node scripts/fix-all-sequences.js",
     "db:seed": "prisma db seed && node scripts/fix-all-sequences.js",
-    "db:check": "node scripts/pre-deploy-checks.js",
-    "db:verify": "node scripts/post-deploy-verify.js",
     "db:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "lint": "next lint"
