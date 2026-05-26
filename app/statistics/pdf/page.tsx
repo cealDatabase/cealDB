@@ -55,7 +55,7 @@ export default async function PublishedPDFs() {
               <ul role="list" className="mt-4 space-y-2">
                 <li>
                   <Link href="/statistics/pdf/year-pdf-version" className="text-rose-700 hover:underline">
-                    CEAL Statistics PDFs (1957-2019/2020)
+                    CEAL Statistics PDFs (1957–Present)
                   </Link>
                 </li>
               </ul>
