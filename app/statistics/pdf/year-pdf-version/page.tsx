@@ -6,24 +6,32 @@ type HistoricalReport = {
   year: string;
   link?: string;
   note?: string;
+  extraLink?: { label: string; href: string };
 };
 
 // Post-1998: Link to database current view or external sources
 const POST_1998_REPORTS: HistoricalReport[] = [
-  { year: "2024-2025", link: "" },
+  { year: "2024-2025", link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2888&context=jeal" },
   { year: "2023-2024", link: "" },
-  { year: "2022-2023", link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2856&context=jeal" },
+  {
+    year: "2022-2023",
+    link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2856&context=jeal",
+    extraLink: {
+      label: "Five-Year Analysis FY2019\u2013FY2023",
+      href: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2855&context=jeal",
+    },
+  },
   { year: "2021-2022", link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2835&context=jeal" },
-  { year: "2020-2021", link: "" },
-  { year: "2019-2020", link: "" },
+  { year: "2020-2021", link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2807&context=jeal" },
+  { year: "2019-2020", link: "https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2783&context=jeal" },
   { year: "2018-2019", link: "http://hdl.handle.net/1808/30603" },
   { year: "2017-2018", link: "http://hdl.handle.net/1808/29620" },
   { year: "2016-2017", link: "https://kuscholarworks.ku.edu/handle/1808/26456" },
   { year: "2015-2016", link: "http://hdl.handle.net/1808/22713" },
   { year: "2014-2015", link: "http://hdl.handle.net/1808/20316" },
-  { year: "2013-2014", link: "" },
-  { year: "2012-2013", link: "" },
-  { year: "2011-2012", link: "" },
+  { year: "2013-2014", link: "https://kuscholarworks.ku.edu/handle/1808/17117" },
+  { year: "2012-2013", link: "http://hdl.handle.net/1808/13414" },
+  { year: "2011-2012", link: "http://hdl.handle.net/1808/10956" },
   { year: "2010-2011", link: "" },
   { year: "2009-2010", link: "" },
   { year: "2008-2009", link: "" },
@@ -33,9 +41,9 @@ const POST_1998_REPORTS: HistoricalReport[] = [
   { year: "2004-2005", link: "" },
   { year: "2003-2004", link: "" },
   { year: "2002-2003", link: "" },
-  { year: "2001-2002", link: "" },
+  { year: "2001-2002", link: "https://kuscholarworks.ku.edu/bitstream/handle/1808/11201/Summary%20of%20CEAL%20Statistics%202001-2002.pdf" },
   { year: "2000-2001", link: "" },
-  { year: "1999-2000", link: "" },
+  { year: "1999-2000", link: "https://ceal.ku.edu/download/45" },
   { year: "1998-1999", note: "Revised", link: "" },
 ];
 
@@ -84,6 +92,17 @@ function ReportGrid({ reports }: { reports: HistoricalReport[] }) {
             <span className="text-gray-700">{r.year}</span>
           )}
           {r.note && <div className="text-xs text-gray-500 mt-0.5">{r.note}</div>}
+          {r.extraLink && (
+            <Link
+              href={r.extraLink.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-rose-700 hover:underline inline-flex items-center gap-1 mt-1"
+            >
+              {r.extraLink.label}
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+            </Link>
+          )}
         </div>
       ))}
     </div>
