@@ -61,10 +61,15 @@ const PRE_1998_REPORTS: HistoricalReport[] = [
   { year: "1988-1989", link: "/docs/historical/ceal-stats-1988-1989.pdf" },
   { year: "1987-1988", link: "/docs/historical/ceal-stats-1987-1988.pdf" },
   { year: "1979-1980", link: "/docs/historical/ceal-stats-1979-1980.pdf" },
-  { year: "1975", link: "/docs/historical/ceal-stats-1975.pdf" },
+  {
+    year: "1975", link: "/docs/historical/ceal-stats-1975.pdf",
+    extraLink: {
+      label: "1969-1975 Multi-year compilation",
+      href: "/docs/historical/ceal-stats-1975.pdf",
+    }
+  },
   { year: "1973", link: "/docs/historical/ceal-stats-1973.pdf" },
   { year: "1970 and Pre-1970", link: "/docs/historical/ceal-stats-1970.pdf" },
-  { year: "1969-1975", note: "Multi-year compilation", link: "" },
   { year: "1968", link: "/docs/historical/ceal-stats-1968.pdf" },
   { year: "1967", link: "/docs/historical/ceal-stats-1967.pdf" },
   { year: "1965", link: "/docs/historical/ceal-stats-1965.pdf" },
