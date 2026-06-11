@@ -132,8 +132,14 @@ export async function GET(
       csvRows.push(row.join(','));
     }
 
-    // Add UTF-8 BOM for proper Excel encoding of CJK characters
-    const csvContent = '\uFEFF' + csvRows.join('\n');
+    // Encode as UTF-8 bytes with explicit BOM so Excel always opens correctly
+    const csvString = csvRows.join('\n');
+    const encoder = new TextEncoder();
+    const csvBytes = encoder.encode(csvString);
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const csvContent = new Uint8Array(bom.length + csvBytes.length);
+    csvContent.set(bom, 0);
+    csvContent.set(csvBytes, bom.length);
 
     // Return CSV response with UTF-8 charset
     return new NextResponse(csvContent, {

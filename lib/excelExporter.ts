@@ -198,16 +198,21 @@ export class ExcelExporter {
     // Helper to round numbers to 2 decimal places
     const round2 = (num: number): number => Math.round(num * 100) / 100;
     
+    // Build ordered list of field keys (excluding notes)
+    const orderedFields = Object.keys(config.fieldMapping).filter(
+      (field) => !(config.notesField && field === config.notesField)
+    );
+
     // Add data rows (excluding notes field)
     config.data.forEach((record) => {
       const rowData: any[] = [];
-      Object.keys(config.fieldMapping).forEach((field) => {
-        // Skip notes field - it will be added at the bottom
-        if (config.notesField && field === config.notesField) {
+      orderedFields.forEach((field) => {
+        const value = record[field];
+        // Year field: always store as plain string so Excel never adds thousand separators
+        if (field === 'year') {
+          rowData.push(value !== null && value !== undefined ? String(value) : '');
           return;
         }
-        
-        const value = record[field];
         // Handle different data types
         if (value === null || value === undefined) {
           rowData.push('');
@@ -228,13 +233,8 @@ export class ExcelExporter {
       // Format numeric cells based on form type
       row.eachCell((cell, colNumber) => {
         if (typeof cell.value === 'number') {
-          // First column (Year) should always be integer format
-          if (colNumber === 1) {
-            cell.numFmt = '0';
-          } else {
-            // Fiscal and Personnel forms get 2 decimal places, others get 0
-            cell.numFmt = needsDecimals ? '0.00' : '0';
-          }
+          // Fiscal and Personnel forms get 2 decimal places, others get 0
+          cell.numFmt = needsDecimals ? '0.00' : '0';
         }
       });
     });
@@ -291,25 +291,23 @@ export class ExcelExporter {
 
       // Add notes data rows
       config.data.forEach((record) => {
-        const year = record['year'] || '';
+        // Always store year as string to avoid thousand-separator formatting
+        const yearVal = record['year'];
+        const yearStr = yearVal !== null && yearVal !== undefined ? String(yearVal) : '';
         const institutionName = record['Library_Year.Library.library_name'] || '';
         const notes = config.notesField ? (record[config.notesField] || '') : '';
         
         // Only add row if there are notes
         if (notes && notes.trim() !== '') {
-          const notesRow = worksheet.addRow([year, institutionName, notes]);
+          const notesRow = worksheet.addRow([yearStr, institutionName, notes]);
           notesRow.alignment = { vertical: 'top', wrapText: true };
-          notesRow.eachCell((cell, colNumber) => {
+          notesRow.eachCell((cell) => {
             cell.border = {
               top: { style: 'thin' },
               left: { style: 'thin' },
               bottom: { style: 'thin' },
               right: { style: 'thin' }
             };
-            // Format year column as integer
-            if (colNumber === 1 && typeof cell.value === 'number') {
-              cell.numFmt = '0';
-            }
           });
         }
       });
