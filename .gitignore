@@ -49,3 +49,4 @@ next-env.d.ts
 *.test.*
 github-recovery-codes.txt
 /reports
+recovery-codes.txt
