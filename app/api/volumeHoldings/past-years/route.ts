@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/db";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     const libraryId = parseInt(libidParam);
-    const currentYear = new Date().getFullYear();
+    const currentYear = await getActiveSurveyYear();
     
     // Calculate past 5 years (excluding current year)
     const pastYears = Array.from({ length: 5 }, (_, i) => currentYear - 1 - i);

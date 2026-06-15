@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 export async function GET(
   req: Request,
@@ -17,7 +18,7 @@ export async function GET(
     }
 
     const libraryId = Number(libid);
-    const currentYear = new Date().getFullYear();
+    const currentYear = await getActiveSurveyYear();
 
     // Find Library_Year record
     let libraryYear = await db.library_Year.findFirst({

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { verifyJWTToken } from '@/lib/auth';
 
 const prisma = db;
 
@@ -8,6 +10,12 @@ export async function GET(
   context: { params: Promise<{ year: string }> }
 ) {
   try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken || !verifyJWTToken(sessionToken)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { year } = await context.params;
     const yearNum = parseInt(year);
 

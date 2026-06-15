@@ -3,6 +3,7 @@ import { ExcelExporter, getNestedValue } from '@/lib/excelExporter';
 import { formFieldMappings, notesFields } from '@/lib/formFieldMappings';
 import db from "@/lib/db";
 import { Buffer } from "node:buffer";
+import { hasValidSession } from "@/lib/auth";
 
 const prisma = db;
 
@@ -350,6 +351,10 @@ const FORM_FULL_TITLES: { [key: string]: string } = {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!(await hasValidSession())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { libraryId, years, forms } = body;
 

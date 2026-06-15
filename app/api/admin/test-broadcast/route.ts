@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isSuperAdminDb } from '@/lib/auth';
 import { Resend } from 'resend';
 import { getSurveyDates } from '@/lib/surveyDates';
 import { formatAsEasternTime } from '@/lib/timezoneUtils';
@@ -18,10 +19,10 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🧪 TEST BROADCAST - Email only, no database changes');
 
-    const { year, openingDate, closingDate, userRoles, testEmail } = await request.json();
+    const { year, openingDate, closingDate, testEmail } = await request.json();
 
-    // Verify user is super admin
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }

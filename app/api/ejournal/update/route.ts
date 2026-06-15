@@ -1,9 +1,14 @@
 // /app/api/ejournal/update/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { hasValidSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
+    if (!(await hasValidSession())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
 
     const {

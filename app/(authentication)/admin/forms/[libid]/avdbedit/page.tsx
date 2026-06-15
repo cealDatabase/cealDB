@@ -13,6 +13,7 @@ import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -32,8 +33,8 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   const cookieStore = await cookies();
   
-  // Parse year early so we can use it in error messages
-  const year = sp.year ? Number(sp.year) : 2025;
+  // Parse year: prefer URL param, otherwise use the centralized SurveySession year
+  const year = sp.year ? Number(sp.year) : await getActiveSurveyYear();
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;

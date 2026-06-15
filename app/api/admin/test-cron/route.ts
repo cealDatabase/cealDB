@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isSuperAdminDb } from '@/lib/auth';
 import { 
   sendFormsOpenedNotification, 
   sendFormsClosedNotification,
@@ -34,10 +35,10 @@ export async function POST(request: NextRequest) {
   console.log('🧪 TEST CRON: Manual trigger started:', new Date().toISOString());
 
   try {
-    const { action, year, userRoles, testMode = false, testEmails = [] } = await request.json();
+    const { action, year, testMode = false, testEmails = [] } = await request.json();
 
-    // Verify user is super admin
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }

@@ -158,6 +158,42 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   }
 }
 
+// Lightweight session guard for API routes: returns true only when the
+// request carries a valid signed JWT session cookie.
+export async function hasValidSession(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken) return false;
+    return verifyJWTToken(sessionToken) !== null;
+  } catch {
+    return false;
+  }
+}
+
+// Server-side super admin check backed by the database.
+// Verifies the JWT session cookie, then checks Users_Roles for role_id=1.
+// NEVER trust roles supplied in a request body — use this instead.
+export async function isSuperAdminDb(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken) return false;
+
+    const payload = verifyJWTToken(sessionToken);
+    if (!payload?.userId) return false;
+
+    const superAdminRole = await db.users_Roles.findFirst({
+      where: { user_id: payload.userId, role_id: 1 },
+      select: { user_id: true },
+    });
+    return superAdminRole !== null;
+  } catch (error) {
+    console.error('isSuperAdminDb error:', error);
+    return false;
+  }
+}
+
 // Set session cookies with consistent configuration
 export async function setSessionCookies(user: SessionUser, token: string) {
   const cookieStore = await cookies();

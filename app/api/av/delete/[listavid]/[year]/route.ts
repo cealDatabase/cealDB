@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { hasValidSession } from "@/lib/auth";
 
 export async function DELETE(
   req: Request,
   context: { params: Promise<{ listavid: string, year: string }> }
 ) {
+  if (!(await hasValidSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   // ✅ Await the params, then pull out listavid and year
   const { listavid, year } = await context.params;
 

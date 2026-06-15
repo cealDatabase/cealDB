@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isSuperAdminDb } from '@/lib/auth';
 import { getSurveyDates } from '@/lib/surveyDates';
 import { logUserAction } from '@/lib/auditLogger';
 
@@ -76,10 +77,10 @@ export async function GET(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
-    const { year, openingDate, closingDate, userRoles } = await request.json();
+    const { year, openingDate, closingDate } = await request.json();
 
-    // Verify user is super admin
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isSuperAdminDb } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
@@ -11,10 +12,10 @@ const prisma = db;
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const { year, userRoles } = await request.json();
+    const { year } = await request.json();
 
-    // Verify user is super admin (role ID 1)
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }

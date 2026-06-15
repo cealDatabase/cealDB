@@ -1,12 +1,13 @@
 // /app/api/electronic-books/status/[libid]/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 export async function GET(req: Request, { params }: { params: Promise<{ libid: string }> }) {
   try {
     const { libid: libidStr } = await params;
     const libid = Number(libidStr);
-    const currentYear = new Date().getFullYear();
+    const currentYear = await getActiveSurveyYear();
 
     if (isNaN(libid)) {
       return NextResponse.json(

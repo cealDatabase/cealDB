@@ -2,9 +2,14 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
+import { hasValidSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
+    if (!(await hasValidSession())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { id, counts, language, year, ...updateData } = body;
 

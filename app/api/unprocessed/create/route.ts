@@ -4,6 +4,7 @@ import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 import { hasValidUnprocessedData } from "@/lib/formValidation";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     }
 
     const libraryId = Number(libid);
-    const currentYear = new Date().getFullYear();
+    const currentYear = await getActiveSurveyYear();
 
     // Find Library_Year record for current year and library
     let libraryYear = await db.library_Year.findFirst({

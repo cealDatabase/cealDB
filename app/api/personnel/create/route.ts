@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
+import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 import { hasValidPersonnelData } from "@/lib/formValidation";
 
 export async function POST(req: Request) {
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     }
 
     const libraryId = Number(libid);
-    const currentYear = new Date().getFullYear();
+    const currentYear = await getActiveSurveyYear();
 
     // Check if Library_Year exists and is open for editing
     let libraryYear = await db.library_Year.findFirst({

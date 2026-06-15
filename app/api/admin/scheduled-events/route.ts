@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isSuperAdminDb } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
@@ -58,10 +59,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { event_type, year, scheduled_date, userRoles, notes } = await request.json();
+    const { event_type, year, scheduled_date, notes } = await request.json();
 
-    // Verify user is super admin
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }
@@ -153,10 +154,10 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const { eventId, userRoles } = await request.json();
+    const { eventId } = await request.json();
 
-    // Verify user is super admin
-    if (!userRoles || !userRoles.includes('1')) {
+    // Verify user is super admin (DB-backed, never trust request body)
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
         { status: 403 }

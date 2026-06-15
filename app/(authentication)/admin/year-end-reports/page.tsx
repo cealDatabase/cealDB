@@ -37,14 +37,24 @@ export default function YearEndReportsPage() {
   const [exportedForms, setExportedForms] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Generate available years (current year and past 10 years)
-    const currentYear = new Date().getFullYear() - 1;
-    const years = [];
-    for (let i = 0; i < 20; i++) {
-      years.push(currentYear - i);
+    // Fetch the authoritative reporting year from SurveySession
+    async function init() {
+      let reportingYear: number;
+      try {
+        const res = await fetch('/api/current-survey-year');
+        const data = await res.json();
+        reportingYear = data.reporting ?? (new Date().getFullYear() - 1);
+      } catch {
+        reportingYear = new Date().getFullYear() - 1;
+      }
+      const years = [];
+      for (let i = 0; i < 20; i++) {
+        years.push(reportingYear - i);
+      }
+      setAvailableYears(years);
+      setSelectedYear(reportingYear.toString());
     }
-    setAvailableYears(years);
-    setSelectedYear(currentYear.toString());
+    init();
   }, []);
 
   const handleExport = async (formType: string, formName: string) => {

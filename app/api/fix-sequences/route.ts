@@ -1,6 +1,8 @@
 // /app/api/fix-sequences/route.ts
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
+import { verifyJWTToken } from "@/lib/auth";
 
 const CRITICAL_TABLES = [
   "List_AV",
@@ -49,6 +51,13 @@ async function resetSequenceFor(table: string) {
 
 export async function POST(req: Request) {
   try {
+    // Require a valid signed-in session (this route mutates DB sequences)
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("session")?.value;
+    if (!sessionToken || !verifyJWTToken(sessionToken)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     console.log("🔧 Auto-fixing sequences for create pages...");
     
     const results = [];

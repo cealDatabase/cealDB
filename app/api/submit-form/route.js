@@ -1,10 +1,14 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
 import { findMaxId } from "@/data/fetchPrisma";
-// import { connect } from "http2";
+import { hasValidSession } from "@/lib/auth";
 
 export async function POST(request) {
   try {
+    if (!(await hasValidSession())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await request.json();
 
     const maxId = await findMaxId();

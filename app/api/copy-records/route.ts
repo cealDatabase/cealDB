@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { ResourceType, CopyRecord, RESOURCE_TYPES } from "@/lib/copyRecords";
 import { logUserAction } from "@/lib/auditLogger";
 import { fixSequenceForTable } from "@/lib/sequenceFixer";
+import { verifyJWTToken } from "@/lib/auth";
 
 // POST /api/copy-records
 // Expects JSON body: { resource: "av"|"ebook"|"ejournal", targetYear: number, records: Array<{id:number, counts:number}> }
@@ -10,7 +12,14 @@ import { fixSequenceForTable } from "@/lib/sequenceFixer";
 export async function POST(request: Request) {
   try {
     console.log("/api/copy-records: Start processing request");
-    
+
+    // Require a valid signed-in session (this route mutates count tables)
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("session")?.value;
+    if (!sessionToken || !verifyJWTToken(sessionToken)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Parse and type-check the request
     const body = await request.json();
     const resource = body.resource as ResourceType;
