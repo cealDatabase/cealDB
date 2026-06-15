@@ -354,7 +354,99 @@ export async function GET(request: NextRequest) {
     });
     const myLibraryName = library?.library_name ?? "Your Institution";
 
-    // Compute rankings for each metric
+    // Check if a specific metric is requested for full ranking view
+    const metricParam = sp.get("metric");
+    const targetMetric = metricParam
+      ? METRICS.find((m) => m.label === metricParam)
+      : null;
+
+    // If a specific metric is requested, return full ranking list
+    if (targetMetric) {
+      const selectFields = targetMetric.fields
+        ? Object.fromEntries(targetMetric.fields.map((f) => [f, true]))
+        : { [targetMetric.field as string]: true };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const modelRepo = db[targetMetric.model] as any;
+
+      // Fetch all rows with library info
+      const allRows = await modelRepo.findMany({
+        where: { Library_Year: { year: targetYear } },
+        select: {
+          ...selectFields,
+          libraryyear: true,
+          Library_Year: { select: { library: true } },
+        },
+      });
+
+      // Get library names
+      const libraryIds = [
+        ...new Set(
+          allRows.map(
+            (r: { Library_Year: { library: number } }) =>
+              r.Library_Year.library,
+          ),
+        ),
+      ] as number[];
+      const libraries = await db.library.findMany({
+        where: { id: { in: libraryIds } },
+        select: { id: true, library_name: true },
+      });
+      const libMap: Record<number, string> = Object.fromEntries(
+        libraries.map((l) => [l.id, l.library_name]),
+      );
+
+      // Compute values and build full ranking
+      const getValue = (r: Record<string, unknown>): number =>
+        targetMetric.compute
+          ? targetMetric.compute(r)
+          : numVal(r, targetMetric.field as string);
+
+      interface RankingItem {
+        libraryId: number;
+        libraryName: string;
+        value: number;
+      }
+
+      const sortedItems: RankingItem[] = (allRows as Record<string, unknown>[])
+        .map((r) => ({
+          libraryId: (r.Library_Year as { library: number }).library,
+          libraryName:
+            libMap[(r.Library_Year as { library: number }).library] ||
+            "Unknown",
+          value: getValue(r),
+        }))
+        .filter((r: RankingItem) => r.value > 0)
+        .sort((a: RankingItem, b: RankingItem) => b.value - a.value);
+
+      // Add ranks with tie handling
+      const fullRanking: Array<{
+        libraryId: number;
+        libraryName: string;
+        value: number;
+        rank: number;
+      }> = [];
+      let currentRank = 1;
+      for (let idx = 0; idx < sortedItems.length; idx++) {
+        const r = sortedItems[idx];
+        if (idx > 0 && r.value < sortedItems[idx - 1].value) {
+          currentRank = idx + 1;
+        }
+        fullRanking.push({ ...r, rank: currentRank });
+      }
+
+      return NextResponse.json({
+        fullRanking,
+        metric: targetMetric.label,
+        category: targetMetric.category,
+        availableYears,
+        year: targetYear,
+        libraryId,
+        libraryName: myLibraryName,
+      });
+    }
+
+    // Compute rankings for each metric (summary view)
     const rankings: {
       category: string;
       label: string;
