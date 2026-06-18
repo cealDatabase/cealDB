@@ -198,6 +198,56 @@ const METRICS: Metric[] = [
     field: "etotal_expenditure_grandtotal",
   },
 
+  // Total Electronic Digital Resources Rankings (Section 2.3 = 2.1 + 2.2)
+  {
+    category: "Total Electronic Digital Resources Rankings",
+    label: "Chinese",
+    model: "electronic",
+    fields: ["eindex_electronic_title_chinese", "efulltext_electronic_title_chinese"],
+    compute: (r: Record<string, unknown>) =>
+      numVal(r, "eindex_electronic_title_chinese") + numVal(r, "efulltext_electronic_title_chinese"),
+  },
+  {
+    category: "Total Electronic Digital Resources Rankings",
+    label: "Japanese",
+    model: "electronic",
+    fields: ["eindex_electronic_title_japanese", "efulltext_electronic_title_japanese"],
+    compute: (r: Record<string, unknown>) =>
+      numVal(r, "eindex_electronic_title_japanese") + numVal(r, "efulltext_electronic_title_japanese"),
+  },
+  {
+    category: "Total Electronic Digital Resources Rankings",
+    label: "Korean",
+    model: "electronic",
+    fields: ["eindex_electronic_title_korean", "efulltext_electronic_title_korean"],
+    compute: (r: Record<string, unknown>) =>
+      numVal(r, "eindex_electronic_title_korean") + numVal(r, "efulltext_electronic_title_korean"),
+  },
+  {
+    category: "Total Electronic Digital Resources Rankings",
+    label: "Non-CJK",
+    model: "electronic",
+    fields: ["eindex_electronic_title_noncjk", "efulltext_electronic_title_noncjk"],
+    compute: (r: Record<string, unknown>) =>
+      numVal(r, "eindex_electronic_title_noncjk") + numVal(r, "efulltext_electronic_title_noncjk"),
+  },
+  {
+    category: "Total Electronic Digital Resources Rankings",
+    label: "Total Electronic Digital Resources",
+    model: "electronic",
+    fields: [
+      "eindex_electronic_title_chinese", "efulltext_electronic_title_chinese",
+      "eindex_electronic_title_japanese", "efulltext_electronic_title_japanese",
+      "eindex_electronic_title_korean", "efulltext_electronic_title_korean",
+      "eindex_electronic_title_noncjk", "efulltext_electronic_title_noncjk",
+    ],
+    compute: (r: Record<string, unknown>) =>
+      numVal(r, "eindex_electronic_title_chinese") + numVal(r, "efulltext_electronic_title_chinese") +
+      numVal(r, "eindex_electronic_title_japanese") + numVal(r, "efulltext_electronic_title_japanese") +
+      numVal(r, "eindex_electronic_title_korean") + numVal(r, "efulltext_electronic_title_korean") +
+      numVal(r, "eindex_electronic_title_noncjk") + numVal(r, "efulltext_electronic_title_noncjk"),
+  },
+
   // Total Holdings Rankings
   {
     category: "Total Holdings Rankings",

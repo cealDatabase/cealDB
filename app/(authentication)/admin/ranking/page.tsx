@@ -297,8 +297,7 @@ export default function RankingPage() {
               ))}
 
               <p className='text-xs text-muted-foreground text-center pb-4'>
-                Rankings are computed among institutions that reported data for
-                each metric. Tied values share the same rank.
+                Note: Each ranking is calculated based on institutions that reported data for the particular metric in the given year. Tied values share the same rank.
               </p>
             </div>
 
