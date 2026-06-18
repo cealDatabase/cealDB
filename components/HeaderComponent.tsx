@@ -49,7 +49,7 @@ export function HeaderComponent({
             <span className="sr-only">
               The Council on East Asian Libraries (CEAL) Statistics
             </span>
-            <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
+            <img className="h-18 w-auto" src="/logo.jpg" alt="CEAL logo" />
           </Link>
         </div>
         {/* Mobile menu drawer trigger */}
@@ -159,7 +159,7 @@ export function HeaderComponent({
                 <span className="sr-only">
                   The Council on East Asian Libraries (CEAL) Statistics
                 </span>
-                <img className="h-18 w-auto" src="/logo.png" alt="CEAL logo" />
+                <img className="h-18 w-auto" src="/logo.jpg" alt="CEAL logo" />
               </Link>
             </DrawerTitle>
             <DrawerClose asChild>
