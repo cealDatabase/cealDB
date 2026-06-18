@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -29,6 +30,14 @@ export async function GET(request: NextRequest) {
     const buffer = await generateOrganizationalStructureReport(yearNum);
     const uint8Array = new Uint8Array(buffer);
     const filename = `Organizational_Structure-${year}.xlsx`;
+
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Organizational Structure Report',
+      newValues: { year: yearNum, format: 'xlsx' },
+      success: true,
+    }, request);
 
     return new NextResponse(uint8Array, {
       headers: {

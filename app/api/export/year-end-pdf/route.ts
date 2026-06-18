@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
 import { PdfExporter } from '@/lib/pdfExporter';
+import { logAuditEvent } from '@/lib/auditLogger';
 import {
   getTable1Config,
   getTable2Config,
@@ -763,6 +764,14 @@ export async function GET(request: NextRequest) {
 
     const buffer = await exporter.generateBuffer();
     const uint8Array = new Uint8Array(buffer);
+
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Year-End PDF Report',
+      newValues: { year: yearNum, format: 'pdf' },
+      success: true,
+    }, request);
 
     return new NextResponse(uint8Array, {
       headers: {

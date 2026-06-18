@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
 import { verifyJWTToken } from '@/lib/auth';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -148,6 +149,14 @@ export async function GET(
     const csvContent = new Uint8Array(bom.length + csvBytes.length);
     csvContent.set(bom, 0);
     csvContent.set(csvBytes, bom.length);
+
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'EBook Database CSV',
+      newValues: { year: yearNum, format: 'csv', recordCount: records.length },
+      success: true,
+    }, request);
 
     // Return CSV response with UTF-8 charset
     return new NextResponse(csvContent, {

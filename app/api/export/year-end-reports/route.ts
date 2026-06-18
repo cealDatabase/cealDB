@@ -3,6 +3,7 @@ import { ExcelExporter, getNestedValue } from '@/lib/excelExporter';
 import { formFieldMappings, notesFields } from '@/lib/formFieldMappings';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -237,19 +238,27 @@ export async function GET(request: NextRequest) {
     const yearNum = parseInt(year);
 
     // If formType is 'all', export all forms in a single workbook
+    let response: NextResponse;
     if (formType === 'all') {
-      return await exportAllForms(yearNum);
-    }
-
-    // Export single form
-    if (!formType) {
+      response = await exportAllForms(yearNum);
+    } else if (!formType) {
       return NextResponse.json(
         { error: 'Form type parameter is required' },
         { status: 400 }
       );
+    } else {
+      response = await exportSingleForm(formType, yearNum);
     }
 
-    return await exportSingleForm(formType, yearNum);
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Year-End Excel Report',
+      newValues: { year: yearNum, formType: formType || 'all', format: 'xlsx' },
+      success: true,
+    }, request);
+
+    return response;
   } catch (error) {
     console.error('Export error:', error);
     return NextResponse.json(

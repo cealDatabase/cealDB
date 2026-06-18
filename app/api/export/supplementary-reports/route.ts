@@ -4,6 +4,7 @@ import db from '@/lib/db';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 import archiver from 'archiver';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -69,18 +70,27 @@ export async function GET(request: NextRequest) {
     const yearNum = parseInt(year);
     const userCtx = await getUserContext();
 
+    let response: NextResponse;
     if (reportType === 'batch') {
-      return await exportBatchReports(yearNum, userCtx);
-    }
-
-    if (!reportType) {
+      response = await exportBatchReports(yearNum, userCtx);
+    } else if (!reportType) {
       return NextResponse.json(
         { error: 'Report type parameter is required' },
         { status: 400 }
       );
+    } else {
+      response = await exportSingleReport(reportType, yearNum, userCtx);
     }
 
-    return await exportSingleReport(reportType, yearNum, userCtx);
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Supplementary Report',
+      newValues: { year: yearNum, reportType: reportType || 'batch', format: 'xlsx' },
+      success: true,
+    }, request);
+
+    return response;
   } catch (error) {
     console.error('Export error:', error);
     return NextResponse.json(

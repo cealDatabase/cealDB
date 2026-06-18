@@ -4,6 +4,7 @@ import db from '@/lib/db';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 import archiver from 'archiver';
+import { logAuditEvent } from '@/lib/auditLogger';
 import { Readable } from 'stream';
 import {
   hasValidFiscalData,
@@ -61,18 +62,27 @@ export async function GET(request: NextRequest) {
 
     const yearNum = parseInt(year);
 
+    let response: NextResponse;
     if (reportType === 'batch') {
-      return await exportBatchReports(yearNum);
-    }
-
-    if (!reportType) {
+      response = await exportBatchReports(yearNum);
+    } else if (!reportType) {
       return NextResponse.json(
         { error: 'Report type parameter is required' },
         { status: 400 }
       );
+    } else {
+      response = await exportSingleReport(reportType, yearNum);
     }
 
-    return await exportSingleReport(reportType, yearNum);
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Participation Report',
+      newValues: { year: yearNum, reportType: reportType || 'batch', format: 'xlsx' },
+      success: true,
+    }, request);
+
+    return response;
   } catch (error) {
     console.error('Export error:', error);
     return NextResponse.json(

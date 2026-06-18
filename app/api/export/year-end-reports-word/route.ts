@@ -3,6 +3,7 @@ import { WordExporter } from '@/lib/wordExporter';
 import { formFieldMappings, notesFields } from '@/lib/formFieldMappings';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -217,18 +218,27 @@ export async function GET(request: NextRequest) {
 
     const yearNum = parseInt(year);
     
+    let response: NextResponse;
     if (formType === 'all') {
-      return await exportAllFormsWord(yearNum);
-    }
-
-    if (!formType) {
+      response = await exportAllFormsWord(yearNum);
+    } else if (!formType) {
       return NextResponse.json(
         { error: 'Form type parameter is required' },
         { status: 400 }
       );
+    } else {
+      response = await exportSingleFormWord(formType, yearNum);
     }
 
-    return await exportSingleFormWord(formType, yearNum);
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Year-End Word Report',
+      newValues: { year: yearNum, formType: formType || 'all', format: 'docx' },
+      success: true,
+    }, request);
+
+    return response;
   } catch (error) {
     console.error('Word export error:', error);
     return NextResponse.json(

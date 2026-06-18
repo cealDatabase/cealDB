@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { XCircle, CheckCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { XCircle, CheckCircle, ArrowLeft, Eye, EyeOff, Cookie, ShieldCheck } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -25,6 +25,49 @@ export default function SignInPage() {
   const [emailCheckError, setEmailCheckError] = React.useState<any>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [cookieConsent, setCookieConsent] = React.useState<'accepted' | 'declined' | null>(null);
+  const [showCookieBanner, setShowCookieBanner] = React.useState(false);
+
+  // Check for existing cookie consent on mount
+  React.useEffect(() => {
+    const consent = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('cookie_consent='))
+      ?.split('=')[1];
+    if (consent === 'accepted') {
+      setCookieConsent('accepted');
+      setShowCookieBanner(false);
+    } else if (consent === 'declined') {
+      setCookieConsent('declined');
+      setShowCookieBanner(false);
+    } else {
+      setShowCookieBanner(true);
+    }
+  }, []);
+
+  const handleAcceptCookies = () => {
+    document.cookie = 'cookie_consent=accepted; path=/; max-age=31536000; SameSite=Lax';
+    setCookieConsent('accepted');
+    setShowCookieBanner(false);
+    // Log consent to audit trail
+    fetch('/api/cookie-consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'accepted' }),
+    }).catch(() => {});
+  };
+
+  const handleDeclineCookies = () => {
+    document.cookie = 'cookie_consent=declined; path=/; max-age=31536000; SameSite=Lax';
+    setCookieConsent('declined');
+    setShowCookieBanner(false);
+    // Log declined consent to audit trail
+    fetch('/api/cookie-consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'declined' }),
+    }).catch(() => {});
+  };
 
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,6 +76,17 @@ export default function SignInPage() {
 
     if (!email) {
       setEmailCheckError({ message: 'Please enter your email address.' });
+      return;
+    }
+
+    // Block login if cookies were not accepted
+    if (cookieConsent !== 'accepted') {
+      setEmailCheckError({
+        message: 'Cookie consent required',
+        hint: 'You must accept cookies to sign in to the CEAL Statistics Database. Cookies are essential for authentication and session management.',
+        suggestions: ['Please accept cookies using the banner below to continue.']
+      });
+      setShowCookieBanner(true);
       return;
     }
 
@@ -168,6 +222,7 @@ export default function SignInPage() {
   };
 
   return (
+    <>
     <AuthLayout
       title={getTitle()}
       subtitle={getSubtitle()}
@@ -409,6 +464,67 @@ export default function SignInPage() {
           </div>
         </div>
       )}
+      {/* Cookie Consent Declined Message */}
+      {cookieConsent === 'declined' && (
+        <div className="rounded-md bg-amber-50 border border-amber-200 p-4 mt-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Cookie className="h-5 w-5 text-amber-500" aria-hidden="true" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-amber-800">
+                Cookies Required for Sign In
+              </h3>
+              <p className="mt-1 text-sm text-amber-700">
+                You have declined cookies. The CEAL Statistics Database requires cookies for authentication and session management.
+                You must accept cookies to sign in.
+              </p>
+              <button
+                onClick={handleAcceptCookies}
+                className="mt-3 inline-flex items-center px-3 py-1.5 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+              >
+                <ShieldCheck className="h-4 w-4 mr-1.5" />
+                Accept Cookies Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthLayout>
+
+    {/* Cookie Consent Banner */}
+    {showCookieBanner && (
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 text-white shadow-lg border-t border-gray-700">
+        <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <Cookie className="h-6 w-6 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium">Cookie Notice</p>
+                <p className="text-xs text-gray-300 mt-1">
+                  The CEAL Statistics Database uses essential cookies for authentication, session management, and security.
+                  You must accept cookies to sign in and use this application.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 flex-shrink-0 w-full sm:w-auto">
+              <button
+                onClick={handleDeclineCookies}
+                className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors"
+              >
+                Decline
+              </button>
+              <button
+                onClick={handleAcceptCookies}
+                className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md transition-colors"
+              >
+                Accept Cookies
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

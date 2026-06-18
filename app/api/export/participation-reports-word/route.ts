@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { logAuditEvent } from '@/lib/auditLogger';
 import { 
   Document, 
   Packer, 
@@ -74,18 +75,27 @@ export async function GET(request: NextRequest) {
 
     const yearNum = parseInt(year);
 
+    let response: NextResponse;
     if (reportType === 'batch') {
-      return await exportBatchReportsWord(yearNum);
-    }
-
-    if (!reportType) {
+      response = await exportBatchReportsWord(yearNum);
+    } else if (!reportType) {
       return NextResponse.json(
         { error: 'Report type parameter is required' },
         { status: 400 }
       );
+    } else {
+      response = await exportSingleReportWord(reportType, yearNum);
     }
 
-    return await exportSingleReportWord(reportType, yearNum);
+    // Audit log the export
+    await logAuditEvent({
+      action: 'EXPORT',
+      tableName: 'Participation Word Report',
+      newValues: { year: yearNum, reportType: reportType || 'batch', format: 'docx' },
+      success: true,
+    }, request);
+
+    return response;
   } catch (error) {
     console.error('Word export error:', error);
     return NextResponse.json(
