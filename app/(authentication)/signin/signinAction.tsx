@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import db from '@/lib/db';
 import { verifyPassword, generateJWTToken } from '@/lib/auth';
@@ -23,6 +23,13 @@ export default async function signinAction(
       hint: 'Please enter both your username and password to sign in.',
     };
   }
+
+  // Get client info from headers
+  const headersList = await headers();
+  const forwarded = headersList.get('x-forwarded-for');
+  const realIp = headersList.get('x-real-ip');
+  const ipAddress = forwarded?.split(',')[0]?.trim() || realIp || 'unknown';
+  const userAgent = headersList.get('user-agent') || null;
 
   try {
     // Find user in database with role and library information - case insensitive
@@ -74,8 +81,8 @@ export default async function signinAction(
           success: false,
           error_message: 'User not found',
           timestamp: new Date(),
-          ip_address: null,
-          user_agent: null
+          ip_address: ipAddress,
+          user_agent: userAgent
         }
       });
       
@@ -109,8 +116,8 @@ export default async function signinAction(
           success: false,
           error_message: 'Invalid password',
           timestamp: new Date(),
-          ip_address: null,
-          user_agent: null
+          ip_address: ipAddress,
+          user_agent: userAgent
         }
       });
 
@@ -199,8 +206,8 @@ export default async function signinAction(
         action: 'SIGNIN',
         success: true,
         timestamp: new Date(),
-        ip_address: null, // We don't have access to IP in server actions
-        user_agent: null  // We don't have access to user agent in server actions
+        ip_address: ipAddress,
+        user_agent: userAgent
       }
     });
 
@@ -228,8 +235,8 @@ export default async function signinAction(
           success: false,
           error_message: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date(),
-          ip_address: null,
-          user_agent: null
+          ip_address: ipAddress,
+          user_agent: userAgent
         }
       });
     } catch (auditError) {

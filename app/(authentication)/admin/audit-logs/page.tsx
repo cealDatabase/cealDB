@@ -20,14 +20,31 @@ async function getAuditLogs(page: number = 1, limit: number = 50, filter?: strin
     
     let whereClause: any = {};
     if (filter) {
-      whereClause = {
-        OR: [
-          { username: { contains: filter, mode: 'insensitive' } },
-          { action: { contains: filter, mode: 'insensitive' } },
-          { table_name: { contains: filter, mode: 'insensitive' } },
-          { error_message: { contains: filter, mode: 'insensitive' } },
-        ],
-      };
+      // Split filter into words to support "Meng Qu" matching firstname + lastname separately
+      const words = filter.trim().split(/\s+/);
+      
+      const baseConditions = [
+        { username: { contains: filter, mode: 'insensitive' } },
+        { action: { contains: filter, mode: 'insensitive' } },
+        { table_name: { contains: filter, mode: 'insensitive' } },
+        { error_message: { contains: filter, mode: 'insensitive' } },
+        { ip_address: { contains: filter, mode: 'insensitive' } },
+        // Search by related User's firstname or lastname
+        { User: { firstname: { contains: filter, mode: 'insensitive' } } },
+        { User: { lastname: { contains: filter, mode: 'insensitive' } } },
+      ];
+
+      // If multiple words, also try matching each word against firstname/lastname
+      if (words.length >= 2) {
+        baseConditions.push({
+          AND: [
+            { User: { firstname: { contains: words[0], mode: 'insensitive' } } },
+            { User: { lastname: { contains: words[words.length - 1], mode: 'insensitive' } } },
+          ],
+        } as any);
+      }
+
+      whereClause = { OR: baseConditions };
     }
 
     const [logs, total] = await Promise.all([
