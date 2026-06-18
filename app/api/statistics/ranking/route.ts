@@ -44,11 +44,44 @@ function currentHoldings(
     numVal(r, `vhwithdrawn_${lang}`);
 }
 
-// Combined print + e-serial total per language
-function serialTotal(lang: "chinese" | "japanese" | "korean" | "noncjk") {
-  return (r: Record<string, unknown>) =>
-    numVal(r, `stotal_${lang}`) + numVal(r, `s_etotal_${lang}`);
+// Fiscal: compute language appropriation subtotal from 4 items, with manual override
+function langAppropriations(lang: "chinese" | "japanese" | "korean" | "noncjk") {
+  return (r: Record<string, unknown>) => {
+    const manual = r[`fs${lang}_appropriations_subtotal_manual`];
+    if (manual !== null && manual !== undefined) return numVal(r, `fs${lang}_appropriations_subtotal_manual`);
+    const stored = r[`fs${lang}_appropriations_subtotal`];
+    if (stored !== null && stored !== undefined) return numVal(r, `fs${lang}_appropriations_subtotal`);
+    return numVal(r, `fs${lang}_appropriations_monographic`) +
+      numVal(r, `fs${lang}_appropriations_serial`) +
+      numVal(r, `fs${lang}_appropriations_other_material`) +
+      numVal(r, `fs${lang}_appropriations_electronic`);
+  };
 }
+
+// All individual fiscal fields needed for computed metrics
+const FISCAL_INDIVIDUAL_FIELDS = [
+  "fschinese_appropriations_monographic", "fschinese_appropriations_serial",
+  "fschinese_appropriations_other_material", "fschinese_appropriations_electronic",
+  "fschinese_appropriations_subtotal", "fschinese_appropriations_subtotal_manual",
+  "fsjapanese_appropriations_monographic", "fsjapanese_appropriations_serial",
+  "fsjapanese_appropriations_other_material", "fsjapanese_appropriations_electronic",
+  "fsjapanese_appropriations_subtotal", "fsjapanese_appropriations_subtotal_manual",
+  "fskorean_appropriations_monographic", "fskorean_appropriations_serial",
+  "fskorean_appropriations_other_material", "fskorean_appropriations_electronic",
+  "fskorean_appropriations_subtotal", "fskorean_appropriations_subtotal_manual",
+  "fsnoncjk_appropriations_monographic", "fsnoncjk_appropriations_serial",
+  "fsnoncjk_appropriations_other_material", "fsnoncjk_appropriations_electronic",
+  "fsnoncjk_appropriations_subtotal", "fsnoncjk_appropriations_subtotal_manual",
+  "fstotal_appropriations", "fstotal_appropriations_manual",
+  "fsendowments_chinese", "fsendowments_japanese", "fsendowments_korean", "fsendowments_noncjk",
+  "fsendowments_subtotal", "fsendowments_subtotal_manual",
+  "fsgrants_chinese", "fsgrants_japanese", "fsgrants_korean", "fsgrants_noncjk",
+  "fsgrants_subtotal", "fsgrants_subtotal_manual",
+  "fseast_asian_program_support_chinese", "fseast_asian_program_support_japanese",
+  "fseast_asian_program_support_korean", "fseast_asian_program_support_noncjk",
+  "fseast_asian_program_support_subtotal", "fseast_asian_program_support_subtotal_manual",
+  "fstotal_acquisition_budget",
+];
 
 const METRICS: Metric[] = [
   // Fiscal Support Rankings
@@ -56,27 +89,43 @@ const METRICS: Metric[] = [
     category: "Fiscal Support Rankings",
     label: "Total Appropriations",
     model: "fiscal_Support",
-    field: "fstotal_appropriations",
+    fields: FISCAL_INDIVIDUAL_FIELDS,
+    compute: (r) => {
+      const manual = r["fstotal_appropriations_manual"];
+      if (manual !== null && manual !== undefined) return numVal(r, "fstotal_appropriations_manual");
+      const stored = r["fstotal_appropriations"];
+      if (stored !== null && stored !== undefined) return numVal(r, "fstotal_appropriations");
+      return langAppropriations("chinese")(r) +
+        langAppropriations("japanese")(r) +
+        langAppropriations("korean")(r) +
+        langAppropriations("noncjk")(r);
+    },
   },
   {
     category: "Fiscal Support Rankings",
     label: "Total CJK Appropriations",
     model: "fiscal_Support",
-    fields: [
-      "fschinese_appropriations_subtotal",
-      "fsjapanese_appropriations_subtotal",
-      "fskorean_appropriations_subtotal",
-    ],
+    fields: FISCAL_INDIVIDUAL_FIELDS,
     compute: (r) =>
-      numVal(r, "fschinese_appropriations_subtotal") +
-      numVal(r, "fsjapanese_appropriations_subtotal") +
-      numVal(r, "fskorean_appropriations_subtotal"),
+      langAppropriations("chinese")(r) +
+      langAppropriations("japanese")(r) +
+      langAppropriations("korean")(r),
   },
   {
     category: "Fiscal Support Rankings",
     label: "Total Endowments",
     model: "fiscal_Support",
-    field: "fsendowments_subtotal",
+    fields: FISCAL_INDIVIDUAL_FIELDS,
+    compute: (r) => {
+      const manual = r["fsendowments_subtotal_manual"];
+      if (manual !== null && manual !== undefined) return numVal(r, "fsendowments_subtotal_manual");
+      const stored = r["fsendowments_subtotal"];
+      if (stored !== null && stored !== undefined) return numVal(r, "fsendowments_subtotal");
+      return numVal(r, "fsendowments_chinese") +
+        numVal(r, "fsendowments_japanese") +
+        numVal(r, "fsendowments_korean") +
+        numVal(r, "fsendowments_noncjk");
+    },
   },
   {
     category: "Fiscal Support Rankings",
@@ -100,13 +149,33 @@ const METRICS: Metric[] = [
     category: "Fiscal Support Rankings",
     label: "Total Grants",
     model: "fiscal_Support",
-    field: "fsgrants_subtotal",
+    fields: FISCAL_INDIVIDUAL_FIELDS,
+    compute: (r) => {
+      const manual = r["fsgrants_subtotal_manual"];
+      if (manual !== null && manual !== undefined) return numVal(r, "fsgrants_subtotal_manual");
+      const stored = r["fsgrants_subtotal"];
+      if (stored !== null && stored !== undefined) return numVal(r, "fsgrants_subtotal");
+      return numVal(r, "fsgrants_chinese") +
+        numVal(r, "fsgrants_japanese") +
+        numVal(r, "fsgrants_korean") +
+        numVal(r, "fsgrants_noncjk");
+    },
   },
   {
     category: "Fiscal Support Rankings",
     label: "Total East Asian Program Support",
     model: "fiscal_Support",
-    field: "fseast_asian_program_support_subtotal",
+    fields: FISCAL_INDIVIDUAL_FIELDS,
+    compute: (r) => {
+      const manual = r["fseast_asian_program_support_subtotal_manual"];
+      if (manual !== null && manual !== undefined) return numVal(r, "fseast_asian_program_support_subtotal_manual");
+      const stored = r["fseast_asian_program_support_subtotal"];
+      if (stored !== null && stored !== undefined) return numVal(r, "fseast_asian_program_support_subtotal");
+      return numVal(r, "fseast_asian_program_support_chinese") +
+        numVal(r, "fseast_asian_program_support_japanese") +
+        numVal(r, "fseast_asian_program_support_korean") +
+        numVal(r, "fseast_asian_program_support_noncjk");
+    },
   },
   {
     category: "Fiscal Support Rankings",
@@ -240,41 +309,36 @@ const METRICS: Metric[] = [
     field: "psfprofessional_subtotal",
   },
 
-  // Serial Subscriptions Rankings — print + e-serial combined
+  // Serial Subscriptions Rankings — print serials only (matches legacy system)
   {
     category: "Serial Subscriptions Rankings",
     label: "Total Current Chinese Serials",
     model: "serials",
-    fields: ["stotal_chinese", "s_etotal_chinese"],
-    compute: serialTotal("chinese"),
+    field: "stotal_chinese",
   },
   {
     category: "Serial Subscriptions Rankings",
     label: "Total Current Japanese Serials",
     model: "serials",
-    fields: ["stotal_japanese", "s_etotal_japanese"],
-    compute: serialTotal("japanese"),
+    field: "stotal_japanese",
   },
   {
     category: "Serial Subscriptions Rankings",
     label: "Total Current Korean Serials",
     model: "serials",
-    fields: ["stotal_korean", "s_etotal_korean"],
-    compute: serialTotal("korean"),
+    field: "stotal_korean",
   },
   {
     category: "Serial Subscriptions Rankings",
     label: "Total Current Non-CJK Serials",
     model: "serials",
-    fields: ["stotal_noncjk", "s_etotal_noncjk"],
-    compute: serialTotal("noncjk"),
+    field: "stotal_noncjk",
   },
   {
     category: "Serial Subscriptions Rankings",
     label: "Total Current Serials",
     model: "serials",
-    fields: ["sgrandtotal", "s_egrandtotal"],
-    compute: (r) => numVal(r, "sgrandtotal") + numVal(r, "s_egrandtotal"),
+    field: "sgrandtotal",
   },
 ];
 
