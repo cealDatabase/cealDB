@@ -267,7 +267,7 @@ const METRICS: Metric[] = [
   },
   {
     category: "Total Physical Volume Holdings Rankings",
-    label: "Total VolumeHoldings",
+    label: "Total Volume Holdings",
     model: "volume_Holdings",
     fields: [
       "vhprevious_year_subtotal",
