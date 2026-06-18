@@ -262,7 +262,7 @@ export default function RankingPage() {
                             onClick={() =>
                               fetchFullRanking(entry.label, category)
                             }
-                            className={`border-b last:border-b-0 cursor-pointer hover:bg-muted/50 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-muted/20"} ${selectedMetric === entry.label ? "bg-blue-50 hover:bg-blue-50" : ""}`}
+                            className={`border-b last:border-b-0 cursor-pointer transition-colors ${selectedMetric === entry.label ? "bg-blue-50/80 hover:bg-blue-50/80 border-l-2 border-l-blue-400" : `${idx % 2 === 0 ? "bg-white" : "bg-muted/20"} hover:bg-muted/50`}`}
                           >
                             <td className='px-4 py-2.5 text-gray-700'>
                               {entry.label}
@@ -303,9 +303,9 @@ export default function RankingPage() {
             </div>
 
             {/* Right Column — Full Ranking Detail (always 1/3 width) */}
-            <div className='w-1/3 min-w-0'>
+            <div className='w-1/3 min-w-0 sticky top-8 self-start'>
               {selectedMetric ? (
-                <Card className='shadow-sm sticky top-4'>
+                <Card className='shadow-sm'>
                   <CardHeader className='pb-3'>
                     <div className='flex items-start justify-between gap-2'>
                       <div className='min-w-0'>
