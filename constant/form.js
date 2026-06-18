@@ -274,6 +274,8 @@ export const superAdminActions = [
       href: '/admin/users',
       secondaryHref: '/signup',
       secondaryLabel: 'Sign Up New User',
+      tertiaryHref: '/admin/audit-logs',
+      tertiaryLabel: 'Audit Logs',
       icon: Shield,
       iconColor: 'text-purple-600',
       iconBg: 'bg-purple-100',

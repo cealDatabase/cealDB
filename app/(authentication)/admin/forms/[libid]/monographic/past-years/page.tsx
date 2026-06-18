@@ -89,16 +89,16 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={3}>Year</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={20}>Monographs Additions</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={2} rowSpan={2}>Total Number of Additions</th>
               </tr>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={10}>Purchased</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={10}>Rec'd but not Purchased</th>
               </tr>
-              <tr className="bg-teal-600 text-white">
+              <tr className="bg-gray-600 text-white">
                 {/* Purchased - Titles */}
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Titles</th>
                 {/* Purchased - Volumes */}
@@ -113,7 +113,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium">Titles<br/>Grand Total</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium">Volumes<br/>Grand Total</th>
               </tr>
-              <tr className="bg-teal-500 text-white text-xs">
+              <tr className="bg-gray-500 text-white text-xs">
                 {/* Empty cell under Year to align properly */}
                 <th className="border border-gray-300 px-2 py-1"></th>
                 

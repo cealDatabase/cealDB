@@ -75,7 +75,7 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Year</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Number of Library Presentations</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Participants in Presentations</th>
@@ -83,12 +83,12 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Number of Total Circulation</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={4}>Interlibrary Loans</th>
               </tr>
-              <tr className="bg-teal-600 text-white text-xs">
+              <tr className="bg-gray-600 text-white text-xs">
                 {/* Interlibrary Loans subcategories */}
                 <th className="border border-gray-300 px-2 py-1" colSpan={2}>Lending Requests</th>
                 <th className="border border-gray-300 px-2 py-1" colSpan={2}>Borrowing Requests</th>
               </tr>
-              <tr className="bg-teal-500 text-white text-xs">
+              <tr className="bg-gray-500 text-white text-xs">
                 {/* Interlibrary Loans fields - we need to add these after the first 5 columns */}
                 <th className="border border-gray-300 px-2 py-1"></th>
                 <th className="border border-gray-300 px-2 py-1"></th>

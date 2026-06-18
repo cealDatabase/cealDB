@@ -47,12 +47,12 @@ export default function PastYearsPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse" style={{fontSize: '10px'}}>
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-1 py-1 text-center" rowSpan={4}>Year</th>
                 <th className="border border-gray-300 px-1 py-1 text-center" colSpan={60}>Computer Files</th>
                 <th className="border border-gray-300 px-1 py-1 text-center" colSpan={16}>Electronic Resources</th>
               </tr>
-              <tr className="bg-teal-600 text-white">
+              <tr className="bg-gray-600 text-white">
                 <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.1 Computer Files<br/>(One-Time/Monographic)</th>
                 <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.2 Accompanied Computer Files</th>
                 <th className="border border-gray-300 px-1 py-1" colSpan={10}>1.3 Computer Files<br/>(One Time Gift)</th>
@@ -64,7 +64,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-1 py-1" colSpan={5}>2.3 Total Electronic</th>
                 <th className="border border-gray-300 px-1 py-1" rowSpan={3}>3. Total Electronic<br/>Resources Expenditure</th>
               </tr>
-              <tr className="bg-teal-500 text-white">
+              <tr className="bg-gray-500 text-white">
                 {[...Array(6)].map((_, idx) => (
                   <React.Fragment key={idx}>
                     <th className="border px-1 py-1" colSpan={2}>CHN</th>
@@ -84,7 +84,7 @@ export default function PastYearsPage() {
                   </React.Fragment>
                 ))}
               </tr>
-              <tr className="bg-teal-400 text-white">
+              <tr className="bg-gray-400 text-white">
                 {[...Array(30)].map((_, idx) => (
                   <React.Fragment key={idx}>
                     <th className="border px-1">T</th>

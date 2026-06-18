@@ -45,7 +45,7 @@ const ExpandableText = ({ content }: { content: string | string[] | null }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        <button className='text-left text-blue-600 font-medium hover:text-primary hover:underline 
         transition-colors cursor-pointer w-full max-w-[250px] min-w-[200px] truncate'>
           {preview}
         </button>
@@ -96,7 +96,7 @@ const ExpandableTextWithSource = ({
           href={dataSource}
           target='_blank'
           rel='noopener noreferrer'
-          className='text-teal-700 hover:text-primary hover:underline font-medium break-all'
+          className='text-blue-600 hover:text-primary hover:underline font-medium break-all'
         >
           {dataSource}
         </a>
@@ -115,7 +115,7 @@ const ExpandableTextWithSource = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-left text-teal-700 font-medium hover:text-primary hover:underline 
+        <button className='text-left text-blue-600 font-medium hover:text-primary hover:underline 
         transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]'>
           <div className='line-clamp-3'>
             {description}
@@ -179,7 +179,7 @@ const ExpandableSubscribers = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className='text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer'>
+        <button className='text-blue-600 font-medium hover:text-primary hover:underline transition-colors cursor-pointer'>
           {count}
         </button>
       </PopoverTrigger>
@@ -214,7 +214,7 @@ const ExpandableNotes = ({ content }: { content: string | null }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="text-left text-teal-700 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
+        <button className="text-left text-blue-600 font-medium hover:text-primary hover:underline transition-colors cursor-pointer w-full max-w-[200px] min-w-[150px]">
           <div className="line-clamp-3">
             {content}
           </div>

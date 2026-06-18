@@ -115,7 +115,7 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-xs">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-2 py-2 text-center font-semibold" rowSpan={3}>Year</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-semibold" colSpan={21}>Appropriations (US$)</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-semibold" colSpan={5}>Endowments (US$)</th>
@@ -123,7 +123,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-2 text-center font-semibold" colSpan={5}>East Asian Program Support</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-semibold" rowSpan={3}>Total Acquisitions ($US)</th>
               </tr>
-              <tr className="bg-teal-600 text-white">
+              <tr className="bg-gray-600 text-white">
                 {/* Appropriations - Language Groups */}
                 <th className="border border-gray-300 px-2 py-1 text-center font-medium" colSpan={5}>Chinese</th>
                 <th className="border border-gray-300 px-2 py-1 text-center font-medium" colSpan={5}>Japanese</th>
@@ -152,7 +152,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-1" rowSpan={2}>Non-CJK</th>
                 <th className="border border-gray-300 px-2 py-1" rowSpan={2}>Total</th>
               </tr>
-              <tr className="bg-teal-500 text-white">
+              <tr className="bg-gray-500 text-white">
                 {/* Appropriations - Chinese */}
                 <th className="border border-gray-300 px-1 py-1">Mono</th>
                 <th className="border border-gray-300 px-1 py-1">Serial</th>

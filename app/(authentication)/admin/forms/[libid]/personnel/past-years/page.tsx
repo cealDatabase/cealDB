@@ -104,7 +104,7 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Year</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Professional Staff, FTE</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Support Staff, FTE</th>
@@ -113,7 +113,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={2}>Outsourcing</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Total</th>
               </tr>
-              <tr className="bg-teal-600 text-white text-xs">
+              <tr className="bg-gray-600 text-white text-xs">
                 {/* Professional Staff */}
                 <th className="border border-gray-300 px-2 py-1">CHN</th>
                 <th className="border border-gray-300 px-2 py-1">JPN</th>

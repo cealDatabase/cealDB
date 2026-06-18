@@ -276,10 +276,10 @@ async function UserLoggedInPage() {
                     </Button>
                   </div>
 
-                  <div className='flex items-center justify-between p-3 bg-amber-50/50 rounded-lg border border-amber-100'>
+                  <div className='flex items-center justify-between p-3 bg-emerald-50/50 rounded-lg border border-emerald-100'>
                     <div className='flex items-center gap-3'>
-                      <div className='w-8 h-8 bg-amber-100 rounded-md flex items-center justify-center'>
-                        <Trophy className='w-4 h-4 text-amber-600' />
+                      <div className='w-8 h-8 bg-emerald-100 rounded-md flex items-center justify-center'>
+                        <Trophy className='w-4 h-4 text-emerald-600' />
                       </div>
                       <div>
                         <p className='font-medium text-sm'>
@@ -294,7 +294,7 @@ async function UserLoggedInPage() {
                     <Button
                       asChild
                       size='sm'
-                      className='bg-amber-600 hover:bg-amber-700'
+                      className='bg-emerald-600 hover:bg-emerald-700'
                     >
                       <Link href='/admin/ranking'>View Rankings</Link>
                     </Button>
@@ -443,6 +443,13 @@ async function UserLoggedInPage() {
                                   <Button variant='outline' size='sm' asChild>
                                     <Link href={action.secondaryHref}>
                                       {action.secondaryLabel}
+                                    </Link>
+                                  </Button>
+                                )}
+                                {action.tertiaryHref && (
+                                  <Button variant='outline' size='sm' asChild>
+                                    <Link href={action.tertiaryHref}>
+                                      {action.tertiaryLabel}
                                     </Link>
                                   </Button>
                                 )}

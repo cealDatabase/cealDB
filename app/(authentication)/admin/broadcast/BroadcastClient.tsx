@@ -321,10 +321,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   }
 
   return (
-    <Container>
+    <main className="min-h-screen bg-background">
+    <Container className="py-8">
       <div className="max-w-5xl mx-auto">
         {/* Breadcrumb */}
-        <div className="mb-4 mt-6">
+        <div className="mb-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -802,5 +803,6 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
         </Card>
       </div>
     </Container>
+    </main>
   );
 }

@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import * as jose from 'jose';
 import db from '@/lib/db';
 import Link from 'next/link';
 import AuditLogViewer from '../../../../components/AuditLogViewer';
@@ -58,80 +57,36 @@ async function getAuditLogs(page: number = 1, limit: number = 50, filter?: strin
   }
 }
 
-async function getUserFromToken() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jose.jwtVerify(token, secret);
-    const userId = parseInt(payload.sub || '0');
-
-    if (userId) {
-      const user = await db.user.findUnique({
-        where: { id: userId },
-        include: {
-          User_Roles: {
-            include: {
-              Role: true,
-            },
-          },
-        },
-      });
-      return user;
-    }
-  } catch (error) {
-    console.error('Token verification failed:', error);
-  }
-
-  return null;
-}
-
 export default async function AuditLogsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; filter?: string };
+  searchParams: Promise<{ page?: string; filter?: string }>;
 }) {
-  const user = await getUserFromToken();
-  
-  if (!user) {
-    redirect('/signin');
+  // Use the standard cookie-based role check (same as all other admin pages)
+  const cookieStore = await cookies();
+  const roleIds = cookieStore.get('role')?.value;
+
+  let userRoleIds: string[] = [];
+  try {
+    userRoleIds = roleIds ? JSON.parse(roleIds) : [];
+  } catch (error) {
+    console.error('Failed to parse role IDs from cookie:', error);
+    redirect('/admin');
   }
 
-  // Check if user has admin role
-  const hasAdminRole = user.User_Roles.some(
-    (userRole) => userRole.Role.role === 'admin'
-  );
-
-  if (!hasAdminRole) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Access Denied
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>You do not have permission to view audit logs.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  // Super Admin (1) or Assistant Admin (4) can view audit logs
+  const canView = userRoleIds.includes('1') || userRoleIds.includes('4');
+  if (!canView) {
+    redirect('/admin');
   }
 
-  const page = parseInt(searchParams.page || '1');
-  const filter = searchParams.filter || '';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1');
+  const filter = resolvedParams.filter || '';
   const { logs, total } = await getAuditLogs(page, 50, filter);
 
   return (
-    <main>
+    <main className="min-h-screen bg-background">
       <Container className="py-8">
         <div className="mb-4">
           <Breadcrumb>

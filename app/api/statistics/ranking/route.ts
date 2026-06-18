@@ -134,7 +134,7 @@ const METRICS: Metric[] = [
     category: "Total Holdings Rankings",
     label: "Total Volume Holdings",
     model: "volume_Holdings",
-    field: "vhoverall_grand_total",
+    field: "vhgrandtotal",
   },
   {
     category: "Total Holdings Rankings",
@@ -142,6 +142,8 @@ const METRICS: Metric[] = [
     model: "other_Holdings",
     field: "ohgrandtotal",
   },
+  // Grand Total Holdings = Volume Holdings + Other Library Materials (cross-table)
+  // Handled specially in the query logic below; placeholder uses vhgrandtotal
   {
     category: "Total Holdings Rankings",
     label: "Grand Total Holdings",
@@ -286,6 +288,119 @@ function numVal(record: Record<string, unknown>, field: string): number {
   return Number(v) || 0;
 }
 
+/**
+ * Special cross-table handler: Grand Total Holdings = Volume Holdings + Other Library Materials
+ * Both come from different DB tables so we need to join them by library.
+ */
+async function computeGrandTotalHoldingsRanking(
+  targetYear: number,
+  myLibraryId: number,
+  myLibraryName: string,
+  availableYears: number[],
+) {
+  // Fetch volume holdings (vhgrandtotal) per library
+  const vhRows = await db.volume_Holdings.findMany({
+    where: { Library_Year: { year: targetYear } },
+    select: { vhgrandtotal: true, Library_Year: { select: { library: true } } },
+  });
+  // Fetch other holdings (ohgrandtotal) per library
+  const ohRows = await db.other_Holdings.findMany({
+    where: { Library_Year: { year: targetYear } },
+    select: { ohgrandtotal: true, Library_Year: { select: { library: true } } },
+  });
+
+  // Build maps: libraryId → value
+  const vhMap: Record<number, number> = {};
+  for (const r of vhRows) {
+    const lib = r.Library_Year?.library;
+    if (lib != null) vhMap[lib] = r.vhgrandtotal ?? 0;
+  }
+  const ohMap: Record<number, number> = {};
+  for (const r of ohRows) {
+    const lib = r.Library_Year?.library;
+    if (lib != null) ohMap[lib] = r.ohgrandtotal ?? 0;
+  }
+
+  // All library IDs involved
+  const allLibIds = [...new Set([...Object.keys(vhMap), ...Object.keys(ohMap)].map(Number))];
+  const libraries = allLibIds.length > 0
+    ? await db.library.findMany({
+        where: { id: { in: allLibIds } },
+        select: { id: true, library_name: true },
+      })
+    : [];
+  const libMap: Record<number, string> = Object.fromEntries(
+    libraries.map((l) => [l.id, l.library_name]),
+  );
+
+  // Compute combined value per library
+  const items = allLibIds
+    .map((libId) => ({
+      libraryId: libId,
+      libraryName: libMap[libId] || "Unknown",
+      value: (vhMap[libId] ?? 0) + (ohMap[libId] ?? 0),
+    }))
+    .filter((r) => r.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  // Add ranks with tie handling
+  const fullRanking: Array<{ libraryId: number; libraryName: string; value: number; rank: number }> = [];
+  let currentRank = 1;
+  for (let idx = 0; idx < items.length; idx++) {
+    if (idx > 0 && items[idx].value < items[idx - 1].value) {
+      currentRank = idx + 1;
+    }
+    fullRanking.push({ ...items[idx], rank: currentRank });
+  }
+
+  return NextResponse.json({
+    fullRanking,
+    metric: "Grand Total Holdings",
+    category: "Total Holdings Rankings",
+    availableYears,
+    year: targetYear,
+    libraryId: myLibraryId,
+    libraryName: myLibraryName,
+  });
+}
+
+/**
+ * Compute Grand Total Holdings for a single library (for summary view).
+ * Returns vhgrandtotal + ohgrandtotal, and rank among all libraries.
+ */
+async function computeGrandTotalHoldingsSummary(
+  targetYear: number,
+  myLibraryId: number,
+) {
+  const vhRows = await db.volume_Holdings.findMany({
+    where: { Library_Year: { year: targetYear } },
+    select: { vhgrandtotal: true, Library_Year: { select: { library: true } } },
+  });
+  const ohRows = await db.other_Holdings.findMany({
+    where: { Library_Year: { year: targetYear } },
+    select: { ohgrandtotal: true, Library_Year: { select: { library: true } } },
+  });
+
+  const vhMap: Record<number, number> = {};
+  for (const r of vhRows) {
+    const lib = r.Library_Year?.library;
+    if (lib != null) vhMap[lib] = r.vhgrandtotal ?? 0;
+  }
+  const ohMap: Record<number, number> = {};
+  for (const r of ohRows) {
+    const lib = r.Library_Year?.library;
+    if (lib != null) ohMap[lib] = r.ohgrandtotal ?? 0;
+  }
+
+  const allLibIds = [...new Set([...Object.keys(vhMap), ...Object.keys(ohMap)].map(Number))];
+  const allValues = allLibIds.map((id) => (vhMap[id] ?? 0) + (ohMap[id] ?? 0)).filter((v) => v > 0);
+  const myValue = (vhMap[myLibraryId] ?? 0) + (ohMap[myLibraryId] ?? 0);
+  const rank = myValue > 0 ? allValues.filter((v) => v > myValue).length + 1 : 0;
+  const total = allValues.length;
+
+  return { myValue, rank, total };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -362,6 +477,13 @@ export async function GET(request: NextRequest) {
 
     // If a specific metric is requested, return full ranking list
     if (targetMetric) {
+      // Special cross-table handling for "Grand Total Holdings"
+      if (targetMetric.label === "Grand Total Holdings") {
+        return await computeGrandTotalHoldingsRanking(
+          targetYear, libraryId, myLibraryName, availableYears,
+        );
+      }
+
       const selectFields = targetMetric.fields
         ? Object.fromEntries(targetMetric.fields.map((f) => [f, true]))
         : { [targetMetric.field as string]: true };
@@ -379,19 +501,25 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Get library names
+      // Get library names (filter out rows with null Library_Year or null library)
+      const validRows = allRows.filter(
+        (r: { Library_Year: { library: number | null } | null }) =>
+          r.Library_Year != null && r.Library_Year.library != null,
+      );
       const libraryIds = [
         ...new Set(
-          allRows.map(
+          validRows.map(
             (r: { Library_Year: { library: number } }) =>
               r.Library_Year.library,
           ),
         ),
       ] as number[];
-      const libraries = await db.library.findMany({
-        where: { id: { in: libraryIds } },
-        select: { id: true, library_name: true },
-      });
+      const libraries = libraryIds.length > 0
+        ? await db.library.findMany({
+            where: { id: { in: libraryIds } },
+            select: { id: true, library_name: true },
+          })
+        : [];
       const libMap: Record<number, string> = Object.fromEntries(
         libraries.map((l) => [l.id, l.library_name]),
       );
@@ -408,7 +536,7 @@ export async function GET(request: NextRequest) {
         value: number;
       }
 
-      const sortedItems: RankingItem[] = (allRows as Record<string, unknown>[])
+      const sortedItems: RankingItem[] = (validRows as Record<string, unknown>[])
         .map((r) => ({
           libraryId: (r.Library_Year as { library: number }).library,
           libraryName:
@@ -456,6 +584,19 @@ export async function GET(request: NextRequest) {
     }[] = [];
 
     for (const metric of METRICS) {
+      // Special cross-table handling for "Grand Total Holdings"
+      if (metric.label === "Grand Total Holdings") {
+        const gth = await computeGrandTotalHoldingsSummary(targetYear, libraryId);
+        rankings.push({
+          category: metric.category,
+          label: metric.label,
+          myValue: gth.myValue,
+          rank: gth.rank,
+          total: gth.total,
+        });
+        continue;
+      }
+
       // Build select object from either single field or computed fields list
       const selectFields = metric.fields
         ? Object.fromEntries(metric.fields.map((f) => [f, true]))
@@ -481,11 +622,11 @@ export async function GET(request: NextRequest) {
         metric.compute ? metric.compute(r) : numVal(r, metric.field as string);
 
       const myValue = myRows.length > 0 ? getValue(myRows[0]) : 0;
-      const allValues = allRows.map(getValue);
+      const allValues = allRows.map(getValue).filter((v) => v > 0);
 
-      // Rank = number of institutions strictly greater than mine + 1
-      const rank = allValues.filter((v) => v > myValue).length + 1;
-      const total = allRows.length;
+      // Rank = number of institutions with value strictly greater than mine + 1
+      const rank = myValue > 0 ? allValues.filter((v) => v > myValue).length + 1 : 0;
+      const total = allValues.length;
 
       rankings.push({
         category: metric.category,

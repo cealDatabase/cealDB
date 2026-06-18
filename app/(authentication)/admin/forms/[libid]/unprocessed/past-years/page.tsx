@@ -143,7 +143,7 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Year</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Total Physical Volumes Held<br/>(From Table 1, Holding of East Asian Materials)</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Total Electronic Books Volumes Held</th>
@@ -152,7 +152,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={2}>Grand Total Materials Held<br/>with E-Books</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Number of Unprocessed/Backlog Materials</th>
               </tr>
-              <tr className="bg-teal-600 text-white text-xs">
+              <tr className="bg-gray-600 text-white text-xs">
                 {/* Total Physical Volumes Held */}
                 <th className="border border-gray-300 px-2 py-1">CHN</th>
                 <th className="border border-gray-300 px-2 py-1">JPN</th>

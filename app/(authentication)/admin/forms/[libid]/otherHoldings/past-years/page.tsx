@@ -111,14 +111,14 @@ export default function PastYearsPage() {
         <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-teal-700 text-white">
+              <tr className="bg-gray-700 text-white">
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={3}>Year</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Microform</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={5}>Computer Files</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" colSpan={20}>Audiovisual Materials</th>
                 <th className="border border-gray-300 px-3 py-2 text-center font-semibold" rowSpan={3}>Total Other Library Materials</th>
               </tr>
-              <tr className="bg-teal-600 text-white">
+              <tr className="bg-gray-600 text-white">
                 {/* Microform headers */}
                 <th className="border border-gray-300 px-2 py-1 text-xs" colSpan={5}></th>
                 {/* Computer Files headers */}
@@ -129,7 +129,7 @@ export default function PastYearsPage() {
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>Video</th>
                 <th className="border border-gray-300 px-2 py-2 text-center font-medium" colSpan={5}>DVD</th>
               </tr>
-              <tr className="bg-teal-500 text-white text-xs">
+              <tr className="bg-gray-500 text-white text-xs">
                 {/* Microform languages */}
                 <th className="border border-gray-300 px-2 py-1">CHN</th>
                 <th className="border border-gray-300 px-2 py-1">JPN</th>
