@@ -285,7 +285,7 @@ export async function GET(request: NextRequest) {
     if (action === 'institutions') {
       const libraries = await db.library.findMany({
         select: { id: true, library_name: true },
-        where: { hideinlibrarylist: { not: true } },
+        where: {},
         orderBy: { library_name: 'asc' },
       });
       return NextResponse.json({ institutions: libraries });
