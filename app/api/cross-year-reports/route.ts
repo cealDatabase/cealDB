@@ -66,17 +66,30 @@ function calcVolumeHoldings(vh: any): {
 /**
  * Electronic Books
  * Total volumes = purchased_volumes_subtotal + nonpurchased_volumes_subtotal
- * (purchased subtotal itself = sum of 4 language columns)
- * This matches the calculation in year-end-pdf fetchElectronicBooksData().
+ *
+ * IMPORTANT: The DB fields ebooks_purchased_volumes_{lang} may be null for
+ * older records where the form split volumes into prev+add sub-fields. In that
+ * case we fall back to prev_volumes + add_volumes per language — exactly the
+ * same fallback used in the purchased-volumes API and year-end-pdf route.
  */
 function calcEBookVolumes(eb: any): number | null {
   if (!eb) return null;
 
+  // Resolve per-language purchased volumes: stored field ?? (prev + add)
+  function purchasedLang(lang: string): number | null {
+    const stored = eb[`ebooks_purchased_volumes_${lang}`];
+    if (stored !== null && stored !== undefined) return n(stored);
+    const prev = eb[`ebooks_purchased_prev_volumes_${lang}`];
+    const add  = eb[`ebooks_purchased_add_volumes_${lang}`];
+    if ((prev === null || prev === undefined) && (add === null || add === undefined)) return null;
+    return n(prev) + n(add);
+  }
+
   const purchasedSub = sumWithNull(
-    eb.ebooks_purchased_volumes_chinese,
-    eb.ebooks_purchased_volumes_japanese,
-    eb.ebooks_purchased_volumes_korean,
-    eb.ebooks_purchased_volumes_noncjk,
+    purchasedLang('chinese'),
+    purchasedLang('japanese'),
+    purchasedLang('korean'),
+    purchasedLang('noncjk'),
   );
   const nonpurchasedSub = sumWithNull(
     eb.ebooks_nonpurchased_volumes_chinese,
@@ -98,22 +111,7 @@ function calcEBookVolumes(eb: any): number | null {
 function calcOtherHoldingsTotal(oh: any): number | null {
   if (!oh) return null;
 
-  // Sum all 4 languages for each of the 10 categories
-  const microform    = sumWithNull(oh.ohmicroform_chinese,    oh.ohmicroform_japanese,    oh.ohmicroform_korean,    oh.ohmicroform_noncjk);
-  const cartoGraphic = sumWithNull(oh.ohcarto_graphic_chinese, oh.ohcarto_graphic_japanese, oh.ohcarto_graphic_korean, oh.ohcarto_graphic_noncjk);
-  const audio        = sumWithNull(oh.ohaudio_chinese,        oh.ohaudio_japanese,        oh.ohaudio_korean,        oh.ohaudio_noncjk);
-  const filmVideo    = sumWithNull(oh.ohfilm_video_chinese,   oh.ohfilm_video_japanese,   oh.ohfilm_video_korean,   oh.ohfilm_video_noncjk);
-  const dvd          = sumWithNull(oh.ohdvd_chinese,          oh.ohdvd_japanese,          oh.ohdvd_korean,          oh.ohdvd_noncjk);
-  const onlineMap    = sumWithNull(oh.ohonlinemapchinese,     oh.ohonlinemapjapanese,     oh.ohonlinemapkorean,     oh.ohonlinemapnoncjk);
-  const onlineImage  = sumWithNull(oh.ohonlineimagechinese,   oh.ohonlineimagejapanese,   oh.ohonlineimagekorean,   oh.ohonlineimagenoncjk);
-  const streaming    = sumWithNull(oh.ohstreamingchinese,     oh.ohstreamingjapanese,     oh.ohstreamingkorean,     oh.ohstreamingnoncjk);
-  const streamingVid = sumWithNull(oh.ohstreamingvideochinese, oh.ohstreamingvideojapanese, oh.ohstreamingvideokorean, oh.ohstreamingvideononcjk);
-  const custom1      = sumWithNull(oh.ohcustom1chinese,       oh.ohcustom1japanese,       oh.ohcustom1korean,       oh.ohcustom1noncjk);
-  const custom2      = sumWithNull(oh.ohcustom2chinese,       oh.ohcustom2japanese,       oh.ohcustom2korean,       oh.ohcustom2noncjk);
-  const custom3      = sumWithNull(oh.ohcustom3chinese,       oh.ohcustom3japanese,       oh.ohcustom3korean,       oh.ohcustom3noncjk);
-  const custom4      = sumWithNull(oh.ohcustom4chinese,       oh.ohcustom4japanese,       oh.ohcustom4korean,       oh.ohcustom4noncjk);
-
-  // Per-language grand totals
+  // Per-language grand totals across all 10 categories
   const totalChinese  = sumWithNull(oh.ohmicroform_chinese, oh.ohcarto_graphic_chinese, oh.ohaudio_chinese, oh.ohfilm_video_chinese, oh.ohdvd_chinese, oh.ohonlinemapchinese, oh.ohonlineimagechinese, oh.ohstreamingchinese, oh.ohstreamingvideochinese, oh.ohcustom1chinese, oh.ohcustom2chinese, oh.ohcustom3chinese, oh.ohcustom4chinese);
   const totalJapanese = sumWithNull(oh.ohmicroform_japanese, oh.ohcarto_graphic_japanese, oh.ohaudio_japanese, oh.ohfilm_video_japanese, oh.ohdvd_japanese, oh.ohonlinemapjapanese, oh.ohonlineimagejapanese, oh.ohstreamingjapanese, oh.ohstreamingvideojapanese, oh.ohcustom1japanese, oh.ohcustom2japanese, oh.ohcustom3japanese, oh.ohcustom4japanese);
   const totalKorean   = sumWithNull(oh.ohmicroform_korean, oh.ohcarto_graphic_korean, oh.ohaudio_korean, oh.ohfilm_video_korean, oh.ohdvd_korean, oh.ohonlinemapkorean, oh.ohonlineimagekorean, oh.ohstreamingkorean, oh.ohstreamingvideokorean, oh.ohcustom1korean, oh.ohcustom2korean, oh.ohcustom3korean, oh.ohcustom4korean);
@@ -181,18 +179,18 @@ function calcFiscal(fs: any): {
 } {
   if (!fs) return { appropriations: null, grants: null, programSupport: null, endowments: null, totalBudget: null };
 
-  // Appropriations per language (4 sub-categories each) → language subtotal → grand total
+  // Appropriations: always recalculate from sub-fields; manual overrides the result.
+  // This matches year-end-pdf/route.ts exactly — stored subtotals are NOT trusted.
   function langApprop(lang: string): number | null {
-    const manualKey = `fs${lang}_appropriations_subtotal_manual`;
-    const storedKey = `fs${lang}_appropriations_subtotal`;
-    if (fs[manualKey] !== null && fs[manualKey] !== undefined) return n(fs[manualKey]);
-    if (fs[storedKey] !== null && fs[storedKey] !== undefined) return n(fs[storedKey]);
-    return sumWithNull(
+    const calc = sumWithNull(
       fs[`fs${lang}_appropriations_monographic`],
       fs[`fs${lang}_appropriations_serial`],
       fs[`fs${lang}_appropriations_other_material`],
       fs[`fs${lang}_appropriations_electronic`],
     );
+    const calcRounded = calc !== null ? round2(calc) : null;
+    const manual = fs[`fs${lang}_appropriations_subtotal_manual`];
+    return (manual !== null && manual !== undefined) ? n(manual) : calcRounded;
   }
 
   const chineseApprop  = langApprop('chinese');
@@ -201,26 +199,26 @@ function calcFiscal(fs: any): {
   const noncjkApprop   = langApprop('noncjk');
   const calcTotalApprop = sumWithNull(chineseApprop, japaneseApprop, koreanApprop, noncjkApprop);
   const roundedCalcApprop = calcTotalApprop !== null ? round2(calcTotalApprop) : null;
-  // Manual override for grand total appropriations
+  // Field21a (manual) prioritized over calculated
   const appropriations = (fs.fstotal_appropriations_manual !== null && fs.fstotal_appropriations_manual !== undefined)
     ? round2(n(fs.fstotal_appropriations_manual))
     : roundedCalcApprop;
 
-  // Endowments
+  // Endowments: recalculate from language fields; manual overrides
   const calcEndow = sumWithNull(fs.fsendowments_chinese, fs.fsendowments_japanese, fs.fsendowments_korean, fs.fsendowments_noncjk);
   const roundedCalcEndow = calcEndow !== null ? round2(calcEndow) : null;
   const endowments = (fs.fsendowments_subtotal_manual !== null && fs.fsendowments_subtotal_manual !== undefined)
     ? round2(n(fs.fsendowments_subtotal_manual))
     : roundedCalcEndow;
 
-  // Grants
+  // Grants: recalculate from language fields; manual overrides
   const calcGrants = sumWithNull(fs.fsgrants_chinese, fs.fsgrants_japanese, fs.fsgrants_korean, fs.fsgrants_noncjk);
   const roundedCalcGrants = calcGrants !== null ? round2(calcGrants) : null;
   const grants = (fs.fsgrants_subtotal_manual !== null && fs.fsgrants_subtotal_manual !== undefined)
     ? round2(n(fs.fsgrants_subtotal_manual))
     : roundedCalcGrants;
 
-  // Program Support (East Asian Program Support)
+  // Program Support (East Asian Program Support): recalculate; manual overrides
   const calcProgram = sumWithNull(
     fs.fseast_asian_program_support_chinese,
     fs.fseast_asian_program_support_japanese,
@@ -232,7 +230,7 @@ function calcFiscal(fs: any): {
     ? round2(n(fs.fseast_asian_program_support_subtotal_manual))
     : roundedCalcProgram;
 
-  // Total Budget = appropriations + endowments + grants + program support
+  // Total Budget = appropriations + endowments + grants + program support (always derived)
   const calcBudget = sumWithNull(appropriations, endowments, grants, programSupport);
   const totalBudget = calcBudget !== null ? round2(calcBudget) : null;
 
@@ -345,13 +343,19 @@ export async function GET(request: NextRequest) {
             },
           },
 
-          // Electronic Books — need raw language volumes to calculate total
+          // Electronic Books — need raw language volumes to calculate total.
+          // Also fetch prev/add sub-fields as fallback for older records where
+          // the combined _chinese/_japanese/etc. fields may be null.
           Electronic_Books: {
             select: {
-              ebooks_purchased_volumes_chinese:    true, ebooks_purchased_volumes_japanese:    true,
-              ebooks_purchased_volumes_korean:     true, ebooks_purchased_volumes_noncjk:      true,
-              ebooks_nonpurchased_volumes_chinese: true, ebooks_nonpurchased_volumes_japanese: true,
-              ebooks_nonpurchased_volumes_korean:  true, ebooks_nonpurchased_volumes_noncjk:   true,
+              ebooks_purchased_volumes_chinese:         true, ebooks_purchased_volumes_japanese:         true,
+              ebooks_purchased_volumes_korean:          true, ebooks_purchased_volumes_noncjk:           true,
+              ebooks_purchased_prev_volumes_chinese:    true, ebooks_purchased_prev_volumes_japanese:    true,
+              ebooks_purchased_prev_volumes_korean:     true, ebooks_purchased_prev_volumes_noncjk:      true,
+              ebooks_purchased_add_volumes_chinese:     true, ebooks_purchased_add_volumes_japanese:     true,
+              ebooks_purchased_add_volumes_korean:      true, ebooks_purchased_add_volumes_noncjk:       true,
+              ebooks_nonpurchased_volumes_chinese:      true, ebooks_nonpurchased_volumes_japanese:      true,
+              ebooks_nonpurchased_volumes_korean:       true, ebooks_nonpurchased_volumes_noncjk:        true,
             },
           },
 
@@ -658,10 +662,14 @@ export async function GET(request: NextRequest) {
           },
           Electronic_Books: {
             select: {
-              ebooks_purchased_volumes_chinese:    true, ebooks_purchased_volumes_japanese:    true,
-              ebooks_purchased_volumes_korean:     true, ebooks_purchased_volumes_noncjk:      true,
-              ebooks_nonpurchased_volumes_chinese: true, ebooks_nonpurchased_volumes_japanese: true,
-              ebooks_nonpurchased_volumes_korean:  true, ebooks_nonpurchased_volumes_noncjk:   true,
+              ebooks_purchased_volumes_chinese:         true, ebooks_purchased_volumes_japanese:         true,
+              ebooks_purchased_volumes_korean:          true, ebooks_purchased_volumes_noncjk:           true,
+              ebooks_purchased_prev_volumes_chinese:    true, ebooks_purchased_prev_volumes_japanese:    true,
+              ebooks_purchased_prev_volumes_korean:     true, ebooks_purchased_prev_volumes_noncjk:      true,
+              ebooks_purchased_add_volumes_chinese:     true, ebooks_purchased_add_volumes_japanese:     true,
+              ebooks_purchased_add_volumes_korean:      true, ebooks_purchased_add_volumes_noncjk:       true,
+              ebooks_nonpurchased_volumes_chinese:      true, ebooks_nonpurchased_volumes_japanese:      true,
+              ebooks_nonpurchased_volumes_korean:       true, ebooks_nonpurchased_volumes_noncjk:        true,
             },
           },
           Other_Holdings: {

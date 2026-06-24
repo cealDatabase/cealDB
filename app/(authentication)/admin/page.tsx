@@ -7,7 +7,7 @@ import {
   getLibraryById,
 } from "@/data/fetchPrisma";
 import Link from "next/link";
-import { BookOpen, FileText, FileBarChart, Trophy } from "lucide-react";
+import { BookOpen, FileText, FileBarChart, Trophy, TrendingUp } from "lucide-react";
 
 import { eResourceActions, superAdminActions, superAdminCategories } from "@/constant/form";
 import { UserProfile } from "@/components/UserProfile";
@@ -297,6 +297,30 @@ async function UserLoggedInPage() {
                       className='bg-emerald-600 hover:bg-emerald-700'
                     >
                       <Link href='/admin/ranking'>View Rankings</Link>
+                    </Button>
+                  </div>
+
+                  <div className='flex items-center justify-between p-3 bg-emerald-50/50 rounded-lg border border-emerald-100'>
+                    <div className='flex items-center gap-3'>
+                      <div className='w-8 h-8 bg-emerald-100 rounded-md flex items-center justify-center'>
+                        <TrendingUp className='w-4 h-4 text-emerald-600' />
+                      </div>
+                      <div>
+                        <p className='font-medium text-sm'>
+                          Cross-Year Reports
+                        </p>
+                        <p className='text-xs text-muted-foreground'>
+                          View your institution&apos;s materials and fiscal
+                          growth trends across a custom year range
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      asChild
+                      size='sm'
+                      className='bg-emerald-600 hover:bg-emerald-700'
+                    >
+                      <Link href='/admin/my-cross-year-reports'>View Report</Link>
                     </Button>
                   </div>
                 </CardContent>
