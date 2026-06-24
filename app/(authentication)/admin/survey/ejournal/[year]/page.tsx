@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { GetEJournalList, GetEJournalListWithUserSelections } from "../components/getEJournalList";
 import EJournalDataTableClient from "../components/ejDataTableClient";
 import { Container } from "@/components/Container";
@@ -56,7 +57,25 @@ export default async function EJournalListPage(
     const sp = (await props.searchParams) ?? {};
 
     const cookieStore = await cookies();
+    const userCookie = cookieStore.get("uinf")?.value;
     const roleId = cookieStore.get("role")?.value;
+
+    if (!userCookie) {
+        redirect('/signin');
+    }
+
+    // Restrict to Super Admin (1), Assistant Admin (4), E-Resource Editor (3)
+    let parsedRoles: string[] = [];
+    if (roleId) {
+        try {
+            parsedRoles = roleId.startsWith('[') ? JSON.parse(roleId) : [roleId];
+        } catch {
+            parsedRoles = [roleId];
+        }
+    }
+    if (!parsedRoles.some((r) => ['1', '3', '4'].includes(r))) {
+        redirect('/unauthorized');
+    }
 
     // Resolve effective libid for impersonation support.
     // Priority: observe_library cookie (super admin impersonating) > ?libid= query > home library cookie.

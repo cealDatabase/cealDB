@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import YearEndReportsClient from './YearEndReportsClient';
+import CrossYearReportsClient from './CrossYearReportsClient';
 
-export default async function YearEndReportsPage() {
+export default async function CrossYearReportsPage() {
   const cookieStore = await cookies();
   const userCookie = cookieStore.get('uinf')?.value;
   const roleCookie = cookieStore.get('role')?.value;
@@ -28,5 +28,5 @@ export default async function YearEndReportsPage() {
     redirect('/unauthorized');
   }
 
-  return <YearEndReportsClient />;
+  return <CrossYearReportsClient />;
 }

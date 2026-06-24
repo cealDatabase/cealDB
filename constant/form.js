@@ -182,12 +182,20 @@ export const eResourceActions = [
       description: 'Edit the title, description, and associated data for each e-journal database entry.',
     },
     {
-      title: 'Year-End Reports',
+      title: 'Year-End Reports: Single Year Report',
       href: '/admin/year-end-reports',
       icon: FileBarChart,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-100',
       description: 'Access and export annual statistics by category. Each form contains aggregated data from all participating institutions for the selected year.',
+    },
+    {
+      title: 'Cross-Year Reports: Multi-Year Report',
+      href: '/admin/cross-year-reports',
+      icon: FileBarChart,
+      iconColor: 'text-rose-600',
+      iconBg: 'bg-rose-100',
+      description: 'View multi-year growth rate trends for materials and fiscal support. Select a year range and filter by institution to generate cross-year comparison reports.',
     },
     {
       title: 'Participation Reports',

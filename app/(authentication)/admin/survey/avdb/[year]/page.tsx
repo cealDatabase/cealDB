@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { GetAVList, GetAVListWithUserSelections } from "../components/getAVList";
 import AVDataTableClient from "../components/avDataTableClient";
 import { Container } from "@/components/Container";
@@ -61,7 +62,12 @@ export default async function AVListPage(props: {
   const sp = (await props.searchParams) ?? {};
 
   const cookieStore = await cookies();
+  const userCookie = cookieStore.get("uinf")?.value;
   const roleId = cookieStore.get("role")?.value;
+
+  if (!userCookie) {
+    redirect('/signin');
+  }
 
   // Parse user roles for permission checking
   let userRoles: string[] | null = null;
@@ -72,6 +78,12 @@ export default async function AVListPage(props: {
     } catch (error) {
       console.error('Error parsing role cookie:', error);
     }
+  }
+
+  // Restrict to Super Admin (1), Assistant Admin (4), E-Resource Editor (3)
+  const isAllowed = (userRoles ?? []).some((r) => ['1', '3', '4'].includes(r));
+  if (!isAllowed) {
+    redirect('/unauthorized');
   }
 
   // Resolve effective libid for impersonation support.
