@@ -604,6 +604,242 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ data: result });
     }
 
+    // ── Action: per-institution breakdown ────────────────────────────────────
+    // Returns the same metrics as 'data' but split per institution, so the
+    // frontend can render a drill-down row for each selected institution.
+    if (action === 'institution-data') {
+      const startYearStr = searchParams.get('startYear');
+      const endYearStr   = searchParams.get('endYear');
+      const institutionIdsStr = searchParams.get('institutionIds');
+
+      if (!startYearStr || !endYearStr) {
+        return NextResponse.json({ error: 'startYear and endYear are required' }, { status: 400 });
+      }
+
+      const startYear = parseInt(startYearStr);
+      const endYear   = parseInt(endYearStr);
+
+      if (isNaN(startYear) || isNaN(endYear) || endYear <= startYear) {
+        return NextResponse.json({ error: 'Invalid year range' }, { status: 400 });
+      }
+
+      // Which institutions to break down — must be explicitly specified
+      let institutionIds: number[] = [];
+      if (institutionIdsStr && institutionIdsStr.trim()) {
+        institutionIds = institutionIdsStr.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      }
+      if (institutionIds.length === 0) {
+        return NextResponse.json({ error: 'institutionIds required for institution-data action' }, { status: 400 });
+      }
+
+      const yearsInRange = Array.from(
+        { length: endYear - startYear + 1 },
+        (_, i) => startYear + i,
+      ).filter(y => y !== 1900);
+
+      // Fetch raw records — same select shape as 'data' action
+      const libraryYears = await db.library_Year.findMany({
+        where: {
+          year: { in: yearsInRange },
+          library: { in: institutionIds },
+        },
+        select: {
+          id: true, year: true, library: true,
+          Library: { select: { id: true, library_name: true } },
+          Volume_Holdings: {
+            select: {
+              vhprevious_year_chinese: true, vhprevious_year_japanese: true,
+              vhprevious_year_korean:  true, vhprevious_year_noncjk:   true,
+              vhadded_gross_chinese:   true, vhadded_gross_japanese:   true,
+              vhadded_gross_korean:    true, vhadded_gross_noncjk:     true,
+              vhwithdrawn_chinese:     true, vhwithdrawn_japanese:     true,
+              vhwithdrawn_korean:      true, vhwithdrawn_noncjk:       true,
+            },
+          },
+          Electronic_Books: {
+            select: {
+              ebooks_purchased_volumes_chinese:    true, ebooks_purchased_volumes_japanese:    true,
+              ebooks_purchased_volumes_korean:     true, ebooks_purchased_volumes_noncjk:      true,
+              ebooks_nonpurchased_volumes_chinese: true, ebooks_nonpurchased_volumes_japanese: true,
+              ebooks_nonpurchased_volumes_korean:  true, ebooks_nonpurchased_volumes_noncjk:   true,
+            },
+          },
+          Other_Holdings: {
+            select: {
+              ohmicroform_chinese: true,     ohmicroform_japanese: true,     ohmicroform_korean: true,     ohmicroform_noncjk: true,
+              ohcarto_graphic_chinese: true, ohcarto_graphic_japanese: true, ohcarto_graphic_korean: true, ohcarto_graphic_noncjk: true,
+              ohaudio_chinese: true,         ohaudio_japanese: true,         ohaudio_korean: true,         ohaudio_noncjk: true,
+              ohfilm_video_chinese: true,    ohfilm_video_japanese: true,    ohfilm_video_korean: true,    ohfilm_video_noncjk: true,
+              ohdvd_chinese: true,           ohdvd_japanese: true,           ohdvd_korean: true,           ohdvd_noncjk: true,
+              ohonlinemapchinese: true,      ohonlinemapjapanese: true,      ohonlinemapkorean: true,      ohonlinemapnoncjk: true,
+              ohonlineimagechinese: true,    ohonlineimagejapanese: true,    ohonlineimagekorean: true,    ohonlineimagenoncjk: true,
+              ohstreamingchinese: true,      ohstreamingjapanese: true,      ohstreamingkorean: true,      ohstreamingnoncjk: true,
+              ohstreamingvideochinese: true, ohstreamingvideojapanese: true, ohstreamingvideokorean: true, ohstreamingvideononcjk: true,
+              ohcustom1chinese: true,        ohcustom1japanese: true,        ohcustom1korean: true,        ohcustom1noncjk: true,
+              ohcustom2chinese: true,        ohcustom2japanese: true,        ohcustom2korean: true,        ohcustom2noncjk: true,
+              ohcustom3chinese: true,        ohcustom3japanese: true,        ohcustom3korean: true,        ohcustom3noncjk: true,
+              ohcustom4chinese: true,        ohcustom4japanese: true,        ohcustom4korean: true,        ohcustom4noncjk: true,
+            },
+          },
+          Monographic_Acquisitions: {
+            select: {
+              mapurchased_volumes_chinese:    true, mapurchased_volumes_japanese:    true,
+              mapurchased_volumes_korean:     true, mapurchased_volumes_noncjk:      true,
+              manonpurchased_volumes_chinese: true, manonpurchased_volumes_japanese: true,
+              manonpurchased_volumes_korean:  true, manonpurchased_volumes_noncjk:   true,
+            },
+          },
+          Serials: {
+            select: {
+              spurchased_chinese:      true, spurchased_japanese:      true,
+              spurchased_korean:       true, spurchased_noncjk:        true,
+              snonpurchased_chinese:   true, snonpurchased_japanese:   true,
+              snonpurchased_korean:    true, snonpurchased_noncjk:     true,
+              s_epurchased_chinese:    true, s_epurchased_japanese:    true,
+              s_epurchased_korean:     true, s_epurchased_noncjk:      true,
+              s_enonpurchased_chinese: true, s_enonpurchased_japanese: true,
+              s_enonpurchased_korean:  true, s_enonpurchased_noncjk:   true,
+            },
+          },
+          Fiscal_Support: {
+            select: {
+              fschinese_appropriations_monographic:         true, fschinese_appropriations_serial:              true,
+              fschinese_appropriations_other_material:      true, fschinese_appropriations_electronic:          true,
+              fschinese_appropriations_subtotal:            true, fschinese_appropriations_subtotal_manual:     true,
+              fsjapanese_appropriations_monographic:        true, fsjapanese_appropriations_serial:             true,
+              fsjapanese_appropriations_other_material:     true, fsjapanese_appropriations_electronic:         true,
+              fsjapanese_appropriations_subtotal:           true, fsjapanese_appropriations_subtotal_manual:    true,
+              fskorean_appropriations_monographic:          true, fskorean_appropriations_serial:               true,
+              fskorean_appropriations_other_material:       true, fskorean_appropriations_electronic:           true,
+              fskorean_appropriations_subtotal:             true, fskorean_appropriations_subtotal_manual:      true,
+              fsnoncjk_appropriations_monographic:          true, fsnoncjk_appropriations_serial:               true,
+              fsnoncjk_appropriations_other_material:       true, fsnoncjk_appropriations_electronic:           true,
+              fsnoncjk_appropriations_subtotal:             true, fsnoncjk_appropriations_subtotal_manual:      true,
+              fstotal_appropriations:                       true, fstotal_appropriations_manual:                true,
+              fsendowments_chinese:                         true, fsendowments_japanese:                        true,
+              fsendowments_korean:                          true, fsendowments_noncjk:                          true,
+              fsendowments_subtotal:                        true, fsendowments_subtotal_manual:                 true,
+              fsgrants_chinese:                             true, fsgrants_japanese:                            true,
+              fsgrants_korean:                              true, fsgrants_noncjk:                              true,
+              fsgrants_subtotal:                            true, fsgrants_subtotal_manual:                     true,
+              fseast_asian_program_support_chinese:                         true, fseast_asian_program_support_japanese:                        true,
+              fseast_asian_program_support_korean:                          true, fseast_asian_program_support_noncjk:                          true,
+              fseast_asian_program_support_subtotal:                        true, fseast_asian_program_support_subtotal_manual:                 true,
+              fstotal_acquisition_budget:                   true,
+            },
+          },
+        },
+        orderBy: [{ library: 'asc' }, { year: 'asc' }],
+      });
+
+      // Group by institution → per-year metric object
+      // Map: institutionId → { name, years: { year → metrics } }
+      const instMap: Record<number, {
+        id: number;
+        name: string;
+        yearData: Record<number, {
+          grandTotalWithEBooks: number | null;
+          grandTotalWithoutEBooks: number | null;
+          totalVolumesWithEBooks: number | null;
+          totalVolumesWithoutEBooks: number | null;
+          totalOtherMaterials: number | null;
+          monographAdditions: number | null;
+          serials: number | null;
+          appropriations: number | null;
+          grants: number | null;
+          programSupport: number | null;
+          endowments: number | null;
+          totalBudget: number | null;
+        }>;
+      }> = {};
+
+      for (const ly of libraryYears) {
+        const libId = ly.library;
+        if (!libId) continue;
+
+        if (!instMap[libId]) {
+          instMap[libId] = {
+            id: libId,
+            name: ly.Library?.library_name ?? `Institution ${libId}`,
+            yearData: {},
+          };
+        }
+
+        const { endYearSubtotal: physVols } = calcVolumeHoldings(ly.Volume_Holdings);
+        const ebookVols  = calcEBookVolumes(ly.Electronic_Books);
+        const otherTotal = calcOtherHoldingsTotal(ly.Other_Holdings);
+        const monoVols   = calcMonoTotalVolumes(ly.Monographic_Acquisitions);
+        const serialTot  = calcSerialsTotal(ly.Serials);
+        const fiscal     = calcFiscal(ly.Fiscal_Support);
+
+        const grandWith    = (physVols !== null || ebookVols !== null || otherTotal !== null) ? sumWithNull(physVols, ebookVols, otherTotal) : null;
+        const grandWithout = (physVols !== null || otherTotal !== null) ? sumWithNull(physVols, otherTotal) : null;
+        const totalVolsWith    = (physVols !== null || ebookVols !== null) ? sumWithNull(physVols, ebookVols) : null;
+
+        instMap[libId].yearData[ly.year] = {
+          grandTotalWithEBooks:    grandWith,
+          grandTotalWithoutEBooks: grandWithout,
+          totalVolumesWithEBooks:  totalVolsWith,
+          totalVolumesWithoutEBooks: physVols,
+          totalOtherMaterials:     otherTotal,
+          monographAdditions:      monoVols,
+          serials:                 serialTot,
+          ...fiscal,
+        };
+      }
+
+      // Build the response: array of institutions, each with sorted yearly rows + growth rates
+      function growthRate(curr: number | null, prev: number | null): number | null {
+        if (curr === null || prev === null || prev === 0) return null;
+        return Math.round(((curr - prev) / prev) * 10000) / 100;
+      }
+
+      const institutions = Object.values(instMap).map(inst => {
+        const sortedYears = yearsInRange.filter(y => inst.yearData[y]);
+        const yearRows = sortedYears.map((year, idx) => {
+          const curr = inst.yearData[year];
+          const prev = idx > 0 ? inst.yearData[sortedYears[idx - 1]] : null;
+          return {
+            year,
+            materials: {
+              grandTotalWithEBooks:            curr.grandTotalWithEBooks,
+              grandTotalWithEBooksGrowth:      growthRate(curr.grandTotalWithEBooks,    prev?.grandTotalWithEBooks    ?? null),
+              grandTotalWithoutEBooks:         curr.grandTotalWithoutEBooks,
+              grandTotalWithoutEBooksGrowth:   growthRate(curr.grandTotalWithoutEBooks, prev?.grandTotalWithoutEBooks ?? null),
+              totalVolumesWithEBooks:          curr.totalVolumesWithEBooks,
+              totalVolumesWithEBooksGrowth:    growthRate(curr.totalVolumesWithEBooks,  prev?.totalVolumesWithEBooks  ?? null),
+              totalVolumesWithoutEBooks:       curr.totalVolumesWithoutEBooks,
+              totalVolumesWithoutEBooksGrowth: growthRate(curr.totalVolumesWithoutEBooks, prev?.totalVolumesWithoutEBooks ?? null),
+              totalOtherMaterials:             curr.totalOtherMaterials,
+              totalOtherMaterialsGrowth:       growthRate(curr.totalOtherMaterials,    prev?.totalOtherMaterials     ?? null),
+              monographAdditions:              curr.monographAdditions,
+              monographAdditionsGrowth:        growthRate(curr.monographAdditions,     prev?.monographAdditions      ?? null),
+              serials:                         curr.serials,
+              serialsGrowth:                   growthRate(curr.serials,                prev?.serials                 ?? null),
+            },
+            fiscal: {
+              appropriations:       curr.appropriations,
+              appropriationsGrowth: growthRate(curr.appropriations, prev?.appropriations ?? null),
+              grants:               curr.grants,
+              grantsGrowth:         growthRate(curr.grants,         prev?.grants         ?? null),
+              programSupport:       curr.programSupport,
+              programSupportGrowth: growthRate(curr.programSupport, prev?.programSupport ?? null),
+              endowments:           curr.endowments,
+              endowmentsGrowth:     growthRate(curr.endowments,     prev?.endowments     ?? null),
+              totalBudget:          curr.totalBudget,
+              totalBudgetGrowth:    growthRate(curr.totalBudget,    prev?.totalBudget    ?? null),
+            },
+          };
+        });
+        return { id: inst.id, name: inst.name, years: yearRows };
+      });
+
+      // Sort by institution name
+      institutions.sort((a, b) => a.name.localeCompare(b.name));
+
+      return NextResponse.json({ institutions });
+    }
+
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
     console.error('Cross-year reports error:', error);
