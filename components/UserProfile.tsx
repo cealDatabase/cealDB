@@ -12,7 +12,8 @@ import {
   Building,
   Settings,
 } from "lucide-react";
-import { EditNameDialog } from "@/components/EditNameDialog";
+import { EditNameDialog } from "@/components/EditNameDialog"
+import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
 interface UserProfileProps {
   user: SingleUserType;
@@ -103,6 +104,11 @@ export function UserProfile({
               </Link>
             </div>
           )}
+        </div>
+
+        {/* Change password */}
+        <div className="pt-2 border-t">
+          <ChangePasswordDialog />
         </div>
       </CardContent>
     </Card>

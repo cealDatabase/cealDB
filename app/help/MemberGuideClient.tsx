@@ -349,8 +349,8 @@ export default function MemberGuideClient() {
           </div>
         </div>
 
-        {/* Quick PDF download (preserved from old /help page) */}
-        <div className="mb-8 print:hidden">
+        {/* Quick PDF download + LIbGuide links */}
+        <div className="mb-8 print:hidden flex flex-wrap gap-3">
           <Link
             href="/docs/user-guide.pdf"
             target="_blank"
@@ -370,6 +370,23 @@ export default function MemberGuideClient() {
             </div>
             <Download className="w-5 h-5 text-emerald-700 group-hover:translate-y-0.5 transition-transform" />
           </Link>
+
+          <a
+            href="https://guides.libraries.emory.edu/alma_ceal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors group max-w-md no-underline"
+          >
+            <BookOpen className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-semibold text-emerald-900">
+                Alma Analytics for CEAL Statistics Guide
+              </p>
+              <p className="text-sm text-emerald-700">
+                Lawrence P. Hamblin, MLIS · Japanese Studies Librarian · Robert W. Woodruff Library, Emory University
+              </p>
+            </div>
+          </a>
         </div>
 
         {/* Grid: sidebar + main */}

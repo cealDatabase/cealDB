@@ -48,7 +48,7 @@ export default async function Index() {
               </Card>
 
               <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
-                <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">39</div>
+                <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">147</div>
                 <div className="text-sm text-muted-foreground uppercase tracking-wider">Institutions</div>
               </Card>
 
