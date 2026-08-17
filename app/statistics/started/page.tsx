@@ -28,26 +28,14 @@ export default function Home() {
               information about total materials held (including serials).
             </li>
             <li>
-              <Link href="/statistics/tableview/basic">Table View (Basic)</Link>{" "}
-              - Search the database with year(s) and libraries, and view all the
-              data and fields available in individual tables.
+              <Link href="/statistics/tableview">Table View</Link> - Search the
+              database with year(s) and libraries, and view all the data and
+              fields available in individual tables.
             </li>
             <li>
-              <Link href="/statistics/tableview/adv">Table View (Advance)</Link>{" "}
-              - Search the database with year(s) and libraries, and view the
-              data available in individual tables. Unlike basic view, fields to
-              display can be customized.
-            </li>
-            <li>
-              <Link href="/statistics/graphview/basic">Graph View (Basic)</Link>{" "}
-              - Search the database and view the data available as graphs.
-            </li>
-            <li>
-              <Link href="/statistics/graphview/adv">
-                Graph View (Advanced)
-              </Link>{" "}
-              - Search the database and view the data available as graphs
-              .Unlike basic view, fields to display can be customized.
+              <Link href="/statistics/graphview">Graph View</Link> - Search the
+              database and view the data available as graphs, with customizable
+              fields and chart types.
             </li>
             <li>
               <Link href="/statistics/pdf">PDF</Link> - View published data in

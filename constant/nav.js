@@ -21,13 +21,13 @@ export const StatisticsMenu = [
   },
   {
     name: "Table View",
-    description: "Contains Basic view and Advanced view, to fetch all the data available in individual tables.",
+    description: "Fetch all the data available in individual tables, filtered by year and institution.",
     href: "/statistics/tableview",
     icon: Table,
   },
   {
     name: "Graph View",
-    description: "Contains Basic view and Advanced view, to fetch all the data available in individual graphs.",
+    description: "Visualize the data as customizable graphs, filtered by year and institution.",
     href: "/statistics/graphview",
     icon: PieChart,
   },
