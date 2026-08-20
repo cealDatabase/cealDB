@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from '@/lib/db';
-import { cookies } from "next/headers";
+import { isSuperAdminDb, getSessionUserId } from "@/lib/auth";
 
 const prisma = db;
 
@@ -67,15 +67,28 @@ export async function PUT(
       );
     }
 
-    // Check authentication and authorization
-    const cookieStore = await cookies();
-    const userLibraryId = cookieStore.get("library")?.value;
-    const userRole = cookieStore.get("role")?.value;
-    
-    // Parse user role to check for super admin (role "1")
-    const isSuperAdmin = userRole?.includes("1") || false;
-    const isOwnLibrary = parseInt(userLibraryId ?? "-1") === libraryId;
-    
+    // Check authentication and authorization.
+    //
+    // Both facts are derived from the signed session JWT and the database.
+    // Previously this trusted the `role` and `library` cookies, which were
+    // client-writable: a member could set role=["1"] to become super admin, or
+    // set library=<any id> to claim ownership of any institution. The old role
+    // test was also a substring match on the raw cookie string.
+    const sessionUserId = await getSessionUserId();
+    if (!sessionUserId) {
+      return NextResponse.json(
+        { error: "Unauthorized - no valid session" },
+        { status: 401 }
+      );
+    }
+
+    const isSuperAdmin = await isSuperAdminDb();
+    const isOwnLibrary =
+      (await db.user_Library.findFirst({
+        where: { user_id: sessionUserId, library_id: libraryId },
+        select: { user_id: true },
+      })) !== null;
+
     if (!isSuperAdmin && !isOwnLibrary) {
       return NextResponse.json(
         { error: "Unauthorized - You can only edit your own library or need super admin privileges" },

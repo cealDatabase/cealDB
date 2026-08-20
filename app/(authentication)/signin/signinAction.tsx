@@ -170,15 +170,17 @@ export default async function signinAction(
     const userRoleIds = user.User_Roles?.map(userRole => userRole.Role.id.toString()) || ['2'];
     const userLibraryId = user.User_Library?.[0]?.Library?.id?.toString() || '';
     
-    // Client-accessible cookie options (no httpOnly so JS can read them)
-    const clientCookieOptions = {
-      ...cookieOptions,
-      httpOnly: false, // Allow client-side JS to read these
-    };
-    
-    // Store role IDs array as JSON string in cookie
-    cookieStore.set('role', JSON.stringify(userRoleIds), clientCookieOptions);
-    cookieStore.set('library', userLibraryId, clientCookieOptions);
+    // These are httpOnly: client components read them through the server
+    // actions in lib/cookieActions.ts, never via document.cookie. Leaving them
+    // client-readable also made them client-WRITABLE, which allowed any user to
+    // forge `role=["1"]` and impersonate a Super Admin.
+    //
+    // NOTE: this cookie is still unsigned, so it must never be the sole basis
+    // for an authorization decision. Server-side checks must derive roles from
+    // the signed `session` JWT via getSessionRoleIds()/requireRoles() in
+    // lib/auth.ts. This cookie is for UI convenience only.
+    cookieStore.set('role', JSON.stringify(userRoleIds), cookieOptions);
+    cookieStore.set('library', userLibraryId, cookieOptions);
 
     // Save previous login time before overwriting, then update to now
     if (user.lastlogin_at) {

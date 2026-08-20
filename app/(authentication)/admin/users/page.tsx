@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { UserRoleManager } from "@/components/UserRoleManager";
 import { Container } from "@/components/Container";
+import { isSuperAdminDb } from "@/lib/auth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,6 +31,11 @@ async function UserManagementPage() {
   if (!userRoleIds.includes("1")) {
     redirect('/admin');
   }
+
+  // Authoritative, DB-backed super admin check. The `role` cookie above is set
+  // with httpOnly:false and is therefore client-writable, so it must not be the
+  // only thing gating the roster export.
+  const isSuperAdmin = await isSuperAdminDb();
 
   return (
     <main className="min-h-screen bg-background">
@@ -67,7 +73,7 @@ async function UserManagementPage() {
           </p>
         </div>
         
-        <UserRoleManager />
+        <UserRoleManager isSuperAdmin={isSuperAdmin} />
       </Container>
     </main>
   );

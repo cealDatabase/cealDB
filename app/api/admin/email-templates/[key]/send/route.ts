@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isSuperAdminDb } from '@/lib/auth';
 import { Resend } from 'resend';
 import db from '@/lib/db';
 import {
@@ -31,20 +31,14 @@ export async function POST(
   { params }: { params: Promise<{ key: string }> },
 ) {
   // --- Auth -----------------------------------------------------------------
-  const cookieStore = await cookies();
-  const roleCookie = cookieStore.get('role')?.value;
-  let roles: string[] = [];
-  if (roleCookie) {
-    try { roles = JSON.parse(roleCookie); } catch { roles = [roleCookie]; }
-  }
-  if (!roles.includes('1')) {
+  // Super Admin only, verified against the database via the signed session JWT.
+  // The `role` cookie is unsigned, so it must not gate a bulk email broadcast.
+  if (!(await isSuperAdminDb())) {
     return NextResponse.json(
       { error: 'Unauthorized: Super Admin access required' },
       { status: 403 },
     );
   }
-  const userIdCookie = cookieStore.get('user_id')?.value || cookieStore.get('userId')?.value;
-  const userId = userIdCookie ? Number(userIdCookie) : null;
 
   // --- Validate key ---------------------------------------------------------
   const { key } = await params;

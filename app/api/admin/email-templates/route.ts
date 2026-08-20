@@ -1,29 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isSuperAdminDb } from '@/lib/auth';
 import db from '@/lib/db';
 import { DEFAULT_TEMPLATES, TemplateKey } from '@/lib/emailTemplate';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
 
-async function getUserRolesFromCookies(): Promise<string[] | null> {
-  try {
-    const cookieStore = await cookies();
-    const roleCookie = cookieStore.get('role')?.value;
-    if (!roleCookie) return null;
-    try {
-      return JSON.parse(roleCookie);
-    } catch {
-      return [roleCookie];
-    }
-  } catch {
-    return null;
-  }
-}
-
+// Verified against the database via the signed session JWT. The `role` cookie
+// is unsigned and therefore forgeable, so it must not gate template writes.
 async function ensureSuperAdmin() {
-  const roles = await getUserRolesFromCookies();
-  if (!roles || !roles.includes('1')) {
+  if (!(await isSuperAdminDb())) {
     return NextResponse.json(
       { error: 'Unauthorized: Super Admin access required' },
       { status: 403 },

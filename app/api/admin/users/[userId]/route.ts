@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { isSuperAdminDb } from "@/lib/auth";
 import db from "@/lib/db";
 import { logUserAction } from "@/lib/auditLogger";
 
@@ -9,23 +9,9 @@ export async function DELETE(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    // Check if user is super admin
-    const cookieStore = await cookies();
-    const roleIds = cookieStore.get("role")?.value;
-    
-    let userRoleIds: string[] = [];
-    try {
-      userRoleIds = roleIds ? JSON.parse(roleIds) : [];
-    } catch (error) {
-      console.error('Failed to parse role IDs from cookie:', error);
-      return NextResponse.json(
-        { error: "Invalid session" },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is super admin (role ID 1)
-    if (!userRoleIds.includes("1")) {
+    // Super admin only. Verified against the database via the signed session
+    // JWT — never the `role` cookie, which is unsigned and therefore forgeable.
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: "Unauthorized. Super admin access required." },
         { status: 403 }

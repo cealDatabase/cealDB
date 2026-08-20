@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { getSessionRoleIds, getSessionUserId } from '@/lib/auth';
 import db from '@/lib/db';
 import {
   DEFAULT_TEMPLATES,
@@ -11,20 +11,17 @@ import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
 
+// Both values come from the signed session JWT (roles re-checked against the
+// database). Previously these were read from the `role` cookie — unsigned and
+// forgeable — and a `user_id`/`userId` cookie that is never set, so `userId`
+// was always null and `updated_by` was never recorded.
 async function getCookieData(): Promise<{ roles: string[] | null; userId: number | null }> {
   try {
-    const cookieStore = await cookies();
-    const roleCookie = cookieStore.get('role')?.value;
-    const userIdCookie = cookieStore.get('user_id')?.value || cookieStore.get('userId')?.value;
-    let roles: string[] | null = null;
-    if (roleCookie) {
-      try {
-        roles = JSON.parse(roleCookie);
-      } catch {
-        roles = [roleCookie];
-      }
-    }
-    return { roles, userId: userIdCookie ? Number(userIdCookie) : null };
+    const [roleIds, userId] = await Promise.all([
+      getSessionRoleIds(),
+      getSessionUserId(),
+    ]);
+    return { roles: roleIds.map(String), userId };
   } catch {
     return { roles: null, userId: null };
   }

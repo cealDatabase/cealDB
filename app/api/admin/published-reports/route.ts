@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isSuperAdminDb, getSessionUserId } from '@/lib/auth';
 import db from '@/lib/db';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db as any;
 
+// Verified against the database via the signed session JWT. The `role` cookie
+// is unsigned and therefore forgeable, so it must not gate writes.
 async function requireSuperAdmin() {
-  const cookieStore = await cookies();
-  const roleCookie = cookieStore.get('role')?.value;
-  let roles: string[] = [];
-  if (roleCookie) {
-    try { roles = JSON.parse(roleCookie); } catch { roles = [roleCookie]; }
-  }
-  return roles.includes('1');
+  return isSuperAdminDb();
 }
 
+// Derived from the signed session JWT. This previously read a `user_id`/`userId`
+// cookie that is never set anywhere, so it always returned null.
 async function currentUserId() {
-  const cookieStore = await cookies();
-  const v = cookieStore.get('user_id')?.value || cookieStore.get('userId')?.value;
-  return v ? Number(v) : null;
+  return getSessionUserId();
 }
 
 /**

@@ -171,6 +171,94 @@ export async function hasValidSession(): Promise<boolean> {
   }
 }
 
+// Returns the caller's user ID from the signed `session` JWT, or null.
+// Use this instead of reading a `user_id`/`userId` cookie — no such cookie is
+// ever set, so those reads always yielded null.
+export async function getSessionUserId(): Promise<number | null> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken) return null;
+
+    const payload = verifyJWTToken(sessionToken);
+    return payload?.userId ?? null;
+  } catch (error) {
+    console.error('getSessionUserId error:', error);
+    return null;
+  }
+}
+
+// Returns the caller's role IDs, derived from the signed `session` JWT and
+// re-read from the database. Returns [] when there is no valid session.
+//
+// ALWAYS use this (or requireRoles) for authorization. Do NOT read the `role`
+// cookie: it is unsigned, so a client can send any value it likes.
+export async function getSessionRoleIds(): Promise<number[]> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken) return [];
+
+    const payload = verifyJWTToken(sessionToken);
+    if (!payload?.userId) return [];
+
+    const rows = await db.users_Roles.findMany({
+      where: { user_id: payload.userId },
+      select: { role_id: true },
+    });
+    return rows.map((r) => r.role_id);
+  } catch (error) {
+    console.error('getSessionRoleIds error:', error);
+    return [];
+  }
+}
+
+// True when the caller holds at least one of the given role IDs.
+// Role IDs: 1 = Super Admin, 2 = Member Institution,
+//           3 = E-Resource Editor, 4 = Assistant Admin.
+export async function requireRoles(...allowed: number[]): Promise<boolean> {
+  const roleIds = await getSessionRoleIds();
+  return roleIds.some((id) => allowed.includes(id));
+}
+
+// Roles allowed to act across every institution (Super Admin, E-Resource
+// Editor, Assistant Admin). Members (role 2) are scoped to their own library.
+const CROSS_LIBRARY_ROLES = [1, 3, 4];
+
+// True when the caller may act on the given library: either they hold a
+// cross-library role, or they are assigned to that library in User_Library.
+//
+// Use this on any endpoint that takes a library id from the request. Trusting
+// a caller-supplied `libid` (or the `library` cookie) lets one institution
+// modify another institution's data.
+export async function canAccessLibrary(libraryId: number): Promise<boolean> {
+  try {
+    if (!Number.isFinite(libraryId)) return false;
+
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+    if (!sessionToken) return false;
+
+    const payload = verifyJWTToken(sessionToken);
+    if (!payload?.userId) return false;
+
+    const roles = await db.users_Roles.findMany({
+      where: { user_id: payload.userId },
+      select: { role_id: true },
+    });
+    if (roles.some((r) => CROSS_LIBRARY_ROLES.includes(r.role_id))) return true;
+
+    const assignment = await db.user_Library.findFirst({
+      where: { user_id: payload.userId, library_id: libraryId },
+      select: { user_id: true },
+    });
+    return assignment !== null;
+  } catch (error) {
+    console.error('canAccessLibrary error:', error);
+    return false;
+  }
+}
+
 // Server-side super admin check backed by the database.
 // Verifies the JWT session cookie, then checks Users_Roles for role_id=1.
 // NEVER trust roles supplied in a request body — use this instead.

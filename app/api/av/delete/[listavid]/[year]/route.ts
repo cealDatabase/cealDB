@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { hasValidSession } from "@/lib/auth";
+import { requireRoles } from "@/lib/auth";
 
 export async function DELETE(
   req: Request,
   context: { params: Promise<{ listavid: string, year: string }> }
 ) {
-  if (!(await hasValidSession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Mutates the shared, cross-institution catalog record, so this is limited to
+  // Super Admin / E-Resource Editor / Assistant Admin — matching the
+  // /admin/survey/* pages this is called from. hasValidSession() only proved
+  // the caller was logged in, which let any member edit the global catalog.
+  if (!(await requireRoles(1, 3, 4))) {
+    return NextResponse.json(
+      { error: "Unauthorized: E-Resource Editor or Super Admin access required" },
+      { status: 403 }
+    );
   }
 
   // ✅ Await the params, then pull out listavid and year

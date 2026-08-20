@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { isSuperAdminDb } from '@/lib/auth';
 import db from '@/lib/db';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db as any;
 
+// Verified against the database via the signed session JWT. The `role` cookie
+// is unsigned and therefore forgeable, so it must not gate publish/delete.
 async function requireSuperAdmin() {
-  const cookieStore = await cookies();
-  const roleCookie = cookieStore.get('role')?.value;
-  let roles: string[] = [];
-  if (roleCookie) {
-    try { roles = JSON.parse(roleCookie); } catch { roles = [roleCookie]; }
-  }
-  return roles.includes('1');
+  return isSuperAdminDb();
 }
 
 /**

@@ -1,33 +1,23 @@
 // app/api/admin/survey-sessions/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { cookies } from 'next/headers';
+import { getSessionRoleIds } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
 
 /**
- * Get user info from cookies (server-side)
+ * Get the caller's roles from the signed session JWT, re-checked against the
+ * database. Previously read from the `role` cookie, which is unsigned and
+ * therefore forgeable by any client.
  */
 async function getUserFromCookies() {
-  const cookieStore = await cookies();
-  const roleCookie = cookieStore.get('role')?.value;
-  
-  if (!roleCookie) {
-    return null;
-  }
-
   try {
-    let userRoles: string[] = [];
-    try {
-      userRoles = JSON.parse(roleCookie);
-    } catch {
-      userRoles = [roleCookie];
+    const roleIds = await getSessionRoleIds();
+    if (roleIds.length === 0) {
+      return null;
     }
-
-    return {
-      userRoles
-    };
+    return { userRoles: roleIds.map(String) };
   } catch {
     return null;
   }

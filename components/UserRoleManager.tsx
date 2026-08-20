@@ -16,7 +16,8 @@ import {
   Loader2,
   AlertCircle,
   Trash2,
-  Send
+  Send,
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,7 +43,12 @@ interface User {
   }>;
 }
 
-export function UserRoleManager() {
+interface UserRoleManagerProps {
+  /** Only Super Admins may see and use the roster export. */
+  isSuperAdmin?: boolean;
+}
+
+export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,6 +57,7 @@ export function UserRoleManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
   const [sendingUserId, setSendingUserId] = useState<number | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -161,6 +168,47 @@ export function UserRoleManager() {
     }
   };
 
+  const handleExportRoster = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch('/api/admin/users/export');
+
+      if (!response.ok) {
+        // Error responses are JSON; success responses are CSV.
+        let message = 'Failed to export roster';
+        try {
+          const data = await response.json();
+          message = data.error || message;
+        } catch {
+          // Non-JSON error body - keep the default message.
+        }
+        throw new Error(message);
+      }
+
+      // Prefer the server-provided filename from Content-Disposition.
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="?([^"]+)"?/);
+      const filename = match?.[1] || 'CEAL_User_Roster.csv';
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Roster exported successfully');
+    } catch (error) {
+      console.error('Error exporting roster:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to export roster');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const getUserDisplayName = (user: User) => {
     if (user.firstname && user.lastname) {
       return `${user.firstname} ${user.lastname}`;
@@ -185,16 +233,41 @@ export function UserRoleManager() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle>User Role Management</CardTitle>
+                <CardDescription>
+                  Manage roles for all users in the system
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle>User Role Management</CardTitle>
-              <CardDescription>
-                Manage roles for all users in the system
-              </CardDescription>
-            </div>
+
+            {/* Roster export — Super Admin only */}
+            {isSuperAdmin && (
+              <Button
+                variant="outline"
+                onClick={handleExportRoster}
+                disabled={isExporting}
+                className="shrink-0"
+                title="Download all users (name, institution, email, role) as CSV"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Roster (CSV)
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>

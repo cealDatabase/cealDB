@@ -1,32 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { Resend } from 'resend';
-import { cookies } from 'next/headers';
+import { isSuperAdminDb } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
 
 const prisma = db;
 
-async function getUserRolesFromCookies(): Promise<string[] | null> {
-  try {
-    const cookieStore = await cookies();
-    const roleCookie = cookieStore.get('role')?.value;
-    if (!roleCookie) return null;
-    try {
-      return JSON.parse(roleCookie);
-    } catch {
-      return [roleCookie];
-    }
-  } catch {
-    return null;
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    // AuthZ: Super Admin (role "1") only
-    const roles = await getUserRolesFromCookies();
-    if (!roles || !roles.includes('1')) {
+    // AuthZ: Super Admin only, verified against the database via the signed
+    // session JWT. The `role` cookie is unsigned and must not gate email sends.
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json({ error: 'Unauthorized: Super Admin access required' }, { status: 403 });
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserRoles } from "@/data/fetchPrisma";
-import { cookies } from "next/headers";
+import db from "@/lib/db";
+import { isSuperAdminDb } from "@/lib/auth";
 import { logUserAction } from "@/lib/auditLogger";
 
 interface RouteParams {
@@ -22,23 +23,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Check if user is super admin
-    const cookieStore = await cookies();
-    const roleIds = cookieStore.get("role")?.value;
-    
-    let userRoleIds: string[] = [];
-    try {
-      userRoleIds = roleIds ? JSON.parse(roleIds) : [];
-    } catch (error) {
-      console.error('Failed to parse role IDs from cookie:', error);
-      return NextResponse.json(
-        { error: "Invalid session" },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is super admin (role ID 1)
-    if (!userRoleIds.includes("1")) {
+    // Super admin only. Checked against the database via the signed session
+    // JWT — never the `role` cookie, which is unsigned and forgeable. This
+    // endpoint grants roles, so a bypass here means permanent privilege
+    // escalation.
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: "Unauthorized. Super admin access required." },
         { status: 403 }
@@ -55,9 +44,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Get current user roles for audit log
-    const currentUserEmail = cookieStore.get("uinf")?.value;
-    const oldRoles = userRoleIds.map(id => parseInt(id));
+    // Capture the TARGET user's existing roles for the audit log. This
+    // previously logged the acting admin's own roles, which made every role
+    // change record show the wrong "before" value.
+    const oldRoles = (
+      await db.users_Roles.findMany({
+        where: { user_id: userIdNum },
+        select: { role_id: true },
+      })
+    ).map((r) => r.role_id);
 
     const result = await updateUserRoles(userIdNum, newRoleIds);
 

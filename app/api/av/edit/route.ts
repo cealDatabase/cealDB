@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { logUserAction } from "@/lib/auditLogger";
-import { hasValidSession } from "@/lib/auth";
+import { hasValidSession, canAccessLibrary } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -40,6 +40,16 @@ export async function POST(req: Request) {
 
     if (!Number.isFinite(libraryId)) {
       return NextResponse.json({ error: "Invalid library ID" }, { status: 400 });
+    }
+
+    // The caller supplies libid, so confirm they may act on that institution.
+    // Previously only a valid session was required, which let any member
+    // modify another institution's records.
+    if (!(await canAccessLibrary(Number(libid)))) {
+      return NextResponse.json(
+        { error: "Forbidden: you may only modify your own institution" },
+        { status: 403 }
+      );
     }
 
     if (!Number.isFinite(yearNum)) {

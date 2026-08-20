@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { isSuperAdminDb } from '@/lib/auth';
 import db from '@/lib/db';
 
 const prisma = db;
@@ -8,7 +9,6 @@ export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const userEmail = cookieStore.get('uinf')?.value;
-    const roleData = cookieStore.get('role')?.value;
 
     if (!userEmail) {
       return NextResponse.json(
@@ -17,17 +17,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let isSuperAdmin = false;
-    if (roleData) {
-      try {
-        const roles = JSON.parse(decodeURIComponent(roleData));
-        isSuperAdmin = Array.isArray(roles) && roles.includes('1');
-      } catch {
-        isSuperAdmin = roleData === '1';
-      }
-    }
-
-    if (!isSuperAdmin) {
+    // Verified against the database via the signed session JWT. The `role`
+    // cookie is unsigned and therefore forgeable by any client.
+    if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { success: false, error: 'Only Super Admins can update published status' },
         { status: 403 }

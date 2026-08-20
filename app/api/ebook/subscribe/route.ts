@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import db from "@/lib/db";
+import { canAccessLibrary } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +25,17 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
+    }
+
+    // These endpoints previously had NO authentication at all and are not
+    // covered by the proxy matcher, so they were reachable anonymously.
+    // canAccessLibrary() rejects callers with no session and confirms the
+    // caller may act on this institution.
+    if (!(await canAccessLibrary(Number(libid)))) {
+      return NextResponse.json(
+        { error: "Forbidden: you may only modify your own institution" },
+        { status: 403 }
+      );
     }
 
     if (!year || isNaN(Number(year))) {

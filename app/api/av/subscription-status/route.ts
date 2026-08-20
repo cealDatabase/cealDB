@@ -1,6 +1,7 @@
 // /app/api/av/subscription-status/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { canAccessLibrary } from "@/lib/auth";
 
 export async function GET(req: Request) {
   try {
@@ -14,6 +15,16 @@ export async function GET(req: Request) {
       return NextResponse.json(
         { error: "Missing or invalid library ID" },
         { status: 400 }
+      );
+    }
+
+    // This route had no authentication and is not covered by the proxy
+    // matcher, so any anonymous caller could read another institution's
+    // subscription list by passing its libid.
+    if (!(await canAccessLibrary(Number(libid)))) {
+      return NextResponse.json(
+        { error: "Forbidden: you may only view your own institution" },
+        { status: 403 }
       );
     }
 
