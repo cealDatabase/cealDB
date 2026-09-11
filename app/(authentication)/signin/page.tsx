@@ -356,7 +356,7 @@ export default function SignInPage() {
               </li>
               <li className="flex gap-2">
                 <span className="font-medium text-blue-600">3.</span>
-                Create a secure password (minimum 8 characters)
+                Create a secure password (minimum 12 characters, with upper and lower case, a number and a special character)
               </li>
             </ol>
           </div>

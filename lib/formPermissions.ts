@@ -100,12 +100,15 @@ export async function checkFormEditPermission(
 
   } catch (error) {
     console.error('Error checking form edit permission:', error);
-    // On error, default to allowing edit (fail open for better UX)
+    // Fail closed. If we cannot determine whether the survey window is open,
+    // we must not grant write access: the error case used to default to
+    // `canEdit: true`, which meant a transient database fault reopened every
+    // form — including after the collection period had closed.
     return {
-      canEdit: true,
+      canEdit: false,
       isAfterClosing: false,
       isPrivilegedPostClosing: false,
-      reason: 'Permission check failed - defaulting to allow'
+      reason: 'Permission check failed - edit denied. Please try again, or contact the CEAL Statistics Committee if this persists.'
     };
   }
 }

@@ -4,8 +4,20 @@ import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import db from './db';
 
-// Authentication secret - should be in environment variables in production
-const AUTH_SECRET = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
+// Authentication secret. There is deliberately no fallback: a hardcoded
+// default is a publicly known signing key, so anyone could mint a valid
+// session JWT for any user the moment the env var went missing. Failing
+// loudly at startup is the safe behaviour.
+const AUTH_SECRET_ENV = process.env.AUTH_SECRET;
+if (!AUTH_SECRET_ENV) {
+  throw new Error(
+    'AUTH_SECRET is not set. Generate one with `openssl rand -base64 32` and ' +
+    'add it to your .env (local) or the Vercel project environment variables.'
+  );
+}
+// Re-bound so the type is `string`, not `string | undefined`: TypeScript does
+// not carry the narrowing from the throw above into the functions below.
+const AUTH_SECRET: string = AUTH_SECRET_ENV;
 
 // Argon2id configuration
 const ARGON2_OPTS = {
