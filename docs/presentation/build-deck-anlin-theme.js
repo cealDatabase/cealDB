@@ -223,17 +223,12 @@ function note(s, txt){ s.addNotes(txt); }
     'Checked the migrated numbers against the historical record',
     'Made the decisions that unblocked us, quickly, again and again',
   ], 10);
-  card(s, M, 3.52, 2.55, 0.78);
-  s.addText([{ text: '≈ N', options: { fontSize: 20, bold: true, color: CORAL, fontFace: FONTB, breakLine: true } },
-             { text: 'EMAIL THREADS, OVER M MONTHS', options: { fontSize: 7, color: MUTED, fontFace: FONT, charSpacing: 0.8 } }],
-    { x: M, y: 3.60, w: 2.55, h: 0.64, isTextBox: true, margin: 0, align: 'center' });
-  s.addText('You cannot read these requirements out of a database.\nThey came out of that correspondence.',
-    { x: M + 2.80, y: 3.56, w: CW - 2.80, h: 0.72, isTextBox: true, margin: 0,
-      fontFace: FONTB, fontSize: 12, bold: true, color: INK, valign: 'middle', lineSpacingMultiple: 1.1 });
-  s.addText('[需要你补] 把 N 和 M 换成邮箱里的真实数字',
-    { x: M, y: 4.48, w: CW, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: FONT, fontSize: 8, italic: true, color: MUTED });
-  note(s, `MENG — ~2 min ⭐ 全场最重要的一页,也是给 Anlin 的致谢。\n\nI want to spend a minute on something that is not code.\n\nWhen you rebuild a survey like this, the hard part is not the software. The hard part is understanding what every single field on the form actually means. What counts as a volume. What belongs in one column and not another. Why two questions that look similar are counted differently.\n\nNone of that is written in the old database. It lives in the practice of this community. And the person who translated it for us was Anlin.\n\nOver the past two and a half years, Anlin has explained fields to us question by question. She put us in touch with the right person at each library when we needed to check something. She coordinated the deadlines. She checked our migrated numbers against the historical record. And when we were stuck on a decision that was not ours to make, she made it, usually within a day.\n\nThat is roughly N separate email threads across M months.\n\nSo I want to say this plainly, and in front of all of you. This system is accurate because the Committee kept us accurate. Anlin, thank you.\n\n导演提示: 因为 Anlin 排在最后讲,这一页还能提前把她捧起来。说完看一眼镜头里的她再切页。\n需要你补:去邮箱数 thread 数和月数。`);
+  statCard(s, M, 3.50, 1.75, '356', 'Emails about CEAL', CORAL);
+  statCard(s, M + 1.90, 3.50, 1.75, '185', 'Zoom meetings', GREEN);
+  s.addText('Over twenty-nine months.\nYou cannot read these requirements out of a database — they came out of that conversation.',
+    { x: M + 3.95, y: 3.52, w: CW - 3.95, h: 1.04, isTextBox: true, margin: 0,
+      fontFace: FONTB, fontSize: 11.5, bold: true, color: INK, valign: 'middle', lineSpacingMultiple: 1.12 });
+  note(s, `MENG — ~2 min ⭐ 全场最重要的一页,也是给 Anlin 的致谢。\n\nI want to spend a minute on something that is not code.\n\nWhen you rebuild a survey like this, the hard part is not the software. The hard part is understanding what every single field on the form actually means. What counts as a volume. What belongs in one column and not another. Why two questions that look similar are counted differently.\n\nNone of that is written in the old database. It lives in the practice of this community. And the person who translated it for us was Anlin.\n\nOver the past two and a half years, Anlin has explained fields to us question by question. She put us in touch with the right person at each library when we needed to check something. She coordinated the deadlines. She checked our migrated numbers against the historical record. And when we were stuck on a decision that was not ours to make, she made it, usually within a day.\n\nTo put a number on it: three hundred and fifty-six emails about CEAL, and a hundred and eighty-five Zoom meetings. Over twenty-nine months.\n\nSo I want to say this plainly, and in front of all of you. This system is accurate because the Committee kept us accurate. Anlin, thank you.\n\n导演提示: 因为 Anlin 排在最后讲,这一页还能提前把她捧起来。说完看一眼镜头里的她再切页。\n185 次 Zoom 会议比 356 封邮件更有冲击力 —— 两年半里平均每月六次会,听众自己会算这笔账。`);
 }
 
 /* ===== S7 sign-in ===== */

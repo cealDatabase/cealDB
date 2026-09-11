@@ -277,7 +277,7 @@ sentence with three technical nouns in it.
 > - Checked the migrated numbers against the historical record
 > - Made the decisions that unblocked us, quickly, again and again
 >
-> **[NEEDS: about N email threads across M months]**
+> **356 emails about CEAL  ·  185 Zoom meetings  ·  29 months**
 >
 > You cannot read these requirements out of a database.
 > They came out of that correspondence.
@@ -301,8 +301,8 @@ sentence with three technical nouns in it.
 > were stuck on a decision that was not ours to make, she made it, usually
 > within a day.
 >
-> [Optional, if you have the number] That is roughly N separate email threads
-> across M months.
+> To put a number on it: three hundred and fifty-six emails about CEAL, and a
+> hundred and eighty-five Zoom meetings. Over twenty-nine months.
 >
 > So I want to say this plainly, and in front of all of you. This system is
 > accurate because the Committee kept us accurate. Anlin, thank you.
@@ -313,7 +313,7 @@ sentence with three technical nouns in it.
 
 因为 Anlin 排在最后讲,这一页还有个额外作用:**提前把她捧起来**,她上台时听众已经知道她做了多少事。
 
-`[需要你补]` 去邮箱数一下跟 Anlin 大概多少个 thread、跨了几个月。填一个具体数字,比"大量沟通"有力十倍。想放截图也可以,**记得把邮箱地址和正文打码**。
+`导演提示:` 这两个数字念出来就够了,不用解释怎么统计的。**185 次 Zoom 会议比 356 封邮件更有冲击力** —— 那是两年半里每个月平均六次会,听众自己会算这笔账。
 
 说完这段,看一眼镜头里的 Anlin,再切下一页。
 
@@ -1145,9 +1145,9 @@ sentence with three technical nouns in it.
 > |---|---|
 > | **July 1 – June 30** | The fiscal year your numbers describe |
 > | **around Sept** | The Committee confirms dates and the contact list |
-> | **October 1** | Forms open. You get an email the same day. |
+> | **mid-October** | Forms open. You get an email the same day. |
 > | **late November** | A reminder, one week before closing |
-> | **December 2** | Forms close |
+> | **mid-December** | Forms close |
 > | **Dec – Jan** | The Committee reviews and prepares the report |
 > | **Feb – May** | The report appears in the *Journal of East Asian Libraries* |
 >
@@ -1164,8 +1164,8 @@ sentence with three technical nouns in it.
 > that we have the right contact person for every library — and if your
 > delegate has changed, this is the moment to tell us.
 >
-> The forms open on October first, and you will get an email that same day.
-> They close on December second, and you will get a reminder one week before
+> The forms open in mid-October, and you will get an email that same day.
+> They close in mid-December, and you will get a reminder one week before
 > that.
 >
 > After they close, the Committee reviews the data and prepares the annual
@@ -1359,7 +1359,7 @@ sentence with three technical nouns in it.
 
 **SLIDE**
 
-> ### Three things, before October 1
+> ### Three things, before the forms open
 >
 > **1 · Confirm your delegate**
 > Tell us if the person who submits for your library has changed. This is the
