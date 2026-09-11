@@ -84,10 +84,12 @@ function ResetPasswordContent() {
       return;
     }
 
-    if (password.length < 8) {
+    // Mirrors the server policy in lib/password.ts. The server remains
+    // authoritative; this is a pre-check so the user is not bounced by the API.
+    if (password.length < 12) {
       setMessage({
         type: 'error',
-        text: 'Password must be at least 8 characters long.'
+        text: 'Password must be at least 12 characters long, and include an uppercase letter, a lowercase letter, a number and a special character.'
       });
       return;
     }

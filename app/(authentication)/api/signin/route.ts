@@ -172,10 +172,19 @@ export async function POST(request: NextRequest) {
         select: { library_id: true }
       });
 
-      const userRole = await db.users_Roles.findFirst({
+      // Every role, not just the first: a user can hold several, and dropping
+      // the rest silently removed access this account was entitled to.
+      const userRoles = await db.users_Roles.findMany({
         where: { user_id: user.id },
         include: { Role: true }
       });
+
+      // The `role` cookie is consumed as a JSON array of Role *ids*
+      // (see proxy.ts and the admin pages, which all JSON.parse it). This
+      // handler used to write the role *name* as a bare string, so every
+      // consumer threw on parse and fell back to "no roles" — users signing in
+      // through this path lost the UI their role should have given them.
+      const userRoleIds = userRoles.map((ur) => ur.Role.id.toString());
 
       // Create session user object
       const sessionUser = {
@@ -183,7 +192,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
-        role: userRole?.Role?.role || null,
+        role: userRoleIds.length > 0 ? JSON.stringify(userRoleIds) : null,
         library: userLibrary?.library_id || null,
       };
 
@@ -214,9 +223,11 @@ export async function POST(request: NextRequest) {
       const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
       const isProduction = process.env.NODE_ENV === 'production';
       
-      // Cookie options for route handler - secure: false for development
+      // `secure` must track the environment, not be pinned off. Hardcoding it
+      // to false shipped the session cookie without the Secure attribute in
+      // production, so it could be sent over plaintext HTTP.
       const cookieOptions = {
-        secure: false, // Always false for localhost development
+        secure: isProduction,
         httpOnly: true,
         expires: expireTime,
         path: '/',

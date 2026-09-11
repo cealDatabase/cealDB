@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { hashPassword, generateResetToken } from '@/lib/auth';
+import { validatePassword } from '@/lib/password';
 import { sendPasswordResetEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -158,14 +159,19 @@ async function handlePasswordResetRequest(email: string) {
 
 async function handlePasswordReset(token: string, newPassword: string) {
   try {
-    // Validate password strength
-    if (!newPassword || newPassword.length < 8) {
+    // Validate password strength against the single shared policy in
+    // lib/password.ts. This endpoint previously enforced its own weaker rule
+    // (8 characters, no character-class requirements), which let a reset
+    // bypass the 12-character policy applied everywhere else.
+    const passwordCheck = validatePassword(newPassword);
+    if (!passwordCheck.valid) {
       return NextResponse.json(
         {
           success: false,
           errorType: 'WEAK_PASSWORD',
-          message: 'Password must be at least 8 characters long.',
-          hint: 'Please choose a stronger password with at least 8 characters.',
+          message: passwordCheck.errors[0],
+          hint: passwordCheck.errors.join(' '),
+          errors: passwordCheck.errors,
         },
         { status: 400 }
       );
