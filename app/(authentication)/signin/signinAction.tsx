@@ -154,8 +154,11 @@ export default async function signinAction(
     const cookieStore = await cookies();
     const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000 * 3); // 3 days
     
+    // `secure` must track the environment, not be pinned off. Hardcoding it to
+    // false shipped the session cookie without the Secure attribute in
+    // production, so it could be sent over plaintext HTTP.
     const cookieOptions = {
-      secure: false, // For development
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       expires: expireTime,
       path: '/',

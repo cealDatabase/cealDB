@@ -4,7 +4,15 @@ import { jwtVerify } from 'jose';
 
 async function verifyJWTToken(token: string): Promise<{ username: string } | null> {
   try {
-    const secret = process.env.AUTH_SECRET || 'fallback-secret-change-in-production';
+    // No fallback secret. A hardcoded default is a publicly known signing key,
+    // so anyone could forge a session JWT the moment the env var went missing.
+    // Middleware runs on every request, so rather than throwing (which would
+    // take the whole site down) we treat the token as unverifiable and deny.
+    const secret = process.env.AUTH_SECRET;
+    if (!secret) {
+      console.error('[proxy] AUTH_SECRET is not set - refusing to verify any session.');
+      return null;
+    }
     const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
     
     const username = payload.username as string;
@@ -108,7 +116,10 @@ export const config = {
     '/signup/:path*',
     // Auth routes  
     '/signin',
+    // Both forms: '/forgot' alone does not match '/forgot/<anything>', which is
+    // how a route under it previously shipped with no middleware coverage.
     '/forgot',
+    '/forgot/:path*',
     '/confirmed',
     '/unauthorized',
     // Protected API routes

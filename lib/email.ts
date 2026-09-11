@@ -108,7 +108,7 @@ export async function sendPasswordResetEmail(
               <p><strong>What you need to do:</strong></p>
               <ol>
                 <li>Click the button below to ${isInitialSetup ? 'create' : 'set'} your ${isInitialSetup ? 'initial' : 'new'} password</li>
-                <li>Choose a strong password (minimum 8 characters)</li>
+                <li>Choose a strong password (minimum 12 characters, including an uppercase letter, a lowercase letter, a number and a special character)</li>
                 <li>Include uppercase, lowercase, numbers, and special characters</li>
               </ol>
               
@@ -212,7 +212,7 @@ export async function sendWelcomeEmail(
               
               <p><strong>Password Requirements:</strong></p>
               <ul>
-                <li>Minimum 8 characters long</li>
+                <li>Minimum 12 characters long</li>
                 <li>Include uppercase letters (A-Z)</li>
                 <li>Include lowercase letters (a-z)</li>
                 <li>Include numbers (0-9)</li>
