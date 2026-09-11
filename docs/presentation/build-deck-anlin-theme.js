@@ -23,6 +23,32 @@ const FONTB = 'Lexend SemiBold';
 const M = 0.5;                      // side margin
 const CW = 10 - M * 2;              // 9.0 content width
 
+// ---- screenshot slots -------------------------------------------------------
+// Set a file path to embed the real image; null draws a labelled frame instead.
+const IMG = {
+  oldMember : null,   // ceal.ku.edu/member      - old site, after signing in
+  newAdmin  : null,   // cealstats.org/admin     - new site, after signing in
+  toolkit   : null,   // new site, Super Admin Toolkit
+  oldHome   : null,   // ceal.ku.edu             - old homepage (optional/backup)
+  myForms   : null,   // new site, My Forms       (optional/backup)
+};
+
+// Draws the image if a path is set, otherwise a dashed frame naming what goes there.
+function shot(s, key, x, y, w, h, caption){
+  const path = IMG[key];
+  if (path) {
+    s.addImage({ path, x, y, w, h, sizing: { type: 'contain', w, h } });
+    s.addShape(pres.ShapeType.rect, { x, y, w, h, fill: { type: 'none' },
+      line: { color: TAN, width: 0.75 } });
+  } else {
+    s.addShape(pres.ShapeType.rect, { x, y, w, h, fill: { color: WHITE },
+      line: { color: TAN, width: 1, dashType: 'dash' } });
+    s.addText(caption || key, { x: x + 0.15, y: y + h / 2 - 0.30, w: w - 0.30, h: 0.60,
+      isTextBox: true, margin: 0, fontFace: FONT, fontSize: 9, color: MUTED,
+      align: 'center', valign: 'middle' });
+  }
+}
+
 function slide(){ const s = pres.addSlide(); s.background = { color: BG }; return s; }
 
 function head(s, title, speaker, kicker){
@@ -144,30 +170,22 @@ function note(s, txt){ s.addNotes(txt); }
 /* ===== S3 Where we started ===== */
 {
   const s = slide();
-  head(s, 'Where we started', 'Meng', 'The site we inherited');
-  const colW = (CW - 0.25) / 2;
-  card(s, M, 1.25, colW, 2.35, MINT);
-  s.addText('What it did well — for twenty years', { x: M + 0.20, y: 1.38, w: colW - 0.40,
-    h: 0.26, isTextBox: true, margin: 0, fontFace: FONTB, fontSize: 11.5, bold: true, color: GREEN });
-  bullets(s, M + 0.20, 1.70, colW - 0.40, 1.8, [
-    'Held every data point and every form, complete and correct',
-    'Served guests, member libraries and the Committee, reliably',
-    'Never lost anyone’s data',
-  ], 10);
-  card(s, M + colW + 0.25, 1.25, colW, 2.35);
-  s.addText('What it could no longer do', { x: M + colW + 0.45, y: 1.38, w: colW - 0.40,
-    h: 0.26, isTextBox: true, margin: 0, fontFace: FONTB, fontSize: 11.5, bold: true, color: CORAL });
-  bullets(s, M + colW + 0.45, 1.70, colW - 0.40, 1.8, [
-    'Built for a desktop monitor. Unusable on a phone or tablet.',
-    'Fixed page width, dated colours, hard to read',
-    'Every administrative change needed a developer',
-    'Built on software getting harder to host safely',
-  ], 10);
-  emphasis(s, 3.78, 'Whoever built that site deserves credit. It did its job for two decades.', GREEN);
-  s.addText('[截图] 用两张图替掉上面两个卡片：旧站首页 / 旧站 390px 宽',
-    { x: M, y: 4.55, w: CW, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: FONT, fontSize: 8, italic: true, color: MUTED });
-  note(s, `MENG — ~1.5 min\n\nLet me start with the old site, and let me start by being fair to it.\n\nThat site did its job for two decades. Every number was in there. Every form was in there. It never lost anyone's data. Whoever built it deserves credit, and some of them may be on this call.\n\n[可删] But it was built for a desktop computer in the early two thousands. If you opened it on your phone, you had to pinch and scroll sideways to read a table. The page had a fixed width, so on a large monitor most of your screen was empty. The colours were hard on the eyes.\n\nAnd there was a bigger problem, one you would only notice if you were on the Committee. Almost nothing could be changed without a developer. Opening the survey, sending the announcement, adding a new library — all of it meant emailing someone technical and waiting.\n\nThat is the situation we were asked to fix.\n\n导演提示: 必须先夸旧站再说问题。Anlin 第 2 页已经讲了 KU 停止托管那条线,这里不要重复,直接讲"网站本身老了"。`);
+  head(s, 'Where we started', 'Meng', 'The same screen, then and now');
+  const fw = 3.45, fh = 2.92, x1 = 1.35, x2 = 5.20, fy = 1.46;
+
+  s.addText('BEFORE  \u00B7  ceal.ku.edu', { x: x1, y: 1.16, w: fw, h: 0.24, isTextBox: true,
+    margin: 0, fontFace: FONTB, fontSize: 9.5, bold: true, color: MUTED, charSpacing: 0.8 });
+  s.addText('AFTER  \u00B7  cealstats.org', { x: x2, y: 1.16, w: fw, h: 0.24, isTextBox: true,
+    margin: 0, fontFace: FONTB, fontSize: 9.5, bold: true, color: CORAL, charSpacing: 0.8 });
+
+  shot(s, 'oldMember', x1, fy, fw, fh, '\u65E7\u7AD9\u4F1A\u5458\u533A\nceal.ku.edu/member');
+  shot(s, 'newAdmin',  x2, fy, fw, fh, '\u65B0\u7AD9 Dashboard\ncealstats.org/admin');
+
+  card(s, M, 4.56, CW, 0.62, MINT);
+  s.addText('Both of these are the first screen you see after signing in.',
+    { x: M + 0.20, y: 4.60, w: CW - 0.40, h: 0.54, isTextBox: true, margin: 0,
+      fontFace: FONTB, fontSize: 11.5, bold: true, color: INK, valign: 'middle' });
+  note(s, `MENG — ~1.5 min\n\nLet me start with the old site, and let me start by being fair to it.\n\nThat site did its job for two decades. Every number was in there. Every form was in there. It never lost anyone's data. Whoever built it deserves credit, and some of them may be on this call.\n\n[指左边] This is what you saw after signing in. Everything works — but it is a wall of links, and you have to already know what you are looking for.\n\n[指右边] This is the same moment on the new site. Your name, your institution, what you are allowed to do, and the three things you most likely came to do.\n\n[可删] It was built for a desktop computer in the early two thousands. On a phone you had to pinch and scroll sideways to read a table. The page had a fixed width, so on a large monitor most of your screen was empty.\n\nAnd there was a bigger problem, one you would only notice if you were on the Committee. Almost nothing could be changed without a developer. Opening the survey, sending the announcement, adding a new library — all of it meant emailing someone technical and waiting.\n\nThat is the situation we were asked to fix.\n\n导演提示: 两张图都是"登录后第一屏",对比公平,不会被说是挑软柿子。\n必须先夸旧站再说问题。Anlin 第 2 页已讲 KU 停止托管,这里不要重复。\n旧站首页那张(满屏文字)可以留作 Q&A 备用,或换掉左边这张。`);
 }
 
 /* ===== S4 The brief ===== */
@@ -250,29 +268,29 @@ function note(s, txt){ s.addNotes(txt); }
 /* ===== S8 toolkit I ===== */
 {
   const s = slide();
-  head(s, 'Giving the Committee the controls', 'Meng', 'The toolkit — running the survey');
-  s.addText('Every one of these used to require a developer. Now each is a page on the site.',
-    { x: M, y: 1.18, w: CW, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: FONT, fontSize: 10, italic: true, color: GREEN });
-  const g = [
-    ['Set the dates', 'Opening, closing, fiscal year, publication — per year'],
-    ['Open a new year', 'Creates the year’s records for all 50 libraries at once'],
-    ['Open or close right now', 'An override for when the schedule slips'],
-    ['Send the announcement', 'Preview it, confirm it, send now or schedule it'],
-    ['Edit the wording', 'Of every automatic message, in the browser'],
-    ['Email one person', 'For the library that joined after the announcement went out'],
-  ];
-  const cw2 = (CW - 0.3) / 3, chh = 1.02;
-  g.forEach((it, i) => {
-    const x = M + (i % 3) * (cw2 + 0.15), y = 1.52 + Math.floor(i / 3) * (chh + 0.16);
-    card(s, x, y, cw2, chh, i === 5 ? MINT : WHITE);
-    s.addText(it[0], { x: x + 0.16, y: y + 0.12, w: cw2 - 0.32, h: 0.26, isTextBox: true,
-      margin: 0, fontFace: FONTB, fontSize: 11, bold: true, color: i === 5 ? CORAL : INK });
-    s.addText(it[1], { x: x + 0.16, y: y + 0.40, w: cw2 - 0.32, h: 0.54, isTextBox: true,
-      margin: 0, fontFace: FONT, fontSize: 9, color: INK, valign: 'top' });
-  });
-  emphasis(s, 4.02, 'A library joined mid-season and never got the announcement. Now the Chair sends them their own copy — one click.', CORAL);
-  note(s, `MENG — ~2 min\n\nNow the part I am most pleased about, and the part that matters most to the Committee.\n\nOn the old site, running the survey meant asking a developer. Opening the forms was a developer task. Sending the announcement was a developer task. Changing a date was a developer task.\n\nAll of that is now a page on the site.\n\nThe Chair sets the opening and closing dates herself. Opening a new survey year creates the records for all fifty libraries in one action. If a date needs to slip, there is a button for that. The announcement email can be previewed, then sent now or scheduled for later. And the wording of every automatic message can be edited right in the browser — no developer, no waiting.\n\nI want to point out the last item on that list, because it came directly out of last year's collection. A library joined partway through the season. The announcement had already gone out weeks earlier, so their delegate never got it. Under the old system, the fix was to email me.\n\nNow the Chair opens the user list, finds that one person, and clicks a button that sends them their own copy of the announcement. That is it.\n\n导演提示: 最后那个例子是真事,讲具体故事比列功能有效。`);
+  head(s, 'Giving the Committee the controls', 'Meng', 'The toolkit \u2014 running the survey');
+  shot(s, 'toolkit', M, 1.28, 4.05, 3.12, 'Super Admin Toolkit\n\u65B0\u7AD9\u622A\u56FE');
+
+  card(s, M + 4.35, 1.28, CW - 4.35, 1.28, MINT);
+  s.addText('On the old site there was no screen like this.',
+    { x: M + 4.55, y: 1.36, w: CW - 4.75, h: 0.34, isTextBox: true, margin: 0,
+      fontFace: FONTB, fontSize: 12, bold: true, color: CORAL });
+  s.addText('Opening the survey, sending the announcement, changing a date \u2014 every one of those was a developer task, and meant emailing me and waiting.',
+    { x: M + 4.55, y: 1.70, w: CW - 4.75, h: 0.78, isTextBox: true, margin: 0,
+      fontFace: FONT, fontSize: 9.5, color: INK, valign: 'top' });
+
+  bullets(s, M + 4.55, 2.72, CW - 4.75, 1.05, [
+    'Set the dates, per year',
+    'Open a new year for all 50 libraries at once',
+    'Open or close right now, when the schedule slips',
+    'Edit the wording of every automatic message',
+  ], 9.5);
+
+  card(s, M, 4.56, CW, 0.62);
+  s.addText('A library joined mid-season and never got the announcement. Now the Chair sends them their own copy \u2014 one click.',
+    { x: M + 0.20, y: 4.60, w: CW - 0.40, h: 0.54, isTextBox: true, margin: 0,
+      fontFace: FONTB, fontSize: 11, bold: true, color: CORAL, valign: 'middle' });
+  note(s, `MENG — ~2 min\n\nNow the part I am most pleased about, and the part that matters most to the Committee.\n\nOn the old site, running the survey meant asking a developer. Opening the forms was a developer task. Sending the announcement was a developer task. Changing a date was a developer task.\n\nAll of that is now this one page.\n\n[指截图] Survey dates. Open and close the annual surveys. Email templates. Manage users. Manage participating institutions. Manage the published PDFs. The Chair does all of it herself.\n\nI want to point out one thing in particular, because it came directly out of last year's collection. A library joined partway through the season. The announcement had already gone out weeks earlier, so their delegate never got it. Under the old system, the fix was to email me.\n\nNow the Chair opens the user list, finds that one person, and clicks a button that sends them their own copy. That is it.\n\n导演提示: 截图本身就列全了六个工具,不用再念一遍。挑两三个说,重点讲最后那个真实例子。`);
 }
 
 /* ===== S9 toolkit II ===== */
