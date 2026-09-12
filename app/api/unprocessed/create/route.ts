@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { canAccessLibrary } from "@/lib/auth";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 import { hasValidUnprocessedData } from "@/lib/formValidation";
 import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
@@ -22,6 +23,23 @@ export async function POST(req: Request) {
     }
 
     const libraryId = Number(libid);
+
+    // Authorization. Without this the caller-supplied `libid` is trusted
+    // outright, so anyone reaching this endpoint - signed in as another
+    // institution's delegate, or not signed in at all - could write into this
+    // library's forms while its survey window was open. canAccessLibrary()
+    // returns false when there is no valid session, and otherwise allows only
+    // a cross-library role (Super Admin, E-Resource Editor, Assistant Admin)
+    // or a user actually assigned to this library.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json(
+        {
+          error: "Forbidden",
+          message: "You are not authorized to submit data for this institution.",
+        },
+        { status: 403 }
+      );
+    }
     const currentYear = await getActiveSurveyYear();
 
     // Find Library_Year record for current year and library
