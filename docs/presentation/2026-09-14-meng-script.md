@@ -179,7 +179,9 @@ inconvenient" —— 和 "most" 完全自洽:有些功能是**有意**不搬的,
 显示(`components/InstitutionSwitcher.tsx:163-167`),横幅文字确实是 "Super Admin View:" /
 "Editor View:"(同文件 267 行)。
 
-`⚠️ 但是不要说这个功能"安全"或"权限在数据库里逐次校验"。` 原因见文件末尾那一节。
+`✅ 更新:` 写这份稿子的时候,这个功能的访问控制是坏的,我让你别把它说成安全特性。
+**那个洞已经修好并合并了。** 现在你可以准确地讲它,甚至可以加一句"每次提交都会校验机构归属"。
+细节和可选的补充句见文件末尾那一节。
 
 `导演提示:` 最后一段是重点。**不要提中间件、cookie、token 这些词。**
 
@@ -535,43 +537,41 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 
 ---
 
-## ⚠️ 讲之前必须知道:机构切换这个功能目前的访问控制是坏的
+## ✅ 已修复:机构切换 / 跨机构写入的访问控制
 
-我核对切换器实现的时候发现的。**不是让你改讲稿,是提醒你别把它说成安全特性**,
-以及这个洞必须在 10 月表单开放前补上。
+写这份讲稿时我发现这个功能的访问控制是坏的,当时提醒你别把它说成安全特性。
+**那个洞已经修好并合并进 main 了**([PR #166](https://github.com/cealDatabase/cealDB/pull/166),
+`b48a648`)。这一节保留下来,是因为它现在变成了你**可以讲**的东西。
 
-**链条是这样的:**
+**当时是什么问题:** 十个表单的提交接口从请求体里取 `libid`,但从不验证调用者和那个机构有没有关系。
+`/api/switch-library` 也一样,不检查登录也不检查角色。结果是:只要某个机构年度开放着,
+**任何人都能往那个机构的表单里写数据 —— 不需要是该馆代表,甚至不需要登录。**
 
-1. `POST /api/switch-library`(`app/api/switch-library/route.ts`,全文 48 行)
-   **不检查登录,也不检查角色**。你给它一个 library ID,它就写进 `observe_library` cookie。
-2. 那个 cookie 是 `httpOnly: false`,所以连接口都不用调 —— 在浏览器控制台里直接设就行。
-3. 读这个 cookie 的页面(`/admin/forms`、三个 `*edit` 页、几个 export 接口)
-   **直接拿它当"当前机构"用,不复核权限**。
-4. 中间件的 matcher 不覆盖 `/api/switch-library`,所以那一层也没拦。
+**怎么确认的:** 不是读代码推断的。起了一个真的 PostgreSQL,建了个开放年度的馆,
+不带任何 cookie 发 POST,拿到 200,数据库里真的多了一行。
 
-**更要紧的是十个表单的提交接口。** 我完整读了 `app/api/monographic/create/route.ts`:
-它从请求体里取 `libid`,然后**从不验证调用者和这个机构有没有关系**。
-里面唯一和身份有关的调用是 `isSuperAdmin()`,而它只用来决定两件事——能不能回退到往年、
-以及能不能绕过"表单已关闭"。普通调用者拿到 `false`,然后**继续往下走**。
+**怎么修的:** `lib/auth.ts` 里本来就有个 `canAccessLibrary()` 是专门防这个的,
+但十个表单接口一个都没接上。现在十个全接上了,`switch-library` 加了登录 + 角色校验,
+`observe_library` cookie 改成 `httpOnly`。
 
-`lib/auth.ts` 里有个 `canAccessLibrary()` 就是专门防这个的,它自己的注释写着
-"Trusting a caller-supplied `libid` … lets one institution modify another institution's data"。
-但十个表单接口**一个都没调用它**(我逐个 grep 过)。它只用在 AV / E-Book / E-Journal 的
-subscribe / edit / unsubscribe 上。
+**修完验证过(真库真服务器,七个场景):** 不登录写别人馆 → 403;别的馆代表写 → 403;
+本馆代表写 → 200(没坏);Super Admin 跨机构写 → 200(**切换功能没坏**);
+switch-library 不登录 → 401,普通成员 → 403,Super Admin → 200 且 cookie 带 HttpOnly。
 
-**后果:** 只要某个机构年度的 `is_open_for_editing` 是 true,任何人都能往那个机构的表单里写数据。
-不需要是该馆的代表。**甚至不需要登录。**
+---
 
-**现在没在流血** —— 2026 年度的表单还没开,`is_open_for_editing` 是 false,非 super admin 会被 403 挡掉。
-**但 10 月一开就成立了。**
+### 所以第 8 页那段现在可以加一句
 
-**所以:**
-- 讲稿里我没让你说这个功能"安全"。描述它做什么(准确),不评价它的访问控制。
-- 第 9 页那段"权限在数据库里逐次校验"的说法,**对十个表单接口来说目前是不成立的**,
-  我已经从讲稿里拿掉了。
-- 这个洞要在 10 月前修。修法很直接:在十个 create 接口里加 `canAccessLibrary(libraryId)`,
-  给 `/api/switch-library` 加登录和角色校验,并把 `observe_library` 改成 `httpOnly: true`。
-  需要的话跟我说,我开个 PR。
+你原来让我删掉的那句"权限在数据库里逐次校验"当时确实不成立,**现在成立了**。
+如果你想在切换器那段后面补一句,可以这么说:
 
-**核实程度说明:** `monographic` 那条我是完整读完代码确认的;其余九条是 grep 层面确认
-"没有调用 `canAccessLibrary`"。动手修之前建议把那九条也逐个看一眼,可能有别的写法在拦。
+> And it is checked on the way in, not just in the menu. Every submission
+> verifies that your account is entitled to that institution before it writes
+> anything — so pointing your browser at someone else's library does not get
+> you their forms.
+
+`导演提示:` 这句**可加可不加**。不加也完全说得通,机构切换本身已经是个好故事。
+加的话好处是:万一 Q&A 有人问"那我能不能看别人馆的数据",你已经答过了。
+⚠️ 但**别主动讲"我们最近修了个漏洞"** —— 那是内部工程过程,不是给委员会的内容,
+而且会把听众的注意力从"这个系统做得好"引到"这个系统出过问题"。
+真被直接问到,照实说"发现了一个权限校验的缺口,已经修了,在表单开放前"。
