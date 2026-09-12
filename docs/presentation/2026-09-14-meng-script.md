@@ -5,7 +5,8 @@
 改动的地方在每页下面用 `⚠️ 改了什么` 标出来。
 
 时间:第 4 页开始,第 20 页交给一凡。预算 18 分钟。
-照下面全念大约 18.5 分钟,标了 `[可删]` 的段落先砍。
+照下面全念大约 **19.5 分钟**(第 7 页加了新旧对比那段,多 1 分钟),
+标了 `[可删]` 的段落先砍 —— 砍完回到 18 分钟出头。
 
 ---
 
@@ -97,37 +98,68 @@
 
 ---
 
-# 第 7 页 · What we set out to do · ~1 分钟
+# 第 7 页 · What we set out to do · ~2 分钟
 
 **SCRIPT**
 
-> So we wrote ourselves a brief, and it fits on one line. Keep most functions.
-> Replace the experience.
+> So we wrote ourselves a brief, and this is what we set out to do: keep most
+> functions, replace the experience.
 >
 > Four parts to that.
 >
-> First, match the old site function for function, as closely as we could. The
-> rule we held ourselves to was this: nothing gets dropped just because it
-> would be inconvenient to rebuild.
+> First, rebuild the functions people actually use. The rule we held ourselves
+> to was this: we don't skip a function just because it's hard to rebuild.
 >
 > Second, once we had that, hand the controls over. If the Chair wants to open
 > the survey a week late, that should be a button — not an email to me.
 >
-> [可删] Third, work on whatever screen you happen to have, and render Chinese,
-> Japanese and Korean properly, which the old site did not always do.
+> Third, work on whatever screen you happen to have — the layout rearranges
+> itself for a phone — and render Chinese, Japanese and Korean properly.
 >
 > Fourth, and this is the one I care most about: write it all down. Real
 > documentation, so that when Yifan and I are no longer the people doing this,
 > the next person can pick it up.
+>
+> [停一下,手指向右边两张图]
+>
+> Look at the two panels on the right. Same person, same account. Both of them
+> are the page you land on right after you sign in.
+>
+> The top one is the old site. It is a menu. Modify institution information.
+> Change password. E-resources. Every one of those still exists today. That is
+> the "keep most functions" half of the line.
+>
+> The bottom one is the new site. Before you click anything, it already tells
+> you where you stand. Your name. Your email. Your institution. The roles you
+> hold. And when you last signed in — so if a login shows up that was not you,
+> you can see it.
+>
+> Nothing was taken away. The page just answers the questions first, instead of
+> making you click around to find out. That is the other half: replace the
+> experience.
 
-`⚠️ 改了什么:` 你把标题从 "Keep **every** function" 改成了 "Keep **most** functions",
-原讲稿还在说 "every function"、"Nothing gets dropped",对不上。现在改成
-"as closely as we could" + "nothing gets dropped **just because** it would be
-inconvenient" —— 和 "most" 完全自洽:有些功能是**有意**不搬的,但没有一个是嫌麻烦才不搬的。
+`导演提示:` **最后三段是这一页的落点,不要赶。** 前面四条是清单,听众会走神;
+右边那两张图是他们真正认得的东西——那是他们自己每年登录看到的页面。
+
+说到 "Look at the two panels on the right" 的时候**停半秒再往下说**,给他们时间把眼睛移过去。
+四条清单可以念快一点,这三段要慢。
+
+`⚠️ 幻灯片上要改:` 第 1 条标题现在是 "**feature** Rebuild the functions people actually use",
+开头那个 `feature` 是上一版 "Match the old site feature for feature" 没删干净的残留,**删掉**。
+
+`⚠️ 讲稿改了什么:`
+1. 第一条从 "match the old site function for function" 改成 "rebuild the functions
+   people actually use" —— 和你 PPT 上的新标题一致。原来那句是绝对说法("function for
+   function"),和标题里的 "**most** functions" 打架。
+2. 第三条按你 PPT 的措辞重写,去掉了重复和语法错。
+3. **新增最后三段**,把右边的新旧对比讲出来。原来那两张图在屏幕上没人提。
 
 `⚠️ 要准备:` 说了 "most" 就可能被追问 **"那哪些没搬过来?"**。
 这个答案只有你知道,**上台前想好一两个例子**,而且要能说出"为什么不搬"
 (比如没人用了、或者被更好的功能取代了)。答不上来会很被动。
+
+`⚠️ 时间:` 这一页从 ~1 分钟变成 ~2 分钟。你整段是 18 分钟,多出来的 1 分钟
+要从别处找补 —— 见文件末尾的时间表。
 
 ---
 
@@ -526,6 +558,7 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 | 页 | 改动 |
 |---|---|
 | 7 | "Keep every function" → **"Keep most functions"**,并去掉 "Nothing gets dropped" 的绝对说法 |
+| 7 | 第一条改成 "rebuild the functions people actually use",与 PPT 新标题一致;第三条按 PPT 重写;**新增结尾三段讲右边的新旧 personal information 对比** |
 | 8 | 删掉 "A super administrator **is the Committee**" 这个不准确的等号 |
 | 6 | 删掉"旧站什么都得找开发者"——无法证实,且旧站有 Admin 菜单 |
 | 9 | 整页从 Committee 改为 **Super Admin**;不再拿"以前要找开发者"做对比,改讲权限模型:Editor 和 Member 一个都没有 |
