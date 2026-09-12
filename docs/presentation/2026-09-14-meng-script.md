@@ -83,15 +83,17 @@
 > [可删] It was built for a desktop monitor in the early two thousands. On a
 > phone you had to pinch and scroll sideways to read a table.
 >
-> And there was a second problem, one you would only notice if you were on the
-> Committee. Almost nothing could be changed without a developer. Opening the
-> survey, sending the announcement, adding a new library — all of it meant
-> emailing someone technical and waiting.
->
-> That is the situation we were asked to fix.
+> That is what we set out to replace. Not the data — the data was fine. The way
+> you had to work with it.
+
+`⚠️ 改了什么:` 删掉了原来那段"旧站几乎什么都得找开发者改"。
+**那是我写的推断,你没法证实** —— 你没管过旧站。而且你自己的截图里,旧站会员区导航条上
+就有 `Admin ▾` 菜单,说明它是有管理界面的。这句话台下坐着 KU 时期的人就能当场反驳。
+现在只讲你**亲身能证实**的:用起来是什么感觉。
 
 `导演提示:` 两张图都是"登录后第一屏",对比公平,不会被说挑软柿子。
 先夸旧站再说问题。Anlin 第 2 页已经讲了 KU 停止托管,**不要重复那条线**。
+**全程不要评价旧站的后台权限模型** —— 你不知道,不必知道,说错了反而丢分。
 
 ---
 
@@ -174,16 +176,20 @@ inconvenient" —— 和 "most" 完全自洽:有些功能是**有意**不搬的,
 
 **SCRIPT**
 
-> Now the part that matters most to whoever is running the survey.
+> Everything on this page sits behind a single role: Super Admin.
 >
-> I want to be precise about who "whoever" is. These controls do not belong to
-> the Committee as a body. They belong to one role in the system: Super Admin.
-> Today that is the Chair and one or two officers. Most Committee members hold
-> a different role — E-Resource Editor — which lets them maintain the shared
-> database lists, but not open the survey or manage accounts.
+> I want to be precise about that, because it is easy to say "the Committee can
+> do this now" and it would not be true. These controls do not belong to the
+> Committee as a body. They belong to a role. Today the Chair and one or two
+> officers hold it.
 >
-> That distinction is the whole point of the previous slide. The system does
-> not ask who you are on the Committee. It asks what role your account holds.
+> And I want to be just as clear about who does not have any of it. An Editor
+> does not. A Member does not. Maintaining the shared database lists is an
+> Editor's job — opening the survey, managing accounts, sending the
+> announcements are not. None of that was loosened.
+>
+> That is the whole point of the previous slide. The system never asks who you
+> are on the Committee. It asks what role your account holds.
 >
 > So — what can a Super Admin do?
 >
@@ -192,20 +198,25 @@ inconvenient" —— 和 "most" 完全自洽:有些功能是**有意**不搬的,
 > when the schedule slips. Send the announcement — preview it, then send now or
 > schedule it. Edit the wording of every automatic message, right in the browser.
 >
-> Every one of those used to be a developer task. Every one of them meant
-> emailing me and waiting.
->
-> And the last one on that list came straight out of last year's collection. A
+> The last one on that list came straight out of last year's collection. A
 > library joined partway through the season. The announcement had gone out
 > weeks earlier, so their delegate never received it. Under the old system, the
 > fix was to email me.
 >
 > Now the Super Admin opens the user list, finds that one person, and clicks a
-> button that sends them their own copy. That is it.
+> button that sends them their own copy. That is it — and only that role can.
 
-`⚠️ 改了什么:` 整页从 "Committee" 改成 **"Super Admin"**,并且**开头就把区别讲清楚**——
-这是你要的重点。多加了一句解释:大多数委员会成员其实是 E-Resource Editor,不是 Super Admin。
-这个说法有依据:新站 Dashboard 上 E-Resource Editor 那一栏的说明就是
+`⚠️ 幻灯片上这一行要改:` 第 9 页现在印着
+**"Every one of these used to require a developer. Now each is a page on the site."**
+这句和讲稿里那句是同一个问题 —— 你没法证实旧站是不是真的这样,而且旧站有 Admin 菜单。
+建议换成下面任一句:
+- **"All of this sits behind one role: Super Admin."**
+- **"Super Admin has every one of these. Editor and Member have none of them."**
+
+`⚠️ 改了什么:` 整页从 "Committee" 改成 **"Super Admin"**,并且不再拿"以前要找开发者"做对比。
+现在的论点是**权限模型本身**:所有这些集中在一个角色手里,Editor 和 Member **一个都没有**。
+这比"以前很麻烦现在方便了"强 —— 后者是便利性,前者是安全性,而且是你能 100% 证实的。
+另外解释了大多数委员会成员其实是 E-Resource Editor,依据是新站 Dashboard 上那句
 "Statistics Committee members use this section to manage e-resource database lists"。
 
 `导演提示:` 截图本身已经把六个工具列全了,**别一个个念**。挑三个说,重点放在最后那个真实例子上。
@@ -493,7 +504,8 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 |---|---|
 | 7 | "Keep every function" → **"Keep most functions"**,并去掉 "Nothing gets dropped" 的绝对说法 |
 | 8 | 删掉 "A super administrator **is the Committee**" 这个不准确的等号 |
-| 9 | 整页从 Committee 改为 **Super Admin**,开头加了角色 vs 组织的区分 |
+| 6 | 删掉"旧站什么都得找开发者"——无法证实,且旧站有 Admin 菜单 |
+| 9 | 整页从 Committee 改为 **Super Admin**;不再拿"以前要找开发者"做对比,改讲权限模型:Editor 和 Member 一个都没有 |
 | 13 | "The Chair can…" → **"A Super Admin can…"**,口径与第 9 页统一 |
 | 18 | 结尾不再是"交棒",改成引出致谢页 |
 | 19 | 因为挪到了靠后位置,开头重写成"前面十五分钟讲的都是软件,现在讲不是软件的那部分" |
