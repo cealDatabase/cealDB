@@ -219,32 +219,36 @@
 
 ---
 
-# 第 9 页 · Super Admin has all controls · ~2 分钟
-
-> ⚠️ **这一页的标题建议改掉。** 现在是 "Giving the Committee the controls" /
-> "THE TOOLKIT — RUNNING THE SURVEY"。按你说的,应该是 **Super Admin**,不是 Committee。
-> 建议:
-> - 大标题 → **Super Admin has all controls**
-> - 上面那行小标 → **THE TOOLKIT**
->
-> 讲稿按改完之后写。
+# 第 9 页 · The Super Admin has all controls · ~2 分钟
 
 **SCRIPT**
 
 > Everything on this page sits behind a single role: Super Admin.
 >
-> I want to be precise about that, because it is easy to say "the Committee can
-> do this now" and it would not be true. These controls do not belong to the
-> Committee as a body. They belong to a role. Today the Chair and one or two
-> officers hold it.
+> I want to stay on that word for a moment. Role. These controls are not
+> attached to a person. They are attached to a role — and a role is something
+> you can hand to someone else.
 >
-> And I want to be just as clear about who does not have any of it. An Editor
-> does not. A Member does not. Maintaining the shared database lists is an
-> Editor's job — opening the survey, managing accounts, sending the
-> announcements are not. None of that was loosened.
+> Here is what that means in practice.
 >
-> That is the whole point of the previous slide. The system never asks who you
-> are on the Committee. It asks what role your account holds.
+> Say the Chair finishes their term. Their account does not go anywhere. They
+> keep it. They keep their name, their institution, their sign-in, their
+> history. One thing changes: the Super Admin role comes off, and they carry
+> on as a member of their own library, the same as everybody else in this room.
+>
+> And the next Chair does not get a new account, and does not get a password
+> passed to them in an email. They get that role added to the account they
+> already have.
+>
+> [指右边截图] A Super Admin does this right here. Manage Users. Pick the
+> person, change which roles they hold, save. It takes about as long as it took
+> me to say it.
+>
+> [可删] And every one of those changes is written to a log. So a year from now,
+> you can still see who handed what to whom, and when.
+>
+> That is what I mean when I say we handed the controls over. We did not hand
+> them to a person. We handed them to a role — and the role moves.
 >
 > So — what can a Super Admin do?
 >
@@ -253,29 +257,46 @@
 > when the schedule slips. Send the announcement — preview it, then send now or
 > schedule it. Edit the wording of every automatic message, right in the browser.
 >
-> The last one on that list came straight out of last year's collection. A
-> library joined partway through the season. The announcement had gone out
-> weeks earlier, so their delegate never received it. Under the old system, the
-> fix was to email me.
+> The last one came straight out of last year's collection. A library joined
+> partway through the season. The announcement had gone out weeks earlier, so
+> their delegate never received it. The fix, back then, was to email me.
 >
 > Now the Super Admin opens the user list, finds that one person, and clicks a
-> button that sends them their own copy. That is it — and only that role can.
+> button that sends them their own copy. That is it.
 
-`⚠️ 幻灯片上这一行要改:` 第 9 页现在印着
-**"Every one of these used to require a developer. Now each is a page on the site."**
-这句和讲稿里那句是同一个问题 —— 你没法证实旧站是不是真的这样,而且旧站有 Admin 菜单。
-建议换成下面任一句:
-- **"All of this sits behind one role: Super Admin."**
-- **"Super Admin has every one of these. Editor and Member have none of them."**
+`导演提示:` **这一页的重点是"交接",不是"权限"。**
 
-`⚠️ 改了什么:` 整页从 "Committee" 改成 **"Super Admin"**,并且不再拿"以前要找开发者"做对比。
-现在的论点是**权限模型本身**:所有这些集中在一个角色手里,Editor 和 Member **一个都没有**。
-这比"以前很麻烦现在方便了"强 —— 后者是便利性,前者是安全性,而且是你能 100% 证实的。
-另外解释了大多数委员会成员其实是 E-Resource Editor,依据是新站 Dashboard 上那句
-"Statistics Committee members use this section to manage e-resource database lists"。
+前半段讲角色可以移交,后半段讲这个角色能做什么。中间那句
+"We did not hand them to a person. We handed them to a role — and the role moves."
+是这一页的落点,**说完停一下再往下**。
 
-`导演提示:` 截图本身已经把六个工具列全了,**别一个个念**。挑三个说,重点放在最后那个真实例子上。
-如果听众里有委员会成员,这一页会让他们清楚自己账号能做什么、不能做什么——很实用。
+台下坐的是委员会的人,他们真正关心的问题是"等你们俩不干了怎么办"。
+这一页就是答案,而且第 20 页会再接一次。
+
+`⚠️ 改了什么(按你的要求重写):`
+
+1. **删掉了整段"谁没有这些权限"** —— 原来那段列举 Editor 不行、Member 不行。
+   你说不需要强调这个,删了。而且删掉之后这一页干净很多:原来是"我们有、你们没有",
+   现在是"这套东西可以交给下一个人"。语气完全不同。
+2. **新增交接那一整段**,按你说的:卸任的人账号保留,可以继续当普通 member,
+   另一个人被指派成 Super Admin。
+3. 结尾去掉 "and only that role can" —— 同样是"别人不行"的说法。
+
+`✅ 这段话技术上全部核实过:`
+
+- 角色存在**单独的表**(`Users_Roles`),不在账号上。所以改角色**完全不碰账号本身** ——
+  用户名、密码、机构关联、历史记录一条都不动(`prisma/schema/schema.prisma:147`)。
+- 一个账号**可以同时挂多个角色**(表上是 user_id + role_id 的组合),所以"卸任后继续当
+  member"是系统本来就支持的,不是变通做法。
+- 改角色的接口是 `PUT /api/admin/users/[userId]/roles`,**只有 Super Admin 能调**,
+  而且是拿签名过的 session 去数据库核对身份的。
+- 每次改角色都写审计日志,**记录改之前和改之后的角色**
+  (`app/api/admin/users/[userId]/roles/route.ts`)。所以"一年后还能查是谁交给谁的"
+  这句是真的,可以放心讲。
+
+`⚠️ 幻灯片文字:` 现在的标题和副标题已经对了。右边截图里 Manage Users 那一块写的是
+"Assign users as super admins, assistant admins, e-resource editors, or member
+institution users" —— **正好就是你要讲的那件事**,指过去的时候可以顺手点它。
 
 ---
 
@@ -561,7 +582,7 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 | 7 | 第一条改成 "rebuild the functions people actually use",与 PPT 新标题一致;第三条按 PPT 重写;**新增结尾三段讲右边的新旧 personal information 对比** |
 | 8 | 删掉 "A super administrator **is the Committee**" 这个不准确的等号 |
 | 6 | 删掉"旧站什么都得找开发者"——无法证实,且旧站有 Admin 菜单 |
-| 9 | 整页从 Committee 改为 **Super Admin**;不再拿"以前要找开发者"做对比,改讲权限模型:Editor 和 Member 一个都没有 |
+| 9 | 整页从 Committee 改为 **Super Admin**;删掉"Editor/Member 没有权限"那一段,改讲**角色可以移交**:卸任的人保留账号继续当 member,下一个人在自己已有的账号上加这个角色 |
 | 13 | "The Chair can…" → **"A Super Admin can…"**,口径与第 9 页统一 |
 | 18 | 结尾不再是"交棒",改成引出致谢页 |
 | 19 | 因为挪到了靠后位置,开头重写成"前面十五分钟讲的都是软件,现在讲不是软件的那部分" |
