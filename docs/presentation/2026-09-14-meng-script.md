@@ -530,20 +530,55 @@ something else" —— 因为你把致谢页挪到了这后面,不是马上交�
 > decision that was not ours to make, she made it — usually within a day.
 >
 > To put a number on it: three hundred and fifty-six emails about CEAL, and a
-> hundred and eighty-five Zoom meetings. Over twenty-nine months.
+> hundred and eighty-five Zoom meetings. WeChat, phone calls, chats in person.
+> Over twenty-nine months.
+>
+> [停,指右边]
+>
+> And all of that happened outside the system. This is the part that happened
+> inside it.
+>
+> That panel is the audit log — the database keeping its own record of who did
+> what. Her name is all through it. Signing in. Exporting a report to check it
+> against the old one. Correcting a list. Signing in again the next morning.
+>
+> She was not advising us from a distance. She was in here, in the data, with us.
 >
 > So let me say this plainly, and in front of all of you. This system is
 > accurate because the Committee kept us accurate. Anlin — thank you.
 
-`⚠️ 改了什么:` 这一页你从我原来的第 6 位(很靠前)挪到了第 19 位(很靠后)。
-**挪得好** —— 放在这里更有力:先让他们看完 886 次提交、29 个月、2025 年那一季的硬功夫,
-再说"但真正让它准确的是委员会",分量完全不一样。
-所以开头改成了 "I have just spent fifteen minutes showing you software. I want to
-spend two on something that is not." —— 明确把前面所有内容当作铺垫。
+`导演提示:` **这一页有两个停顿,都别省。**
 
-`导演提示:` **185 次 Zoom 会议比 356 封邮件更有冲击力** —— 两年半平均每月六次会,
-听众自己会算这笔账。念完停一秒。
+第一个在 "Over twenty-nine months." 之后 —— 让 185 这个数字落地,听众自己会算
+"两年半、平均每月六次会"。
+
+第二个在 "And all of that happened outside the system." 之后 —— 手指向右边,
+**等他们把眼睛移过去再往下说**。
+
 说完最后那句,**看一眼镜头里的 Anlin**,再切下一页。
+
+`⚠️ 新增:审计日志那三段(按你说的)。` 为什么这么接:
+
+这一页原来全是"你们看不见的东西"——邮件、会议、微信。都很真实,但**没有一样能在屏幕上求证**。
+审计日志是唯一一处**系统自己留下的证据**:她不只是在旁边给建议,她登录进来、导出报表核对、
+改列表。这把整页从"我说她帮了很多忙"变成"你们自己看"。
+
+而且它和第 9 页对上了 —— 你在那里说过"每次改动都写进日志,一年后还能查是谁做的"。
+现在那句话在第 19 页有了画面。**同一个功能,前面讲原理,后面讲它记下了谁**。
+
+`⚠️ 顺手改的:` "and a 185 Zoom meetings" 的 `a` 去掉了;把微信/电话/当面聊
+并进了同一句,和幻灯片上第三个方块对应。
+
+`🔒 投影之前必须处理截图:` 现在这张日志里有 **Anlin 的私人邮箱
+(yanganlin@icloud.com)和她的两个 IP 地址**,还有你自己的 IP。
+这一页是感谢她的页面,把她的私人邮箱和 IP 投给一屋子同行看,和这一页要表达的东西相反,
+而且没经过她同意。**把 Email 那一行和整个 IP 列涂掉或裁掉**(顺手把 "View Details"
+一列也裁了,画面更干净)。保留动作标签、姓名、时间、表名就够讲。
+
+`💡 可以加的一句:` 截图上写着 `Showing 50 of 926 audit logs`。如果那 926 是真实数字,
+在"Her name is all through it"后面可以补一句:
+**"Nine hundred and twenty-six entries in that log, and a lot of them are hers."**
+⚠️ 但**先确认这个数字是当时的真实值**,而且截图里能看到 —— 说得出口才加。
 
 ---
 
@@ -586,6 +621,7 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 | 13 | "The Chair can…" → **"A Super Admin can…"**,口径与第 9 页统一 |
 | 18 | 结尾不再是"交棒",改成引出致谢页 |
 | 19 | 因为挪到了靠后位置,开头重写成"前面十五分钟讲的都是软件,现在讲不是软件的那部分" |
+| 19 | **新增审计日志三段** —— 前面全是屏幕上求证不了的东西(邮件、会议、微信),日志是唯一一处系统自己留下的证据;同时和第 9 页的"每次改动都写日志"呼应 |
 | 20 | 交棒语保留在这里 |
 | 全篇 | 页码全部改成现在这份 41 页 deck 的真实页码 |
 
