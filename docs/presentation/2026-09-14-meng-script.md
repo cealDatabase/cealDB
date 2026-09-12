@@ -150,15 +150,36 @@ inconvenient" —— 和 "most" 完全自洽:有些功能是**有意**不搬的,
 > And a Super Admin can do all of it, including the one thing nobody else can:
 > change data after the deadline has passed.
 >
-> One thing worth saying about that table. On the old site, a lot of permission
-> was really just a hidden menu item. If you knew the address, you could
-> sometimes get further than you should. On the new site, every one of those
-> checks happens in the database, every time. Hiding a button is not security,
-> and we did not treat it as security.
+> One row on that table deserves a closer look: "See and edit every library."
+>
+> On the old site this mattered a great deal. Someone had to be able to open
+> another institution's numbers — to check a figure, to help a delegate who was
+> stuck, to see what had actually been submitted. That was not a convenience;
+> it was how the Committee did its work. So we kept it, in full.
+>
+> Here is how it works now. You stay signed in as yourself. You pick another
+> institution from a switcher at the top of the page, and the site shows you
+> that institution's forms and data as they stand. A banner appears telling you
+> whose data you are looking at — it says "Super Admin View" or "Editor View"
+> and names the institution — so you never lose track of where you are. When
+> you are done, you switch back.
+>
+> Same person, same account, same log. Just pointed at a different institution.
+>
+> And it is one of the two roles at the right of that table who can do it. A
+> Member sees their own library and nothing else.
 
-`⚠️ 改了什么:` 原讲稿写的是 "A super administrator **is the Committee**" —— 这句不准确,
-和你第 9 页要强调的是同一个问题。**Super Admin 是系统里的一个角色,委员会是一个组织**,
-两者不等同。改成直接描述这个角色能做什么。
+`⚠️ 改了什么(两处):`
+1. 删掉 "A super administrator **is the Committee**" —— 角色 ≠ 组织,和第 9 页是同一个问题。
+2. **整段换成机构切换器**,按你说的。原来那段讲"旧站权限只是藏了个菜单项"是我编的,
+   你没法证实,而且和第 6 页删掉的那句是同一个毛病。
+
+切换器这个替换好得多:它对应表格里 "See and edit every library" 那一行,是听众真正在用的功能,
+而且是**你能百分之百证实**的。核对过代码:切换器只对 Editor(角色 3)和 Super Admin(角色 1)
+显示(`components/InstitutionSwitcher.tsx:163-167`),横幅文字确实是 "Super Admin View:" /
+"Editor View:"(同文件 267 行)。
+
+`⚠️ 但是不要说这个功能"安全"或"权限在数据库里逐次校验"。` 原因见文件末尾那一节。
 
 `导演提示:` 最后一段是重点。**不要提中间件、cookie、token 这些词。**
 
@@ -511,3 +532,46 @@ spend two on something that is not." —— 明确把前面所有内容当作铺
 | 19 | 因为挪到了靠后位置,开头重写成"前面十五分钟讲的都是软件,现在讲不是软件的那部分" |
 | 20 | 交棒语保留在这里 |
 | 全篇 | 页码全部改成现在这份 41 页 deck 的真实页码 |
+
+---
+
+## ⚠️ 讲之前必须知道:机构切换这个功能目前的访问控制是坏的
+
+我核对切换器实现的时候发现的。**不是让你改讲稿,是提醒你别把它说成安全特性**,
+以及这个洞必须在 10 月表单开放前补上。
+
+**链条是这样的:**
+
+1. `POST /api/switch-library`(`app/api/switch-library/route.ts`,全文 48 行)
+   **不检查登录,也不检查角色**。你给它一个 library ID,它就写进 `observe_library` cookie。
+2. 那个 cookie 是 `httpOnly: false`,所以连接口都不用调 —— 在浏览器控制台里直接设就行。
+3. 读这个 cookie 的页面(`/admin/forms`、三个 `*edit` 页、几个 export 接口)
+   **直接拿它当"当前机构"用,不复核权限**。
+4. 中间件的 matcher 不覆盖 `/api/switch-library`,所以那一层也没拦。
+
+**更要紧的是十个表单的提交接口。** 我完整读了 `app/api/monographic/create/route.ts`:
+它从请求体里取 `libid`,然后**从不验证调用者和这个机构有没有关系**。
+里面唯一和身份有关的调用是 `isSuperAdmin()`,而它只用来决定两件事——能不能回退到往年、
+以及能不能绕过"表单已关闭"。普通调用者拿到 `false`,然后**继续往下走**。
+
+`lib/auth.ts` 里有个 `canAccessLibrary()` 就是专门防这个的,它自己的注释写着
+"Trusting a caller-supplied `libid` … lets one institution modify another institution's data"。
+但十个表单接口**一个都没调用它**(我逐个 grep 过)。它只用在 AV / E-Book / E-Journal 的
+subscribe / edit / unsubscribe 上。
+
+**后果:** 只要某个机构年度的 `is_open_for_editing` 是 true,任何人都能往那个机构的表单里写数据。
+不需要是该馆的代表。**甚至不需要登录。**
+
+**现在没在流血** —— 2026 年度的表单还没开,`is_open_for_editing` 是 false,非 super admin 会被 403 挡掉。
+**但 10 月一开就成立了。**
+
+**所以:**
+- 讲稿里我没让你说这个功能"安全"。描述它做什么(准确),不评价它的访问控制。
+- 第 9 页那段"权限在数据库里逐次校验"的说法,**对十个表单接口来说目前是不成立的**,
+  我已经从讲稿里拿掉了。
+- 这个洞要在 10 月前修。修法很直接:在十个 create 接口里加 `canAccessLibrary(libraryId)`,
+  给 `/api/switch-library` 加登录和角色校验,并把 `observe_library` 改成 `httpOnly: true`。
+  需要的话跟我说,我开个 PR。
+
+**核实程度说明:** `monographic` 那条我是完整读完代码确认的;其余九条是 grep 层面确认
+"没有调用 `canAccessLibrary`"。动手修之前建议把那九条也逐个看一眼,可能有别的写法在拦。
