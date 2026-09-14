@@ -89,7 +89,7 @@ export default async function Index() {
               <p>
                 Certain data, such as tables with derived statistical data,
                 can only be accessed by members. Please{" "}
-                <Link href="/help" className="">contact us</Link> for information about
+                <Link href="https://www.eastasianlib.org/newsite/statistics/" className="">contact us</Link> for information about
                 membership.
               </p>
             </div>
