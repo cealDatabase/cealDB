@@ -11,7 +11,7 @@ import { SubscriptionBreadcrumb } from "@/components/SubscriptionBreadcrumb";
 import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
-import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
+import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 
 // Define the component props interface for typing (matching actual database schema)
 interface EJournalSubscriptionManagementClientProps {
@@ -65,7 +65,14 @@ export default async function Page({ params, searchParams }: PageProps) {
   const cookieStore = await cookies();
   
   // Parse year: prefer URL param, otherwise use the centralized SurveySession year
-  const year = sp.year ? Number(sp.year) : await getActiveSurveyYear();
+  // Members must not reach a year whose collection window has not opened yet:
+  // scheduling next year creates its Library_Year rows and SurveySession up
+  // front, so the lists exist well before anyone should be filling them in.
+  // Super admins and editors do review them early, so the gate is on members.
+  const year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
+  if (!(await canViewSurveyYearLists(year))) {
+    notFound();
+  }
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;

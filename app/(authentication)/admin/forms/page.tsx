@@ -10,6 +10,7 @@ import { FormStatusBadge } from "@/components/FormStatusBadge"
 import { FormsAvailabilityBadge } from "@/components/FormsAvailabilityBadge"
 import db from "@/lib/db"
 import { getActiveSurveyYear } from "@/lib/currentSurveyYear"
+import { getVisibleSurveyYear } from "@/lib/surveyVisibility"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -44,6 +45,12 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
   const currentYear = await getActiveSurveyYear()
   const previousYear = currentYear - 1
   const nextYear = currentYear + 1
+  // The database-list links below resolve their own year, and a member is held
+  // at the last opened one. Label them with the year they actually open so the
+  // link text is not promising next year's list to someone who cannot see it.
+  // The survey-status copy above keeps using currentYear: telling a member the
+  // upcoming survey opens soon is the point of that message.
+  const listYear = await getVisibleSurveyYear()
 
   // Fetch survey dates (with defaults or admin-selected dates)
   const surveyDates = await getFormattedSurveyDates(currentYear)
@@ -380,7 +387,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                   href={`/admin/forms/${libid}/avdbedit`}
                   className='block text-orange-900 hover:text-orange-700 font-semibold transition-colors'
                 >
-                  🎵 Audio/Visual Databases for {libraryName} in {currentYear}
+                  🎵 Audio/Visual Databases for {libraryName} in {listYear}
                 </Link>
               </div>
               <div className='p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all'>
@@ -388,7 +395,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                   href={`/admin/forms/${libid}/ebookedit`}
                   className='block text-orange-900 hover:text-orange-700 font-semibold transition-colors'
                 >
-                  📚 E-Book Databases for {libraryName} in {currentYear}
+                  📚 E-Book Databases for {libraryName} in {listYear}
                 </Link>
               </div>
               <div className='p-5 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-orange-500 hover:shadow-md transition-all'>
@@ -396,7 +403,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
                   href={`/admin/forms/${libid}/ejournaledit`}
                   className='block text-orange-900 hover:text-orange-700 font-semibold transition-colors'
                 >
-                  📰 E-Journal Databases for {libraryName} in {currentYear}
+                  📰 E-Journal Databases for {libraryName} in {listYear}
                 </Link>
               </div>
             </div>
