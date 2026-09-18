@@ -12,6 +12,7 @@ import {
   hasValidElectronicData,
   hasValidElectronicBooksData
 } from '@/lib/formValidation';
+import { canViewParticipationYear } from '@/lib/surveyVisibility';
 
 const prisma = db;
 
@@ -27,6 +28,23 @@ export async function GET(
       return NextResponse.json(
         { error: "Invalid year parameter" },
         { status: 400 }
+      );
+    }
+
+    // This route had no authorization of any kind, so the year came straight
+    // from the URL. A member institution could read the participation table
+    // for a year that had not opened - every library showing as incomplete
+    // because nobody had been asked to submit yet. Members get a year once it
+    // has closed; privileged roles get all of them.
+    if (!(await canViewParticipationYear(year))) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Forbidden",
+          message:
+            "Participation status for this year becomes available once the collection period closes.",
+        },
+        { status: 403 }
       );
     }
 

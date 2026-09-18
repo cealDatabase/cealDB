@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from '@/lib/db';
+import { filterParticipationYears } from '@/lib/surveyVisibility';
 
 const prisma = db;
 
@@ -33,7 +34,12 @@ export async function GET() {
       },
     });
 
-    const yearList = years.map(item => item.year);
+    // Mid-collection this table is nothing but crosses, so a member
+    // institution only gets a year once its window has closed. Privileged
+    // roles keep every year - chasing outstanding submissions during
+    // collection is what the tab is for. Enforced here rather than in the
+    // component because the component's props are not an access decision.
+    const yearList = await filterParticipationYears(years.map(item => item.year));
 
     return NextResponse.json({
       success: true,

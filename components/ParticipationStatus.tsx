@@ -59,6 +59,7 @@ interface ParticipationStatusProps {
 export default function ParticipationStatus({ isSuperAdmin }: ParticipationStatusProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [availableYears, setAvailableYears] = useState<number[]>([])
+  const [yearsLoaded, setYearsLoaded] = useState(false)
   const [participationData, setParticipationData] = useState<ParticipationData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -89,6 +90,8 @@ export default function ParticipationStatus({ isSuperAdmin }: ParticipationStatu
       } catch (err) {
         setError('Error fetching available years')
         console.error('Error:', err)
+      } finally {
+        setYearsLoaded(true)
       }
     }
 
@@ -225,6 +228,28 @@ export default function ParticipationStatus({ isSuperAdmin }: ParticipationStatu
       ))}
     </div>
   )
+
+  // The years endpoint only returns years a member may see, which is the ones
+  // that have closed. Before a library's first cycle closes that list is
+  // empty, and without this the tab would render a year picker with nothing
+  // in it and an empty table underneath.
+  if (yearsLoaded && !error && availableYears.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Participating Libraries Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Participation status becomes available once a collection period
+              has closed. There is no closed year to show yet.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
