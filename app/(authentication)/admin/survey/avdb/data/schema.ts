@@ -14,6 +14,7 @@ export const listAVSchema = z.object({
   data_source: z.string().nullish(),
   is_global: z.boolean(),
   libraryyear: z.number().nullish(),
+  import_origin: z.string().nullish(),
   subscribers: z.array(z.string()),
   language: z.array(z.string()),
 })

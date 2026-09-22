@@ -112,7 +112,46 @@ const getEBookListByYear = async (userSelectedYear: number) => {
     return value;
   });
 
-  return groupedRecords;
+  const previousYear = userSelectedYear - 1;
+  const previousEntries = await db.list_EBook.findMany({
+    where: { List_EBook_Counts: { some: { year: previousYear } } },
+    select: {
+      id: true, is_global: true, libraryyear: true, title: true,
+      sub_series_number: true, publisher: true, description: true, notes: true,
+      subtitle: true, cjk_title: true, romanized_title: true, data_source: true,
+      Library_Year: { select: { library: true } },
+    },
+  });
+  const currentEntries = await db.list_EBook.findMany({
+    where: { id: { in: groupedRecords.map((row: any) => row.id) } },
+    select: {
+      id: true, is_global: true, title: true, sub_series_number: true,
+      publisher: true, description: true, notes: true, subtitle: true,
+      cjk_title: true, romanized_title: true, data_source: true,
+      Library_Year: { select: { library: true } },
+    },
+  });
+  const globalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
+  const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
+    library, row.title, row.sub_series_number, row.publisher, row.description,
+    row.notes, row.subtitle, row.cjk_title, row.romanized_title, row.data_source,
+  ]);
+  const priorLocalEntries = new Set(previousEntries
+    .filter((row) => !row.is_global && row.Library_Year?.library)
+    .map((row) => localKey(row, row.Library_Year?.library)));
+  const origins = new Map(currentEntries.map((row) => [
+    row.id,
+    row.is_global && globalIds.has(row.id)
+      ? `${previousYear} Global (Admin)`
+      : !row.is_global && priorLocalEntries.has(localKey(row, row.Library_Year?.library))
+        ? `${previousYear} Institution-created`
+        : null,
+  ]));
+
+  return groupedRecords.map((row: any) => ({
+    ...row,
+    import_origin: origins.get(row.id) ?? null,
+  }));
 };
 
 export async function GetEBookList(userSelectedYear: number) {
@@ -176,45 +215,6 @@ export async function GetEBookListWithUserSelections(
     };
   });
 
-  // Dedup global-vs-library-specific twins for this user's library so the
-  // user only sees one row per resource. Carry over selection state from
-  // any deduped twin to avoid losing prior input.
-  let displayData = mergedData;
-  if (libraryYearId) {
-    const groupKey = (it: any) =>
-      `${(it.title ?? "").toLowerCase()}_${(it.publisher ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}`;
-    const groups = new Map<string, typeof mergedData>();
-    for (const item of mergedData) {
-      const k = groupKey(item);
-      if (!groups.has(k)) groups.set(k, []);
-      groups.get(k)!.push(item);
-    }
-    const kept: typeof mergedData = [];
-    for (const group of groups.values()) {
-      if (group.length === 1) {
-        kept.push(group[0]);
-        continue;
-      }
-      const mine = group.find(
-        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
-      );
-      if (mine) {
-        const twinWithState = group.find(
-          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
-        );
-        if (twinWithState) {
-          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
-          if ((mine as any).custom_count == null) {
-            (mine as any).custom_count = (twinWithState as any).custom_count;
-          }
-        }
-        kept.push(mine);
-      } else {
-        kept.push(...group);
-      }
-    }
-    displayData = kept;
-  }
-
-  return z.array(listEBookWithSelectionSchema).parse(displayData || []);
+  // The catalogue is shared; only selection state is institution-specific.
+  return z.array(listEBookWithSelectionSchema).parse(mergedData || []);
 }

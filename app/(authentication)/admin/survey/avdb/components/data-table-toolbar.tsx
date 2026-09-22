@@ -88,6 +88,39 @@ export function DataTableToolbar<TData>({
 
   const isMemberUser = roleId?.trim() === "2";
   const [isExportingExcel, setIsExportingExcel] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const canImportPreviousYear = (() => {
+    try {
+      const roles = roleId?.startsWith("[") ? JSON.parse(roleId) : [roleId];
+      return roles.some((role: unknown) => ["1", "3"].includes(String(role)));
+    } catch {
+      return roleId === "1" || roleId === "3";
+    }
+  })();
+
+  const handleImportPreviousYear = async () => {
+    const sourceYear = year - 1;
+    if (!window.confirm(`Import all ${sourceYear} global and institution-created AV entries into ${year}? Existing matching entries will be skipped.`)) {
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const response = await fetch("/api/survey/import-previous-year", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resource: "av", targetYear: year }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Import failed");
+      toast.success(`Imported ${result.globalCreated} global and ${result.localCreated} institution entries from ${sourceYear}. ${result.skipped} existing entries were skipped.`);
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Import failed");
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   const handleExportCSV = async () => {
     setIsExporting(true);
@@ -181,6 +214,19 @@ export function DataTableToolbar<TData>({
       </div>
 
       <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
+        {canImportPreviousYear && (
+          <Button
+            onClick={handleImportPreviousYear}
+            variant="outline"
+            size="sm"
+            className='h-8 border-blue-300 bg-blue-50 hover:bg-blue-100'
+            disabled={isImporting}
+            title={`Import ${year - 1} catalogue entries`}
+          >
+            {isImporting ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Download className='mr-2 h-4 w-4' />}
+            {isImporting ? "Importing..." : `Import ${year - 1} Entries`}
+          </Button>
+        )}
         {/* Export Excel button visible to all users */}
       <Button
         onClick={handleExportExcel}

@@ -99,7 +99,48 @@ const getAVListByYear = async (userSelectedYear: number) => {
     return value;
   });
 
-  return groupedRecords;
+  // Mark only entries that can be traced to the immediately preceding year.
+  // Global entries keep the same List_AV id; local entries are copied to a
+  // new id, so they are matched by owning institution plus catalogue fields.
+  const previousYear = userSelectedYear - 1;
+  const previousEntries = await db.list_AV.findMany({
+    where: { List_AV_Counts: { some: { year: previousYear } } },
+    select: {
+      id: true, is_global: true, libraryyear: true, type: true, title: true,
+      cjk_title: true, romanized_title: true, subtitle: true, publisher: true,
+      description: true, notes: true, data_source: true,
+      Library_Year: { select: { library: true } },
+    },
+  });
+  const currentEntries = await db.list_AV.findMany({
+    where: { id: { in: groupedRecords.map((row: any) => row.id) } },
+    select: {
+      id: true, is_global: true, type: true, title: true, cjk_title: true,
+      romanized_title: true, subtitle: true, publisher: true, description: true,
+      notes: true, data_source: true, Library_Year: { select: { library: true } },
+    },
+  });
+  const globalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
+  const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
+    library, row.type, row.title, row.cjk_title, row.romanized_title, row.subtitle,
+    row.publisher, row.description, row.notes, row.data_source,
+  ]);
+  const priorLocalEntries = new Set(previousEntries
+    .filter((row) => !row.is_global && row.Library_Year?.library)
+    .map((row) => localKey(row, row.Library_Year?.library)));
+  const origins = new Map(currentEntries.map((row) => [
+    row.id,
+    row.is_global && globalIds.has(row.id)
+      ? `${previousYear} Global (Admin)`
+      : !row.is_global && priorLocalEntries.has(localKey(row, row.Library_Year?.library))
+        ? `${previousYear} Institution-created`
+        : null,
+  ]));
+
+  return groupedRecords.map((row: any) => ({
+    ...row,
+    import_origin: origins.get(row.id) ?? null,
+  }));
 }
 
 export async function GetAVList(userSelectedYear: number) {
@@ -162,50 +203,7 @@ export async function GetAVListWithUserSelections(
     };
   });
 
-  // Dedup global-vs-library-specific twins. When the user's library has its
-  // own version of a resource (List_AV.libraryyear === their library_year id),
-  // hide any matching global record so the user only ever sees one row per
-  // resource and edits don't go to the wrong junction record.
-  // Records that don't have a library-specific twin pass through untouched.
-  let displayData = mergedData;
-  if (libraryYearId) {
-    const groupKey = (it: any) =>
-      `${(it.title ?? "").toLowerCase()}_${(it.type ?? "").toLowerCase()}_${(it.subtitle ?? "").toLowerCase()}`;
-    const groups = new Map<string, typeof mergedData>();
-    for (const item of mergedData) {
-      const k = groupKey(item);
-      if (!groups.has(k)) groups.set(k, []);
-      groups.get(k)!.push(item);
-    }
-    const kept: typeof mergedData = [];
-    for (const group of groups.values()) {
-      if (group.length === 1) {
-        kept.push(group[0]);
-        continue;
-      }
-      const mine = group.find(
-        (g: any) => g.libraryyear === libraryYearId && g.is_global === false
-      );
-      if (mine) {
-        // Carry over selection state from any deduped twin so the user's
-        // existing checks/custom_count don't get lost visually.
-        const twinWithState = group.find(
-          (g: any) => g !== mine && (g.is_selected || g.custom_count != null)
-        );
-        if (twinWithState) {
-          (mine as any).is_selected = (mine as any).is_selected || (twinWithState as any).is_selected;
-          if ((mine as any).custom_count == null) {
-            (mine as any).custom_count = (twinWithState as any).custom_count;
-          }
-        }
-        kept.push(mine);
-      } else {
-        // No library-specific twin from this user's library: keep them all.
-        kept.push(...group);
-      }
-    }
-    displayData = kept;
-  }
-
-  return z.array(listAVWithSelectionSchema).parse(displayData || []);
+  // The survey catalogue must be identical for every institution. Only each
+  // institution's checkbox/custom-count state may differ.
+  return z.array(listAVWithSelectionSchema).parse(mergedData || []);
 }
