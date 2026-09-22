@@ -230,7 +230,6 @@ export const getListAVByID = async (id: number) => {
     const listAV = await db.list_AV.findUnique({
       where: {
         id,
-        is_global: true,
       },
     });
     return listAV;
@@ -298,7 +297,6 @@ export const getListEBookByID = async (id: number) => {
     const listEBook = await db.list_EBook.findUnique({
       where: {
         id,
-        is_global: true,
       },
     });
     return listEBook;
@@ -369,7 +367,6 @@ export const getListEJournalByID = async (id: number) => {
     const listEJournal = await db.list_EJournal.findUnique({
       where: {
         id,
-        is_global: true,
       },
     });
     return listEJournal;

@@ -317,6 +317,16 @@ export function getColumns(
         ),
       } as ColumnDef<EJournalRow>]
       : []),
+    {
+      accessorKey: "import_origin",
+      header: ({ column }) => <DataTableColumnHeader column={column} title={`${year - 1} Origin`} />,
+      cell: ({ row }) => {
+        const origin = row.getValue("import_origin") as string | null | undefined;
+        if (!origin) return null;
+        const isGlobal = origin.includes("Global");
+        return <span className={`rounded px-2 py-1 text-xs font-medium ${isGlobal ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"}`}>{origin}</span>;
+      },
+    },
 
     /** Journals & Databases (per-year) */
     {

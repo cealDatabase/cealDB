@@ -4,6 +4,7 @@ export const listEJournalSchema = z.object({
   id: z.number(),
   title: z.string(),
   counts: z.number(),
+  sub_series_number: z.string().nullish(),
   publisher: z.string().nullish(),
   description: z.string().nullish(),
   notes: z.string().nullish(),
@@ -16,6 +17,7 @@ export const listEJournalSchema = z.object({
   data_source: z.string().nullish(),
   libraryyear: z.number().nullish(),
   is_global: z.boolean(),
+  import_origin: z.string().nullish(),
   subscribers: z.array(z.string()),
   language: z.array(z.string()),
 })
