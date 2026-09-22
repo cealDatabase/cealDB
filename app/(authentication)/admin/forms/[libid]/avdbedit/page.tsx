@@ -14,7 +14,6 @@ import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
-import { resolveSubscriptionViewAccess } from "@/lib/memberSubscriptionAccess";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -39,7 +38,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   // scheduling next year creates its Library_Year rows and SurveySession up
   // front, so the lists exist well before anyone should be filling them in.
   // Super admins and editors do review them early, so the gate is on members.
-  let year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
+  const year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
+  if (!(await canViewSurveyYearLists(year))) {
+    notFound();
+  }
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;
@@ -114,19 +116,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
-  // The URL and the role/library cookies are only navigation hints. Resolve
-  // the actual institution and year from the signed session before reading
-  // any subscription data.
-  const access = await resolveSubscriptionViewAccess(
-    libid,
-    sp.year ? Number(sp.year) : undefined,
-  );
-  if (!access) notFound();
-  libid = access.libraryId;
-  year = access.year;
-  if (!(await canViewSurveyYearLists(year))) notFound();
-  if (access.isMemberRestricted) ids = [];
-
   // Fetch library information for display
   const library = await getLibraryById(libid);
   const libraryName = library?.library_name || `Library ${libid}`;
@@ -183,41 +172,61 @@ export default async function Page({ params, searchParams }: PageProps) {
       },
     });
 
-    // Every role sees the shared catalogue and entries created by the current
-    // institution. The latter is determined by Library_Year, never by other
-    // institutions' selection rows.
-    const listedAVIds = new Set(subscriptions.map((sub) => sub.listav_id));
-    const catalogueAVs = await db.list_AV.findMany({
-          where: {
-            OR: [
-              { is_global: true },
-              { is_global: false, libraryyear: libraryYearRecord!.id },
-            ],
-            List_AV_Counts: { some: { year, ishidden: false } },
-          },
-          include: {
-            List_AV_Counts: { where: { year }, select: { titles: true } },
-            List_AV_Language: {
-              select: { Language: { select: { short: true } } },
-            },
-          },
-        });
-    const visibleSubscriptions = [
-      ...subscriptions,
-      ...catalogueAVs
-        .filter((av) => !listedAVIds.has(av.id))
-        .map((av) => ({
-          libraryyear_id: libraryYearRecord!.id,
-          listav_id: av.id,
-          is_selected: false,
-          custom_count: null,
-          List_AV: av,
-        })),
-    ];
-    // Keep global and institution-created rows distinct even if they share a
-    // title. A member sees no source marker; privileged roles retain actions.
-    const filteredSubscriptions = visibleSubscriptions;
-    const filteredAVs = filteredSubscriptions.map((sub) => sub.List_AV);
+    const subscribedAVs = subscriptions.map((s) => s.List_AV);
+    
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + type + subtitle) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedAVs[0][]>();
+    
+    subscribedAVs.forEach((av) => {
+      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}_${av.subtitle?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(av);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredAVs = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(av => !av.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered AVs.
+    // If a global twin's junction row has custom_count or is_selected set
+    // (legacy/orphaned data from before dedup), merge that state into the
+    // library-specific row that survives the dedup so the display reflects
+    // the user's intent.
+    const filteredAVIds = new Set(filteredAVs.map((av) => av.id));
+    const groupOfAVId = new Map<number, string>();
+    for (const [key, group] of recordsByIdentifier) {
+      group.forEach((av) => groupOfAVId.set(av.id, key));
+    }
+    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
+    for (const sub of subscriptions) {
+      const key = groupOfAVId.get(sub.List_AV.id);
+      if (!key) continue;
+      const keptAv = filteredAVs.find((av) => groupOfAVId.get(av.id) === key);
+      if (!keptAv) continue;
+      const existing = consolidatedByKept.get(keptAv.id);
+      if (!existing) {
+        // Start with the kept-row's own subscription (if present) or the twin
+        const own = subscriptions.find((s) => s.List_AV.id === keptAv.id);
+        consolidatedByKept.set(keptAv.id, { ...(own ?? sub), List_AV: keptAv as any });
+      }
+      const target = consolidatedByKept.get(keptAv.id)!;
+      // Merge state: prefer non-null custom_count, OR is_selected
+      if (target.custom_count == null && sub.custom_count != null) {
+        target.custom_count = sub.custom_count;
+      }
+      if (!target.is_selected && sub.is_selected) {
+        target.is_selected = sub.is_selected;
+      }
+    }
+    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
+      (sub) => filteredAVIds.has(sub.List_AV.id)
+    );
     
     if (filteredAVs.length === 0) {
       return (
@@ -295,7 +304,6 @@ export default async function Page({ params, searchParams }: PageProps) {
                 mode="view"
                 libraryName={libraryName}
                 roleId={roleFromCookie}
-                readOnly={access.isMemberRestricted}
               />
             </Suspense>
           </div>

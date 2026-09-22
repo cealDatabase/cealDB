@@ -12,7 +12,6 @@ import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
-import { resolveSubscriptionViewAccess } from "@/lib/memberSubscriptionAccess";
 
 // Dynamic import for client component
 const EBookSubscriptionManagementClient = dynamic(
@@ -38,7 +37,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   // scheduling next year creates its Library_Year rows and SurveySession up
   // front, so the lists exist well before anyone should be filling them in.
   // Super admins and editors do review them early, so the gate is on members.
-  let year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
+  const year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
+  if (!(await canViewSurveyYearLists(year))) {
+    notFound();
+  }
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;
@@ -135,19 +137,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
-  // The URL and the role/library cookies are only navigation hints. Resolve
-  // the actual institution and year from the signed session before reading
-  // any subscription data.
-  const access = await resolveSubscriptionViewAccess(
-    libid,
-    sp.year ? Number(sp.year) : undefined,
-  );
-  if (!access) notFound();
-  libid = access.libraryId;
-  year = access.year;
-  if (!(await canViewSurveyYearLists(year))) notFound();
-  if (access.isMemberRestricted) ids = [];
-
   // Fetch library information for display
   const library = await getLibraryById(libid);
   const libraryName = library?.library_name || `Library ${libid}`;
@@ -202,44 +191,57 @@ export default async function Page({ params, searchParams }: PageProps) {
       },
     });
 
-    // Every role sees the shared catalogue and entries created by the current
-    // institution. The latter is determined by Library_Year, never by other
-    // institutions' selection rows.
-    const listedEBookIds = new Set(subscriptions.map((sub) => sub.listebook_id));
-    const catalogueEBooks = await db.list_EBook.findMany({
-          where: {
-            OR: [
-              { is_global: true },
-              { is_global: false, libraryyear: libraryYearRecord!.id },
-            ],
-            List_EBook_Counts: { some: { year, ishidden: false } },
-          },
-          include: {
-            List_EBook_Counts: {
-              where: { year },
-              select: { titles: true, volumes: true, chapters: true },
-            },
-            List_EBook_Language: {
-              select: { Language: { select: { short: true } } },
-            },
-          },
-        });
-    const visibleSubscriptions = [
-      ...subscriptions,
-      ...catalogueEBooks
-        .filter((ebook) => !listedEBookIds.has(ebook.id))
-        .map((ebook) => ({
-          libraryyear_id: libraryYearRecord!.id,
-          listebook_id: ebook.id,
-          is_selected: false,
-          custom_count: null,
-          List_EBook: ebook,
-        })),
-    ];
-    // Keep global and institution-created rows distinct even if they share a
-    // title. A member sees no source marker; privileged roles retain actions.
-    const filteredSubscriptions = visibleSubscriptions;
-    const filteredEBooks = filteredSubscriptions.map((sub) => sub.List_EBook);
+    const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
+    
+    // Filter out global records when library-specific versions exist
+    // Group by unique identifier (title + publisher + subtitle) to find duplicates
+    const recordsByIdentifier = new Map<string, typeof subscribedEBooks[0][]>();
+    
+    subscribedEBooks.forEach((ebook) => {
+      const identifier = `${ebook.title?.toLowerCase() || ''}_${ebook.publisher?.toLowerCase() || ''}_${ebook.subtitle?.toLowerCase() || ''}`;
+      if (!recordsByIdentifier.has(identifier)) {
+        recordsByIdentifier.set(identifier, []);
+      }
+      recordsByIdentifier.get(identifier)!.push(ebook);
+    });
+    
+    // For each group, prefer library-specific over global
+    const filteredEBooks = Array.from(recordsByIdentifier.values()).map((group) => {
+      // If there's a library-specific record (is_global = false), use that
+      const librarySpecific = group.find(ebook => !ebook.is_global);
+      return librarySpecific || group[0]; // fallback to first if all are global
+    });
+    
+    // Filter original subscriptions to match filtered EBooks. Merge state
+    // (custom_count, is_selected) from any deduped twin so the kept row's
+    // display reflects the user's actual input even if it landed on a
+    // global twin record.
+    const filteredEBookIds = new Set(filteredEBooks.map((ebook) => ebook.id));
+    const groupOfEBookId = new Map<number, string>();
+    for (const [key, group] of recordsByIdentifier) {
+      group.forEach((eb) => groupOfEBookId.set(eb.id, key));
+    }
+    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
+    for (const sub of subscriptions) {
+      const key = groupOfEBookId.get(sub.List_EBook.id);
+      if (!key) continue;
+      const keptEB = filteredEBooks.find((eb) => groupOfEBookId.get(eb.id) === key);
+      if (!keptEB) continue;
+      if (!consolidatedByKept.has(keptEB.id)) {
+        const own = subscriptions.find((s) => s.List_EBook.id === keptEB.id);
+        consolidatedByKept.set(keptEB.id, { ...(own ?? sub), List_EBook: keptEB as any });
+      }
+      const target = consolidatedByKept.get(keptEB.id)!;
+      if (target.custom_count == null && sub.custom_count != null) {
+        target.custom_count = sub.custom_count;
+      }
+      if (!target.is_selected && sub.is_selected) {
+        target.is_selected = sub.is_selected;
+      }
+    }
+    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
+      (sub) => filteredEBookIds.has(sub.List_EBook.id)
+    );
     
     if (filteredEBooks.length === 0) {
       return (
@@ -316,7 +318,6 @@ export default async function Page({ params, searchParams }: PageProps) {
                 mode="view"
                 libraryName={libraryName}
                 roleId={roleFromCookie}
-                readOnly={access.isMemberRestricted}
               />
             </Suspense>
           </div>

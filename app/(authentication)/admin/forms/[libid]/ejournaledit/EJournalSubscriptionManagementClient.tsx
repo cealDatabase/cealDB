@@ -45,7 +45,6 @@ interface EJournalSubscriptionManagementClientProps {
   mode: "view" | "add";
   libraryName: string;
   roleId?: string;
-  readOnly?: boolean;
 }
 
 export default function EJournalSubscriptionManagementClient({
@@ -54,8 +53,7 @@ export default function EJournalSubscriptionManagementClient({
   year,
   mode,
   libraryName,
-  roleId,
-  readOnly = false,
+  roleId
 }: EJournalSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -142,7 +140,6 @@ export default function EJournalSubscriptionManagementClient({
       header: "Actions",
       cell: ({ row }: any) => {
         const record = row.original;
-        if (readOnly) return null;
         return (
           <div className="flex items-center gap-2">
             <Button
@@ -167,17 +164,6 @@ export default function EJournalSubscriptionManagementClient({
         );
       },
     },
-    ...(!readOnly
-      ? [{
-          accessorKey: "is_global",
-          header: "Source",
-          cell: ({ row }: any) => (
-            <Badge variant={row.getValue("is_global") ? "secondary" : "outline"}>
-              {row.getValue("is_global") ? "Global" : "This Institution"}
-            </Badge>
-          ),
-        }]
-      : []),
     {
       accessorKey: "cjk_title",
       header: "CJK Title",
@@ -454,7 +440,7 @@ export default function EJournalSubscriptionManagementClient({
             )}
           </div>
           
-          {!readOnly && selectedRows.length > 0 && (
+          {selectedRows.length > 0 && (
             <Button
               variant="destructive"
               onClick={() => handleBulkRemove(selectedIds)}
