@@ -12,6 +12,7 @@ import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
+import { resolveSubscriptionViewAccess } from "@/lib/memberSubscriptionAccess";
 
 // Define the component props interface for typing (matching actual database schema)
 interface EJournalSubscriptionManagementClientProps {
@@ -41,6 +42,7 @@ interface EJournalSubscriptionManagementClientProps {
   mode: "view" | "add";
   libraryName: string;
   roleId?: string;
+  readOnly?: boolean;
 }
 
 // Use dynamic import with proper typing for client component
@@ -69,10 +71,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   // scheduling next year creates its Library_Year rows and SurveySession up
   // front, so the lists exist well before anyone should be filling them in.
   // Super admins and editors do review them early, so the gate is on members.
-  const year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
-  if (!(await canViewSurveyYearLists(year))) {
-    notFound();
-  }
+  let year = sp.year ? Number(sp.year) : await getVisibleSurveyYear();
   
   // Parse libid from URL params, but also check cookies for member users
   let libid: number;
@@ -170,6 +169,19 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
+  // The URL and the role/library cookies are only navigation hints. Resolve
+  // the actual institution and year from the signed session before reading
+  // any subscription data.
+  const access = await resolveSubscriptionViewAccess(
+    libid,
+    sp.year ? Number(sp.year) : undefined,
+  );
+  if (!access) notFound();
+  libid = access.libraryId;
+  year = access.year;
+  if (!(await canViewSurveyYearLists(year))) notFound();
+  if (access.isMemberRestricted) ids = [];
+
   // Fetch library information for display
   const library = await getLibraryById(libid);
   const libraryName = library?.library_name || `Library ${libid}`;
@@ -224,56 +236,44 @@ export default async function Page({ params, searchParams }: PageProps) {
       },
     });
 
-    const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
-    
-    // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + publisher + subtitle + series) to find duplicates
-    const recordsByIdentifier = new Map<string, typeof subscribedEJournals[0][]>();
-    
-    subscribedEJournals.forEach((ejournal) => {
-      const identifier = `${ejournal.title?.toLowerCase() || ''}_${ejournal.publisher?.toLowerCase() || ''}_${ejournal.subtitle?.toLowerCase() || ''}_${ejournal.series?.toLowerCase() || ''}`;
-      if (!recordsByIdentifier.has(identifier)) {
-        recordsByIdentifier.set(identifier, []);
-      }
-      recordsByIdentifier.get(identifier)!.push(ejournal);
-    });
-    
-    // For each group, prefer library-specific over global
-    const filteredEJournals = Array.from(recordsByIdentifier.values()).map((group) => {
-      // If there's a library-specific record (is_global = false), use that
-      const librarySpecific = group.find(ejournal => !ejournal.is_global);
-      return librarySpecific || group[0]; // fallback to first if all are global
-    });
-    
-    // Filter original subscriptions to match filtered EJournals. Merge state
-    // (custom_count, is_selected) from any deduped twin so the kept row's
-    // display reflects the user's actual input.
-    const filteredEJournalIds = new Set(filteredEJournals.map((ejournal) => ejournal.id));
-    const groupOfEJournalId = new Map<number, string>();
-    for (const [key, group] of recordsByIdentifier) {
-      group.forEach((ej) => groupOfEJournalId.set(ej.id, key));
-    }
-    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
-    for (const sub of subscriptions) {
-      const key = groupOfEJournalId.get(sub.List_EJournal.id);
-      if (!key) continue;
-      const keptEJ = filteredEJournals.find((ej) => groupOfEJournalId.get(ej.id) === key);
-      if (!keptEJ) continue;
-      if (!consolidatedByKept.has(keptEJ.id)) {
-        const own = subscriptions.find((s) => s.List_EJournal.id === keptEJ.id);
-        consolidatedByKept.set(keptEJ.id, { ...(own ?? sub), List_EJournal: keptEJ as any });
-      }
-      const target = consolidatedByKept.get(keptEJ.id)!;
-      if (target.custom_count == null && sub.custom_count != null) {
-        target.custom_count = sub.custom_count;
-      }
-      if (!target.is_selected && sub.is_selected) {
-        target.is_selected = sub.is_selected;
-      }
-    }
-    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
-      (sub) => filteredEJournalIds.has(sub.List_EJournal.id)
-    );
+    // Every role sees the shared catalogue and entries created by the current
+    // institution. The latter is determined by Library_Year, never by other
+    // institutions' selection rows.
+    const listedEJournalIds = new Set(subscriptions.map((sub) => sub.listejournal_id));
+    const catalogueEJournals = await db.list_EJournal.findMany({
+          where: {
+            OR: [
+              { is_global: true },
+              { is_global: false, libraryyear: libraryYearRecord!.id },
+            ],
+            List_EJournal_Counts: { some: { year, ishidden: false } },
+          },
+          include: {
+            List_EJournal_Counts: {
+              where: { year },
+              select: { journals: true, dbs: true },
+            },
+            List_EJournal_Language: {
+              select: { Language: { select: { short: true } } },
+            },
+          },
+        });
+    const visibleSubscriptions = [
+      ...subscriptions,
+      ...catalogueEJournals
+        .filter((ejournal) => !listedEJournalIds.has(ejournal.id))
+        .map((ejournal) => ({
+          libraryyear_id: libraryYearRecord!.id,
+          listejournal_id: ejournal.id,
+          is_selected: false,
+          custom_count: null,
+          List_EJournal: ejournal,
+        })),
+    ];
+    // Keep global and institution-created rows distinct even if they share a
+    // title. A member sees no source marker; privileged roles retain actions.
+    const filteredSubscriptions = visibleSubscriptions;
+    const filteredEJournals = filteredSubscriptions.map((sub) => sub.List_EJournal);
     
     if (filteredEJournals.length === 0) {
       return (
@@ -350,6 +350,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 mode="view"
                 libraryName={libraryName}
                 roleId={roleFromCookie}
+                readOnly={access.isMemberRestricted}
               />
             </Suspense>
           </div>

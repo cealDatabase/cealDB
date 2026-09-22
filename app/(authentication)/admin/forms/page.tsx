@@ -10,7 +10,7 @@ import { FormStatusBadge } from "@/components/FormStatusBadge"
 import { FormsAvailabilityBadge } from "@/components/FormsAvailabilityBadge"
 import db from "@/lib/db"
 import { getActiveSurveyYear } from "@/lib/currentSurveyYear"
-import { getVisibleSurveyYear } from "@/lib/surveyVisibility"
+import { getSubscriptionListYear } from "@/lib/memberSubscriptionAccess"
 
 type InstructionGroupKeys = keyof typeof instructionGroup
 
@@ -50,7 +50,7 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
   // link text is not promising next year's list to someone who cannot see it.
   // The survey-status copy above keeps using currentYear: telling a member the
   // upcoming survey opens soon is the point of that message.
-  const listYear = await getVisibleSurveyYear()
+  const listYear = await getSubscriptionListYear()
 
   // Fetch survey dates (with defaults or admin-selected dates)
   const surveyDates = await getFormattedSurveyDates(currentYear)
