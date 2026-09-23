@@ -44,6 +44,7 @@ interface EBookSubscriptionManagementClientProps {
   mode: "view" | "add";
   libraryName: string;
   roleId?: string;
+  readOnly?: boolean;
 }
 
 export default function EBookSubscriptionManagementClient({
@@ -52,7 +53,8 @@ export default function EBookSubscriptionManagementClient({
   year,
   mode,
   libraryName,
-  roleId
+  roleId,
+  readOnly = false,
 }: EBookSubscriptionManagementClientProps) {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
@@ -140,6 +142,7 @@ export default function EBookSubscriptionManagementClient({
       header: "Actions",
       cell: ({ row }: any) => {
         const record = row.original;
+        if (readOnly) return null;
         return (
           <div className="flex items-center gap-2">
             <Button
@@ -164,6 +167,17 @@ export default function EBookSubscriptionManagementClient({
         );
       },
     },
+    ...(!readOnly
+      ? [{
+          accessorKey: "is_global",
+          header: "Source",
+          cell: ({ row }: any) => (
+            <Badge variant={row.getValue("is_global") ? "secondary" : "outline"}>
+              {row.getValue("is_global") ? "Global" : "This Institution"}
+            </Badge>
+          ),
+        }]
+      : []),
     {
       accessorKey: "cjk_title",
       header: "CJK Title",
@@ -450,7 +464,7 @@ export default function EBookSubscriptionManagementClient({
             )}
           </div>
           
-          {selectedRows.length > 0 && (
+          {!readOnly && selectedRows.length > 0 && (
             <Button
               variant="destructive"
               onClick={() => handleBulkRemove(selectedIds)}
