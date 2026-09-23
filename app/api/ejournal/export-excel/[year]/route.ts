@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { getSessionRoleIds } from '@/lib/auth';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 
@@ -69,6 +70,7 @@ export async function GET(
     }
 
     const userCtx = await getUserContext();
+    const isSuperAdmin = (await getSessionRoleIds()).includes(1);
 
     // Get all E-Journal data with counts for the year
     const listEJournalCountsByYear = await prisma.list_EJournal_Counts.findMany({
@@ -137,11 +139,14 @@ export async function GET(
       }
     }
 
-    // Drop other institutions' customized records
-    const filteredEjournals = ejournals.filter((ej: any) => {
-      if (ej.is_global !== false) return true;
-      return viewingLibraryYearId !== null && ej.libraryyear === viewingLibraryYearId;
-    });
+    // Super Admin exports contain every catalogue entry for the requested
+    // year. Other roles only receive global rows and their own local rows.
+    const filteredEjournals = isSuperAdmin
+      ? ejournals
+      : ejournals.filter((ej: any) => {
+          if (ej.is_global !== false) return true;
+          return viewingLibraryYearId !== null && ej.libraryyear === viewingLibraryYearId;
+        });
 
     // Build data array
     const rawData = filteredEjournals.map((ejournal: any) => {
@@ -175,7 +180,7 @@ export async function GET(
 
     // Dedup global-vs-library-specific twins
     let data: any[] = rawData;
-    if (viewingLibraryYearId !== null) {
+    if (!isSuperAdmin && viewingLibraryYearId !== null) {
       const groupKey = (it: any) =>
         `${(it.title ?? '').toLowerCase()}_${(it.subtitle ?? '').toLowerCase()}_${(it.publisher ?? '').toLowerCase()}`;
       const groups = new Map<string, any[]>();

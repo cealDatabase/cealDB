@@ -18,6 +18,7 @@ export const listEJournalSchema = z.object({
   libraryyear: z.number().nullish(),
   is_global: z.boolean(),
   import_origin: z.string().nullish(),
+  origin_institution: z.string().nullish(),
   subscribers: z.array(z.string()),
   language: z.array(z.string()),
 })

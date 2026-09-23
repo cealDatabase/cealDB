@@ -221,6 +221,7 @@ export function getColumns(
   // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
   // Show Actions for admins, super admins, or users with multiple roles
   const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
+  const isSuperAdmin = userRoles.includes("1");
 
   return [
     // User selection checkbox column (new)
@@ -283,9 +284,15 @@ export function getColumns(
         const origin = row.getValue("import_origin") as string | null | undefined;
         if (!origin) return null;
         const isGlobal = origin.includes("Global");
-        return <span className={`rounded px-2 py-1 text-xs font-medium ${isGlobal ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"}`}>{origin}</span>;
+        const isUnverified = origin === "Legacy / source unverified";
+        return <span className={`rounded px-2 py-1 text-xs font-medium ${isUnverified ? "bg-slate-100 text-slate-700" : isGlobal ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"}`}>{origin}</span>;
       },
     },
+    ...(isSuperAdmin ? [{
+      accessorKey: "origin_institution",
+      header: ({ column }: any) => <DataTableColumnHeader column={column} title="Created by institution" />,
+      cell: ({ row }: any) => <span className="max-w-[220px] font-medium">{row.getValue("origin_institution") ?? ""}</span>,
+    }] : []),
     {
       accessorKey: "counts",
       header: ({ column }) => (

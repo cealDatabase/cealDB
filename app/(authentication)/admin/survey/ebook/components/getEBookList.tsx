@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 import { listEBookSchema } from "../data/schema";
 import db from "@/lib/db";
+import { getSessionRoleIds } from "@/lib/auth";
 
 /** ⬇️ allow volumes/chapters on each row (local-only, no schema migration) */
 const listEBookRowSchema = listEBookSchema.extend({
@@ -17,7 +18,7 @@ const listEBookRowSchema = listEBookSchema.extend({
   chapters: z.number().nullable().optional(),
 });
 
-const getEBookListByYear = async (userSelectedYear: number) => {
+const getEBookListByYear = async (userSelectedYear: number, includeUnverified = false) => {
   const listEBookCountsByYear =
     await getListEBookCountsByYear(userSelectedYear);
 
@@ -136,26 +137,61 @@ const getEBookListByYear = async (userSelectedYear: number) => {
     library, row.title, row.sub_series_number, row.publisher, row.description,
     row.notes, row.subtitle, row.cjk_title, row.romanized_title, row.data_source,
   ]);
-  const priorLocalEntries = new Set(previousEntries
+  const copyAuditRows = await db.auditLog.findMany({
+    where: { table_name: "List_EBook", action: "CREATE" },
+    select: { record_id: true, old_values: true },
+  });
+  const copiedFromGlobalIds = new Set(copyAuditRows
+    .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+    .map((row) => Number(row.record_id)));
+  const priorLocalOrigins = new Map(previousEntries
     .filter((row) => !row.is_global && row.Library_Year?.library)
-    .map((row) => localKey(row, row.Library_Year?.library)));
+    .map((row) => [
+      localKey(row, row.Library_Year?.library),
+      copiedFromGlobalIds.has(row.id) ? `${previousYear} Global (Admin)` : `${previousYear} Institution-created`,
+    ]));
   const origins = new Map(currentEntries.map((row) => [
     row.id,
     row.is_global && globalIds.has(row.id)
       ? `${previousYear} Global (Admin)`
-      : !row.is_global && priorLocalEntries.has(localKey(row, row.Library_Year?.library))
-        ? `${previousYear} Institution-created`
+      : !row.is_global
+        ? priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) ?? null
         : null,
   ]));
+  const globalDerivedLocalIds = new Set(currentEntries
+    .filter((row) => !row.is_global && priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) === `${previousYear} Global (Admin)`)
+    .map((row) => row.id));
+  const institutionIds = currentEntries
+    .map((row) => row.Library_Year?.library)
+    .filter((id): id is number => id != null);
+  const institutions = await db.library.findMany({
+    where: { id: { in: institutionIds } },
+    select: { id: true, library_name: true },
+  });
+  const institutionNames = new Map(institutions.map((institution) => [institution.id, institution.library_name]));
+  const originInstitutions = new Map(currentEntries.map((row) => [
+    row.id,
+    !row.is_global && priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) === `${previousYear} Institution-created`
+      ? institutionNames.get(row.Library_Year?.library ?? -1) ?? null
+      : null,
+  ]));
 
-  return groupedRecords.map((row: any) => ({
+  const records = groupedRecords
+    .filter((row: any) => !globalDerivedLocalIds.has(row.id))
+    .map((row: any) => ({
     ...row,
-    import_origin: origins.get(row.id) ?? null,
+    import_origin: origins.get(row.id) ?? "Legacy / source unverified",
+    origin_institution: originInstitutions.get(row.id) ?? null,
   }));
+
+  return includeUnverified
+    ? records
+    : records.filter((row: any) => row.import_origin !== "Legacy / source unverified");
 };
 
 export async function GetEBookList(userSelectedYear: number) {
-  const data = await getEBookListByYear(userSelectedYear);
+  const includeUnverified = (await getSessionRoleIds()).includes(1);
+  const data = await getEBookListByYear(userSelectedYear, includeUnverified);
   /** ⬇️ parse with the extended schema so volumes/chapters are preserved */
   return z.array(listEBookRowSchema).parse(data || []);
 }
@@ -182,7 +218,8 @@ export async function GetEBookListWithUserSelections(
     : null;
   
   // Get base EBook list
-  const baseData = await getEBookListByYear(userSelectedYear);
+  const includeUnverified = (await getSessionRoleIds()).includes(1);
+  const baseData = await getEBookListByYear(userSelectedYear, includeUnverified);
   
   // Get user selections if libraryYear exists
   let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();

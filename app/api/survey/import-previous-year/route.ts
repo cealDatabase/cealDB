@@ -18,6 +18,7 @@ type ResourceConfig = {
   languageReference: "listav_id" | "listebook_id" | "listejournal_id";
   fields: string[];
   countFields: string[];
+  auditTableName: "List_AV" | "List_EBook" | "List_EJournal";
   path: "avdb" | "ebook" | "ejournal";
 };
 
@@ -33,6 +34,7 @@ const RESOURCE_CONFIG: Record<Resource, ResourceConfig> = {
     languageReference: "listav_id",
     fields: ["type", "title", "cjk_title", "romanized_title", "subtitle", "publisher", "description", "notes", "data_source"],
     countFields: ["titles", "ishidden"],
+    auditTableName: "List_AV",
     path: "avdb",
   },
   ebook: {
@@ -46,6 +48,7 @@ const RESOURCE_CONFIG: Record<Resource, ResourceConfig> = {
     languageReference: "listebook_id",
     fields: ["title", "sub_series_number", "publisher", "description", "notes", "subtitle", "cjk_title", "romanized_title", "data_source"],
     countFields: ["titles", "volumes", "chapters", "ishidden"],
+    auditTableName: "List_EBook",
     path: "ebook",
   },
   ejournal: {
@@ -59,6 +62,7 @@ const RESOURCE_CONFIG: Record<Resource, ResourceConfig> = {
     languageReference: "listejournal_id",
     fields: ["title", "sub_series_number", "publisher", "description", "notes", "subtitle", "series", "vendor", "cjk_title", "romanized_title", "data_source"],
     countFields: ["journals", "dbs", "ishidden"],
+    auditTableName: "List_EJournal",
     path: "ejournal",
   },
 };
@@ -102,13 +106,26 @@ export async function POST(request: Request) {
           Library_Year: { select: { library: true } },
         },
       });
+      // A local row created by editing a global entry is an institution's
+      // customization, not a new catalogue entry. Keep it in the database,
+      // but do not carry it into the shared yearly catalogue.
+      const copyAuditRows = await tx.auditLog.findMany({
+        where: { table_name: config.auditTableName, action: "CREATE" },
+        select: { record_id: true, old_values: true },
+      });
+      const copiedFromGlobalIds = new Set(copyAuditRows
+        .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+        .map((row) => Number(row.record_id)));
+      const importableEntries = (sourceEntries as Record<string, any>[]).filter(
+        (entry) => entry.is_global === true || !copiedFromGlobalIds.has(entry.id)
+      );
 
       const targetLibraryYears = new Map<number, number>();
       let globalCreated = 0;
       let localCreated = 0;
       let skipped = 0;
 
-      for (const entry of sourceEntries as Record<string, any>[]) {
+      for (const entry of importableEntries) {
         const sourceCount = entry[config.countRelation][0];
         if (!sourceCount) continue;
 
@@ -211,7 +228,13 @@ export async function POST(request: Request) {
         localCreated++;
       }
 
-      return { globalCreated, localCreated, skipped, sourceEntries: sourceEntries.length };
+      return {
+        globalCreated,
+        localCreated,
+        skipped,
+        excludedCustomizedCopies: sourceEntries.length - importableEntries.length,
+        sourceEntries: importableEntries.length,
+      };
     }, {
       // A yearly catalogue can contain hundreds of entries, each with counts,
       // languages, and (for local entries) an institution relation. Prisma's
