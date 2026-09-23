@@ -15,6 +15,7 @@ export const listEBookSchema = z.object({
   is_global: z.boolean(),
   libraryyear: z.number().nullish(),
   import_origin: z.string().nullish(),
+  origin_institution: z.string().nullish(),
   subscribers: z.array(z.string()),
   language: z.array(z.string()),
   updated_at: z.string().nullish(),

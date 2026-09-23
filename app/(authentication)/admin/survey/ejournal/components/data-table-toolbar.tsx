@@ -168,7 +168,7 @@ export function DataTableToolbar<TData>({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
-      toast.success('Excel exported successfully! Includes your selections.');
+      toast.success('Excel exported successfully!');
     } catch (error) {
       console.error('Excel export error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to export Excel');
@@ -232,7 +232,7 @@ export function DataTableToolbar<TData>({
         size="sm"
         className='h-8 bg-green-50 hover:bg-green-100 border-green-200'
         disabled={isExportingExcel}
-        title={isExportingExcel ? "Preparing Excel export..." : "Export to Excel (includes your selections)"}
+        title={isExportingExcel ? "Preparing Excel export..." : "Export to Excel"}
       >
         {isExportingExcel ? (
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />

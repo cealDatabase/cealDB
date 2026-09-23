@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
+import { getSessionRoleIds } from '@/lib/auth';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 
@@ -71,6 +72,7 @@ export async function GET(
     }
 
     const userCtx = await getUserContext();
+    const isSuperAdmin = (await getSessionRoleIds()).includes(1);
 
     // Get all AV data with counts for the year
     const listAVCountsByYear = await prisma.list_AV_Counts.findMany({
@@ -137,12 +139,15 @@ export async function GET(
       }
     }
 
-    // Drop other institutions' customized records — keep only globals plus
-    // the viewing library's own customs.
-    const filteredAvs = avs.filter((av: any) => {
-      if (av.is_global !== false) return true; // global or unknown
-      return viewingLibraryYearId !== null && av.libraryyear === viewingLibraryYearId;
-    });
+    // A Super Admin exports the complete annual catalogue, including every
+    // institution-owned entry, whether or not it is selected by the library
+    // currently being viewed. Other roles retain their scoped export.
+    const filteredAvs = isSuperAdmin
+      ? avs
+      : avs.filter((av: any) => {
+          if (av.is_global !== false) return true; // global or unknown
+          return viewingLibraryYearId !== null && av.libraryyear === viewingLibraryYearId;
+        });
 
     // Build data array
     const rawData = filteredAvs.map((av: any) => {
@@ -176,7 +181,7 @@ export async function GET(
     // when the viewing library has its own version of a resource, hide the
     // global twin and carry over any selection state from it.
     let data: any[] = rawData;
-    if (viewingLibraryYearId !== null) {
+    if (!isSuperAdmin && viewingLibraryYearId !== null) {
       const groupKey = (it: any) =>
         `${(it.title ?? '').toLowerCase()}_${(it.type ?? '').toLowerCase()}_${(it.subtitle ?? '').toLowerCase()}`;
       const groups = new Map<string, any[]>();
