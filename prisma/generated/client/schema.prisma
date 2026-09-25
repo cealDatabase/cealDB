@@ -358,23 +358,25 @@ model LibraryYear_ListEJournal {
 }
 
 model List_AV {
-  id                 Int                  @id @default(autoincrement())
-  type               String?
-  title              String?
-  cjk_title          String?
-  romanized_title    String?
-  subtitle           String?
-  publisher          String?
-  description        String?
-  notes              String?
-  data_source        String?
-  updated_at         DateTime
-  is_global          Boolean?
-  libraryyear        Int?
-  LibraryYear_ListAV LibraryYear_ListAV[]
-  Library_Year       Library_Year?        @relation(fields: [libraryyear], references: [id])
-  List_AV_Counts     List_AV_Counts[]
-  List_AV_Language   List_AV_Language[]
+  id                   Int                  @id @default(autoincrement())
+  type                 String?
+  title                String?
+  cjk_title            String?
+  romanized_title      String?
+  subtitle             String?
+  publisher            String?
+  description          String?
+  notes                String?
+  data_source          String?
+  updated_at           DateTime
+  is_global            Boolean?
+  libraryyear          Int?
+  source_entry_id      Int? // Previous-year local catalogue entry copied into this row
+  shared_by_admin_edit Boolean              @default(false) // Made shareable after Super Admin/Editor edit
+  LibraryYear_ListAV   LibraryYear_ListAV[]
+  Library_Year         Library_Year?        @relation(fields: [libraryyear], references: [id])
+  List_AV_Counts       List_AV_Counts[]
+  List_AV_Language     List_AV_Language[]
 }
 
 model List_AV_Counts {
@@ -417,6 +419,8 @@ model List_EBook {
   data_source           String?
   is_global             Boolean?
   libraryyear           Int?
+  source_entry_id       Int? // Previous-year local catalogue entry copied into this row
+  shared_by_admin_edit  Boolean                 @default(false) // Made shareable after Super Admin/Editor edit
   LibraryYear_ListEBook LibraryYear_ListEBook[]
   Library_Year          Library_Year?           @relation(fields: [libraryyear], references: [id])
   List_EBook_Counts     List_EBook_Counts[]
@@ -460,6 +464,8 @@ model List_EJournal {
   data_source              String?
   is_global                Boolean?
   libraryyear              Int?
+  source_entry_id          Int? // Previous-year local catalogue entry copied into this row
+  shared_by_admin_edit     Boolean                    @default(false) // Made shareable after Super Admin/Editor edit
   LibraryYear_ListEJournal LibraryYear_ListEJournal[]
   Library_Year             Library_Year?              @relation(fields: [libraryyear], references: [id])
   List_EJournal_Counts     List_EJournal_Counts[]

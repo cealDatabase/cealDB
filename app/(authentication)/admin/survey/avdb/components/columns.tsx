@@ -279,13 +279,20 @@ export function getColumns(
       : []),
     {
       accessorKey: "import_origin",
-      header: ({ column }) => <DataTableColumnHeader column={column} title={`${year - 1} Origin`} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Origin" />,
       cell: ({ row }) => {
         const origin = row.getValue("import_origin") as string | null | undefined;
         if (!origin) return null;
-        const isGlobal = origin.includes("Global");
-        const isUnverified = origin === "Legacy / source unverified";
-        return <span className={`rounded px-2 py-1 text-xs font-medium ${isUnverified ? "bg-slate-100 text-slate-700" : isGlobal ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"}`}>{origin}</span>;
+        const colorClass = origin === "Legacy / source unverified"
+          ? "bg-slate-100 text-slate-700"
+          : origin.endsWith("Admin-created")
+            ? "bg-violet-100 text-violet-800"
+            : origin.includes("Global")
+              ? "bg-blue-100 text-blue-800"
+              : origin.startsWith(`${year} `)
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-amber-100 text-amber-800";
+        return <span className={`rounded px-2 py-1 text-xs font-medium ${colorClass}`}>{origin}</span>;
       },
     },
     ...(isSuperAdmin ? [{

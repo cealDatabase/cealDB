@@ -132,7 +132,8 @@ const getEJournalListByYear = async (userSelectedYear: number, includeUnverified
       id: true, is_global: true, title: true, sub_series_number: true,
       publisher: true, description: true, notes: true, subtitle: true,
       series: true, vendor: true, cjk_title: true, romanized_title: true,
-      data_source: true, Library_Year: { select: { library: true } },
+      data_source: true, source_entry_id: true, shared_by_admin_edit: true,
+      Library_Year: { select: { library: true } },
     },
   });
   const globalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
@@ -143,10 +144,13 @@ const getEJournalListByYear = async (userSelectedYear: number, includeUnverified
   ]);
   const copyAuditRows = await db.auditLog.findMany({
     where: { table_name: "List_EJournal", action: "CREATE" },
-    select: { record_id: true, old_values: true },
+    select: { record_id: true, old_values: true, timestamp: true },
   });
   const copiedFromGlobalIds = new Set(copyAuditRows
     .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+    .map((row) => Number(row.record_id)));
+  const currentYearCreatedIds = new Set(copyAuditRows
+    .filter((row) => row.timestamp.getUTCFullYear() === userSelectedYear)
     .map((row) => Number(row.record_id)));
   const priorLocalOrigins = new Map(previousEntries
     .filter((row) => !row.is_global && row.Library_Year?.library)
@@ -154,16 +158,31 @@ const getEJournalListByYear = async (userSelectedYear: number, includeUnverified
       localKey(row, row.Library_Year?.library),
       copiedFromGlobalIds.has(row.id) ? `${previousYear} Global (Admin)` : `${previousYear} Institution-created`,
     ]));
+  const previousEntryOrigins = new Map(previousEntries.map((row) => [
+    row.id,
+    row.is_global || copiedFromGlobalIds.has(row.id)
+      ? `${previousYear} Global (Admin)`
+      : `${previousYear} Institution-created`,
+  ]));
+  const localOrigin = (row: any) =>
+    copiedFromGlobalIds.has(row.id)
+      ? `${previousYear} Global (Admin)`
+      : row.source_entry_id != null
+        ? previousEntryOrigins.get(row.source_entry_id) ?? null
+        : priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) ?? null;
   const origins = new Map(currentEntries.map((row) => [
     row.id,
     row.is_global && globalIds.has(row.id)
       ? `${previousYear} Global (Admin)`
       : !row.is_global
-        ? priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) ?? null
-        : null,
+        ? localOrigin(row) ?? (currentYearCreatedIds.has(row.id) ? `${userSelectedYear} Institution-created` : null)
+        : currentYearCreatedIds.has(row.id) ? `${userSelectedYear} Admin-created` : null,
   ]));
   const globalDerivedLocalIds = new Set(currentEntries
-    .filter((row) => !row.is_global && priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) === `${previousYear} Global (Admin)`)
+    .filter((row) => !row.is_global && localOrigin(row) === `${previousYear} Global (Admin)`)
+    .map((row) => row.id));
+  const sharedByAdminEditIds = new Set(currentEntries
+    .filter((row) => row.shared_by_admin_edit)
     .map((row) => row.id));
   const institutionIds = currentEntries
     .map((row) => row.Library_Year?.library)
@@ -175,7 +194,10 @@ const getEJournalListByYear = async (userSelectedYear: number, includeUnverified
   const institutionNames = new Map(institutions.map((institution) => [institution.id, institution.library_name]));
   const originInstitutions = new Map(currentEntries.map((row) => [
     row.id,
-    !row.is_global && priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) === `${previousYear} Institution-created`
+    !row.is_global && (
+      localOrigin(row) === `${previousYear} Institution-created` ||
+      origins.get(row.id) === `${userSelectedYear} Institution-created`
+    )
       ? institutionNames.get(row.Library_Year?.library ?? -1) ?? null
       : null,
   ]));
@@ -186,6 +208,7 @@ const getEJournalListByYear = async (userSelectedYear: number, includeUnverified
     ...row,
     import_origin: origins.get(row.id) ?? "Legacy / source unverified",
     origin_institution: originInstitutions.get(row.id) ?? null,
+    shared_by_admin_edit: sharedByAdminEditIds.has(row.id),
   }));
 
   return includeUnverified
@@ -221,9 +244,26 @@ export async function GetEJournalListWithUserSelections(
     ? libraryYearRecords[0].id 
     : null;
   
-  // Get base EJournal list
-  const includeUnverified = (await getSessionRoleIds()).includes(1);
+  // Super Admin and Editor can review every institution's current local
+  // additions. Other roles receive only their own current-year local rows.
+  const roleIds = await getSessionRoleIds();
+  const canReviewAllInstitutions = roleIds.includes(1) || roleIds.includes(3);
+  const includeUnverified = roleIds.includes(1);
   const baseData = await getEJournalListByYear(userSelectedYear, includeUnverified);
+  const localYearIds = baseData
+    .map((item) => item.libraryyear)
+    .filter((id): id is number => id != null);
+  const localOwners = new Map((await db.library_Year.findMany({
+    where: { id: { in: localYearIds } },
+    select: { id: true, library: true },
+  })).map((row) => [row.id, row.library]));
+  const visibleBaseData = canReviewAllInstitutions
+    ? baseData
+    : baseData.filter((item) =>
+        !item.import_origin?.endsWith("Institution-created") ||
+        item.shared_by_admin_edit ||
+        localOwners.get(item.libraryyear ?? -1) === libraryId
+      );
   
   // Get user selections if libraryYear exists
   let userSelections: Map<number, { is_selected: boolean; custom_count: number | null }> = new Map();
@@ -247,7 +287,7 @@ export async function GetEJournalListWithUserSelections(
   }
   
   // Merge user selections with base data
-  const mergedData = baseData.map((item) => {
+  const mergedData = visibleBaseData.map((item) => {
     const selection = userSelections.get(item.id);
     return {
       ...item,
@@ -256,6 +296,7 @@ export async function GetEJournalListWithUserSelections(
     };
   });
 
-  // The catalogue is shared; only selection state is institution-specific.
+  // Current-year institution-created entries are private to their owning
+  // institution; all other shared catalogue rows remain selectable.
   return z.array(listEJournalWithSelectionSchema).parse(mergedData || []);
 }

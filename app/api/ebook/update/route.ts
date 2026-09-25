@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { requireRoles } from "@/lib/auth";
+import { getSessionRoleIds, requireRoles } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -14,9 +14,10 @@ export async function POST(req: Request) {
       { status: 403 }
     );
   }
+  const sharesLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
 
     const body = await req.json();
-    const { id, counts, volumes, chapters, language, year, ...updateData } =
+    const { id, counts, volumes, chapters, language, year, is_global: _ignoredIsGlobal, ...updateData } =
       body;
 
     const ebookId = Number(id);
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
       // main
       await tx.list_EBook.update({
         where: { id: ebookId },
-        data: { ...updateData, updated_at: new Date() },
+        data: { ...updateData, updated_at: new Date(), ...(sharesLocalEntry ? { shared_by_admin_edit: true } : {}) },
       });
 
       // manual upsert by (listebook, year)

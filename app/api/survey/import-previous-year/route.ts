@@ -177,15 +177,21 @@ export async function POST(request: Request) {
           targetLibraryYears.set(libraryId, targetLibraryYearId);
         }
 
-        // There is no source-id column on the legacy catalogue tables.  The
-        // target institution plus the full catalogue identity is therefore
-        // used as the idempotency key, so a second click does not clone rows.
+        // Keep a permanent link to the local entry that was copied. This
+        // survives later catalogue edits, unlike matching by display fields.
+        // The identity remains the idempotency key for legacy rows.
         const identity = pick(entry, config.fields);
         const existing = await listModel.findFirst({
           where: { libraryyear: targetLibraryYearId, is_global: false, ...identity },
-          select: { id: true },
+          select: { id: true, source_entry_id: true },
         });
         if (existing) {
+          if (existing.source_entry_id == null) {
+            await listModel.update({
+              where: { id: existing.id },
+              data: { source_entry_id: entry.id },
+            });
+          }
           skipped++;
           continue;
         }
@@ -195,6 +201,7 @@ export async function POST(request: Request) {
             ...identity,
             is_global: false,
             libraryyear: targetLibraryYearId,
+            source_entry_id: entry.id,
             updated_at: new Date(),
           },
           select: { id: true },

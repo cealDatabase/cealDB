@@ -1,7 +1,7 @@
 // /app/api/ejournal/update/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { requireRoles } from "@/lib/auth";
+import { getSessionRoleIds, requireRoles } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
       { status: 403 }
     );
   }
+  const sharesLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
 
     const body = await req.json();
 
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
       counts, // legacy alias → used if journals is undefined
       dbs, // optional
       language, // number[] or string[]
+      is_global: _ignoredIsGlobal, // Scope must not change during an edit
       ...updateData // scalar fields for List_EJournal
     } = body;
 
@@ -49,7 +51,7 @@ export async function POST(req: Request) {
       // 1) Update parent row
       await tx.list_EJournal.update({
         where: { id: ejId },
-        data: { ...updateData, updated_at: new Date() },
+        data: { ...updateData, updated_at: new Date(), ...(sharesLocalEntry ? { shared_by_admin_edit: true } : {}) },
       });
 
       // 2) Manual upsert of counts by (listejournal, year)
@@ -100,4 +102,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

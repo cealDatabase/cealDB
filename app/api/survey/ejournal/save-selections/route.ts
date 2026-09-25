@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logUserAction } from "@/lib/auditLogger";
+import { getSessionRoleIds } from "@/lib/auth";
 
 interface EJournalSelection {
   listId: number;
@@ -65,6 +66,25 @@ export async function POST(req: Request) {
     const toDelete = selections.filter(
       (sel) => sel.isSelected === false && (sel.customCount == null)
     );
+
+    // Do not rely on the client-side table filter: an institution-created row
+    // is private until a Super Admin or Editor has explicitly shared it by edit.
+    const roleIds = await getSessionRoleIds();
+    const canReviewAllInstitutions = roleIds.includes(1) || roleIds.includes(3);
+    if (!canReviewAllInstitutions && meaningful.length > 0) {
+      const requested = await db.list_EJournal.findMany({
+        where: {
+          id: { in: meaningful.map((selection) => selection.listId) },
+          is_global: false,
+          libraryyear: { not: libraryYearId },
+          shared_by_admin_edit: false,
+        },
+        select: { id: true },
+      });
+      if (requested.length > 0) {
+        return NextResponse.json({ error: "This institution-created entry is private to its creating institution." }, { status: 403 });
+      }
+    }
 
     // Batch upsert meaningful + delete default-state records
     const results = await db.$transaction([

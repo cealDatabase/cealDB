@@ -14,6 +14,8 @@ model List_EJournal {
   data_source              String?
   is_global                Boolean?
   libraryyear              Int?
+  source_entry_id          Int? // Previous-year local catalogue entry copied into this row
+  shared_by_admin_edit     Boolean @default(false) // Made shareable after Super Admin/Editor edit
   LibraryYear_ListEJournal LibraryYear_ListEJournal[]
   Library_Year             Library_Year?              @relation(fields: [libraryyear], references: [id])
   List_EJournal_Counts     List_EJournal_Counts[]

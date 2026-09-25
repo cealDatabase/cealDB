@@ -461,7 +461,9 @@ exports.Prisma.List_AVScalarFieldEnum = {
   data_source: 'data_source',
   updated_at: 'updated_at',
   is_global: 'is_global',
-  libraryyear: 'libraryyear'
+  libraryyear: 'libraryyear',
+  source_entry_id: 'source_entry_id',
+  shared_by_admin_edit: 'shared_by_admin_edit'
 };
 
 exports.Prisma.List_AV_CountsScalarFieldEnum = {
@@ -496,7 +498,9 @@ exports.Prisma.List_EBookScalarFieldEnum = {
   romanized_title: 'romanized_title',
   data_source: 'data_source',
   is_global: 'is_global',
-  libraryyear: 'libraryyear'
+  libraryyear: 'libraryyear',
+  source_entry_id: 'source_entry_id',
+  shared_by_admin_edit: 'shared_by_admin_edit'
 };
 
 exports.Prisma.List_EBook_CountsScalarFieldEnum = {
@@ -530,7 +534,9 @@ exports.Prisma.List_EJournalScalarFieldEnum = {
   romanized_title: 'romanized_title',
   data_source: 'data_source',
   is_global: 'is_global',
-  libraryyear: 'libraryyear'
+  libraryyear: 'libraryyear',
+  source_entry_id: 'source_entry_id',
+  shared_by_admin_edit: 'shared_by_admin_edit'
 };
 
 exports.Prisma.List_EJournal_CountsScalarFieldEnum = {

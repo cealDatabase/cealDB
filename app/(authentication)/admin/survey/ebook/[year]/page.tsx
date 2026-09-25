@@ -19,10 +19,14 @@ async function EbookSinglePage(
     initialSearch?: string,
     newRecordId?: number
 ) {
-    // Use GetEBookListWithUserSelections if libid is available, otherwise fallback to GetEBookList
-    const tasks = libid
-        ? (await GetEBookListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
-        : (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id);
+  const canReviewAllInstitutions = (userRoles ?? []).some((role) => ["1", "3"].includes(role));
+  // Non-review roles must have an institution context. This prevents a direct
+  // URL without libid from exposing other institutions' current local entries.
+  const tasks = libid
+    ? (await GetEBookListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
+    : canReviewAllInstitutions
+      ? (await GetEBookList(yearPassIn)).sort((a, b) => a.id - b.id)
+      : [];
 
     let isOpenForEditing = true;
     if (libid) {
