@@ -107,8 +107,59 @@ export async function GET(
         List_EJournal_Language: {
           include: { Language: true }
         },
+        Library_Year: { select: { library: true } },
       },
     });
+
+    const previousYear = year - 1;
+    const previousEntries = await prisma.list_EJournal.findMany({
+      where: { List_EJournal_Counts: { some: { year: previousYear } } },
+      select: {
+        id: true, is_global: true, title: true, sub_series_number: true,
+        publisher: true, description: true, notes: true, subtitle: true,
+        series: true, vendor: true, cjk_title: true, romanized_title: true,
+        data_source: true, Library_Year: { select: { library: true } },
+      },
+    });
+    const copyAuditRows = await prisma.auditLog.findMany({
+      where: { table_name: "List_EJournal", action: "CREATE" },
+      select: { record_id: true, old_values: true },
+    });
+    const copiedFromGlobalIds = new Set(copyAuditRows
+      .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+      .map((row) => Number(row.record_id)));
+    const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
+      library, row.title, row.sub_series_number, row.publisher, row.description,
+      row.notes, row.subtitle, row.series, row.vendor, row.cjk_title,
+      row.romanized_title, row.data_source,
+    ]);
+    const previousGlobalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
+    const previousLocalOrigins = new Map(previousEntries
+      .filter((row) => !row.is_global && row.Library_Year?.library)
+      .map((row) => [
+        localKey(row, row.Library_Year?.library),
+        copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
+      ]));
+    const originKinds = new Map(ejournals.map((ejournal: any) => {
+      const priorLocalOrigin = ejournal.is_global === false
+        ? previousLocalOrigins.get(localKey(ejournal, ejournal.Library_Year?.library))
+        : undefined;
+      const kind = ejournal.is_global && previousGlobalIds.has(ejournal.id)
+        ? "global"
+        : ejournal.is_global === false && (copiedFromGlobalIds.has(ejournal.id) || priorLocalOrigin === "customized")
+          ? "customized"
+          : ejournal.is_global === false && priorLocalOrigin === "institution-created"
+            ? "institution-created"
+            : "legacy";
+      return [ejournal.id, kind];
+    }));
+    const originLabel = (id: number) => {
+      switch (originKinds.get(id)) {
+        case "global": return `${previousYear} Global (Admin)`;
+        case "institution-created": return `${previousYear} Institution-created`;
+        default: return "Legacy / source unverified";
+      }
+    };
 
     // Look up the viewing library's Library_Year id
     let viewingLibraryYearId: number | null = null;
@@ -141,12 +192,16 @@ export async function GET(
 
     // Super Admin exports contain every catalogue entry for the requested
     // year. Other roles only receive global rows and their own local rows.
-    const filteredEjournals = isSuperAdmin
+    const scopedEjournals = isSuperAdmin
       ? ejournals
       : ejournals.filter((ej: any) => {
           if (ej.is_global !== false) return true;
           return viewingLibraryYearId !== null && ej.libraryyear === viewingLibraryYearId;
         });
+    const filteredEjournals = scopedEjournals.filter((ejournal: any) => {
+      const origin = originKinds.get(ejournal.id);
+      return origin !== "customized" && (isSuperAdmin || origin !== "legacy");
+    });
 
     // Build data array
     const rawData = filteredEjournals.map((ejournal: any) => {
@@ -175,6 +230,7 @@ export async function GET(
         libraryyear: ejournal.libraryyear,
         is_selected: selection?.is_selected ?? false,
         custom_count: selection?.custom_count ?? null,
+        origin: originLabel(ejournal.id),
       };
     });
 
@@ -251,6 +307,7 @@ async function generateExcel(
   // Define columns (excluding subscribers)
   const columns = [
     { header: 'ID', key: 'id', width: 10 },
+    { header: `${year - 1} Origin`, key: 'origin', width: 30 },
     { header: 'My Selection', key: 'is_selected', width: 15 },
     { header: 'My Custom Count', key: 'custom_count', width: 18 },
     { header: 'Journals (# titles)', key: 'journals', width: 15 },
@@ -284,6 +341,7 @@ async function generateExcel(
   data.forEach((item) => {
     worksheet.addRow({
       id: item.id,
+      origin: item.origin,
       is_selected: item.is_selected ? 'Yes' : 'No',
       custom_count: item.custom_count ?? '',
       journals: item.journals,
@@ -321,7 +379,7 @@ async function generateExcel(
 
   // Add title row above headers
   worksheet.insertRow(1, [`E-Journal Database - ${year}${libraryName ? ` - ${libraryName}` : ''}`]);
-  worksheet.mergeCells('A1:P1');
+  worksheet.mergeCells('A1:Q1');
   const titleRow = worksheet.getRow(1);
   titleRow.font = { bold: true, size: 14 };
   titleRow.alignment = { horizontal: 'center', vertical: 'middle' };

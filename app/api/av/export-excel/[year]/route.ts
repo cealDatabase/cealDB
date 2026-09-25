@@ -106,8 +106,57 @@ export async function GET(
         List_AV_Language: {
           include: { Language: true }
         },
+        Library_Year: { select: { library: true } },
       },
     });
+
+    const previousYear = year - 1;
+    const previousEntries = await prisma.list_AV.findMany({
+      where: { List_AV_Counts: { some: { year: previousYear } } },
+      select: {
+        id: true, is_global: true, type: true, title: true, cjk_title: true,
+        romanized_title: true, subtitle: true, publisher: true, description: true,
+        notes: true, data_source: true, Library_Year: { select: { library: true } },
+      },
+    });
+    const copyAuditRows = await prisma.auditLog.findMany({
+      where: { table_name: "List_AV", action: "CREATE" },
+      select: { record_id: true, old_values: true },
+    });
+    const copiedFromGlobalIds = new Set(copyAuditRows
+      .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+      .map((row) => Number(row.record_id)));
+    const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
+      library, row.type, row.title, row.cjk_title, row.romanized_title, row.subtitle,
+      row.publisher, row.description, row.notes, row.data_source,
+    ]);
+    const previousGlobalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
+    const previousLocalOrigins = new Map(previousEntries
+      .filter((row) => !row.is_global && row.Library_Year?.library)
+      .map((row) => [
+        localKey(row, row.Library_Year?.library),
+        copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
+      ]));
+    const originKinds = new Map(avs.map((av: any) => {
+      const priorLocalOrigin = av.is_global === false
+        ? previousLocalOrigins.get(localKey(av, av.Library_Year?.library))
+        : undefined;
+      const kind = av.is_global && previousGlobalIds.has(av.id)
+        ? "global"
+        : av.is_global === false && (copiedFromGlobalIds.has(av.id) || priorLocalOrigin === "customized")
+          ? "customized"
+          : av.is_global === false && priorLocalOrigin === "institution-created"
+            ? "institution-created"
+            : "legacy";
+      return [av.id, kind];
+    }));
+    const originLabel = (id: number) => {
+      switch (originKinds.get(id)) {
+        case "global": return `${previousYear} Global (Admin)`;
+        case "institution-created": return `${previousYear} Institution-created`;
+        default: return "Legacy / source unverified";
+      }
+    };
 
     // Look up the viewing library's Library_Year id (used both for filtering
     // their own customized records and for fetching their selections).
@@ -142,12 +191,16 @@ export async function GET(
     // A Super Admin exports the complete annual catalogue, including every
     // institution-owned entry, whether or not it is selected by the library
     // currently being viewed. Other roles retain their scoped export.
-    const filteredAvs = isSuperAdmin
+    const scopedAvs = isSuperAdmin
       ? avs
       : avs.filter((av: any) => {
           if (av.is_global !== false) return true; // global or unknown
           return viewingLibraryYearId !== null && av.libraryyear === viewingLibraryYearId;
         });
+    const filteredAvs = scopedAvs.filter((av: any) => {
+      const origin = originKinds.get(av.id);
+      return origin !== "customized" && (isSuperAdmin || origin !== "legacy");
+    });
 
     // Build data array
     const rawData = filteredAvs.map((av: any) => {
@@ -174,6 +227,7 @@ export async function GET(
         libraryyear: av.libraryyear,
         is_selected: selection?.is_selected ?? false,
         custom_count: selection?.custom_count ?? null,
+        origin: originLabel(av.id),
       };
     });
 
@@ -256,6 +310,7 @@ async function generateExcel(
   // Define columns (excluding subscribers)
   const columns = [
     { header: 'ID', key: 'id', width: 10 },
+    { header: `${year - 1} Origin`, key: 'origin', width: 30 },
     { header: 'My Selection', key: 'is_selected', width: 15 },
     { header: 'My Custom Count', key: 'custom_count', width: 18 },
     { header: 'Counts', key: 'counts', width: 12 },
@@ -287,6 +342,7 @@ async function generateExcel(
   data.forEach((item) => {
     worksheet.addRow({
       id: item.id,
+      origin: item.origin,
       is_selected: item.is_selected ? 'Yes' : 'No',
       custom_count: item.custom_count ?? '',
       counts: item.counts,
@@ -322,7 +378,7 @@ async function generateExcel(
 
   // Add title row above headers
   worksheet.insertRow(1, [`AV Database - ${year}${libraryName ? ` - ${libraryName}` : ''}`]);
-  worksheet.mergeCells('A1:N1');
+  worksheet.mergeCells('A1:O1');
   const titleRow = worksheet.getRow(1);
   titleRow.font = { bold: true, size: 14 };
   titleRow.alignment = { horizontal: 'center', vertical: 'middle' };

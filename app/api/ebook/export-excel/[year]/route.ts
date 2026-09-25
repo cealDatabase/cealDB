@@ -109,8 +109,58 @@ export async function GET(
         List_EBook_Language: {
           include: { Language: true }
         },
+        Library_Year: { select: { library: true } },
       },
     });
+
+    const previousYear = year - 1;
+    const previousEntries = await prisma.list_EBook.findMany({
+      where: { List_EBook_Counts: { some: { year: previousYear } } },
+      select: {
+        id: true, is_global: true, title: true, sub_series_number: true,
+        publisher: true, description: true, notes: true, subtitle: true,
+        cjk_title: true, romanized_title: true, data_source: true,
+        Library_Year: { select: { library: true } },
+      },
+    });
+    const copyAuditRows = await prisma.auditLog.findMany({
+      where: { table_name: "List_EBook", action: "CREATE" },
+      select: { record_id: true, old_values: true },
+    });
+    const copiedFromGlobalIds = new Set(copyAuditRows
+      .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+      .map((row) => Number(row.record_id)));
+    const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
+      library, row.title, row.sub_series_number, row.publisher, row.description,
+      row.notes, row.subtitle, row.cjk_title, row.romanized_title, row.data_source,
+    ]);
+    const previousGlobalIds = new Set(previousEntries.filter((row) => row.is_global).map((row) => row.id));
+    const previousLocalOrigins = new Map(previousEntries
+      .filter((row) => !row.is_global && row.Library_Year?.library)
+      .map((row) => [
+        localKey(row, row.Library_Year?.library),
+        copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
+      ]));
+    const originKinds = new Map(ebooks.map((ebook: any) => {
+      const priorLocalOrigin = ebook.is_global === false
+        ? previousLocalOrigins.get(localKey(ebook, ebook.Library_Year?.library))
+        : undefined;
+      const kind = ebook.is_global && previousGlobalIds.has(ebook.id)
+        ? "global"
+        : ebook.is_global === false && (copiedFromGlobalIds.has(ebook.id) || priorLocalOrigin === "customized")
+          ? "customized"
+          : ebook.is_global === false && priorLocalOrigin === "institution-created"
+            ? "institution-created"
+            : "legacy";
+      return [ebook.id, kind];
+    }));
+    const originLabel = (id: number) => {
+      switch (originKinds.get(id)) {
+        case "global": return `${previousYear} Global (Admin)`;
+        case "institution-created": return `${previousYear} Institution-created`;
+        default: return "Legacy / source unverified";
+      }
+    };
 
     // Look up the viewing library's Library_Year id
     let viewingLibraryYearId: number | null = null;
@@ -143,12 +193,16 @@ export async function GET(
 
     // Super Admin exports contain every catalogue entry for the requested
     // year. Other roles only receive global rows and their own local rows.
-    const filteredEbooks = isSuperAdmin
+    const scopedEbooks = isSuperAdmin
       ? ebooks
       : ebooks.filter((eb: any) => {
           if (eb.is_global !== false) return true;
           return viewingLibraryYearId !== null && eb.libraryyear === viewingLibraryYearId;
         });
+    const filteredEbooks = scopedEbooks.filter((ebook: any) => {
+      const origin = originKinds.get(ebook.id);
+      return origin !== "customized" && (isSuperAdmin || origin !== "legacy");
+    });
 
     // Build data array
     const rawData = filteredEbooks.map((ebook: any) => {
@@ -177,6 +231,7 @@ export async function GET(
         libraryyear: ebook.libraryyear,
         is_selected: selection?.is_selected ?? false,
         custom_count: selection?.custom_count ?? null,
+        origin: originLabel(ebook.id),
       };
     });
 
@@ -253,6 +308,7 @@ async function generateExcel(
   // Define columns (excluding subscribers)
   const columns = [
     { header: 'ID', key: 'id', width: 10 },
+    { header: `${year - 1} Origin`, key: 'origin', width: 30 },
     { header: 'My Selection', key: 'is_selected', width: 15 },
     { header: 'My Custom Count', key: 'custom_count', width: 18 },
     { header: 'Counts (# titles)', key: 'counts', width: 15 },
@@ -286,6 +342,7 @@ async function generateExcel(
   data.forEach((item) => {
     worksheet.addRow({
       id: item.id,
+      origin: item.origin,
       is_selected: item.is_selected ? 'Yes' : 'No',
       custom_count: item.custom_count ?? '',
       counts: item.counts,
@@ -323,7 +380,7 @@ async function generateExcel(
 
   // Add title row above headers
   worksheet.insertRow(1, [`E-Book Database - ${year}${libraryName ? ` - ${libraryName}` : ''}`]);
-  worksheet.mergeCells('A1:P1');
+  worksheet.mergeCells('A1:Q1');
   const titleRow = worksheet.getRow(1);
   titleRow.font = { bold: true, size: 14 };
   titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
