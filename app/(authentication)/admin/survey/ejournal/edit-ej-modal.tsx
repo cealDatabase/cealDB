@@ -43,9 +43,6 @@ export default function EditEjournalModal({
   const labelToId = (lbl: string): number | undefined =>
     languages.find((l) => l.label === normalizeLabel(lbl))?.value;
 
-  // Check if user is super admin (role 1) or eresource editor (role 3)
-  const isAutoGlobal = userRoles?.includes("1") || userRoles?.includes("3");
-
   const [formData, setFormData] = useState({
     title: rowData.title || "",
     cjk_title: rowData.cjk_title || "",
@@ -57,7 +54,7 @@ export default function EditEjournalModal({
     series: rowData.series || "",
     notes: rowData.notes || "",
     data_source: rowData.data_source || "",
-    is_global: isAutoGlobal ? true : !!rowData.is_global,
+    is_global: !!rowData.is_global,
     // ↴ Use journals/dbs if present; fall back to counts for journals; dbs default 0
     journals: (rowData as any).journals ?? (rowData as any).counts ?? 0,
     dbs: (rowData as any).dbs ?? 0,
@@ -219,21 +216,6 @@ export default function EditEjournalModal({
                 );
               })}
             </div>
-          </div>
-
-          <div className='flex items-center space-x-2'>
-            <Checkbox
-              id='is_global'
-              checked={formData.is_global}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, is_global: Boolean(checked) })
-              }
-              disabled={isAutoGlobal}
-              className='hover:bg-blue-300/30 hover:cursor-pointer'
-            />
-            <label htmlFor='is_global' className='text-sm font-medium'>
-              Is Global {isAutoGlobal && <span className='text-xs text-muted-foreground'>(Auto-enabled for your role)</span>}
-            </label>
           </div>
 
           <div className='flex justify-end'>

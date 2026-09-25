@@ -56,9 +56,6 @@ export default function EditEbookModal({
     is_global: false,
   });
 
-  // Check if user is super admin (role 1) or eresource editor (role 3)
-  const isAutoGlobal = userRoles?.includes("1") || userRoles?.includes("3");
-
   useEffect(() => {
     if (!open) return;
     setForm({
@@ -83,7 +80,7 @@ export default function EditEbookModal({
             .filter(Boolean)
             .map((id) => String(id))
         : [],
-      is_global: isAutoGlobal ? true : (!!rowData.is_global),
+      is_global: !!rowData.is_global,
     });
   }, [open, rowData, userRoles]);
 
@@ -213,18 +210,6 @@ export default function EditEbookModal({
                 );
               })}
             </div>
-          </div>
-
-          <div className='flex items-center space-x-2'>
-            <Checkbox
-              id='is_global'
-              checked={form.is_global}
-              onCheckedChange={() => set("is_global", !form.is_global)}
-              disabled={isAutoGlobal}
-            />
-            <Label htmlFor='is_global'>
-              Is Global {isAutoGlobal && <span className='text-xs text-muted-foreground'>(Auto-enabled for your role)</span>}
-            </Label>
           </div>
 
           <div className='flex justify-end'>

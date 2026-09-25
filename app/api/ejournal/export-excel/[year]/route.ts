@@ -123,10 +123,13 @@ export async function GET(
     });
     const copyAuditRows = await prisma.auditLog.findMany({
       where: { table_name: "List_EJournal", action: "CREATE" },
-      select: { record_id: true, old_values: true },
+      select: { record_id: true, old_values: true, timestamp: true },
     });
     const copiedFromGlobalIds = new Set(copyAuditRows
       .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+      .map((row) => Number(row.record_id)));
+    const currentYearCreatedIds = new Set(copyAuditRows
+      .filter((row) => row.timestamp.getUTCFullYear() === year)
       .map((row) => Number(row.record_id)));
     const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
       library, row.title, row.sub_series_number, row.publisher, row.description,
@@ -140,9 +143,15 @@ export async function GET(
         localKey(row, row.Library_Year?.library),
         copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
       ]));
+    const previousEntryOrigins = new Map(previousEntries.map((row) => [
+      row.id,
+      row.is_global || copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
+    ]));
     const originKinds = new Map(ejournals.map((ejournal: any) => {
       const priorLocalOrigin = ejournal.is_global === false
-        ? previousLocalOrigins.get(localKey(ejournal, ejournal.Library_Year?.library))
+        ? ejournal.source_entry_id != null
+          ? previousEntryOrigins.get(ejournal.source_entry_id)
+          : previousLocalOrigins.get(localKey(ejournal, ejournal.Library_Year?.library))
         : undefined;
       const kind = ejournal.is_global && previousGlobalIds.has(ejournal.id)
         ? "global"
@@ -150,13 +159,19 @@ export async function GET(
           ? "customized"
           : ejournal.is_global === false && priorLocalOrigin === "institution-created"
             ? "institution-created"
-            : "legacy";
+            : ejournal.is_global === false && currentYearCreatedIds.has(ejournal.id)
+              ? "current-institution-created"
+              : ejournal.is_global && currentYearCreatedIds.has(ejournal.id)
+                ? "current-admin-created"
+                : "legacy";
       return [ejournal.id, kind];
     }));
     const originLabel = (id: number) => {
       switch (originKinds.get(id)) {
         case "global": return `${previousYear} Global (Admin)`;
         case "institution-created": return `${previousYear} Institution-created`;
+        case "current-admin-created": return `${year} Admin-created`;
+        case "current-institution-created": return `${year} Institution-created`;
         default: return "Legacy / source unverified";
       }
     };

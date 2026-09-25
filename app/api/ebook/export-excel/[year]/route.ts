@@ -125,10 +125,13 @@ export async function GET(
     });
     const copyAuditRows = await prisma.auditLog.findMany({
       where: { table_name: "List_EBook", action: "CREATE" },
-      select: { record_id: true, old_values: true },
+      select: { record_id: true, old_values: true, timestamp: true },
     });
     const copiedFromGlobalIds = new Set(copyAuditRows
       .filter((row) => (row.old_values as { original_id?: unknown } | null)?.original_id != null)
+      .map((row) => Number(row.record_id)));
+    const currentYearCreatedIds = new Set(copyAuditRows
+      .filter((row) => row.timestamp.getUTCFullYear() === year)
       .map((row) => Number(row.record_id)));
     const localKey = (row: any, library: number | null | undefined) => JSON.stringify([
       library, row.title, row.sub_series_number, row.publisher, row.description,
@@ -141,9 +144,15 @@ export async function GET(
         localKey(row, row.Library_Year?.library),
         copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
       ]));
+    const previousEntryOrigins = new Map(previousEntries.map((row) => [
+      row.id,
+      row.is_global || copiedFromGlobalIds.has(row.id) ? "customized" : "institution-created",
+    ]));
     const originKinds = new Map(ebooks.map((ebook: any) => {
       const priorLocalOrigin = ebook.is_global === false
-        ? previousLocalOrigins.get(localKey(ebook, ebook.Library_Year?.library))
+        ? ebook.source_entry_id != null
+          ? previousEntryOrigins.get(ebook.source_entry_id)
+          : previousLocalOrigins.get(localKey(ebook, ebook.Library_Year?.library))
         : undefined;
       const kind = ebook.is_global && previousGlobalIds.has(ebook.id)
         ? "global"
@@ -151,13 +160,19 @@ export async function GET(
           ? "customized"
           : ebook.is_global === false && priorLocalOrigin === "institution-created"
             ? "institution-created"
-            : "legacy";
+            : ebook.is_global === false && currentYearCreatedIds.has(ebook.id)
+              ? "current-institution-created"
+              : ebook.is_global && currentYearCreatedIds.has(ebook.id)
+                ? "current-admin-created"
+                : "legacy";
       return [ebook.id, kind];
     }));
     const originLabel = (id: number) => {
       switch (originKinds.get(id)) {
         case "global": return `${previousYear} Global (Admin)`;
         case "institution-created": return `${previousYear} Institution-created`;
+        case "current-admin-created": return `${year} Admin-created`;
+        case "current-institution-created": return `${year} Institution-created`;
         default: return "Legacy / source unverified";
       }
     };

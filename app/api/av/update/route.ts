@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
-import { requireRoles } from "@/lib/auth";
+import { getSessionRoleIds, requireRoles } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -16,9 +16,12 @@ export async function POST(req: Request) {
       { status: 403 }
     );
   }
+  const sharesLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
 
     const body = await req.json();
-    const { id, counts, language, year, ...updateData } = body;
+    // Entry scope is assigned when it is created/imported. Never let an edit
+    // turn a local institution entry into a global one (or vice versa).
+    const { id, counts, language, year, is_global: _ignoredIsGlobal, ...updateData } = body;
 
     const avId = Number(id);
     if (!Number.isFinite(avId)) {
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
       // 1) main row
       const av = await tx.list_AV.update({
         where: { id: avId },
-        data: { ...updateData, updated_at: new Date() },
+        data: { ...updateData, updated_at: new Date(), ...(sharesLocalEntry ? { shared_by_admin_edit: true } : {}) },
       });
 
       // 2) counts for the selected year (use the composite unique)

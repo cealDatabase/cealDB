@@ -24,10 +24,14 @@ async function AVSinglePage(
   initialSearch?: string,
   newRecordId?: number
 ) {
-  // Use GetAVListWithUserSelections if libid is available, otherwise fallback to GetAVList
-  const tasks = libid 
+  const canReviewAllInstitutions = (userRoles ?? []).some((role) => ["1", "3"].includes(role));
+  // Non-review roles must have an institution context. This prevents a direct
+  // URL without libid from exposing other institutions' current local entries.
+  const tasks = libid
     ? (await GetAVListWithUserSelections(yearPassIn, libid)).sort((a, b) => a.id - b.id)
-    : (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id);
+    : canReviewAllInstitutions
+      ? (await GetAVList(yearPassIn)).sort((a, b) => a.id - b.id)
+      : [];
 
   // Fetch survey gate status for this library_year so we can disable
   // editing for non-super-admins when the survey is closed.
