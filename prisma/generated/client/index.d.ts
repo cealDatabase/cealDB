@@ -19167,12 +19167,16 @@ export namespace Prisma {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_AVSumAggregateOutputType = {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_AVMinAggregateOutputType = {
@@ -19191,6 +19195,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_AVMaxAggregateOutputType = {
@@ -19209,6 +19215,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_AVCountAggregateOutputType = {
@@ -19227,6 +19235,8 @@ export namespace Prisma {
     libraryyear: number
     source_entry_id: number
     shared_by_admin_edit: number
+    promoted_to_global_id: number
+    promoted_from_libraryyear_id: number
     _all: number
   }
 
@@ -19235,12 +19245,16 @@ export namespace Prisma {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_AVSumAggregateInputType = {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_AVMinAggregateInputType = {
@@ -19259,6 +19273,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_AVMaxAggregateInputType = {
@@ -19277,6 +19293,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_AVCountAggregateInputType = {
@@ -19295,6 +19313,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
     _all?: true
   }
 
@@ -19400,6 +19420,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
     _count: List_AVCountAggregateOutputType | null
     _avg: List_AVAvgAggregateOutputType | null
     _sum: List_AVSumAggregateOutputType | null
@@ -19437,6 +19459,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     LibraryYear_ListAV?: boolean | List_AV$LibraryYear_ListAVArgs<ExtArgs>
     Library_Year?: boolean | List_AV$Library_YearArgs<ExtArgs>
     List_AV_Counts?: boolean | List_AV$List_AV_CountsArgs<ExtArgs>
@@ -19460,6 +19484,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_AV$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_AV"]>
 
@@ -19479,6 +19505,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_AV$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_AV"]>
 
@@ -19498,9 +19526,11 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
   }
 
-  export type List_AVOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "title" | "cjk_title" | "romanized_title" | "subtitle" | "publisher" | "description" | "notes" | "data_source" | "updated_at" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit", ExtArgs["result"]["list_AV"]>
+  export type List_AVOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "title" | "cjk_title" | "romanized_title" | "subtitle" | "publisher" | "description" | "notes" | "data_source" | "updated_at" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit" | "promoted_to_global_id" | "promoted_from_libraryyear_id", ExtArgs["result"]["list_AV"]>
   export type List_AVInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     LibraryYear_ListAV?: boolean | List_AV$LibraryYear_ListAVArgs<ExtArgs>
     Library_Year?: boolean | List_AV$Library_YearArgs<ExtArgs>
@@ -19539,6 +19569,8 @@ export namespace Prisma {
       libraryyear: number | null
       source_entry_id: number | null
       shared_by_admin_edit: boolean
+      promoted_to_global_id: number | null
+      promoted_from_libraryyear_id: number | null
     }, ExtArgs["result"]["list_AV"]>
     composites: {}
   }
@@ -19981,6 +20013,8 @@ export namespace Prisma {
     readonly libraryyear: FieldRef<"List_AV", 'Int'>
     readonly source_entry_id: FieldRef<"List_AV", 'Int'>
     readonly shared_by_admin_edit: FieldRef<"List_AV", 'Boolean'>
+    readonly promoted_to_global_id: FieldRef<"List_AV", 'Int'>
+    readonly promoted_from_libraryyear_id: FieldRef<"List_AV", 'Int'>
   }
     
 
@@ -23713,12 +23747,16 @@ export namespace Prisma {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EBookSumAggregateOutputType = {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EBookMinAggregateOutputType = {
@@ -23737,6 +23775,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EBookMaxAggregateOutputType = {
@@ -23755,6 +23795,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EBookCountAggregateOutputType = {
@@ -23773,6 +23815,8 @@ export namespace Prisma {
     libraryyear: number
     source_entry_id: number
     shared_by_admin_edit: number
+    promoted_to_global_id: number
+    promoted_from_libraryyear_id: number
     _all: number
   }
 
@@ -23781,12 +23825,16 @@ export namespace Prisma {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EBookSumAggregateInputType = {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EBookMinAggregateInputType = {
@@ -23805,6 +23853,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EBookMaxAggregateInputType = {
@@ -23823,6 +23873,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EBookCountAggregateInputType = {
@@ -23841,6 +23893,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
     _all?: true
   }
 
@@ -23946,6 +24000,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
     _count: List_EBookCountAggregateOutputType | null
     _avg: List_EBookAvgAggregateOutputType | null
     _sum: List_EBookSumAggregateOutputType | null
@@ -23983,6 +24039,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     LibraryYear_ListEBook?: boolean | List_EBook$LibraryYear_ListEBookArgs<ExtArgs>
     Library_Year?: boolean | List_EBook$Library_YearArgs<ExtArgs>
     List_EBook_Counts?: boolean | List_EBook$List_EBook_CountsArgs<ExtArgs>
@@ -24006,6 +24064,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_EBook$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_EBook"]>
 
@@ -24025,6 +24085,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_EBook$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_EBook"]>
 
@@ -24044,9 +24106,11 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
   }
 
-  export type List_EBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sub_series_number" | "publisher" | "description" | "notes" | "updated_at" | "subtitle" | "cjk_title" | "romanized_title" | "data_source" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit", ExtArgs["result"]["list_EBook"]>
+  export type List_EBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sub_series_number" | "publisher" | "description" | "notes" | "updated_at" | "subtitle" | "cjk_title" | "romanized_title" | "data_source" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit" | "promoted_to_global_id" | "promoted_from_libraryyear_id", ExtArgs["result"]["list_EBook"]>
   export type List_EBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     LibraryYear_ListEBook?: boolean | List_EBook$LibraryYear_ListEBookArgs<ExtArgs>
     Library_Year?: boolean | List_EBook$Library_YearArgs<ExtArgs>
@@ -24085,6 +24149,8 @@ export namespace Prisma {
       libraryyear: number | null
       source_entry_id: number | null
       shared_by_admin_edit: boolean
+      promoted_to_global_id: number | null
+      promoted_from_libraryyear_id: number | null
     }, ExtArgs["result"]["list_EBook"]>
     composites: {}
   }
@@ -24527,6 +24593,8 @@ export namespace Prisma {
     readonly libraryyear: FieldRef<"List_EBook", 'Int'>
     readonly source_entry_id: FieldRef<"List_EBook", 'Int'>
     readonly shared_by_admin_edit: FieldRef<"List_EBook", 'Boolean'>
+    readonly promoted_to_global_id: FieldRef<"List_EBook", 'Int'>
+    readonly promoted_from_libraryyear_id: FieldRef<"List_EBook", 'Int'>
   }
     
 
@@ -27298,12 +27366,16 @@ export namespace Prisma {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EJournalSumAggregateOutputType = {
     id: number | null
     libraryyear: number | null
     source_entry_id: number | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EJournalMinAggregateOutputType = {
@@ -27324,6 +27396,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EJournalMaxAggregateOutputType = {
@@ -27344,6 +27418,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean | null
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
   }
 
   export type List_EJournalCountAggregateOutputType = {
@@ -27364,6 +27440,8 @@ export namespace Prisma {
     libraryyear: number
     source_entry_id: number
     shared_by_admin_edit: number
+    promoted_to_global_id: number
+    promoted_from_libraryyear_id: number
     _all: number
   }
 
@@ -27372,12 +27450,16 @@ export namespace Prisma {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EJournalSumAggregateInputType = {
     id?: true
     libraryyear?: true
     source_entry_id?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EJournalMinAggregateInputType = {
@@ -27398,6 +27480,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EJournalMaxAggregateInputType = {
@@ -27418,6 +27502,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
   }
 
   export type List_EJournalCountAggregateInputType = {
@@ -27438,6 +27524,8 @@ export namespace Prisma {
     libraryyear?: true
     source_entry_id?: true
     shared_by_admin_edit?: true
+    promoted_to_global_id?: true
+    promoted_from_libraryyear_id?: true
     _all?: true
   }
 
@@ -27545,6 +27633,8 @@ export namespace Prisma {
     libraryyear: number | null
     source_entry_id: number | null
     shared_by_admin_edit: boolean
+    promoted_to_global_id: number | null
+    promoted_from_libraryyear_id: number | null
     _count: List_EJournalCountAggregateOutputType | null
     _avg: List_EJournalAvgAggregateOutputType | null
     _sum: List_EJournalSumAggregateOutputType | null
@@ -27584,6 +27674,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     LibraryYear_ListEJournal?: boolean | List_EJournal$LibraryYear_ListEJournalArgs<ExtArgs>
     Library_Year?: boolean | List_EJournal$Library_YearArgs<ExtArgs>
     List_EJournal_Counts?: boolean | List_EJournal$List_EJournal_CountsArgs<ExtArgs>
@@ -27609,6 +27701,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_EJournal$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_EJournal"]>
 
@@ -27630,6 +27724,8 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
     Library_Year?: boolean | List_EJournal$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["list_EJournal"]>
 
@@ -27651,9 +27747,11 @@ export namespace Prisma {
     libraryyear?: boolean
     source_entry_id?: boolean
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: boolean
+    promoted_from_libraryyear_id?: boolean
   }
 
-  export type List_EJournalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sub_series_number" | "publisher" | "description" | "notes" | "updated_at" | "subtitle" | "series" | "vendor" | "cjk_title" | "romanized_title" | "data_source" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit", ExtArgs["result"]["list_EJournal"]>
+  export type List_EJournalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sub_series_number" | "publisher" | "description" | "notes" | "updated_at" | "subtitle" | "series" | "vendor" | "cjk_title" | "romanized_title" | "data_source" | "is_global" | "libraryyear" | "source_entry_id" | "shared_by_admin_edit" | "promoted_to_global_id" | "promoted_from_libraryyear_id", ExtArgs["result"]["list_EJournal"]>
   export type List_EJournalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     LibraryYear_ListEJournal?: boolean | List_EJournal$LibraryYear_ListEJournalArgs<ExtArgs>
     Library_Year?: boolean | List_EJournal$Library_YearArgs<ExtArgs>
@@ -27694,6 +27792,8 @@ export namespace Prisma {
       libraryyear: number | null
       source_entry_id: number | null
       shared_by_admin_edit: boolean
+      promoted_to_global_id: number | null
+      promoted_from_libraryyear_id: number | null
     }, ExtArgs["result"]["list_EJournal"]>
     composites: {}
   }
@@ -28138,6 +28238,8 @@ export namespace Prisma {
     readonly libraryyear: FieldRef<"List_EJournal", 'Int'>
     readonly source_entry_id: FieldRef<"List_EJournal", 'Int'>
     readonly shared_by_admin_edit: FieldRef<"List_EJournal", 'Boolean'>
+    readonly promoted_to_global_id: FieldRef<"List_EJournal", 'Int'>
+    readonly promoted_from_libraryyear_id: FieldRef<"List_EJournal", 'Int'>
   }
     
 
@@ -59863,7 +59965,9 @@ export namespace Prisma {
     is_global: 'is_global',
     libraryyear: 'libraryyear',
     source_entry_id: 'source_entry_id',
-    shared_by_admin_edit: 'shared_by_admin_edit'
+    shared_by_admin_edit: 'shared_by_admin_edit',
+    promoted_to_global_id: 'promoted_to_global_id',
+    promoted_from_libraryyear_id: 'promoted_from_libraryyear_id'
   };
 
   export type List_AVScalarFieldEnum = (typeof List_AVScalarFieldEnum)[keyof typeof List_AVScalarFieldEnum]
@@ -59912,7 +60016,9 @@ export namespace Prisma {
     is_global: 'is_global',
     libraryyear: 'libraryyear',
     source_entry_id: 'source_entry_id',
-    shared_by_admin_edit: 'shared_by_admin_edit'
+    shared_by_admin_edit: 'shared_by_admin_edit',
+    promoted_to_global_id: 'promoted_to_global_id',
+    promoted_from_libraryyear_id: 'promoted_from_libraryyear_id'
   };
 
   export type List_EBookScalarFieldEnum = (typeof List_EBookScalarFieldEnum)[keyof typeof List_EBookScalarFieldEnum]
@@ -59957,7 +60063,9 @@ export namespace Prisma {
     is_global: 'is_global',
     libraryyear: 'libraryyear',
     source_entry_id: 'source_entry_id',
-    shared_by_admin_edit: 'shared_by_admin_edit'
+    shared_by_admin_edit: 'shared_by_admin_edit',
+    promoted_to_global_id: 'promoted_to_global_id',
+    promoted_from_libraryyear_id: 'promoted_from_libraryyear_id'
   };
 
   export type List_EJournalScalarFieldEnum = (typeof List_EJournalScalarFieldEnum)[keyof typeof List_EJournalScalarFieldEnum]
@@ -62432,6 +62540,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_AV"> | number | null
     source_entry_id?: IntNullableFilter<"List_AV"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_AV"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_AV"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_AV"> | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_AV_Counts?: List_AV_CountsListRelationFilter
@@ -62454,6 +62564,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     LibraryYear_ListAV?: LibraryYear_ListAVOrderByRelationAggregateInput
     Library_Year?: Library_YearOrderByWithRelationInput
     List_AV_Counts?: List_AV_CountsOrderByRelationAggregateInput
@@ -62479,6 +62591,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_AV"> | number | null
     source_entry_id?: IntNullableFilter<"List_AV"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_AV"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_AV"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_AV"> | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_AV_Counts?: List_AV_CountsListRelationFilter
@@ -62501,6 +62615,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     _count?: List_AVCountOrderByAggregateInput
     _avg?: List_AVAvgOrderByAggregateInput
     _max?: List_AVMaxOrderByAggregateInput
@@ -62527,6 +62643,8 @@ export namespace Prisma {
     libraryyear?: IntNullableWithAggregatesFilter<"List_AV"> | number | null
     source_entry_id?: IntNullableWithAggregatesFilter<"List_AV"> | number | null
     shared_by_admin_edit?: BoolWithAggregatesFilter<"List_AV"> | boolean
+    promoted_to_global_id?: IntNullableWithAggregatesFilter<"List_AV"> | number | null
+    promoted_from_libraryyear_id?: IntNullableWithAggregatesFilter<"List_AV"> | number | null
   }
 
   export type List_AV_CountsWhereInput = {
@@ -62696,6 +62814,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EBook"> | number | null
     source_entry_id?: IntNullableFilter<"List_EBook"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EBook"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EBook"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EBook"> | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_EBook_Counts?: List_EBook_CountsListRelationFilter
@@ -62718,6 +62838,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     LibraryYear_ListEBook?: LibraryYear_ListEBookOrderByRelationAggregateInput
     Library_Year?: Library_YearOrderByWithRelationInput
     List_EBook_Counts?: List_EBook_CountsOrderByRelationAggregateInput
@@ -62743,6 +62865,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EBook"> | number | null
     source_entry_id?: IntNullableFilter<"List_EBook"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EBook"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EBook"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EBook"> | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_EBook_Counts?: List_EBook_CountsListRelationFilter
@@ -62765,6 +62889,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     _count?: List_EBookCountOrderByAggregateInput
     _avg?: List_EBookAvgOrderByAggregateInput
     _max?: List_EBookMaxOrderByAggregateInput
@@ -62791,6 +62917,8 @@ export namespace Prisma {
     libraryyear?: IntNullableWithAggregatesFilter<"List_EBook"> | number | null
     source_entry_id?: IntNullableWithAggregatesFilter<"List_EBook"> | number | null
     shared_by_admin_edit?: BoolWithAggregatesFilter<"List_EBook"> | boolean
+    promoted_to_global_id?: IntNullableWithAggregatesFilter<"List_EBook"> | number | null
+    promoted_from_libraryyear_id?: IntNullableWithAggregatesFilter<"List_EBook"> | number | null
   }
 
   export type List_EBook_CountsWhereInput = {
@@ -62932,6 +63060,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EJournal"> | number | null
     source_entry_id?: IntNullableFilter<"List_EJournal"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EJournal"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EJournal"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EJournal"> | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_EJournal_Counts?: List_EJournal_CountsListRelationFilter
@@ -62956,6 +63086,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalOrderByRelationAggregateInput
     Library_Year?: Library_YearOrderByWithRelationInput
     List_EJournal_Counts?: List_EJournal_CountsOrderByRelationAggregateInput
@@ -62983,6 +63115,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EJournal"> | number | null
     source_entry_id?: IntNullableFilter<"List_EJournal"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EJournal"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EJournal"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EJournal"> | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalListRelationFilter
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
     List_EJournal_Counts?: List_EJournal_CountsListRelationFilter
@@ -63007,6 +63141,8 @@ export namespace Prisma {
     libraryyear?: SortOrderInput | SortOrder
     source_entry_id?: SortOrderInput | SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrderInput | SortOrder
+    promoted_from_libraryyear_id?: SortOrderInput | SortOrder
     _count?: List_EJournalCountOrderByAggregateInput
     _avg?: List_EJournalAvgOrderByAggregateInput
     _max?: List_EJournalMaxOrderByAggregateInput
@@ -63035,6 +63171,8 @@ export namespace Prisma {
     libraryyear?: IntNullableWithAggregatesFilter<"List_EJournal"> | number | null
     source_entry_id?: IntNullableWithAggregatesFilter<"List_EJournal"> | number | null
     shared_by_admin_edit?: BoolWithAggregatesFilter<"List_EJournal"> | boolean
+    promoted_to_global_id?: IntNullableWithAggregatesFilter<"List_EJournal"> | number | null
+    promoted_from_libraryyear_id?: IntNullableWithAggregatesFilter<"List_EJournal"> | number | null
   }
 
   export type List_EJournal_CountsWhereInput = {
@@ -67930,6 +68068,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVCreateNestedManyWithoutList_AVInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsCreateNestedManyWithoutList_AVInput
@@ -67952,6 +68092,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageUncheckedCreateNestedManyWithoutList_AVInput
@@ -67971,6 +68113,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUpdateManyWithoutList_AVNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUpdateManyWithoutList_AVNestedInput
@@ -67993,6 +68137,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUncheckedUpdateManyWithoutList_AVNestedInput
@@ -68014,6 +68160,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type List_AVUpdateManyMutationInput = {
@@ -68030,6 +68178,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_AVUncheckedUpdateManyInput = {
@@ -68048,6 +68198,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_AV_CountsCreateInput = {
@@ -68189,6 +68341,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookCreateNestedManyWithoutList_EBookInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsCreateNestedManyWithoutList_EBookInput
@@ -68211,6 +68365,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageUncheckedCreateNestedManyWithoutList_EBookInput
@@ -68230,6 +68386,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUpdateManyWithoutList_EBookNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUpdateManyWithoutList_EBookNestedInput
@@ -68252,6 +68410,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUncheckedUpdateManyWithoutList_EBookNestedInput
@@ -68273,6 +68433,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type List_EBookUpdateManyMutationInput = {
@@ -68289,6 +68451,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EBookUncheckedUpdateManyInput = {
@@ -68307,6 +68471,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EBook_CountsCreateInput = {
@@ -68432,6 +68598,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalCreateNestedManyWithoutList_EJournalInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsCreateNestedManyWithoutList_EJournalInput
@@ -68456,6 +68624,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedCreateNestedManyWithoutList_EJournalInput
@@ -68477,6 +68647,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUpdateManyWithoutList_EJournalNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUpdateManyWithoutList_EJournalNestedInput
@@ -68501,6 +68673,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedUpdateManyWithoutList_EJournalNestedInput
@@ -68524,6 +68698,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type List_EJournalUpdateManyMutationInput = {
@@ -68542,6 +68718,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EJournalUncheckedUpdateManyInput = {
@@ -68562,6 +68740,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EJournal_CountsCreateInput = {
@@ -73450,12 +73630,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_AVAvgOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_AVMaxOrderByAggregateInput = {
@@ -73474,6 +73658,8 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_AVMinOrderByAggregateInput = {
@@ -73492,12 +73678,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_AVSumOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_AVNullableScalarRelationFilter = {
@@ -73655,12 +73845,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EBookAvgOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EBookMaxOrderByAggregateInput = {
@@ -73679,6 +73873,8 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EBookMinOrderByAggregateInput = {
@@ -73697,12 +73893,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EBookSumOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EBookNullableScalarRelationFilter = {
@@ -73839,12 +74039,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EJournalAvgOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EJournalMaxOrderByAggregateInput = {
@@ -73865,6 +74069,8 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EJournalMinOrderByAggregateInput = {
@@ -73885,12 +74091,16 @@ export namespace Prisma {
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
     shared_by_admin_edit?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EJournalSumOrderByAggregateInput = {
     id?: SortOrder
     libraryyear?: SortOrder
     source_entry_id?: SortOrder
+    promoted_to_global_id?: SortOrder
+    promoted_from_libraryyear_id?: SortOrder
   }
 
   export type List_EJournalNullableScalarRelationFilter = {
@@ -79324,6 +79534,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     Library_Year?: Library_YearCreateNestedOneWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageCreateNestedManyWithoutList_AVInput
@@ -79345,6 +79557,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     List_AV_Counts?: List_AV_CountsUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageUncheckedCreateNestedManyWithoutList_AVInput
   }
@@ -79453,6 +79667,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     Library_Year?: Library_YearUpdateOneWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUpdateManyWithoutList_AVNestedInput
@@ -79474,6 +79690,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     List_AV_Counts?: List_AV_CountsUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUncheckedUpdateManyWithoutList_AVNestedInput
   }
@@ -79560,6 +79778,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     Library_Year?: Library_YearCreateNestedOneWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageCreateNestedManyWithoutList_EBookInput
@@ -79581,6 +79801,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     List_EBook_Counts?: List_EBook_CountsUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageUncheckedCreateNestedManyWithoutList_EBookInput
   }
@@ -79689,6 +79911,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     Library_Year?: Library_YearUpdateOneWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUpdateManyWithoutList_EBookNestedInput
@@ -79710,6 +79934,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     List_EBook_Counts?: List_EBook_CountsUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUncheckedUpdateManyWithoutList_EBookNestedInput
   }
@@ -79798,6 +80024,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     Library_Year?: Library_YearCreateNestedOneWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageCreateNestedManyWithoutList_EJournalInput
@@ -79821,6 +80049,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     List_EJournal_Counts?: List_EJournal_CountsUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedCreateNestedManyWithoutList_EJournalInput
   }
@@ -79931,6 +80161,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     Library_Year?: Library_YearUpdateOneWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUpdateManyWithoutList_EJournalNestedInput
@@ -79954,6 +80186,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     List_EJournal_Counts?: List_EJournal_CountsUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedUpdateManyWithoutList_EJournalNestedInput
   }
@@ -80260,6 +80494,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVCreateNestedManyWithoutList_AVInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageCreateNestedManyWithoutList_AVInput
@@ -80281,6 +80517,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageUncheckedCreateNestedManyWithoutList_AVInput
   }
@@ -80315,6 +80553,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUpdateManyWithoutList_AVNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUpdateManyWithoutList_AVNestedInput
@@ -80336,6 +80576,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUncheckedUpdateManyWithoutList_AVNestedInput
   }
@@ -80374,6 +80616,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVCreateNestedManyWithoutList_AVInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsCreateNestedManyWithoutList_AVInput
@@ -80395,6 +80639,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsUncheckedCreateNestedManyWithoutList_AVInput
   }
@@ -80455,6 +80701,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUpdateManyWithoutList_AVNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUpdateManyWithoutList_AVNestedInput
@@ -80476,6 +80724,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUncheckedUpdateManyWithoutList_AVNestedInput
   }
@@ -80788,6 +81038,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookCreateNestedManyWithoutList_EBookInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageCreateNestedManyWithoutList_EBookInput
@@ -80809,6 +81061,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageUncheckedCreateNestedManyWithoutList_EBookInput
   }
@@ -80843,6 +81097,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUpdateManyWithoutList_EBookNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUpdateManyWithoutList_EBookNestedInput
@@ -80864,6 +81120,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUncheckedUpdateManyWithoutList_EBookNestedInput
   }
@@ -80902,6 +81160,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookCreateNestedManyWithoutList_EBookInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsCreateNestedManyWithoutList_EBookInput
@@ -80923,6 +81183,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsUncheckedCreateNestedManyWithoutList_EBookInput
   }
@@ -80983,6 +81245,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUpdateManyWithoutList_EBookNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUpdateManyWithoutList_EBookNestedInput
@@ -81004,6 +81268,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUncheckedUpdateManyWithoutList_EBookNestedInput
   }
@@ -81315,6 +81581,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalCreateNestedManyWithoutList_EJournalInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageCreateNestedManyWithoutList_EJournalInput
@@ -81338,6 +81606,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedCreateNestedManyWithoutList_EJournalInput
   }
@@ -81374,6 +81644,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUpdateManyWithoutList_EJournalNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUpdateManyWithoutList_EJournalNestedInput
@@ -81397,6 +81669,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedUpdateManyWithoutList_EJournalNestedInput
   }
@@ -81437,6 +81711,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalCreateNestedManyWithoutList_EJournalInput
     Library_Year?: Library_YearCreateNestedOneWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsCreateNestedManyWithoutList_EJournalInput
@@ -81460,6 +81736,8 @@ export namespace Prisma {
     libraryyear?: number | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedCreateNestedManyWithoutList_EJournalInput
   }
@@ -81522,6 +81800,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUpdateManyWithoutList_EJournalNestedInput
     Library_Year?: Library_YearUpdateOneWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUpdateManyWithoutList_EJournalNestedInput
@@ -81545,6 +81825,8 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedUpdateManyWithoutList_EJournalNestedInput
   }
@@ -83182,6 +83464,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVCreateNestedManyWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageCreateNestedManyWithoutList_AVInput
@@ -83202,6 +83486,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Counts?: List_AV_CountsUncheckedCreateNestedManyWithoutList_AVInput
     List_AV_Language?: List_AV_LanguageUncheckedCreateNestedManyWithoutList_AVInput
@@ -83231,6 +83517,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookCreateNestedManyWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageCreateNestedManyWithoutList_EBookInput
@@ -83251,6 +83539,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Counts?: List_EBook_CountsUncheckedCreateNestedManyWithoutList_EBookInput
     List_EBook_Language?: List_EBook_LanguageUncheckedCreateNestedManyWithoutList_EBookInput
@@ -83282,6 +83572,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageCreateNestedManyWithoutList_EJournalInput
@@ -83304,6 +83596,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedCreateNestedManyWithoutList_EJournalInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedCreateNestedManyWithoutList_EJournalInput
@@ -84592,6 +84886,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_AV"> | number | null
     source_entry_id?: IntNullableFilter<"List_AV"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_AV"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_AV"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_AV"> | number | null
   }
 
   export type List_EBookUpsertWithWhereUniqueWithoutLibrary_YearInput = {
@@ -84629,6 +84925,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EBook"> | number | null
     source_entry_id?: IntNullableFilter<"List_EBook"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EBook"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EBook"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EBook"> | number | null
   }
 
   export type List_EJournalUpsertWithWhereUniqueWithoutLibrary_YearInput = {
@@ -84668,6 +84966,8 @@ export namespace Prisma {
     libraryyear?: IntNullableFilter<"List_EJournal"> | number | null
     source_entry_id?: IntNullableFilter<"List_EJournal"> | number | null
     shared_by_admin_edit?: BoolFilter<"List_EJournal"> | boolean
+    promoted_to_global_id?: IntNullableFilter<"List_EJournal"> | number | null
+    promoted_from_libraryyear_id?: IntNullableFilter<"List_EJournal"> | number | null
   }
 
   export type Monographic_AcquisitionsUpsertWithoutLibrary_YearInput = {
@@ -87302,6 +87602,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type List_EBookCreateManyLibrary_YearInput = {
@@ -87319,6 +87621,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type List_EJournalCreateManyLibrary_YearInput = {
@@ -87338,6 +87642,8 @@ export namespace Prisma {
     is_global?: boolean | null
     source_entry_id?: number | null
     shared_by_admin_edit?: boolean
+    promoted_to_global_id?: number | null
+    promoted_from_libraryyear_id?: number | null
   }
 
   export type LibraryYear_ListAVUpdateWithoutLibrary_YearInput = {
@@ -87417,6 +87723,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUpdateManyWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUpdateManyWithoutList_AVNestedInput
@@ -87437,6 +87745,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListAV?: LibraryYear_ListAVUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Counts?: List_AV_CountsUncheckedUpdateManyWithoutList_AVNestedInput
     List_AV_Language?: List_AV_LanguageUncheckedUpdateManyWithoutList_AVNestedInput
@@ -87457,6 +87767,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EBookUpdateWithoutLibrary_YearInput = {
@@ -87473,6 +87785,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUpdateManyWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUpdateManyWithoutList_EBookNestedInput
@@ -87493,6 +87807,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEBook?: LibraryYear_ListEBookUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Counts?: List_EBook_CountsUncheckedUpdateManyWithoutList_EBookNestedInput
     List_EBook_Language?: List_EBook_LanguageUncheckedUpdateManyWithoutList_EBookNestedInput
@@ -87513,6 +87829,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type List_EJournalUpdateWithoutLibrary_YearInput = {
@@ -87531,6 +87849,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUpdateManyWithoutList_EJournalNestedInput
@@ -87553,6 +87873,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
     LibraryYear_ListEJournal?: LibraryYear_ListEJournalUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Counts?: List_EJournal_CountsUncheckedUpdateManyWithoutList_EJournalNestedInput
     List_EJournal_Language?: List_EJournal_LanguageUncheckedUpdateManyWithoutList_EJournalNestedInput
@@ -87575,6 +87897,8 @@ export namespace Prisma {
     is_global?: NullableBoolFieldUpdateOperationsInput | boolean | null
     source_entry_id?: NullableIntFieldUpdateOperationsInput | number | null
     shared_by_admin_edit?: BoolFieldUpdateOperationsInput | boolean
+    promoted_to_global_id?: NullableIntFieldUpdateOperationsInput | number | null
+    promoted_from_libraryyear_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type User_LibraryCreateManyUserInput = {

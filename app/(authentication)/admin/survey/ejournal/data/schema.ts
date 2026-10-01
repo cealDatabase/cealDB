@@ -20,6 +20,7 @@ export const listEJournalSchema = z.object({
   import_origin: z.string().nullish(),
   origin_institution: z.string().nullish(),
   shared_by_admin_edit: z.boolean().optional(),
+  promoted_to_global_id: z.number().nullish(),
   subscribers: z.array(z.string()),
   language: z.array(z.string()),
 })

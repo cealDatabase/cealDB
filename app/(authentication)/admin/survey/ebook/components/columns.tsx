@@ -313,6 +313,10 @@ export function getColumns(
         if (!origin) return null;
         const colorClass = origin === "Legacy / source unverified"
           ? "bg-slate-100 text-slate-700"
+          : origin.includes("Admin-edited")
+            ? "bg-cyan-100 text-cyan-800"
+          : origin.includes("Promoted to Global")
+            ? "bg-fuchsia-100 text-fuchsia-800"
           : origin.endsWith("Admin-created")
             ? "bg-violet-100 text-violet-800"
             : origin.includes("Global")

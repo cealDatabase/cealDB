@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       { status: 403 }
     );
   }
-  const sharesLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
+  const canShareLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
 
     const body = await req.json();
     // Entry scope is assigned when it is created/imported. Never let an edit
@@ -27,6 +27,8 @@ export async function POST(req: Request) {
     if (!Number.isFinite(avId)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
+    const existingEntry = await db.list_AV.findUnique({ where: { id: avId }, select: { is_global: true } });
+    const sharesLocalEntry = canShareLocalEntry && existingEntry?.is_global === false;
 
     const y = year == null ? null : Number(year);
     const safeCounts = Number.isFinite(Number(counts)) ? Number(counts) : 0;

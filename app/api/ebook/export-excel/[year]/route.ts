@@ -154,14 +154,16 @@ export async function GET(
           ? previousEntryOrigins.get(ebook.source_entry_id)
           : previousLocalOrigins.get(localKey(ebook, ebook.Library_Year?.library))
         : undefined;
-      const kind = ebook.is_global && previousGlobalIds.has(ebook.id)
+      const kind = ebook.promoted_from_libraryyear_id != null
+        ? "promoted-to-global"
+        : ebook.is_global && previousGlobalIds.has(ebook.id)
         ? "global"
         : ebook.is_global === false && (copiedFromGlobalIds.has(ebook.id) || priorLocalOrigin === "customized")
           ? "customized"
           : ebook.is_global === false && priorLocalOrigin === "institution-created"
-            ? "institution-created"
+            ? ebook.shared_by_admin_edit ? "institution-admin-edited" : "institution-created"
             : ebook.is_global === false && currentYearCreatedIds.has(ebook.id)
-              ? "current-institution-created"
+              ? ebook.shared_by_admin_edit ? "current-institution-admin-edited" : "current-institution-created"
               : ebook.is_global && currentYearCreatedIds.has(ebook.id)
                 ? "current-admin-created"
                 : "legacy";
@@ -170,9 +172,12 @@ export async function GET(
     const originLabel = (id: number) => {
       switch (originKinds.get(id)) {
         case "global": return `${previousYear} Global (Admin)`;
+        case "promoted-to-global": return `${year} Promoted to Global`;
         case "institution-created": return `${previousYear} Institution-created`;
+        case "institution-admin-edited": return `${previousYear} Institution-created · Admin-edited in ${year}`;
         case "current-admin-created": return `${year} Admin-created`;
         case "current-institution-created": return `${year} Institution-created`;
+        case "current-institution-admin-edited": return `${year} Institution-created · Admin-edited in ${year}`;
         default: return "Legacy / source unverified";
       }
     };

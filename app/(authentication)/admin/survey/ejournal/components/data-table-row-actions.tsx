@@ -27,6 +27,9 @@ export function DataTableRowActions({
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
+  const canPromote = (userRoles ?? []).some((role) => role === "1" || role === "3")
+    && row.original.is_global === false
+    && row.original.promoted_to_global_id == null;
 
   async function handleDelete() {
     const ok = confirm(`Delete “${row.original.title}” for ${year}?`);
@@ -45,6 +48,15 @@ export function DataTableRowActions({
     }
   }
 
+  async function handlePromote() {
+    const ok = confirm(`Promote “${row.original.title}” to the global catalogue? This changes the current entry to global while retaining its original institution in the audit trail.`);
+    if (!ok) return;
+    const res = await fetch("/api/ejournal/promote-to-global", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: row.original.id, year }) });
+    const data = await res.json();
+    if (res.ok) { toast.success("Entry promoted to global"); router.refresh(); }
+    else toast.error(data.error ?? "Promotion failed");
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -60,6 +72,7 @@ export function DataTableRowActions({
           >
             Edit
           </DropdownMenuItem>
+          {canPromote && <DropdownMenuItem onClick={handlePromote} className='hover:bg-violet-100/30'>Promote to Global</DropdownMenuItem>}
           <DropdownMenuItem
             onClick={handleDelete}
             className='hover:bg-red-100/30 text-red-600'

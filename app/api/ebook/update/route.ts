@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       { status: 403 }
     );
   }
-  const sharesLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
+  const canShareLocalEntry = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
 
     const body = await req.json();
     const { id, counts, volumes, chapters, language, year, is_global: _ignoredIsGlobal, ...updateData } =
@@ -24,6 +24,8 @@ export async function POST(req: Request) {
     if (!Number.isFinite(ebookId)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
+    const existingEntry = await db.list_EBook.findUnique({ where: { id: ebookId }, select: { is_global: true } });
+    const sharesLocalEntry = canShareLocalEntry && existingEntry?.is_global === false;
     const y = Number(year);
     if (!Number.isFinite(y)) {
       return NextResponse.json(
