@@ -129,7 +129,7 @@ const getEBookListByYear = async (userSelectedYear: number, includeUnverified = 
       id: true, is_global: true, title: true, sub_series_number: true,
       publisher: true, description: true, notes: true, subtitle: true,
       cjk_title: true, romanized_title: true, data_source: true,
-      source_entry_id: true, shared_by_admin_edit: true,
+      source_entry_id: true, shared_by_admin_edit: true, promoted_to_global_id: true, promoted_from_libraryyear_id: true,
       Library_Year: { select: { library: true } },
     },
   });
@@ -166,23 +166,37 @@ const getEBookListByYear = async (userSelectedYear: number, includeUnverified = 
       : row.source_entry_id != null
         ? previousEntryOrigins.get(row.source_entry_id) ?? null
         : priorLocalOrigins.get(localKey(row, row.Library_Year?.library)) ?? null;
-  const origins = new Map(currentEntries.map((row) => [
-    row.id,
-    row.is_global && globalIds.has(row.id)
+  const origins = new Map(currentEntries.map((row) => {
+    const baseOrigin = row.promoted_from_libraryyear_id != null
+      ? `${userSelectedYear} Promoted to Global`
+      : row.is_global && globalIds.has(row.id)
       ? `${previousYear} Global (Admin)`
       : !row.is_global
         ? localOrigin(row) ?? (currentYearCreatedIds.has(row.id) ? `${userSelectedYear} Institution-created` : null)
-        : currentYearCreatedIds.has(row.id) ? `${userSelectedYear} Admin-created` : null,
-  ]));
+        : currentYearCreatedIds.has(row.id) ? `${userSelectedYear} Admin-created` : null;
+    const origin = !row.is_global && row.shared_by_admin_edit && baseOrigin?.endsWith("Institution-created")
+      ? `${baseOrigin} · Admin-edited in ${userSelectedYear}`
+      : baseOrigin;
+    return [row.id, origin];
+  }));
   const globalDerivedLocalIds = new Set(currentEntries
     .filter((row) => !row.is_global && localOrigin(row) === `${previousYear} Global (Admin)`)
     .map((row) => row.id));
   const sharedByAdminEditIds = new Set(currentEntries
     .filter((row) => row.shared_by_admin_edit)
     .map((row) => row.id));
-  const institutionIds = currentEntries
+  const promotedLocalIds = new Set(currentEntries
+    .filter((row) => !row.is_global && row.promoted_to_global_id != null)
+    .map((row) => row.id));
+  const localInstitutionIds = currentEntries
     .map((row) => row.Library_Year?.library)
     .filter((id): id is number => id != null);
+  const promotedLibraryYears = await db.library_Year.findMany({
+    where: { id: { in: currentEntries.map((row) => row.promoted_from_libraryyear_id).filter((id): id is number => id != null) } },
+    select: { id: true, library: true },
+  });
+  const promotedOriginLibraries = new Map(promotedLibraryYears.map((row) => [row.id, row.library]));
+  const institutionIds = [...localInstitutionIds, ...promotedLibraryYears.map((row) => row.library).filter((id): id is number => id != null)];
   const institutions = await db.library.findMany({
     where: { id: { in: institutionIds } },
     select: { id: true, library_name: true },
@@ -190,21 +204,24 @@ const getEBookListByYear = async (userSelectedYear: number, includeUnverified = 
   const institutionNames = new Map(institutions.map((institution) => [institution.id, institution.library_name]));
   const originInstitutions = new Map(currentEntries.map((row) => [
     row.id,
-    !row.is_global && (
+    row.promoted_from_libraryyear_id != null
+      ? institutionNames.get(promotedOriginLibraries.get(row.promoted_from_libraryyear_id) ?? -1) ?? null
+      : !row.is_global && (
       localOrigin(row) === `${previousYear} Institution-created` ||
-      origins.get(row.id) === `${userSelectedYear} Institution-created`
+      origins.get(row.id)?.startsWith(`${userSelectedYear} Institution-created`)
     )
       ? institutionNames.get(row.Library_Year?.library ?? -1) ?? null
       : null,
   ]));
 
   const records = groupedRecords
-    .filter((row: any) => !globalDerivedLocalIds.has(row.id))
+    .filter((row: any) => !globalDerivedLocalIds.has(row.id) && !promotedLocalIds.has(row.id))
     .map((row: any) => ({
     ...row,
     import_origin: origins.get(row.id) ?? "Legacy / source unverified",
     origin_institution: originInstitutions.get(row.id) ?? null,
     shared_by_admin_edit: sharedByAdminEditIds.has(row.id),
+    promoted_to_global_id: currentEntries.find((entry) => entry.id === row.id)?.promoted_to_global_id ?? null,
   }));
 
   return includeUnverified

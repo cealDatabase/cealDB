@@ -17,6 +17,9 @@ import EditAVModal from "../edit-av-modal";
 export function DataTableRowActions({ row, year, userRoles }: { row: Row<any>, year: number, userRoles?: string[] }) {
   const [openEdit, setOpenEdit] = useState(false);
   const router = useRouter();
+  const canPromote = (userRoles ?? []).some((role) => role === "1" || role === "3")
+    && row.original.is_global === false
+    && row.original.promoted_to_global_id == null;
 
   const handleEditClick = () => {
     setOpenEdit(true);
@@ -37,6 +40,15 @@ export function DataTableRowActions({ row, year, userRoles }: { row: Row<any>, y
     }
   }
 
+  async function handlePromote() {
+    const ok = confirm(`Promote “${row.original.title}” to the global catalogue? This changes the current entry to global while retaining its original institution in the audit trail.`);
+    if (!ok) return;
+    const res = await fetch("/api/av/promote-to-global", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: row.original.id, year }) });
+    const data = await res.json();
+    if (res.ok) { toast.success("Entry promoted to global"); router.refresh(); }
+    else toast.error(data.error ?? "Promotion failed");
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -52,6 +64,7 @@ export function DataTableRowActions({ row, year, userRoles }: { row: Row<any>, y
           >
             Edit
           </DropdownMenuItem>
+          {canPromote && <DropdownMenuItem onClick={handlePromote} className='hover:bg-violet-100/30'>Promote to Global</DropdownMenuItem>}
           <DropdownMenuItem
             onClick={handleDelete}
             className='hover:bg-red-100/30 text-red-600'

@@ -150,14 +150,16 @@ export async function GET(
           ? previousEntryOrigins.get(av.source_entry_id)
           : previousLocalOrigins.get(localKey(av, av.Library_Year?.library))
         : undefined;
-      const kind = av.is_global && previousGlobalIds.has(av.id)
+      const kind = av.promoted_from_libraryyear_id != null
+        ? "promoted-to-global"
+        : av.is_global && previousGlobalIds.has(av.id)
         ? "global"
         : av.is_global === false && (copiedFromGlobalIds.has(av.id) || priorLocalOrigin === "customized")
           ? "customized"
           : av.is_global === false && priorLocalOrigin === "institution-created"
-            ? "institution-created"
+            ? av.shared_by_admin_edit ? "institution-admin-edited" : "institution-created"
             : av.is_global === false && currentYearCreatedIds.has(av.id)
-              ? "current-institution-created"
+              ? av.shared_by_admin_edit ? "current-institution-admin-edited" : "current-institution-created"
               : av.is_global && currentYearCreatedIds.has(av.id)
                 ? "current-admin-created"
                 : "legacy";
@@ -166,9 +168,12 @@ export async function GET(
     const originLabel = (id: number) => {
       switch (originKinds.get(id)) {
         case "global": return `${previousYear} Global (Admin)`;
+        case "promoted-to-global": return `${year} Promoted to Global`;
         case "institution-created": return `${previousYear} Institution-created`;
+        case "institution-admin-edited": return `${previousYear} Institution-created · Admin-edited in ${year}`;
         case "current-admin-created": return `${year} Admin-created`;
         case "current-institution-created": return `${year} Institution-created`;
+        case "current-institution-admin-edited": return `${year} Institution-created · Admin-edited in ${year}`;
         default: return "Legacy / source unverified";
       }
     };
