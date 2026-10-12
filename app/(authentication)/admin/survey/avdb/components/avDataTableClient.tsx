@@ -30,6 +30,7 @@ export default function AVDataTableClient({
 }) {
   // Survey gating: only super admin (role 1) can edit when survey is closed.
   const isSuperAdmin = (userRoles ?? []).includes("1");
+  const canBulkDelete = (userRoles ?? []).some((role) => ["1", "3", "4"].includes(role));
   const canEdit = isOpenForEditing || isSuperAdmin;
   const showSuperAdminWarning = !isOpenForEditing && isSuperAdmin && !!libid;
   const router = useRouter();
@@ -125,6 +126,58 @@ export default function AVDataTableClient({
     [canEdit, libid, persistOne]
   );
 
+  const handleAllAccessSelection = useCallback(
+    async (ids: number[], selected: boolean) => {
+      if (!canEdit) {
+        toast.error("Survey is closed. Editing is disabled.");
+        return;
+      }
+
+      const previous = selectionData;
+      const changedIds = ids.filter((id) => (previous.get(id)?.is_selected ?? false) !== selected);
+      if (changedIds.length === 0) return;
+
+      setSelectionData((current) => {
+        const next = new Map(current);
+        changedIds.forEach((id) => {
+          next.set(id, {
+            is_selected: selected,
+            custom_count: current.get(id)?.custom_count ?? null,
+          });
+        });
+        return next;
+      });
+
+      if (!libid) return;
+      setIsSaving(true);
+      try {
+        const response = await fetch("/api/survey/av/save-selections", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            year,
+            libraryId: libid,
+            selections: changedIds.map((listId) => ({
+              listId,
+              isSelected: selected,
+              customCount: previous.get(listId)?.custom_count ?? null,
+            })),
+          }),
+        });
+        if (!response.ok) {
+          const result = await response.json().catch(() => ({}));
+          throw new Error(result.error || `HTTP ${response.status}`);
+        }
+      } catch (error) {
+        setSelectionData(previous);
+        toast.error(error instanceof Error ? error.message : "Unable to update selections");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [canEdit, libid, selectionData, year]
+  );
+
   // Get columns with callbacks
   const columns = useMemo(
     () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit),
@@ -158,7 +211,16 @@ export default function AVDataTableClient({
   // Toolbar with auto-save status indicator (no manual save button)
   const ToolbarWithLib = (props: any) => (
     <div className="space-y-2">
-      <DataTableToolbar {...props} year={year} libid={libid} roleId={roleIdPassIn} />
+      <DataTableToolbar
+        {...props}
+        year={year}
+        libid={libid}
+        roleId={roleIdPassIn}
+        accessSelectedIds={Array.from(selectionData.entries())
+          .filter(([, selection]) => selection.is_selected)
+          .map(([id]) => id)}
+        onSetAllAccess={handleAllAccessSelection}
+      />
       {showSuperAdminWarning && (
         <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
           ⚠️ Survey is currently <strong>closed</strong> for this library/year.
@@ -199,6 +261,13 @@ export default function AVDataTableClient({
       initialPaginationState={initialPagination}
       highlightRowId={highlightId}
       tableKey={`avdb-survey-${year}`}
+      catalogueCardLabel="Audio/Visual Database"
+      stickyHeader
+      stickyControls
+      bulkDelete={canBulkDelete ? {
+        endpoint: `/api/av/delete-bulk/${year}`,
+        itemLabel: "AV entries",
+      } : undefined}
     />
   );
 }

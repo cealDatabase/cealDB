@@ -432,7 +432,7 @@ export default function EBookSubscriptionManagementClient({
                 column={table.getColumn("language")}
                 title="Language"
                 options={[
-                  { label: "CHN", value: "CHN" },
+                  { label: "CHI", value: "CHI" },
                   { label: "JPN", value: "JPN" },
                   { label: "KOR", value: "KOR" },
                   { label: "NON-CJK", value: "NON" },

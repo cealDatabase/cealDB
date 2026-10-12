@@ -372,7 +372,7 @@ async function main() {
   
   console.log('🔍 Using language data from MySQL dump (PostgreSQL ceal.language table not accessible)...');
   const languages = [
-    { id: 1, short: "CHN", full: "Chinese" },
+    { id: 1, short: "CHI", full: "Chinese" },
     { id: 2, short: "JPN", full: "Japanese" },
     { id: 3, short: "KOR", full: "Korean" },
     { id: 4, short: "NON", full: "Non-CJK" },

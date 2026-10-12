@@ -104,7 +104,7 @@ export async function GET(
       for (const langEntry of av.List_AV_Language) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
-        if (langShort === "CHN") {
+        if (langShort === "CHI" || langShort === "CHN") {
           countsByType[type as keyof typeof countsByType].chinese += count;
         } else if (langShort === "JPN") {
           countsByType[type as keyof typeof countsByType].japanese += count;

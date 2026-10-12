@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 const languages: Array<{ value: number; label: string; displayLabel?: string }> = [
-  { value: 1, label: "CHN" },
+  { value: 1, label: "CHI" },
   { value: 2, label: "JPN" },
   { value: 3, label: "KOR" },
   { value: 4, label: "NON", displayLabel: "NON-CJK" },

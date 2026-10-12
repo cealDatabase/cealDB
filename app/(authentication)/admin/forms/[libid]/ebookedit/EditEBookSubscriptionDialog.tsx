@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 const languages = [
-  { value: 1, label: "CHN" },
+  { value: 1, label: "CHI" },
   { value: 2, label: "JPN" },
   { value: 3, label: "KOR" },
   { value: 4, label: "NON" },

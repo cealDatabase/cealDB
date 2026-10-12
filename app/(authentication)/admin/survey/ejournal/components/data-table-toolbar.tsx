@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import type { Table, Column } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions";
 import { languages } from "../data/data";
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { toast } from "sonner";
@@ -17,6 +16,8 @@ interface DataTableToolbarProps<TData> {
   year: number;
   libid?: number;
   roleId?: string;
+  accessSelectedIds?: number[];
+  onSetAllAccess?: (ids: number[], selected: boolean) => void;
 }
 
 export function DataTableToolbar<TData>({
@@ -24,24 +25,33 @@ export function DataTableToolbar<TData>({
   libid,
   year,
   roleId,
+  accessSelectedIds = [],
+  onSetAllAccess,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
 
   // ✅ Safe getter (no console warning if missing)
   const getCol = (id: string): Column<TData, unknown> | undefined =>
     table.getAllLeafColumns().find((c) => c.id === id);
 
-  const titleCol = getCol("title");
   const languageCol = getCol("language");
+  const vendorCol = getCol("vendor");
+  const seriesCol = getCol("series");
+  const originCol = getCol("import_origin");
+  const facetOptions = (id: string) => Array.from(getCol(id)?.getFacetedUniqueValues().keys() ?? [])
+    .filter((value): value is string => typeof value === "string" && value.trim() !== "")
+    .sort((a, b) => a.localeCompare(b))
+    .map((value) => ({ label: value, value }));
+  const selectedIds = accessSelectedIds;
+  const matchingAccessIds = table.getFilteredRowModel().rows
+    .map((row) => (row.original as { id?: number }).id)
+    .filter((id): id is number => Number.isFinite(id));
+  const selectedAccessSet = new Set(accessSelectedIds);
+  const allMatchingAccessSelected = matchingAccessIds.length > 0
+    && matchingAccessIds.every((id) => selectedAccessSet.has(id));
   
-  const selectedIds = table
-    .getSelectedRowModel()
-    .rows.map((r) => (r.original as any).id as number)
-    .filter((n) => Number.isFinite(n));
-
   const handleDirectSubscribe = async () => {
     if (selectedIds.length === 0) return;
     
@@ -120,34 +130,6 @@ export function DataTableToolbar<TData>({
     }
   };
 
-  const handleExportCSV = async () => {
-    setIsExporting(true);
-    try {
-      const response = await fetch(`/api/ejournal/export/${year}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to export data');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `EJournal_Database_${year}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success('E-Journal database exported successfully!');
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error('Failed to export E-Journal database');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const handleExportExcel = async () => {
     setIsExportingExcel(true);
     try {
@@ -178,13 +160,13 @@ export function DataTableToolbar<TData>({
   }
 
   return (
-    <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-3'>
-      <div className='flex flex-1 items-center space-x-2 flex-wrap gap-y-2'>
+    <div className='flex flex-col items-stretch gap-3 xl:flex-row xl:items-center xl:justify-between'>
+      <div className='flex flex-1 flex-wrap items-center gap-2'>
         <Input
           placeholder='Search in title, CJK, or romanized...'
           value={(table.getState().globalFilter as string) ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className='h-8 w-[150px] lg:w-[250px]'
+          className='h-9 w-full min-w-0 sm:w-[250px]'
         />
 
         {languageCol && (
@@ -193,6 +175,15 @@ export function DataTableToolbar<TData>({
             title='Language'
             options={languages.map((item) => ({ ...item, value: item.label }))}
           />
+        )}
+        {vendorCol && (
+          <DataTableFacetedFilter column={vendorCol} title='Vendor' options={facetOptions("vendor")} />
+        )}
+        {seriesCol && (
+          <DataTableFacetedFilter column={seriesCol} title='Series' options={facetOptions("series")} />
+        )}
+        {originCol && (
+          <DataTableFacetedFilter column={originCol} title='Origin' options={facetOptions("import_origin")} />
         )}
 
         {(isFiltered || table.getState().globalFilter) && (
@@ -211,7 +202,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
 
-      <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
+      <div className='flex w-full flex-wrap gap-2 xl:w-auto xl:justify-end'>
         {canImportPreviousYear && (
           <Button
             onClick={handleImportPreviousYear}
@@ -245,6 +236,20 @@ export function DataTableToolbar<TData>({
         {/* Action visible only to Super Admin (not role 2) */}
         {!isMemberUser && (
           <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onSetAllAccess?.(matchingAccessIds, !allMatchingAccessSelected)}
+            disabled={!onSetAllAccess || matchingAccessIds.length === 0}
+            className='h-8 border-blue-200 bg-blue-50 hover:bg-blue-100'
+          >
+            {allMatchingAccessSelected
+              ? "Clear My Access selection"
+              : `Select all ${matchingAccessIds.length} for My Access`}
+          </Button>
+        )}
+        {!isMemberUser && (
+          <Button
             onClick={handleDirectSubscribe}
             disabled={selectedIds.length === 0 || isSubscribing}
             className='h-8'
@@ -257,8 +262,6 @@ export function DataTableToolbar<TData>({
             {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
           </Button>
         )}
-
-        <DataTableViewOptions table={table} />
       </div>
     </div>
   );

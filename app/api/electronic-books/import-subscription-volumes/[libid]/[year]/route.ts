@@ -95,7 +95,7 @@ export async function GET(
       for (const langEntry of ebook.List_EBook_Language) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
-        if (langShort === "CHN") {
+        if (langShort === "CHI" || langShort === "CHN") {
           countsByLanguage.chinese += count;
         } else if (langShort === "JPN") {
           countsByLanguage.japanese += count;
