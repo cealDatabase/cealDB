@@ -15,7 +15,12 @@ import {
   getSortedRowModel,
   useReactTable,
   Table as TableInstance,
+  Row,
 } from "@tanstack/react-table";
+
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { BookOpen, Check, Clapperboard, ExternalLink, List, Newspaper, Table2, Trash2 } from "lucide-react";
 
 import {
   Table,
@@ -27,6 +32,8 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "@/components/data-table/DataTablePagination";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DataTableProps<TData extends { id: number; counts?: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,6 +64,168 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * Unique key for this table (to isolate sessionStorage between different tables)
    */
   tableKey?: string;
+  /**
+   * Enables the less dense catalogue-card display used by the three survey
+   * catalogues. The regular table remains available from the display switch.
+   */
+  catalogueCardLabel?: string;
+  /** Keep column headings visible while the detailed table is scrolled. */
+  stickyHeader?: boolean;
+  /** Keep catalogue actions available while scrolling through long result sets. */
+  stickyControls?: boolean;
+  /** Optional, role-gated operation for removing several current-year records. */
+  bulkDelete?: {
+    endpoint: string;
+    itemLabel: string;
+  };
+}
+
+type DisplayMode = "cards" | "table";
+
+function textValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map((item) => item === "NON" ? "NON-CJK" : String(item)).join(", ");
+  }
+
+  if (value === null || value === undefined || value === "") return "";
+  return String(value);
+}
+
+function CatalogueCard<TData extends { id: number; counts?: number }>({
+  row,
+  index,
+  label,
+}: {
+  row: Row<TData>;
+  index: number;
+  label: string;
+}) {
+  const record = row.original as TData & Record<string, unknown>;
+  const getCell = (id: string) => row.getVisibleCells().find((cell) => cell.column.id === id);
+  const renderCell = (id: string) => {
+    const cell = getCell(id);
+    return cell ? flexRender(cell.column.columnDef.cell, cell.getContext()) : null;
+  };
+  const has = (key: string) => textValue(record[key]) !== "";
+  const mainTitle = textValue(record.title) || textValue(record.cjk_title) || "Untitled entry";
+  const cjkTitle = textValue(record.cjk_title);
+  const secondaryTitle = textValue(record.title) && cjkTitle ? cjkTitle : "";
+  const description = textValue(record.description);
+  const source = textValue(record.data_source);
+  const isValidSource = /^https?:\/\//i.test(source);
+  const Icon = label.toLowerCase().includes("audio")
+    ? Clapperboard
+    : label.toLowerCase().includes("journal")
+      ? Newspaper
+      : BookOpen;
+
+  const metadata = [
+    ["Romanized", textValue(record.romanized_title)],
+    ["Subtitle", textValue(record.subtitle)],
+    ["Series", textValue(record.series) || textValue(record.sub_series_number)],
+    ["Language", textValue(record.language)],
+    ["Type", textValue(record.type)],
+    ["Publisher", textValue(record.publisher)],
+    ["Vendor", textValue(record.vendor)],
+  ].filter(([, value]) => value);
+
+  const statistics = [
+    ["Counts", textValue(record.counts)],
+    ["Volumes", textValue(record.volumes)],
+    ["Chapters", textValue(record.chapters)],
+    ["Journals", textValue(record.journals)],
+    ["Databases", textValue(record.dbs)],
+  ].filter(([, value]) => value);
+
+  return (
+    <article
+      className="grid overflow-hidden rounded-lg border bg-card shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[4rem_9rem_minmax(0,1fr)]"
+      data-state={row.getIsSelected() ? "selected" : undefined}
+    >
+      <div className="flex items-start justify-center bg-muted/60 px-2 py-5 text-lg font-semibold text-muted-foreground sm:pt-7">
+        {index + 1}.
+      </div>
+      <div className="hidden items-start justify-center border-r bg-muted/30 p-5 sm:flex">
+        <div className="flex h-20 w-20 items-center justify-center rounded-md border bg-background text-muted-foreground">
+          <Icon className="h-9 w-9" aria-hidden="true" />
+        </div>
+      </div>
+      <div className="min-w-0 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+            <h2 className="text-lg font-semibold leading-snug text-primary sm:text-xl">{mainTitle}</h2>
+            {secondaryTitle && (
+              <p className="mt-1 text-base font-medium leading-snug text-foreground/80 sm:text-lg" lang="zh">
+                {secondaryTitle}
+              </p>
+            )}
+          </div>
+          <div className="flex shrink-0 items-center gap-1 rounded-md border bg-muted/40 p-1">
+            {getCell("bulk_delete") && (
+              <span title="Mark for bulk deletion" className="flex items-center gap-1 rounded px-1.5 py-1 text-red-700">
+                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                {renderCell("bulk_delete")}
+              </span>
+            )}
+            {getCell("user_selection") && (
+              <span title="Select for this institution" className="flex items-center gap-1 rounded px-1.5 py-1 text-muted-foreground">
+                <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                {renderCell("user_selection")}
+              </span>
+            )}
+            {renderCell("actions")}
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-x-8 gap-y-3 border-l-2 border-muted pl-4 sm:grid-cols-2 xl:grid-cols-3">
+          {getCell("import_origin") && (
+            <div className="min-w-0">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
+              <dd className="mt-1">{renderCell("import_origin")}</dd>
+            </div>
+          )}
+          {has("origin_institution") && (
+            <div className="min-w-0">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
+              <dd className="mt-1 font-medium">{textValue(record.origin_institution)}</dd>
+            </div>
+          )}
+          {statistics.map(([name, value]) => (
+            <div key={name} className="min-w-0">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
+              <dd className="mt-1 font-medium">{value}</dd>
+            </div>
+          ))}
+          {metadata.map(([name, value]) => (
+            <div key={name} className="min-w-0">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
+              <dd className="mt-1 break-words font-medium">{value}</dd>
+            </div>
+          ))}
+        </div>
+
+        {(description || isValidSource || textValue(record.notes)) && (
+          <div className="mt-4 border-t pt-4 text-sm">
+            {description && <p className="whitespace-pre-wrap text-foreground">{description}</p>}
+            {isValidSource && (
+              <a
+                href={source}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex items-center gap-1 font-medium text-primary hover:underline"
+              >
+                View source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            )}
+            {textValue(record.notes) && (
+              <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{textValue(record.notes)}</p>
+            )}
+          </div>
+        )}
+      </div>
+    </article>
+  );
 }
 
 export function DataTable<TData extends { id: number; counts?: number }, TValue>({
@@ -68,7 +237,12 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   initialPaginationState,
   highlightRowId,
   tableKey = 'default',
+  catalogueCardLabel,
+  stickyHeader = false,
+  stickyControls = false,
+  bulkDelete,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   
@@ -101,7 +275,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         try {
           const parsedSorting = JSON.parse(saved) as SortingState;
           // Validate that sorting columns exist in current column definitions
-          const validColumnIds = columns.map(col => col.id || (col as any).accessorKey);
+          const validColumnIds = columns
+            .map((col) => col.id || ("accessorKey" in col ? col.accessorKey : undefined))
+            .filter((id): id is string => typeof id === "string");
           const validSorting = parsedSorting.filter(sort => 
             validColumnIds.includes(sort.id)
           );
@@ -119,7 +295,6 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [pagination, setPagination] = React.useState(() => {
     // If initialPaginationState is provided (new record), use it
     if (initialPaginationState) {
-      console.log(`📄 Using initialPaginationState for ${tableKey}:`, initialPaginationState);
       return initialPaginationState;
     }
     
@@ -127,22 +302,33 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     if (typeof window !== 'undefined') {
       const key = `table-pagination-${tableKey}`;
       const saved = sessionStorage.getItem(key);
-      console.log(`📄 Restoring pagination for ${tableKey} from sessionStorage:`, saved);
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
-          console.log(`📄 Restored pagination state:`, parsed);
-          return parsed;
+          return JSON.parse(saved);
         } catch {
           return { pageIndex: 0, pageSize: 10 };
         }
       }
     }
-    console.log(`📄 No saved pagination for ${tableKey}, using default`);
     return { pageIndex: 0, pageSize: 10 };
   });
   
   const [globalFilter, setGlobalFilter] = React.useState<string>(initialGlobalFilter || "");
+  const [isBulkDeleting, setIsBulkDeleting] = React.useState(false);
+  const [displayMode, setDisplayMode] = React.useState<DisplayMode>(
+    catalogueCardLabel ? "cards" : "table"
+  );
+
+  React.useEffect(() => {
+    if (!catalogueCardLabel || typeof window === "undefined") return;
+    const saved = sessionStorage.getItem(`table-displayMode-${tableKey}`);
+    if (saved === "cards" || saved === "table") setDisplayMode(saved);
+  }, [catalogueCardLabel, tableKey]);
+
+  React.useEffect(() => {
+    if (!catalogueCardLabel || typeof window === "undefined") return;
+    sessionStorage.setItem(`table-displayMode-${tableKey}`, displayMode);
+  }, [catalogueCardLabel, displayMode, tableKey]);
 
   // Save row selection state to sessionStorage whenever it changes
   React.useEffect(() => {
@@ -162,14 +348,50 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const key = `table-pagination-${tableKey}`;
-      console.log(`💾 Saving pagination for ${tableKey}:`, pagination);
       sessionStorage.setItem(key, JSON.stringify(pagination));
     }
   }, [pagination, tableKey]);
 
+  const bulkDeleteColumn = React.useMemo<ColumnDef<TData>>(() => ({
+    id: "bulk_delete",
+    header: ({ table }) => {
+      const matchingRows = table.getFilteredRowModel().rows.slice(0, 500);
+      const allMatchingSelected = matchingRows.length > 0 && matchingRows.every((row) => row.getIsSelected());
+
+      return (
+        <Checkbox
+          checked={allMatchingSelected || (table.getIsSomeRowsSelected() && "indeterminate")}
+          onCheckedChange={(value) => table.setRowSelection(
+            value ? Object.fromEntries(matchingRows.map((row) => [row.id, true])) : {}
+          )}
+          aria-label="Select all matching entries for bulk deletion"
+          title="Select all matching entries for bulk deletion"
+          className="border-red-400 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+        />
+      );
+    },
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select entry for bulk deletion"
+        title="Select entry for bulk deletion"
+        className="border-red-400 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    size: 50,
+  }), []);
+
+  const tableColumns = React.useMemo(
+    () => bulkDelete ? [bulkDeleteColumn, ...columns] : columns,
+    [bulkDelete, bulkDeleteColumn, columns]
+  );
+
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     state: {
       sorting,
       columnVisibility,
@@ -203,6 +425,10 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    // Saving edits refreshes the catalogue data. Keep the reader on their
+    // current page instead of letting TanStack Table reset to page one.
+    autoResetPageIndex: false,
+    getRowId: (originalRow) => String(originalRow.id),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -211,55 +437,190 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  const selectedBulkIds = table
+    .getSelectedRowModel()
+    .rows.map((row) => row.original.id)
+    .filter((id) => Number.isFinite(id));
+  const matchingBulkRows = table.getFilteredRowModel().rows.slice(0, 500);
+  const allMatchingRowsSelected = matchingBulkRows.length > 0
+    && matchingBulkRows.every((row) => row.getIsSelected());
+
+  const toggleAllMatchingBulkRows = () => {
+    table.setRowSelection(
+      allMatchingRowsSelected
+        ? {}
+        : Object.fromEntries(matchingBulkRows.map((row) => [row.id, true]))
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (!bulkDelete || selectedBulkIds.length === 0) return;
+
+    const approved = window.confirm(
+      `Delete ${selectedBulkIds.length} ${bulkDelete.itemLabel} from this year? This cannot be undone, but entries in other years will not be affected.`
+    );
+    if (!approved) return;
+
+    setIsBulkDeleting(true);
+    try {
+      const response = await fetch(bulkDelete.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedBulkIds }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Bulk delete failed");
+
+      table.resetRowSelection();
+      toast.success(`${result.deleted ?? selectedBulkIds.length} ${bulkDelete.itemLabel} deleted from this year`);
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Bulk delete failed");
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  const tableControls = (
+    <>
+      {Toolbar && <Toolbar table={table} />}
+      {bulkDelete && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50/60 px-3 py-2">
+          <p className="text-sm text-red-950">
+            <span className="font-semibold">Delete selection:</span> {selectedBulkIds.length} selected
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-red-200 bg-white hover:bg-red-100"
+              disabled={matchingBulkRows.length === 0 || isBulkDeleting}
+              onClick={toggleAllMatchingBulkRows}
+            >
+              {allMatchingRowsSelected
+                ? "Clear delete selection"
+                : `Select all ${matchingBulkRows.length} matching`}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={selectedBulkIds.length === 0 || isBulkDeleting}
+              onClick={handleBulkDelete}
+            >
+              {isBulkDeleting ? "Deleting…" : `Delete selected (${selectedBulkIds.length})`}
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-4">
-      {Toolbar && <Toolbar table={table} />}
-      <div className="rounded-md border" suppressHydrationWarning>
-        <Table suppressHydrationWarning>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                const isHighlighted = highlightRowId && row.original.id === highlightRowId;
-                return (
-                  <TableRow 
-                    key={row.id} 
-                    data-state={row.getIsSelected() && "selected"}
-                    className={isHighlighted ? "bg-yellow-50 animate-pulse" : ""}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {stickyControls ? (
+        <div className="sticky top-[5.25rem] z-30 -mx-2 space-y-2 border-y bg-white/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
+          {tableControls}
+        </div>
+      ) : tableControls}
+      {catalogueCardLabel && (
+        <div className="flex justify-end" aria-label="Display mode">
+          <div className="inline-flex items-center rounded-md border bg-muted/40 p-1 shadow-sm">
+          <Button
+            type="button"
+            variant={displayMode === "cards" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setDisplayMode("cards")}
+            aria-pressed={displayMode === "cards"}
+            aria-label="List view"
+            title="List view"
+          >
+            <List className="h-4 w-4" aria-hidden="true" />
+          </Button>
+          <Button
+            type="button"
+            variant={displayMode === "table" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setDisplayMode("table")}
+            aria-pressed={displayMode === "table"}
+            aria-label="Table view"
+            title="Table view"
+          >
+            <Table2 className="h-4 w-4" aria-hidden="true" />
+          </Button>
+          </div>
+        </div>
+      )}
+
+      {displayMode === "cards" && catalogueCardLabel ? (
+        <div className="space-y-4" suppressHydrationWarning>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row, index) => (
+              <CatalogueCard
+                key={row.id}
+                row={row}
+                index={table.getState().pagination.pageIndex * table.getState().pagination.pageSize + index}
+                label={catalogueCardLabel}
+              />
+            ))
+          ) : (
+            <div className="rounded-md border py-10 text-center text-sm text-muted-foreground">No results.</div>
+          )}
+        </div>
+      ) : (
+        <div
+          className={`rounded-md border ${stickyHeader ? "max-h-[70vh] overflow-auto" : "overflow-x-auto"}`}
+          suppressHydrationWarning
+        >
+          <Table suppressHydrationWarning>
+            <TableHeader className={stickyHeader ? "sticky top-0 z-20 bg-background shadow-sm" : undefined}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} colSpan={header.colSpan} className={stickyHeader ? "bg-background" : undefined}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => {
+                  const isHighlighted = highlightRowId && row.original.id === highlightRowId;
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={isHighlighted ? "bg-yellow-50 animate-pulse" : ""}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={table.getVisibleLeafColumns().length} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
       <DataTablePagination table={table} userRoles={userRoles} />
     </div>
   );

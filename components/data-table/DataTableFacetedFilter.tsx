@@ -70,10 +70,13 @@ export function DataTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-white" align="start">
-        <Command>
+      <PopoverContent
+        className="w-[min(20rem,calc(100vw-2rem))] max-h-[min(70vh,30rem)] overflow-hidden p-0 bg-white"
+        align="start"
+      >
+        <Command className="max-h-[min(70vh,30rem)]">
           <CommandInput placeholder={title} />
-          <CommandList>
+          <CommandList className="max-h-[min(55vh,22rem)]">
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {

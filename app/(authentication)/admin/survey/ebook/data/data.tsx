@@ -1,7 +1,7 @@
 export const languages = [
   {
     value: 1,
-    label: "CHN",
+    label: "CHI",
   },
   {
     value: 2,

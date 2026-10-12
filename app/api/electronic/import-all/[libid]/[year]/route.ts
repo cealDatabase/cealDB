@@ -106,7 +106,7 @@ export async function GET(
       for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
-        if (langShort === "CHN") {
+        if (langShort === "CHI" || langShort === "CHN") {
           countsByLanguage.chinese += 1;
           counted = true;
         } else if (langShort === "JPN") {
@@ -170,7 +170,7 @@ export async function GET(
       for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
-        if (langShort === "CHN") {
+        if (langShort === "CHI" || langShort === "CHN") {
           countsByLanguage.chinese += 1;
           counted = true;
         } else if (langShort === "JPN") {
@@ -233,7 +233,7 @@ export async function GET(
       for (const langEntry of languages) {
         const langShort = langEntry.Language.short?.toUpperCase();
         
-        if (langShort === "CHN") {
+        if (langShort === "CHI" || langShort === "CHN") {
           countsByLanguage.chinese += 1;
           counted = true;
         } else if (langShort === "JPN") {

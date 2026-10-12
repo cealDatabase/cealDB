@@ -1,5 +1,4 @@
 import db from "@/lib/db";
-import { list } from "postcss";
 
 // Get libraries
 export const getLibraryById = async (id: number) => {
@@ -211,12 +210,6 @@ export const getListAVCountsByYear = async (year: number) => {
       orderBy: {
         listav: 'asc'  // CRITICAL: Order by listav ID to maintain consistency
       }
-    });
-    
-    console.log(`   Found ${listAVCountsArray.length} records`);
-    // Log first few to verify order
-    listAVCountsArray.slice(0, 5).forEach(c => {
-      console.log(`   listav=${c.listav}, titles=${c.titles}`);
     });
     
     return listAVCountsArray;

@@ -46,7 +46,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
     // Show loading state during hydration
     if (!isClient || years.length === 0) {
         return (
-            <div className='flex items-center justify-end my-4 gap-4'>
+            <div className='sticky top-0 z-40 my-4 flex items-center justify-end gap-4 rounded-md border bg-white/95 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85'>
                 <div className='flex flex-row self-end'>
                     <div className="text-sm/6 font-medium text-sky-600">Select Year:</div>
                     <div className="grid cursor-default grid-cols-1 rounded-md bg-white px-3 pb-0.5 text-left outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
@@ -56,14 +56,14 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
                     </div>
                 </div>
                 <Button disabled className='ml-4 text-sm px-4 py-0 md:text-normal'>
-                    Create New Entry
+                    Create a New Entry
                 </Button>
             </div>
         );
     }
 
     return (
-        <div className='flex items-center justify-between my-4 gap-4'>
+        <div className='sticky top-0 z-40 my-4 flex items-center justify-between gap-4 rounded-md border bg-white/95 px-3 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85'>
             <div className="flex items-center gap-4">
                 <div className="min-w-[120px]">
                     <label className="block text-sm font-medium text-gray-900 mb-2">Select Year</label>
@@ -83,7 +83,7 @@ export default function SelectYear({ yearCurrent }: { yearCurrent: string }) {
             </div>
 
             <Button onClick={handleCreateClick} className='text-sm px-4 py-0 md:text-normal'>
-                Create New Entry
+                Create a New Entry
             </Button>
         </div>
     );

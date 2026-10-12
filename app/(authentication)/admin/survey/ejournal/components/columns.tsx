@@ -287,7 +287,6 @@ export function getColumns(
             }}
             disabled={!canEdit}
             aria-label='Select all for survey'
-            className='translate-y-[2px]'
           />
         );
       },
@@ -301,7 +300,6 @@ export function getColumns(
             onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
             disabled={!canEdit}
             aria-label='Select for survey'
-            className='translate-y-[2px]'
           />
         );
       },
@@ -321,6 +319,10 @@ export function getColumns(
     {
       accessorKey: "import_origin",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Origin" />,
+      filterFn: (row, id, value) => {
+        const selected = value as string[];
+        return !selected?.length || selected.includes(String(row.getValue(id) ?? ""));
+      },
       cell: ({ row }) => {
         const origin = row.getValue("import_origin") as string | null | undefined;
         if (!origin) return null;
@@ -426,6 +428,10 @@ export function getColumns(
           </span>
         </div>
       ),
+      filterFn: (row, id, value) => {
+        const selected = value as string[];
+        return !selected?.length || selected.includes(String(row.getValue(id) ?? ""));
+      },
     },
     {
       accessorKey: "subtitle",
@@ -510,6 +516,10 @@ export function getColumns(
       ),
       enableSorting: true,
       enableHiding: false,
+      filterFn: (row, id, value) => {
+        const selected = value as string[];
+        return !selected?.length || selected.includes(String(row.getValue(id) ?? ""));
+      },
     },
 
     {
