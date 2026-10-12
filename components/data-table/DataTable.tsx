@@ -93,11 +93,9 @@ function textValue(value: unknown): string {
 
 function CatalogueCard<TData extends { id: number; counts?: number }>({
   row,
-  index,
   label,
 }: {
   row: Row<TData>;
-  index: number;
   label: string;
 }) {
   const record = row.original as TData & Record<string, unknown>;
@@ -139,11 +137,28 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
 
   return (
     <article
-      className="grid overflow-hidden rounded-lg border bg-card shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[4rem_9rem_minmax(0,1fr)]"
+      className="grid overflow-hidden rounded-lg border bg-card shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[4.5rem_8.5rem_minmax(0,1fr)]"
       data-state={row.getIsSelected() ? "selected" : undefined}
     >
-      <div className="flex items-start justify-center bg-muted/60 px-2 py-5 text-lg font-semibold text-muted-foreground sm:pt-7">
-        {index + 1}.
+      <div className="flex flex-col items-center gap-2 border-r bg-muted/60 px-2 py-5 text-sm font-normal text-muted-foreground sm:pt-7">
+        {getCell("user_selection") && (
+          <span
+            title="Select for this institution"
+            className="flex h-8 w-12 items-center justify-center gap-1 rounded-md border bg-background text-muted-foreground"
+          >
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            {renderCell("user_selection")}
+          </span>
+        )}
+        {getCell("bulk_delete") && (
+          <span
+            title="Mark for bulk deletion"
+            className="flex h-8 w-12 items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 text-red-700"
+          >
+            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            {renderCell("bulk_delete")}
+          </span>
+        )}
       </div>
       <div className="hidden items-start justify-center border-r bg-muted/30 p-5 sm:flex">
         <div className="flex h-20 w-20 items-center justify-center rounded-md border bg-background text-muted-foreground">
@@ -161,21 +176,7 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
               </p>
             )}
           </div>
-          <div className="flex shrink-0 items-center gap-1 rounded-md border bg-muted/40 p-1">
-            {getCell("bulk_delete") && (
-              <span title="Mark for bulk deletion" className="flex items-center gap-1 rounded px-1.5 py-1 text-red-700">
-                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                {renderCell("bulk_delete")}
-              </span>
-            )}
-            {getCell("user_selection") && (
-              <span title="Select for this institution" className="flex items-center gap-1 rounded px-1.5 py-1 text-muted-foreground">
-                <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                {renderCell("user_selection")}
-              </span>
-            )}
-            {renderCell("actions")}
-          </div>
+          <div className="shrink-0">{renderCell("actions")}</div>
         </div>
 
         <div className="mt-4 grid gap-x-8 gap-y-3 border-l-2 border-muted pl-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -558,11 +559,10 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       {displayMode === "cards" && catalogueCardLabel ? (
         <div className="space-y-4" suppressHydrationWarning>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row, index) => (
+            table.getRowModel().rows.map((row) => (
               <CatalogueCard
                 key={row.id}
                 row={row}
-                index={table.getState().pagination.pageIndex * table.getState().pagination.pageSize + index}
                 label={catalogueCardLabel}
               />
             ))
