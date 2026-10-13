@@ -464,10 +464,16 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
 
   const tableColumns = React.useMemo(() => {
     if (!bulkDelete || !bulkMode) return columns;
-    const actionsIndex = columns.findIndex((column) => column.id === "actions");
+    // Bulk manage swaps the My Access column out instead of sitting beside it.
+    // Two checkbox columns on one row - one that records your institution's
+    // holdings and saves immediately, one that only marks rows to delete or
+    // copy - read as the same control, and ticking the wrong one quietly
+    // changes a library's survey data. One mode, one kind of checkbox.
+    const withoutAccess = columns.filter((column) => column.id !== "user_selection");
+    const actionsIndex = withoutAccess.findIndex((column) => column.id === "actions");
     return actionsIndex >= 0
-      ? [...columns.slice(0, actionsIndex), bulkDeleteColumn, ...columns.slice(actionsIndex)]
-      : [bulkDeleteColumn, ...columns];
+      ? [...withoutAccess.slice(0, actionsIndex), bulkDeleteColumn, ...withoutAccess.slice(actionsIndex)]
+      : [bulkDeleteColumn, ...withoutAccess];
   }, [bulkDelete, bulkMode, bulkDeleteColumn, columns]);
 
   const table = useReactTable({
@@ -516,6 +522,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    // Toolbars read this to drop their My Access controls while bulk manage is
+    // on, so the only "select all" on screen is the bulk-manage one.
+    meta: { bulkMode: !!bulkDelete && bulkMode },
   });
 
   const selectedBulkIds = table
@@ -578,6 +587,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           <p className="flex items-center gap-2 text-sm text-amber-950">
             <ShieldCheck className="h-4 w-4 text-amber-700" aria-hidden="true" />
             <span className="font-semibold">Admin bulk manage:</span> {selectedBulkIds.length} selected
+            <span className="text-amber-800/80">· My Access checkboxes are hidden until you press Done</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -766,6 +776,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         table={table}
         userRoles={userRoles}
         showSelectionSummary={!catalogueCardLabel || bulkMode}
+        selectionLabel={bulkDelete ? "selected for bulk actions" : undefined}
       />
     </div>
   );
