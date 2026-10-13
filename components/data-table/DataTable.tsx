@@ -116,6 +116,7 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
     : label.toLowerCase().includes("journal")
       ? Newspaper
       : BookOpen;
+  const isAudioVisualCatalogue = label.toLowerCase().includes("audio");
 
   const metadata = [
     ["Romanized", textValue(record.romanized_title)],
@@ -179,32 +180,75 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
           <div className="shrink-0">{renderCell("actions")}</div>
         </div>
 
-        <div className="mt-4 grid gap-x-8 gap-y-3 border-l-2 border-muted pl-4 sm:grid-cols-2 xl:grid-cols-3">
-          {getCell("import_origin") && (
+        {isAudioVisualCatalogue ? (
+          <dl className="mt-4 space-y-4 border-l-2 border-muted pl-4">
+            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
+              {getCell("import_origin") && (
+                <div className="min-w-0">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
+                  <dd className="mt-1">{renderCell("import_origin")}</dd>
+                </div>
+              )}
+              {getCell("origin_institution") && has("origin_institution") && (
+                <div className="min-w-0 xl:col-start-2">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
+                  <dd className="mt-1 font-medium">{renderCell("origin_institution")}</dd>
+                </div>
+              )}
+            </div>
+
+            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
+              {[
+                ["Romanized Title", textValue(record.romanized_title)],
+                ["Language", textValue(record.language)],
+                ["Type", textValue(record.type)],
+              ].map(([name, value]) => value && (
+                <div key={name} className="min-w-0">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
+                  <dd className="mt-1 break-words font-medium">{value}</dd>
+                </div>
+              ))}
+            </div>
+
+            {textValue(record.publisher) && (
+              <div className="min-w-0">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Publisher</dt>
+                <dd className="mt-1 break-words font-medium">{textValue(record.publisher)}</dd>
+              </div>
+            )}
             <div className="min-w-0">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
-              <dd className="mt-1">{renderCell("import_origin")}</dd>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Count</dt>
+              <dd className="mt-1 break-words font-medium">{textValue(record.counts) || "—"}</dd>
             </div>
-          )}
-          {has("origin_institution") && (
-            <div className="min-w-0">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
-              <dd className="mt-1 font-medium">{textValue(record.origin_institution)}</dd>
-            </div>
-          )}
-          {statistics.map(([name, value]) => (
-            <div key={name} className="min-w-0">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-              <dd className="mt-1 font-medium">{value}</dd>
-            </div>
-          ))}
-          {metadata.map(([name, value]) => (
-            <div key={name} className="min-w-0">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-              <dd className="mt-1 break-words font-medium">{value}</dd>
-            </div>
-          ))}
-        </div>
+          </dl>
+        ) : (
+          <div className="mt-4 grid gap-x-8 gap-y-3 border-l-2 border-muted pl-4 sm:grid-cols-2 xl:grid-cols-3">
+            {getCell("import_origin") && (
+              <div className="min-w-0">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
+                <dd className="mt-1">{renderCell("import_origin")}</dd>
+              </div>
+            )}
+            {getCell("origin_institution") && has("origin_institution") && (
+              <div className="min-w-0">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
+                <dd className="mt-1 font-medium">{renderCell("origin_institution")}</dd>
+              </div>
+            )}
+            {statistics.map(([name, value]) => (
+              <div key={name} className="min-w-0">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
+                <dd className="mt-1 font-medium">{value}</dd>
+              </div>
+            ))}
+            {metadata.map(([name, value]) => (
+              <div key={name} className="min-w-0">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
+                <dd className="mt-1 break-words font-medium">{value}</dd>
+              </div>
+            ))}
+          </div>
+        )}
 
         {(description || isValidSource || textValue(record.notes)) && (
           <div className="mt-4 border-t pt-4 text-sm">
