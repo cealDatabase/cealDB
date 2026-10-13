@@ -95,6 +95,11 @@ export function DataTableToolbar<TData>({
   }
 
   const isMemberUser = roleId?.trim() === "2"
+  // While bulk manage is on, its banner owns selection. Offering "Select all
+  // for My Access" beside "Select all matching" puts two select-alls on screen
+  // that write to completely different places.
+  const bulkMode = !!(table.options.meta as { bulkMode?: boolean } | undefined)?.bulkMode
+  const showAccessControls = !isMemberUser && !!libid && !bulkMode
   const [isExportingExcel, setIsExportingExcel] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const canImportPreviousYear = (() => {
@@ -229,7 +234,7 @@ export function DataTableToolbar<TData>({
       </Button>
 
         {/* Action visible only to Super Admin (not role 2) */}
-        {!isMemberUser && !!libid && (
+        {showAccessControls && (
           <Button
             type="button"
             variant="outline"
@@ -243,7 +248,7 @@ export function DataTableToolbar<TData>({
               : `Select all ${matchingAccessIds.length} for My Access`}
           </Button>
         )}
-        {!isMemberUser && !!libid && (
+        {showAccessControls && (
           <Button
             onClick={handleDirectSubscribe}
             disabled={!canEdit || selectedIds.length === 0 || isSubscribing}

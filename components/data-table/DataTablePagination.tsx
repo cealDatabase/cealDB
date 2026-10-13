@@ -27,9 +27,11 @@ interface DataTablePaginationProps<TData> {
   userRoles?: string[] | null;
   /** Show the selected-row count and the copy-to-year tools. */
   showSelectionSummary?: boolean;
+  /** What the selected count refers to, e.g. "selected for bulk actions". */
+  selectionLabel?: string;
 }
 
-export function DataTablePagination<TData extends { id: number; counts?: number }>({ table, userRoles, showSelectionSummary = true }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends { id: number; counts?: number }>({ table, userRoles, showSelectionSummary = true, selectionLabel = "row(s) selected" }: DataTablePaginationProps<TData>) {
   // Year options range from 2017 to the current year
   const beginYear = 2017;
   const years = Array.from({ length: new Date().getFullYear() - beginYear + 1 }, (_, i) => beginYear + i);
@@ -120,7 +122,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
       <div className="flex-1 text-sm text-muted-foreground flex items-center space-x-2">
         {showSelectionSummary && (
         <span>
-          {selectedRows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
+          {selectedRows.length} of {table.getFilteredRowModel().rows.length} {selectionLabel}
         </span>
         )}
         {showSelectionSummary && selectedRows.length > 0 && canCopy && (

@@ -278,17 +278,26 @@ export function getColumns(
           return state.is_selected;
         });
         
+        // Labelled and coloured to match the blue My Access zone in the card
+        // view, so it cannot be mistaken for the amber bulk-manage checkbox.
         return (
-          <Checkbox
-            checked={allSelected || (someSelected && "indeterminate")}
-            onCheckedChange={(value) => {
-              rows.forEach(row => {
-                onSelectionChange?.((row.original as any).id, !!value);
-              });
-            }}
-            disabled={!canEdit}
-            aria-label='Select all for survey'
-          />
+          <div className="flex flex-col items-center gap-1">
+            <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-blue-700">
+              My Access
+            </span>
+            <Checkbox
+              checked={allSelected || (someSelected && "indeterminate")}
+              onCheckedChange={(value) => {
+                rows.forEach(row => {
+                  onSelectionChange?.((row.original as any).id, !!value);
+                });
+              }}
+              disabled={!canEdit}
+              aria-label='My Access: mark every entry on this page as held by your institution'
+              title='My Access: mark every entry on this page as held by your institution'
+              className='border-blue-500 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600'
+            />
+          </div>
         );
       },
       cell: ({ row }) => {
@@ -300,7 +309,9 @@ export function getColumns(
             checked={is_selected}
             onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
             disabled={!canEdit}
-            aria-label='Select for survey'
+            aria-label='My Access: your institution holds this entry'
+            title='My Access: your institution holds this entry'
+            className='border-blue-500 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600'
           />
         );
       },

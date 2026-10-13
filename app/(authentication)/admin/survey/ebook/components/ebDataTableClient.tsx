@@ -234,7 +234,11 @@ export default function EBookDataTableClient({
       {libid && (
         <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
           <span>
-            {Array.from(selectionData.values()).filter((s) => s.is_selected).length} items selected
+            <span className="font-medium text-blue-700">My Access:</span>{" "}
+            {(() => {
+              const held = Array.from(selectionData.values()).filter((s) => s.is_selected).length;
+              return `${held} ${held === 1 ? "entry" : "entries"} held by your institution`;
+            })()}
           </span>
           <span aria-live="polite" className="text-xs">
             {isSaving ? "Saving…" : canEdit ? "All changes saved" : ""}
