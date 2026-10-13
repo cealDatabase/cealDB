@@ -571,6 +571,18 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     }
   };
 
+  // The page buttons sit under the last row, so without this the reader lands
+  // at the bottom of the next page and has to scroll back up to its first
+  // entry. Scroll to the top of the list (search and filters), not the top of
+  // the document, which is a screen of breadcrumbs and instructions away.
+  const listTopRef = React.useRef<HTMLDivElement>(null);
+  const scrollToListTop = () => {
+    requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      listTopRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    });
+  };
+
   const exitBulkMode = () => {
     table.resetRowSelection();
     setBulkMode(false);
@@ -631,7 +643,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   );
 
   return (
-    <div className="space-y-3">
+    // Land the list where its sticky controls stick. Any higher and the sticky
+    // bar is pushed down over the first rows and the column headers.
+    <div ref={listTopRef} className={cn("space-y-3", stickyControls ? "scroll-mt-[5.25rem]" : "scroll-mt-4")}>
       {stickyControls ? (
         <div className="sticky top-[5.25rem] z-30 -mx-2 space-y-2 border-y bg-white/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
           {tableControls}
@@ -777,6 +791,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         userRoles={userRoles}
         showSelectionSummary={!catalogueCardLabel || bulkMode}
         selectionLabel={bulkDelete ? "selected for bulk actions" : undefined}
+        onPageChange={scrollToListTop}
       />
     </div>
   );

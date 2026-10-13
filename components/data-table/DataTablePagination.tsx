@@ -29,9 +29,11 @@ interface DataTablePaginationProps<TData> {
   showSelectionSummary?: boolean;
   /** What the selected count refers to, e.g. "selected for bulk actions". */
   selectionLabel?: string;
+  /** Called after the reader moves to another page. */
+  onPageChange?: () => void;
 }
 
-export function DataTablePagination<TData extends { id: number; counts?: number }>({ table, userRoles, showSelectionSummary = true, selectionLabel = "row(s) selected" }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends { id: number; counts?: number }>({ table, userRoles, showSelectionSummary = true, selectionLabel = "row(s) selected", onPageChange }: DataTablePaginationProps<TData>) {
   // Year options range from 2017 to the current year
   const beginYear = 2017;
   const years = Array.from({ length: new Date().getFullYear() - beginYear + 1 }, (_, i) => beginYear + i);
@@ -202,7 +204,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
+            onClick={() => { table.setPageIndex(0); onPageChange?.(); }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to first page</span>
@@ -211,7 +213,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.previousPage()}
+            onClick={() => { table.previousPage(); onPageChange?.(); }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
@@ -220,7 +222,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.nextPage()}
+            onClick={() => { table.nextPage(); onPageChange?.(); }}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to next page</span>
@@ -229,7 +231,7 @@ export function DataTablePagination<TData extends { id: number; counts?: number 
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => { table.setPageIndex(table.getPageCount() - 1); onPageChange?.(); }}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>
