@@ -43,7 +43,7 @@ const formSchema = z.object({
   cjk_title: z.string().optional(),
   romanized_title: z.string().optional(),
   type: z.string().min(1, "Type is required"),
-  counts: z.number().min(0, "Counts must be 0 or greater"),
+  counts: z.number().min(0, "Counts must be 0 or greater").optional(),
   language: z.array(z.number()).min(1, "At least one language must be selected"),
   is_global: z.boolean(),
 });
@@ -80,7 +80,7 @@ export default function CreateAVForm({
       cjk_title: "",
       romanized_title: "",
       type: "",
-      counts: 0,
+      counts: undefined,
       language: [],
       is_global: canCreateGlobal, // Default to true for admins, false for members
     },
@@ -92,6 +92,9 @@ export default function CreateAVForm({
       // For members (role 2), force is_global to false and add library_id
       const submissionData = {
         ...values,
+        // Keep the field visually empty until a user enters a value, while
+        // preserving the existing zero-count behaviour on submission.
+        counts: values.counts ?? 0,
         year: selectedYear,
         is_global: isMemberOnly ? false : values.is_global,
         library_id: isMemberOnly && libraryId ? libraryId : undefined,
@@ -125,14 +128,6 @@ export default function CreateAVForm({
     }
   };
 
-  const toggleLanguage = (languageId: number, currentLanguages: number[]) => {
-    if (currentLanguages.includes(languageId)) {
-      return currentLanguages.filter((id) => id !== languageId);
-    } else {
-      return [...currentLanguages, languageId];
-    }
-  };
-
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardContent>
@@ -147,12 +142,12 @@ export default function CreateAVForm({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="cjk_title"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CJK Title</FormLabel>
+                      <FormLabel>English Title*</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter CJK title" {...field} />
+                        <Input placeholder="Enter the title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -175,12 +170,12 @@ export default function CreateAVForm({
 
                 <FormField
                   control={form.control}
-                  name="title"
+                  name="cjk_title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>English Title*</FormLabel>
+                      <FormLabel>CJK Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter the title" {...field} />
+                        <Input placeholder="Enter CJK title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -275,9 +270,12 @@ export default function CreateAVForm({
                         <Input
                           type="number"
                           min="0"
-                          placeholder="Enter count"
+                          placeholder="0"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(
+                            e.target.value === "" ? undefined : Number(e.target.value)
+                          )}
                         />
                       </FormControl>
                       <FormMessage />
@@ -351,8 +349,11 @@ export default function CreateAVForm({
                             id={`lang-${lang.value}`}
                             checked={field.value.includes(lang.value)}
                             onCheckedChange={(checked) => {
-                              const newValue = toggleLanguage(lang.value, field.value);
-                              field.onChange(newValue);
+                              field.onChange(
+                                checked
+                                  ? [...field.value, lang.value]
+                                  : field.value.filter((id) => id !== lang.value)
+                              );
                             }}
                           />
                           <label
