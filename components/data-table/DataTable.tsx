@@ -349,20 +349,28 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
         )}
 
         {(description || isValidSource || textValue(record.notes)) && (
-          <div className="mt-4 border-t pt-4 text-sm">
-            {description && <p className="whitespace-pre-wrap text-foreground">{description}</p>}
+          <div className="mt-4 space-y-3 border-t pt-4 text-sm">
+            {description && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</p>
+                <p className="mt-1 whitespace-pre-wrap text-foreground">{description}</p>
+              </div>
+            )}
             {isValidSource && (
               <a
                 href={source}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
               >
                 View source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
             )}
             {textValue(record.notes) && (
-              <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{textValue(record.notes)}</p>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Notes</p>
+                <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{textValue(record.notes)}</p>
+              </div>
             )}
           </div>
         )}
