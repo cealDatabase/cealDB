@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
+import { canAccessLibrary, requireRoles } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -25,6 +26,16 @@ export async function POST(req: Request) {
       is_global,
       library_id, // optional library ID for member-created entries
     } = body;
+
+    // Global and admin-created entries change the shared catalogue (Super
+    // Admin / E-Resource Editor only). Member-created entries must belong to
+    // an institution the caller is assigned to.
+    const mayCreate = is_global || !library_id
+      ? await requireRoles(1, 3)
+      : await canAccessLibrary(Number(library_id));
+    if (!mayCreate) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
 
     const year = Number(libraryyear);
     if (!Number.isFinite(year)) {
@@ -86,20 +97,8 @@ export async function POST(req: Request) {
           );
         }
 
-        // Check if editing is allowed (super admins can bypass this)
-        if (!libraryYearRecord.is_open_for_editing) {
-          const superAdmin = await isSuperAdmin();
-          if (!superAdmin) {
-            return NextResponse.json(
-              { 
-                error: "Form submission not allowed", 
-                message: "This survey is currently closed. Please contact the administrator for assistance." 
-              },
-              { status: 403 }
-            );
-          }
-          console.log("[EJournal Create] Super Admin bypassing is_open_for_editing check");
-        }
+        // Admin-created entries are catalogue maintenance (Super Admin / E-Resource
+        // Editor, checked above), which is allowed at every stage of the survey.
 
         libraryYearId = libraryYearRecord.id;
       }

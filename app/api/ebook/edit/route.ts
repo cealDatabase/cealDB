@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { logUserAction } from "@/lib/auditLogger";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
+import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
 export async function POST(req: Request) {
   try {
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
     // Fetch the original record to check if it's global
     const originalRecord = await db.list_EBook.findUnique({
       where: { id: ebookId },
-      select: { is_global: true },
+      select: { is_global: true, Library_Year: { select: { library: true } } },
     });
 
     if (!originalRecord) {
@@ -75,21 +76,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find or create Library_Year record
-    let libraryYearRecord = await db.library_Year.findFirst({
-      where: { library: libraryId, year: yearNum },
-    });
-
-    if (!libraryYearRecord) {
-      libraryYearRecord = await db.library_Year.create({
-        data: {
-          library: libraryId,
-          year: yearNum,
-          updated_at: new Date(),
-          is_open_for_editing: true,
-          is_active: true,
-        },
-      });
+    // Edits are institution data: allowed only while the library-year is open.
+    const libraryYearRecord = await findOrCreateLibraryYear(libraryId, yearNum);
+    if (!(await canWriteLibraryYear(libraryYearRecord))) {
+      return NextResponse.json(
+        { error: "Survey is closed. This entry cannot be edited for this year." },
+        { status: 403 }
+      );
     }
 
     const libraryYearId = libraryYearRecord.id;
@@ -101,7 +94,11 @@ export async function POST(req: Request) {
     let isNewRecord = false;
 
     // KEY LOGIC: If the record is global, create a NEW library-specific record
-    if (originalRecord.is_global) {
+    // Only the owning institution's own local entry is updated in place. A
+    // global entry, or another institution's shared local entry, gets a copy.
+    const isOwnLocalRecord = !originalRecord.is_global
+      && originalRecord.Library_Year?.library === libraryId;
+    if (!isOwnLocalRecord) {
       console.log("Original record is global - creating library-specific copy");
 
       // Create a NEW library-specific record

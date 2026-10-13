@@ -1,7 +1,7 @@
 // app/(authentication)/admin/forms/[libid]/avdbedit/page.tsx
 import { cookies } from "next/headers";
 import db from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import AvdbEditClient from "./AvdbEditClient";
 import { Container } from "@/components/Container";
 import AVDataTableClient from "@/app/(authentication)/admin/survey/avdb/components/avDataTableClient";
@@ -14,6 +14,8 @@ import { getLibraryById } from "@/data/fetchPrisma";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
+import { canAccessLibrary } from "@/lib/auth";
+import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -116,6 +118,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     );
   }
 
+  // libid comes from the URL or an unsigned cookie: confirm the caller may
+  // act on that institution before showing or changing its list.
+  if (!(await canAccessLibrary(libid))) {
+    redirect("/unauthorized");
+  }
+
   // Fetch library information for display
   const library = await getLibraryById(libid);
   const libraryName = library?.library_name || `Library ${libid}`;
@@ -124,21 +132,8 @@ export default async function Page({ params, searchParams }: PageProps) {
   if (ids.length === 0) {
     
     // Find or create Library_Year record
-    let libraryYearRecord = await db.library_Year.findFirst({
-      where: { library: libid, year: year }
-    });
-    
-    if (!libraryYearRecord) {
-      libraryYearRecord = await db.library_Year.create({
-        data: {
-          library: libid,
-          year: year,
-          updated_at: new Date(),
-          is_open_for_editing: true,
-          is_active: true,
-        },
-      });
-    }
+    const libraryYearRecord = await findOrCreateLibraryYear(libid, year);
+    const canWrite = await canWriteLibraryYear(libraryYearRecord);
 
     // Get all current subscriptions for this library and year with counts.
     // Junction table provides per-library state (is_selected, custom_count);
@@ -243,6 +238,11 @@ export default async function Page({ params, searchParams }: PageProps) {
             <div className='flex-1 flex-col px-8 pb-4 md:flex'>
               <InstitutionSwitcher currentYear={year} />
               <FallbackYearBanner year={year} className="mb-4" />
+            {!canWrite && (
+              <div className='mb-4 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700'>
+                🔒 The {year} survey is closed for your institution. This list is read-only.
+              </div>
+            )}
               <div className='space-y-4'>
                 <div className='space-y-2'>
                   <h2 className='text-3xl font-bold tracking-tight'>
@@ -287,6 +287,11 @@ export default async function Page({ params, searchParams }: PageProps) {
           <div className='flex-1 flex-col px-8 pb-4 md:flex'>
             <InstitutionSwitcher currentYear={year} />
             <FallbackYearBanner year={year} className="mb-4" />
+            {!canWrite && (
+              <div className='mb-4 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700'>
+                🔒 The {year} survey is closed for your institution. This list is read-only.
+              </div>
+            )}
             <div className='mb-6 space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
                 {libraryName} - AV Access Management

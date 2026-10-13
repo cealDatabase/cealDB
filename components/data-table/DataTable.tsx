@@ -20,7 +20,7 @@ import {
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { BookOpen, Check, Clapperboard, ExternalLink, List, Newspaper, Table2, Trash2 } from "lucide-react";
+import { ExternalLink, List, ShieldCheck, Table2, Trash2, X } from "lucide-react";
 
 import {
   Table,
@@ -34,6 +34,7 @@ import {
 import { DataTablePagination } from "@/components/data-table/DataTablePagination";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData extends { id: number; counts?: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -91,12 +92,46 @@ function textValue(value: unknown): string {
   return String(value);
 }
 
+const ADMIN_COLUMN_IDS = new Set(["actions", "bulk_delete"]);
+
+/** Colour zones shared by the card and table views: blue = institution, amber = admin. */
+function zoneClass(columnId: string) {
+  if (columnId === "user_selection") return "bg-blue-50/70";
+  if (ADMIN_COLUMN_IDS.has(columnId)) return "bg-amber-50/80";
+  return undefined;
+}
+
+function ClampedText({ label, text }: { label: string; text: string }) {
+  const [expanded, setExpanded] = React.useState(false);
+  const isLong = text.length > 140 || text.split("\n").length > 2;
+
+  return (
+    <div>
+      <p className={cn("whitespace-pre-wrap", !expanded && "line-clamp-2")}>
+        <span className="font-medium text-foreground">{label}: </span>
+        {text}
+      </p>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className="text-xs font-medium text-primary hover:underline"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function CatalogueCard<TData extends { id: number; counts?: number }>({
   row,
   label,
+  highlighted,
 }: {
   row: Row<TData>;
   label: string;
+  highlighted?: boolean;
 }) {
   const record = row.original as TData & Record<string, unknown>;
   const getCell = (id: string) => row.getVisibleCells().find((cell) => cell.column.id === id);
@@ -104,277 +139,156 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
     const cell = getCell(id);
     return cell ? flexRender(cell.column.columnDef.cell, cell.getContext()) : null;
   };
-  const has = (key: string) => textValue(record[key]) !== "";
   const mainTitle = textValue(record.title) || textValue(record.cjk_title) || "Untitled entry";
   const cjkTitle = textValue(record.cjk_title);
   const secondaryTitle = textValue(record.title) && cjkTitle ? cjkTitle : "";
   const description = textValue(record.description);
+  const notes = textValue(record.notes);
   const source = textValue(record.data_source);
   const isValidSource = /^https?:\/\//i.test(source);
-  const Icon = label.toLowerCase().includes("audio")
-    ? Clapperboard
-    : label.toLowerCase().includes("journal")
-      ? Newspaper
-      : BookOpen;
-  const isAudioVisualCatalogue = label.toLowerCase().includes("audio");
-  const isEBookCatalogue = label.toLowerCase().includes("e-book");
-  const isEJournalCatalogue = label.toLowerCase().includes("e-journal");
+  const catalogue = label.toLowerCase();
+  const createdBy = getCell("origin_institution") ? textValue(record.origin_institution) : "";
 
-  const metadata = [
-    ["Romanized", textValue(record.romanized_title)],
-    ["Subtitle", textValue(record.subtitle)],
-    ["Series", textValue(record.series) || textValue(record.sub_series_number)],
-    ["Language", textValue(record.language)],
-    ["Type", textValue(record.type)],
-    ["Publisher", textValue(record.publisher)],
-    ["Vendor", textValue(record.vendor)],
-  ].filter(([, value]) => value);
+  const [facts, stats] = catalogue.includes("audio")
+    ? [
+        [
+          ["Romanized", textValue(record.romanized_title)],
+          ["Language", textValue(record.language)],
+          ["Type", textValue(record.type)],
+          ["Publisher", textValue(record.publisher)],
+        ],
+        [["Count", textValue(record.counts)]],
+      ]
+    : catalogue.includes("e-book")
+      ? [
+          [
+            ["Romanized", textValue(record.romanized_title)],
+            ["Series", textValue(record.sub_series_number)],
+            ["Language", textValue(record.language)],
+            ["Publisher", textValue(record.publisher)],
+          ],
+          [
+            ["Titles", textValue(record.counts)],
+            ["Volumes", textValue(record.volumes)],
+            ["Chapters", textValue(record.chapters)],
+          ],
+        ]
+      : catalogue.includes("e-journal")
+        ? [
+            [
+              ["Romanized", textValue(record.romanized_title)],
+              ["Series", textValue(record.series) || textValue(record.sub_series_number)],
+              ["Language", textValue(record.language)],
+              ["Publisher", textValue(record.publisher)],
+              ["Vendor", textValue(record.vendor)],
+            ],
+            [
+              ["Journals", textValue(record.journals)],
+              ["Databases", textValue(record.dbs)],
+            ],
+          ]
+        : [
+            [
+              ["Romanized", textValue(record.romanized_title)],
+              ["Subtitle", textValue(record.subtitle)],
+              ["Series", textValue(record.series) || textValue(record.sub_series_number)],
+              ["Language", textValue(record.language)],
+              ["Type", textValue(record.type)],
+              ["Publisher", textValue(record.publisher)],
+              ["Vendor", textValue(record.vendor)],
+            ],
+            [
+              ["Counts", textValue(record.counts)],
+              ["Volumes", textValue(record.volumes)],
+              ["Chapters", textValue(record.chapters)],
+              ["Journals", textValue(record.journals)],
+              ["Databases", textValue(record.dbs)],
+            ].filter(([, value]) => value),
+          ];
+  const visibleFacts = [...facts, ["Created by", createdBy]].filter(([, value]) => value);
 
-  const statistics = [
-    ["Counts", textValue(record.counts)],
-    ["Volumes", textValue(record.volumes)],
-    ["Chapters", textValue(record.chapters)],
-    ["Journals", textValue(record.journals)],
-    ["Databases", textValue(record.dbs)],
-  ].filter(([, value]) => value);
+  const accessCell = renderCell("user_selection");
+  const actionsCell = renderCell("actions");
+  const adminSelectCell = renderCell("bulk_delete");
 
   return (
     <article
-      className="grid overflow-hidden rounded-lg border bg-card shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[4.5rem_8.5rem_minmax(0,1fr)]"
-      data-state={row.getIsSelected() ? "selected" : undefined}
+      className={cn(
+        "flex overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/25",
+        row.getIsSelected() && adminSelectCell && "border-amber-400 bg-amber-50/30",
+        highlighted && "bg-yellow-50 ring-2 ring-yellow-300"
+      )}
     >
-      <div className="flex flex-col items-center gap-2 border-r bg-muted/60 px-2 py-5 text-sm font-normal text-muted-foreground sm:pt-7">
-        {getCell("user_selection") && (
-          <span
-            title="Select for this institution"
-            className="flex h-8 w-12 items-center justify-center gap-1 rounded-md border bg-background text-muted-foreground"
-          >
-            <Check className="h-3.5 w-3.5" aria-hidden="true" />
-            {renderCell("user_selection")}
-          </span>
-        )}
-        {getCell("bulk_delete") && (
-          <span
-            title="Mark for bulk deletion"
-            className="flex h-8 w-12 items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 text-red-700"
-          >
-            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-            {renderCell("bulk_delete")}
-          </span>
-        )}
-      </div>
-      <div className="hidden items-start justify-center border-r bg-muted/30 p-5 sm:flex">
-        <div className="flex h-20 w-20 items-center justify-center rounded-md border bg-background text-muted-foreground">
-          <Icon className="h-9 w-9" aria-hidden="true" />
+      {accessCell && (
+        <div
+          className="flex w-11 shrink-0 justify-center border-r border-blue-100 bg-blue-50/70 pt-3.5"
+          title="My Access: mark that your institution holds this resource"
+        >
+          {accessCell}
         </div>
-      </div>
-      <div className="min-w-0 p-4 sm:p-5">
-        <div className="flex items-start gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-            <h2 className="text-lg font-semibold leading-snug text-primary sm:text-xl">{mainTitle}</h2>
-            {secondaryTitle && (
-              <p className="mt-1 text-base font-medium leading-snug text-foreground/80 sm:text-lg" lang="zh">
-                {secondaryTitle}
-              </p>
+      )}
+
+      <div className="min-w-0 flex-1 px-4 py-3">
+        <div className="flex flex-wrap items-start gap-x-6 gap-y-2">
+          <div className="min-w-0 flex-1 basis-80">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h2 className="text-base font-semibold leading-snug text-primary">{mainTitle}</h2>
+              {secondaryTitle && (
+                <span className="text-sm font-medium text-foreground/70" lang="zh">{secondaryTitle}</span>
+              )}
+              {renderCell("import_origin")}
+            </div>
+            {(visibleFacts.length > 0 || isValidSource) && (
+              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-sm">
+                {visibleFacts.map(([name, value]) => (
+                  <span key={name} className="min-w-0 break-words">
+                    <span className="text-muted-foreground">{name}</span>{" "}
+                    <span className="font-medium">{value}</span>
+                  </span>
+                ))}
+                {isValidSource && (
+                  <a
+                    href={source}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                  >
+                    Source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
             )}
           </div>
-          <div className="shrink-0">{renderCell("actions")}</div>
+
+          {stats.length > 0 && (
+            <dl className="flex shrink-0 gap-5 text-right">
+              {stats.map(([name, value]) => (
+                <div key={name}>
+                  <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{name}</dt>
+                  <dd className="text-base font-semibold tabular-nums">{value || "—"}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
 
-        {isAudioVisualCatalogue ? (
-          <dl className="mt-4 space-y-4 border-l-2 border-muted pl-4">
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
-              {getCell("import_origin") && (
-                <div className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
-                  <dd className="mt-1">{renderCell("import_origin")}</dd>
-                </div>
-              )}
-              {getCell("origin_institution") && has("origin_institution") && (
-                <div className="min-w-0 xl:col-start-2">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
-                  <dd className="mt-1 font-medium">{renderCell("origin_institution")}</dd>
-                </div>
-              )}
-            </div>
-
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
-              {[
-                ["Romanized Title", textValue(record.romanized_title)],
-                ["Language", textValue(record.language)],
-                ["Type", textValue(record.type)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-
-            {textValue(record.publisher) && (
-              <div className="min-w-0">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Publisher</dt>
-                <dd className="mt-1 break-words font-medium">{textValue(record.publisher)}</dd>
-              </div>
-            )}
-            <div className="min-w-0">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Count</dt>
-              <dd className="mt-1 break-words font-medium">{textValue(record.counts) || "—"}</dd>
-            </div>
-          </dl>
-        ) : isEBookCatalogue ? (
-          <dl className="mt-4 space-y-4 border-l-2 border-muted pl-4">
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
-              {getCell("import_origin") && (
-                <div className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
-                  <dd className="mt-1">{renderCell("import_origin")}</dd>
-                </div>
-              )}
-              {[
-                ["Romanized Title", textValue(record.romanized_title)],
-                ["Series", textValue(record.sub_series_number)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
-              {[
-                ["Publisher", textValue(record.publisher)],
-                ["Language", textValue(record.language)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-              {getCell("origin_institution") && has("origin_institution") && (
-                <div className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
-                  <dd className="mt-1 font-medium">{renderCell("origin_institution")}</dd>
-                </div>
-              )}
-            </div>
-
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
-              {[
-                ["Counts (# titles)", textValue(record.counts)],
-                ["Volumes", textValue(record.volumes)],
-                ["Chapters", textValue(record.chapters)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-          </dl>
-        ) : isEJournalCatalogue ? (
-          <dl className="mt-4 space-y-4 border-l-2 border-muted pl-4">
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
-              {getCell("import_origin") && (
-                <div className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
-                  <dd className="mt-1">{renderCell("import_origin")}</dd>
-                </div>
-              )}
-              {[
-                ["Romanized Title", textValue(record.romanized_title)],
-                ["Language", textValue(record.language)],
-                ["Series", textValue(record.series) || textValue(record.sub_series_number)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                ["Publisher", textValue(record.publisher)],
-                ["Vendor", textValue(record.vendor)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                ["Journals", textValue(record.journals)],
-                ["Databases", textValue(record.dbs)],
-              ].map(([name, value]) => value && (
-                <div key={name} className="min-w-0">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                  <dd className="mt-1 break-words font-medium">{value}</dd>
-                </div>
-              ))}
-            </div>
-          </dl>
-        ) : (
-          <div className="mt-4 grid gap-x-8 gap-y-3 border-l-2 border-muted pl-4 sm:grid-cols-2 xl:grid-cols-3">
-            {getCell("import_origin") && (
-              <div className="min-w-0">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Origin</dt>
-                <dd className="mt-1">{renderCell("import_origin")}</dd>
-              </div>
-            )}
-            {getCell("origin_institution") && has("origin_institution") && (
-              <div className="min-w-0">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by institution</dt>
-                <dd className="mt-1 font-medium">{renderCell("origin_institution")}</dd>
-              </div>
-            )}
-            {statistics.map(([name, value]) => (
-              <div key={name} className="min-w-0">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                <dd className="mt-1 font-medium">{value}</dd>
-              </div>
-            ))}
-            {metadata.map(([name, value]) => (
-              <div key={name} className="min-w-0">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{name}</dt>
-                <dd className="mt-1 break-words font-medium">{value}</dd>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {(description || isValidSource || textValue(record.notes)) && (
-          <div className="mt-4 space-y-3 border-t pt-4 text-sm">
-            {description && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</p>
-                <p className="mt-1 whitespace-pre-wrap text-foreground">{description}</p>
-              </div>
-            )}
-            {isValidSource && (
-              <a
-                href={source}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-              >
-                View source <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-              </a>
-            )}
-            {textValue(record.notes) && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Notes</p>
-                <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{textValue(record.notes)}</p>
-              </div>
-            )}
+        {(description || notes) && (
+          <div className="mt-2 space-y-1 border-t border-dashed pt-2 text-sm text-foreground/80">
+            {description && <ClampedText label="Description" text={description} />}
+            {notes && <ClampedText label="Notes" text={notes} />}
           </div>
         )}
       </div>
+
+      {(actionsCell || adminSelectCell) && (
+        <div
+          className="flex w-11 shrink-0 flex-col items-center gap-2 border-l border-amber-200 bg-amber-50/80 pt-2"
+          title="Admin actions (Super Admin / E-Resource Editor)"
+        >
+          {actionsCell}
+          {adminSelectCell}
+        </div>
+      )}
     </article>
   );
 }
@@ -481,6 +395,19 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     sessionStorage.setItem(`table-displayMode-${tableKey}`, displayMode);
   }, [catalogueCardLabel, displayMode, tableKey]);
 
+  // Admin multi-select is opt-in so the default view stays focused on My Access.
+  const [bulkMode, setBulkMode] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!bulkDelete || typeof window === "undefined") return;
+    setBulkMode(sessionStorage.getItem(`table-bulkMode-${tableKey}`) === "on");
+  }, [bulkDelete, tableKey]);
+
+  React.useEffect(() => {
+    if (!bulkDelete || typeof window === "undefined") return;
+    sessionStorage.setItem(`table-bulkMode-${tableKey}`, bulkMode ? "on" : "off");
+  }, [bulkDelete, bulkMode, tableKey]);
+
   // Save row selection state to sessionStorage whenever it changes
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -515,9 +442,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           onCheckedChange={(value) => table.setRowSelection(
             value ? Object.fromEntries(matchingRows.map((row) => [row.id, true])) : {}
           )}
-          aria-label="Select all matching entries for bulk deletion"
-          title="Select all matching entries for bulk deletion"
-          className="border-red-400 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+          aria-label="Select all matching entries for admin bulk actions"
+          title="Select all matching entries for admin bulk actions"
+          className="border-amber-500 data-[state=checked]:border-amber-600 data-[state=checked]:bg-amber-600"
         />
       );
     },
@@ -525,9 +452,9 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select entry for bulk deletion"
-        title="Select entry for bulk deletion"
-        className="border-red-400 data-[state=checked]:border-red-600 data-[state=checked]:bg-red-600"
+        aria-label="Select entry for admin bulk actions"
+        title="Select entry for admin bulk actions"
+        className="border-amber-500 data-[state=checked]:border-amber-600 data-[state=checked]:bg-amber-600"
       />
     ),
     enableSorting: false,
@@ -535,10 +462,13 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     size: 50,
   }), []);
 
-  const tableColumns = React.useMemo(
-    () => bulkDelete ? [bulkDeleteColumn, ...columns] : columns,
-    [bulkDelete, bulkDeleteColumn, columns]
-  );
+  const tableColumns = React.useMemo(() => {
+    if (!bulkDelete || !bulkMode) return columns;
+    const actionsIndex = columns.findIndex((column) => column.id === "actions");
+    return actionsIndex >= 0
+      ? [...columns.slice(0, actionsIndex), bulkDeleteColumn, ...columns.slice(actionsIndex)]
+      : [bulkDeleteColumn, ...columns];
+  }, [bulkDelete, bulkMode, bulkDeleteColumn, columns]);
 
   const table = useReactTable({
     data,
@@ -632,35 +562,57 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     }
   };
 
+  const exitBulkMode = () => {
+    table.resetRowSelection();
+    setBulkMode(false);
+  };
+
+  const hasAccessZone = tableColumns.some((column) => column.id === "user_selection");
+  const hasAdminZone = !!bulkDelete || tableColumns.some((column) => column.id === "actions");
+
   const tableControls = (
     <>
       {Toolbar && <Toolbar table={table} />}
-      {bulkDelete && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50/60 px-3 py-2">
-          <p className="text-sm text-red-950">
-            <span className="font-semibold">Delete selection:</span> {selectedBulkIds.length} selected
+      {bulkDelete && bulkMode && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2">
+          <p className="flex items-center gap-2 text-sm text-amber-950">
+            <ShieldCheck className="h-4 w-4 text-amber-700" aria-hidden="true" />
+            <span className="font-semibold">Admin bulk manage:</span> {selectedBulkIds.length} selected
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="border-red-200 bg-white hover:bg-red-100"
+              className="h-8 border-amber-300 bg-white hover:bg-amber-100"
               disabled={matchingBulkRows.length === 0 || isBulkDeleting}
               onClick={toggleAllMatchingBulkRows}
             >
               {allMatchingRowsSelected
-                ? "Clear delete selection"
+                ? "Clear selection"
                 : `Select all ${matchingBulkRows.length} matching`}
             </Button>
             <Button
               type="button"
               variant="destructive"
               size="sm"
+              className="h-8"
               disabled={selectedBulkIds.length === 0 || isBulkDeleting}
               onClick={handleBulkDelete}
             >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
               {isBulkDeleting ? "Deleting…" : `Delete selected (${selectedBulkIds.length})`}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 text-amber-900 hover:bg-amber-100"
+              onClick={exitBulkMode}
+              disabled={isBulkDeleting}
+            >
+              <X className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
+              Done
             </Button>
           </div>
         </div>
@@ -669,51 +621,86 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {stickyControls ? (
         <div className="sticky top-[5.25rem] z-30 -mx-2 space-y-2 border-y bg-white/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
           {tableControls}
         </div>
       ) : tableControls}
-      {catalogueCardLabel && (
-        <div className="flex justify-end" aria-label="Display mode">
-          <div className="inline-flex items-center rounded-md border bg-muted/40 p-1 shadow-sm">
-          <Button
-            type="button"
-            variant={displayMode === "cards" ? "secondary" : "ghost"}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setDisplayMode("cards")}
-            aria-pressed={displayMode === "cards"}
-            aria-label="List view"
-            title="List view"
-          >
-            <List className="h-4 w-4" aria-hidden="true" />
-          </Button>
-          <Button
-            type="button"
-            variant={displayMode === "table" ? "secondary" : "ghost"}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setDisplayMode("table")}
-            aria-pressed={displayMode === "table"}
-            aria-label="Table view"
-            title="Table view"
-          >
-            <Table2 className="h-4 w-4" aria-hidden="true" />
-          </Button>
+      {(catalogueCardLabel || bulkDelete) && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+            <span className="text-sm font-medium text-foreground">
+              {table.getFilteredRowModel().rows.length} entries
+            </span>
+            {hasAccessZone && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-sm border border-blue-200 bg-blue-100" aria-hidden="true" />
+                My Access (your institution)
+              </span>
+            )}
+            {hasAdminZone && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-sm border border-amber-300 bg-amber-100" aria-hidden="true" />
+                Admin actions
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {bulkDelete && !bulkMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                onClick={() => setBulkMode(true)}
+                title="Select several entries to delete or copy them"
+              >
+                <ShieldCheck className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                Bulk manage
+              </Button>
+            )}
+            {catalogueCardLabel && (
+              <div className="inline-flex items-center rounded-md border bg-muted/40 p-0.5" aria-label="Display mode">
+                <Button
+                  type="button"
+                  variant={displayMode === "cards" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setDisplayMode("cards")}
+                  aria-pressed={displayMode === "cards"}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  <List className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                <Button
+                  type="button"
+                  variant={displayMode === "table" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setDisplayMode("table")}
+                  aria-pressed={displayMode === "table"}
+                  aria-label="Table view"
+                  title="Table view"
+                >
+                  <Table2 className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {displayMode === "cards" && catalogueCardLabel ? (
-        <div className="space-y-4" suppressHydrationWarning>
+        <div className="space-y-2" suppressHydrationWarning>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <CatalogueCard
                 key={row.id}
                 row={row}
                 label={catalogueCardLabel}
+                highlighted={!!highlightRowId && row.original.id === highlightRowId}
               />
             ))
           ) : (
@@ -730,7 +717,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} colSpan={header.colSpan} className={stickyHeader ? "bg-background" : undefined}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={cn(stickyHeader && "bg-background", zoneClass(header.column.id))}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -753,7 +744,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
                       className={isHighlighted ? "bg-yellow-50 animate-pulse" : ""}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className={zoneClass(cell.column.id)}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
@@ -771,7 +762,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           </Table>
         </div>
       )}
-      <DataTablePagination table={table} userRoles={userRoles} />
+      <DataTablePagination
+        table={table}
+        userRoles={userRoles}
+        showSelectionSummary={!catalogueCardLabel || bulkMode}
+      />
     </div>
   );
 }

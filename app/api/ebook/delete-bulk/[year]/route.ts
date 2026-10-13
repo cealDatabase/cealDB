@@ -6,7 +6,7 @@ export async function POST(
   request: Request,
   context: { params: Promise<{ year: string }> }
 ) {
-  if (!(await requireRoles(1, 3, 4))) {
+  if (!(await requireRoles(1, 3))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

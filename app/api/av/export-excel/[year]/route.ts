@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
-import { getSessionRoleIds } from '@/lib/auth';
+import { canAccessLibrary, getSessionRoleIds, getSessionUserId } from '@/lib/auth';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 
@@ -14,9 +14,8 @@ interface UserContext {
 
 async function getUserContext(): Promise<UserContext> {
   const cookieStore = await cookies();
-  const rawEmail = cookieStore.get('uinf')?.value;
   const observeLibrary = cookieStore.get('observe_library')?.value;
-  const userEmail = rawEmail ? decodeURIComponent(rawEmail).toLowerCase() : undefined;
+  const userId = await getSessionUserId();
 
   let viewingLibraryId: number | null = null;
   let libraryName = '';
@@ -24,13 +23,13 @@ async function getUserContext(): Promise<UserContext> {
   // Super-admin impersonation: observe_library takes precedence
   if (observeLibrary) {
     const observed = parseInt(observeLibrary);
-    if (!isNaN(observed)) viewingLibraryId = observed;
+    if (!isNaN(observed) && await canAccessLibrary(observed)) viewingLibraryId = observed;
   }
 
   // Otherwise fall back to the user's home library
-  if (!viewingLibraryId && userEmail) {
-    const user = await prisma.user.findFirst({
-      where: { username: { equals: userEmail, mode: 'insensitive' } },
+  if (!viewingLibraryId && userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
       include: { User_Library: true }
     });
     if (user?.User_Library && user.User_Library.length > 0) {
@@ -51,10 +50,7 @@ export async function GET(
   { params }: { params: Promise<{ year: string }> }
 ) {
   try {
-    const cookieStore = await cookies();
-    const userEmail = cookieStore.get('uinf')?.value;
-
-    if (!userEmail) {
+    if (!(await getSessionUserId())) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
         { status: 401 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db from '@/lib/db';
-import { verifyJWTToken } from '@/lib/auth';
+import { requireRoles, verifyJWTToken } from '@/lib/auth';
 import { logAuditEvent } from '@/lib/auditLogger';
 
 const prisma = db;
@@ -15,6 +15,11 @@ export async function GET(
     const sessionToken = cookieStore.get('session')?.value;
     if (!sessionToken || !verifyJWTToken(sessionToken)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    // Returns every institution's local entries, so it is limited to the
+    // roles that may review all institutions.
+    if (!(await requireRoles(1, 3))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { year } = await context.params;

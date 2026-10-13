@@ -7,10 +7,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import EditEBModal from "../edit-eb-modal";
 
@@ -61,11 +63,15 @@ export function DataTableRowActions({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='h-8 w-8 p-0'>
+          <Button variant='ghost' className='h-8 w-8 p-0 text-amber-800 hover:bg-amber-100 hover:text-amber-900' aria-label='Admin actions' title='Admin actions'>
             <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='bg-white'>
+          <DropdownMenuLabel className='flex items-center gap-1.5 text-xs font-semibold text-amber-800'>
+            <ShieldCheck className='h-3.5 w-3.5' aria-hidden='true' /> Admin actions
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setOpenEdit(true)}
             className='hover:bg-blue-100/30'
@@ -73,6 +79,7 @@ export function DataTableRowActions({
             Edit
           </DropdownMenuItem>
           {canPromote && <DropdownMenuItem onClick={handlePromote} className='hover:bg-violet-100/30'>Promote to Global</DropdownMenuItem>}
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleDelete}
             className='hover:bg-red-100/30 text-red-600'

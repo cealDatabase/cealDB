@@ -30,7 +30,7 @@ export default function AVDataTableClient({
 }) {
   // Survey gating: only super admin (role 1) can edit when survey is closed.
   const isSuperAdmin = (userRoles ?? []).includes("1");
-  const canBulkDelete = (userRoles ?? []).some((role) => ["1", "3", "4"].includes(role));
+  const canBulkDelete = (userRoles ?? []).some((role) => ["1", "3"].includes(role));
   const canEdit = isOpenForEditing || isSuperAdmin;
   const showSuperAdminWarning = !isOpenForEditing && isSuperAdmin && !!libid;
   const router = useRouter();
@@ -180,8 +180,8 @@ export default function AVDataTableClient({
 
   // Get columns with callbacks
   const columns = useMemo(
-    () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit),
-    [year, roleIdPassIn, handleSelectionChange, selectionData, canEdit]
+    () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, !!libid),
+    [year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, libid]
   );
 
   // Clean up URL and remove highlight after 3 seconds
@@ -220,6 +220,7 @@ export default function AVDataTableClient({
           .filter(([, selection]) => selection.is_selected)
           .map(([id]) => id)}
         onSetAllAccess={handleAllAccessSelection}
+        canEdit={canEdit}
       />
       {showSuperAdminWarning && (
         <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">

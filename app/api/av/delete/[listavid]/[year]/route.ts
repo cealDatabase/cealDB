@@ -7,10 +7,10 @@ export async function DELETE(
   context: { params: Promise<{ listavid: string, year: string }> }
 ) {
   // Mutates the shared, cross-institution catalog record, so this is limited to
-  // Super Admin / E-Resource Editor / Assistant Admin — matching the
+  // Super Admin / E-Resource Editor — matching the
   // /admin/survey/* pages this is called from. hasValidSession() only proved
   // the caller was logged in, which let any member edit the global catalog.
-  if (!(await requireRoles(1, 3, 4))) {
+  if (!(await requireRoles(1, 3))) {
     return NextResponse.json(
       { error: "Unauthorized: E-Resource Editor or Super Admin access required" },
       { status: 403 }

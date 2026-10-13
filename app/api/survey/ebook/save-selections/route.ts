@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logUserAction } from "@/lib/auditLogger";
-import { getSessionRoleIds } from "@/lib/auth";
+import { canAccessLibrary, getSessionRoleIds } from "@/lib/auth";
 
 interface EBookSelection {
   listId: number;
@@ -26,6 +26,12 @@ export async function POST(req: Request) {
         { error: "Missing required fields: year, libraryId, selections" },
         { status: 400 }
       );
+    }
+
+    // Requires a signed-in session. Members may only change their own
+    // institution's selections; cross-library roles may change any.
+    if (!(await canAccessLibrary(Number(libraryId)))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Get Library_Year record

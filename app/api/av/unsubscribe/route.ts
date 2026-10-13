@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
+import { canWriteLibraryYear } from "@/lib/libraryYearHelper";
 
 export async function POST(req: Request) {
   try {
@@ -71,6 +72,14 @@ export async function POST(req: Request) {
           detail: `No Library_Year record exists for library ${libid} and year ${year}.` 
         },
         { status: 404 }
+      );
+    }
+
+    // Members can change My Access only while their library-year is open.
+    if (!(await canWriteLibraryYear(libraryYearRecord))) {
+      return NextResponse.json(
+        { error: "Survey is closed. My Access cannot be changed for this year." },
+        { status: 403 }
       );
     }
 

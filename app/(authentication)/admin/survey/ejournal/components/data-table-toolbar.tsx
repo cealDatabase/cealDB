@@ -18,6 +18,7 @@ interface DataTableToolbarProps<TData> {
   roleId?: string;
   accessSelectedIds?: number[];
   onSetAllAccess?: (ids: number[], selected: boolean) => void;
+  canEdit?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -27,6 +28,7 @@ export function DataTableToolbar<TData>({
   roleId,
   accessSelectedIds = [],
   onSetAllAccess,
+  canEdit = true,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -208,7 +210,7 @@ export function DataTableToolbar<TData>({
             onClick={handleImportPreviousYear}
             variant="outline"
             size="sm"
-            className='h-8 border-blue-300 bg-blue-50 hover:bg-blue-100'
+            className='h-8 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
             disabled={isImporting}
             title={`Import ${year - 1} catalogue entries`}
           >
@@ -234,13 +236,13 @@ export function DataTableToolbar<TData>({
       </Button>
 
         {/* Action visible only to Super Admin (not role 2) */}
-        {!isMemberUser && (
+        {!isMemberUser && !!libid && (
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => onSetAllAccess?.(matchingAccessIds, !allMatchingAccessSelected)}
-            disabled={!onSetAllAccess || matchingAccessIds.length === 0}
+            disabled={!canEdit || !onSetAllAccess || matchingAccessIds.length === 0}
             className='h-8 border-blue-200 bg-blue-50 hover:bg-blue-100'
           >
             {allMatchingAccessSelected
@@ -248,11 +250,11 @@ export function DataTableToolbar<TData>({
               : `Select all ${matchingAccessIds.length} for My Access`}
           </Button>
         )}
-        {!isMemberUser && (
+        {!isMemberUser && !!libid && (
           <Button
             onClick={handleDirectSubscribe}
-            disabled={selectedIds.length === 0 || isSubscribing}
-            className='h-8'
+            disabled={!canEdit || selectedIds.length === 0 || isSubscribing}
+            className='h-8 bg-blue-600 text-white hover:bg-blue-700'
             title={
               selectedIds.length === 0
                 ? "Select at least one row"

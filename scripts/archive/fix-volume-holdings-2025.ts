@@ -25,7 +25,7 @@ const prisma = new PrismaClient({ adapter });
  */
 
 interface UpdateResult {
-  libraryId: number;
+  libraryId: number | null;
   libraryName: string;
   libraryYearId: number;
   previousEbooksTotal: number | null;

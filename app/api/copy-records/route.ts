@@ -4,7 +4,7 @@ import db from "@/lib/db";
 import { ResourceType, CopyRecord, RESOURCE_TYPES } from "@/lib/copyRecords";
 import { logUserAction } from "@/lib/auditLogger";
 import { fixSequenceForTable } from "@/lib/sequenceFixer";
-import { verifyJWTToken } from "@/lib/auth";
+import { requireRoles, verifyJWTToken } from "@/lib/auth";
 
 // POST /api/copy-records
 // Expects JSON body: { resource: "av"|"ebook"|"ejournal", targetYear: number, records: Array<{id:number, counts:number}> }
@@ -18,6 +18,9 @@ export async function POST(request: Request) {
     const sessionToken = cookieStore.get("session")?.value;
     if (!sessionToken || !verifyJWTToken(sessionToken)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await requireRoles(1, 3))) {
+      return NextResponse.json({ error: "Only Super Admin or E-Resource Editor can copy records" }, { status: 403 });
     }
 
     // Parse and type-check the request

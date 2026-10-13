@@ -37,6 +37,7 @@ export async function copyRecords(
   resource: ResourceType,
   targetYear: number,
   records: CopyRecord[],
+  cookieHeader?: string,
 ): Promise<CopyRecordsResult> {
   // Validate input
   if (!Array.isArray(records) || records.length === 0) return { processed: 0 };
@@ -56,7 +57,7 @@ export async function copyRecords(
     ) : "";
     const resp = await fetch(`${baseUrl}/api/copy-records`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(cookieHeader ? { cookie: cookieHeader } : {}) },
       body: JSON.stringify({ resource, targetYear, records }),
     });
     

@@ -26,9 +26,11 @@ import { getActiveSurveyYear } from '@/lib/currentSurveyYear';
 const PREVIEW_ROLES = [1, 3, 4];
 
 /**
- * - `legacy`  no SurveySession row at all. Years collected before this table
- *             existed look like this, so they must stay fully visible.
- * - `pending` scheduled, window has not started. Hidden from members.
+ * - `legacy`  no SurveySession row, and the year predates the first session.
+ *             Years collected before this table existed look like this, so
+ *             they must stay fully visible.
+ * - `pending` scheduled, window has not started — or a later year that has
+ *             no session yet (not scheduled). Hidden from members.
  * - `open`    currently collecting.
  * - `closed`  window has finished.
  */
@@ -41,8 +43,15 @@ type SessionRow = {
   closingDate: Date;
 };
 
-function stateOf(session: SessionRow | null, now: Date): SurveyYearState {
-  if (!session) return 'legacy';
+function stateOf(
+  session: SessionRow | null,
+  now: Date,
+  year: number,
+  firstSessionYear: number | null
+): SurveyYearState {
+  if (!session) {
+    return firstSessionYear !== null && year > firstSessionYear ? 'pending' : 'legacy';
+  }
 
   // `isOpen` is the live status, not the schedule: the cron job flips it on
   // the scheduled dates, and the super admin's "open or close right now"
@@ -64,7 +73,10 @@ export async function getSurveyYearState(year: number): Promise<SurveyYearState>
     where: { academicYear: year },
     select: { academicYear: true, isOpen: true, openingDate: true, closingDate: true },
   });
-  return stateOf(session, new Date());
+  const first = session
+    ? null
+    : await db.surveySession.findFirst({ orderBy: { academicYear: 'asc' }, select: { academicYear: true } });
+  return stateOf(session, new Date(), year, first?.academicYear ?? null);
 }
 
 /** True when the caller holds a role that may preview an unopened year. */
@@ -107,10 +119,11 @@ export async function filterParticipationYears(years: number[]): Promise<number[
     select: { academicYear: true, isOpen: true, openingDate: true, closingDate: true },
   });
   const byYear = new Map(sessions.map((s) => [s.academicYear, s]));
+  const first = await db.surveySession.findFirst({ orderBy: { academicYear: 'asc' }, select: { academicYear: true } });
 
   const now = new Date();
   return years.filter((y) => {
-    const state = stateOf(byYear.get(y) ?? null, now);
+    const state = stateOf(byYear.get(y) ?? null, now, y, first?.academicYear ?? null);
     return state === 'legacy' || state === 'closed';
   });
 }

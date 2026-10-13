@@ -223,7 +223,8 @@ export function getColumns(
   roleIdPassIn?: string,
   onSelectionChange?: (id: number, selected: boolean) => void,
   selectionData?: Map<number, { is_selected: boolean; custom_count: number | null }>,
-  canEdit: boolean = true
+  canEdit: boolean = true,
+  showAccessSelection: boolean = true
 ): ColumnDef<listEBook | listEBookWithSelection>[] {
   // Parse role cookie (can be JSON array or single value)
   let userRoles: string[] = [];
@@ -244,12 +245,12 @@ export function getColumns(
     return { is_selected: false, custom_count: null };
   };
 
-  // Hide Actions column ONLY for users who have ONLY role 2 or ONLY role 4 (no other roles)
-  // Show Actions for admins, super admins, or users with multiple roles
-  const shouldShowActions = !(userRoles.length === 1 && (userRoles[0] === "2" || userRoles[0] === "4"));
+  // Admin actions (Edit / Promote / Delete) are limited to Super Admin and E-Resource Editor,
+  // matching the role checks on the update/delete APIs.
+  const shouldShowActions = userRoles.some((role) => role === "1" || role === "3");
   const isSuperAdmin = userRoles.includes("1");
 
-  return [
+  const allColumns: ColumnDef<listEBook | listEBookWithSelection>[] = [
     // User selection checkbox column (new)
     {
       id: "user_selection",
@@ -551,4 +552,8 @@ export function getColumns(
         ] as ColumnDef<EBookRow>[])
       : []),
   ];
+
+  return showAccessSelection
+    ? allColumns
+    : allColumns.filter((column) => column.id !== "user_selection");
 }

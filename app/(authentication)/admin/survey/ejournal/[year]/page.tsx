@@ -9,7 +9,10 @@ import SkeletonTableCard from "@/components/SkeletonTableCard";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
 import { InstitutionSwitcher } from "@/components/InstitutionSwitcher";
 import { FallbackYearBanner } from "@/components/FallbackYearBanner";
+import { SurveyNotOpenNotice } from "@/components/SurveyNotOpenNotice";
 import db from "@/lib/db";
+import { canAccessLibrary, getSessionRoleIds } from "@/lib/auth";
+import { canViewSurveyYearLists } from "@/lib/surveyVisibility";
 
 async function EJournalSinglePage(
     yearPassIn: number,
@@ -19,7 +22,7 @@ async function EJournalSinglePage(
     initialSearch?: string,
     newRecordId?: number
 ) {
-  const canReviewAllInstitutions = (userRoles ?? []).some((role) => ["1", "3"].includes(role));
+  const canReviewAllInstitutions = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
   // Non-review roles must have an institution context. This prevents a direct
   // URL without libid from exposing other institutions' current local entries.
   const tasks = libid
@@ -68,21 +71,16 @@ export default async function EJournalListPage(
         redirect('/signin');
     }
 
-    // Restrict to Super Admin (1), Assistant Admin (4), E-Resource Editor (3)
-    let parsedRoles: string[] = [];
-    if (roleId) {
-        try {
-            parsedRoles = roleId.startsWith('[') ? JSON.parse(roleId) : [roleId];
-        } catch {
-            parsedRoles = [roleId];
-        }
-    }
-    if (!parsedRoles.some((r) => ['1', '3', '4'].includes(r))) {
+    // Super Admin (1), Member Institution (2), E-Resource Editor (3), Assistant Admin (4).
+    // Checked against the signed session, not the editable role cookie.
+    const sessionRoleIds = await getSessionRoleIds();
+    if (!sessionRoleIds.some((r) => [1, 2, 3, 4].includes(r))) {
         redirect('/unauthorized');
     }
 
     // Resolve effective libid for impersonation support.
     // Priority: observe_library cookie (super admin impersonating) > ?libid= query > home library cookie.
+    // Members only ever resolve to a library they are assigned to.
     const libidFromQuery = sp.libid ? Number(sp.libid) : undefined;
     const observeLibrary = cookieStore.get("observe_library")?.value;
     const libidFromObserve = observeLibrary && !isNaN(Number(observeLibrary))
@@ -92,7 +90,14 @@ export default async function EJournalListPage(
         ? Number(cookieStore.get("library")!.value)
         : undefined;
 
-    const libid = libidFromObserve ?? libidFromQuery ?? libidFromCookie;
+    let libid: number | undefined;
+    for (const candidate of [libidFromObserve, libidFromQuery, libidFromCookie]) {
+        if (candidate !== undefined && await canAccessLibrary(candidate)) {
+            libid = candidate;
+            break;
+        }
+    }
+    const isListVisible = await canViewSurveyYearLists(Number(params.year));
     
     // Get search parameter from URL (for highlighting newly created/edited records)
     const initialSearch = sp.search ? decodeURIComponent(sp.search) : undefined;
@@ -130,9 +135,13 @@ export default async function EJournalListPage(
                         </p>
                     </div>
                     <SelectYear yearCurrent={params.year} />
-                    <Suspense fallback={<SkeletonTableCard />}>
-                        {await EJournalSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch, newRecordId)}
-                    </Suspense>
+                    {isListVisible ? (
+                        <Suspense fallback={<SkeletonTableCard />}>
+                            {await EJournalSinglePage(Number(params.year), roleId, libid, userRoles, initialSearch, newRecordId)}
+                        </Suspense>
+                    ) : (
+                        <SurveyNotOpenNotice year={Number(params.year)} />
+                    )}
                 </div>
             </Container>
         </main>

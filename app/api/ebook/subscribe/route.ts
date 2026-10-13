@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { canAccessLibrary } from "@/lib/auth";
+import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
 export async function POST(req: Request) {
   try {
@@ -76,43 +77,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find or create the Library_Year record for this library and year
-    console.log(`Looking for Library_Year record with library: ${libid}, year: ${year}`);
-    
-    let libraryYearRecord = await db.library_Year.findFirst({
-      where: {
-        library: Number(libid),
-        year: Number(year),
-      },
-    });
-
-    if (!libraryYearRecord) {
-      // Try to create the Library_Year record if it doesn't exist
-      console.log(`Creating Library_Year record for library ${libid} and year ${year}`);
-      
-      try {
-        libraryYearRecord = await db.library_Year.create({
-          data: {
-            library: Number(libid),
-            year: Number(year),
-            updated_at: new Date(),
-            is_open_for_editing: true,
-            is_active: true,
-          },
-        });
-        
-        console.log("Created new Library_Year record:", libraryYearRecord);
-        
-      } catch (createError) {
-        console.error("Failed to create Library_Year record:", createError);
-        return NextResponse.json(
-          { 
-            error: "Library year record not found and could not be created", 
-            detail: `No Library_Year record exists for library ${libid} and year ${year}, and failed to create one: ${createError instanceof Error ? createError.message : "Unknown error"}` 
-          },
-          { status: 404 }
-        );
-      }
+    // Members can change My Access only while their library-year is open.
+    const libraryYearRecord = await findOrCreateLibraryYear(Number(libid), Number(year));
+    if (!(await canWriteLibraryYear(libraryYearRecord))) {
+      return NextResponse.json(
+        { error: "Survey is closed. My Access cannot be changed for this year." },
+        { status: 403 }
+      );
     }
 
     // Create subscription entries using LibraryYear_ListEBook junction table

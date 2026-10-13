@@ -1,6 +1,8 @@
 'use server';
 
+import { cookies } from "next/headers";
 import { copyRecords, ResourceType, CopyRecord, CopyRecordsResult } from "@/lib/copyRecords";
+import { requireRoles } from "@/lib/auth";
 
 /**
  * Server Action: copyCounts
@@ -13,6 +15,11 @@ export async function copyCounts(
   targetYear: number,
   records: CopyRecord[],
 ): Promise<CopyRecordsResult> {
+  // Server actions are publicly callable, so authorize here as well as in the UI.
+  if (!(await requireRoles(1, 3))) {
+    throw new Error("Unauthorized: only Super Admin or E-Resource Editor can copy records");
+  }
+
   // Basic argument validation
   if (!Array.isArray(records) || typeof targetYear !== "number") {
     throw new Error("Invalid payload for copyCounts");
@@ -23,7 +30,8 @@ export async function copyCounts(
   }
   
   try {
-    const result = await copyRecords(resource, targetYear, records);
+    // The API route checks the session, so forward the caller's cookies.
+    const result = await copyRecords(resource, targetYear, records, (await cookies()).toString());
     return result;
   } catch (error: any) {
     // Re-throw with preserved error message for frontend handling
