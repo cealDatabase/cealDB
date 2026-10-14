@@ -138,39 +138,37 @@ export default function EditEbookModal({
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
+          {/* Titles first, then subtitle and sub-series, then publisher;
+              the data source follows the description it supports. */}
           {(
             [
-              ["Title", "title"],
-              ["Subtitle", "subtitle"],
-              ["CJK Title", "cjk_title"],
-              ["Romanized Title", "romanized_title"],
-              ["Publisher", "publisher"],
-              ["Data Source", "data_source"],
-              ["Sub-series Number", "sub_series_number"],
+              ["Title", "title", "input"],
+              ["CJK Title", "cjk_title", "input"],
+              ["Romanized Title", "romanized_title", "input"],
+              ["Subtitle", "subtitle", "input"],
+              ["Sub-series Number", "sub_series_number", "input"],
+              ["Publisher", "publisher", "input"],
+              ["Description", "description", "textarea"],
+              ["Data Source", "data_source", "input"],
+              ["Notes", "notes", "textarea"],
             ] as const
-          ).map(([label, key]) => (
+          ).map(([label, key, kind]) => (
             <div key={key}>
               <Label className='text-sm'>{label}</Label>
-              <Input
-                value={(form as any)[key]}
-                onChange={(e) => set(key, e.target.value)}
-              />
-            </div>
-          ))}
-
-          {(["Description", "Notes"] as const).map((lbl) => {
-            const k = lbl.toLowerCase() as "description" | "notes";
-            return (
-              <div key={k}>
-                <Label className='text-sm'>{lbl}</Label>
+              {kind === "textarea" ? (
                 <textarea
                   className='w-full border rounded px-2 py-1 min-h-[80px] resize-y'
-                  value={(form as any)[k]}
-                  onChange={(e) => set(k, e.target.value)}
+                  value={(form as any)[key]}
+                  onChange={(e) => set(key, e.target.value)}
                 />
-              </div>
-            );
-          })}
+              ) : (
+                <Input
+                  value={(form as any)[key]}
+                  onChange={(e) => set(key, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
 
           <div className='grid sm:grid-cols-3 gap-4'>
             {(
