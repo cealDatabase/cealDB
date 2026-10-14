@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import db from '@/lib/db';
 import { Resend } from 'resend';
 import { 
@@ -14,6 +15,28 @@ import { logUserAction } from '@/lib/auditLogger';
 import { formatDateRange } from '@/lib/dateFormatting';
 
 const prisma = db;
+
+/**
+ * When CRON_SECRET is set, Vercel sends `Authorization: Bearer <CRON_SECRET>`
+ * with every scheduled run (https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs),
+ * so that is the only thing accepted. This used to accept any request that
+ * carried an `x-vercel-cron` header - which anyone can send - and, with the
+ * secret unset, the literal "Bearer undefined".
+ *
+ * Without CRON_SECRET there is nothing to check against. Rather than stop
+ * forms opening and closing on schedule, the old header check stays as a
+ * fallback and every run logs that the secret is missing.
+ */
+function isAuthorizedCronRequest(request: NextRequest): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.error('⚠️ CRON_SECRET is not set: anyone can trigger this job. Set it in Vercel → Settings → Environment Variables.');
+    return request.headers.get('x-vercel-cron') !== null;
+  }
+  const given = Buffer.from(request.headers.get('authorization') ?? '');
+  const expected = Buffer.from(`Bearer ${secret}`);
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
 
 // Sending to every member goes out in batches with retries (lib/email.ts).
 // Give the job room to finish and record the outcome even when Resend is
@@ -86,23 +109,10 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   console.log('🕐 Cron job started:', new Date().toISOString());
 
-  // Verify this is a legitimate cron request from Vercel
-  // Vercel automatically adds the 'x-vercel-cron' header to cron requests
-  // See: https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs
-  if (process.env.NODE_ENV === 'production') {
-    const cronHeader = request.headers.get('x-vercel-cron');
-    const authHeader = request.headers.get('authorization');
-    
-    // Accept either Vercel's x-vercel-cron header OR manual Bearer token
-    const isVercelCron = cronHeader !== null;
-    const isAuthorizedManual = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-    
-    if (!isVercelCron && !isAuthorizedManual) {
-      console.error('❌ Unauthorized cron request - missing x-vercel-cron header or valid Bearer token');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    console.log('✅ Authorized cron request:', isVercelCron ? 'Vercel Cron' : 'Manual Bearer Token');
+  // Only Vercel's scheduler (or someone holding CRON_SECRET) may run this.
+  if (process.env.NODE_ENV === 'production' && !isAuthorizedCronRequest(request)) {
+    console.error('❌ Unauthorized cron request');
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const now = new Date();
