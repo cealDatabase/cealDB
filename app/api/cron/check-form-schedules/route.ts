@@ -4,7 +4,8 @@ import { Resend } from 'resend';
 import { 
   sendFormsOpenedNotification, 
   sendFormsClosedNotification,
-  sendAdminFormsClosedNotification
+  sendAdminFormsClosedNotification,
+  type NotificationResult,
 } from '@/lib/email';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
 import { getSurveyDates } from '@/lib/surveyDates';
@@ -14,9 +15,28 @@ import { formatDateRange } from '@/lib/dateFormatting';
 
 const prisma = db;
 
+// Sending to every member goes out in batches with retries (lib/email.ts).
+// Give the job room to finish and record the outcome even when Resend is
+// slow; 60s is the most every Vercel plan allows.
+export const maxDuration = 60;
+
+/**
+ * Summary of a notification for the cron response and the audit log, or null
+ * when every email went out. The audit log lists the addresses that failed,
+ * so a super admin can follow up with them.
+ */
+function describeEmailFailures(what: string, result: NotificationResult) {
+  if (result.failed.length === 0) return null;
+  const reasons = [...new Set(result.failed.map((f) => f.reason))].join('; ');
+  return {
+    message: `${result.failed.length} of ${result.attempted} ${what} emails were not accepted by Resend: ${reasons}`,
+    failedRecipients: result.failed.slice(0, 100),
+  };
+}
+
 /**
  * Vercel Cron Job Handler - Automated Email & Form Status Management
- * Runs twice daily (8:00 AM and 8:00 PM UTC) to manage scheduled events
+ * Runs twice daily (04:00 and 08:00 UTC, see vercel.json) to manage scheduled events
  * 
  * ═══════════════════════════════════════════════════════════════
  * EMAIL TYPES & DUPLICATE PREVENTION
@@ -279,14 +299,18 @@ export async function GET(request: NextRequest) {
 
         console.log(`📧 Sending notifications to ${userEmails.length} users`);
 
-        // Send notifications to all users
-        await sendFormsOpenedNotification({
+        // Send notifications to all users. A failed email does not stop the
+        // forms from opening; it is reported below and in the audit log.
+        const userEmailResult = await sendFormsOpenedNotification({
           academicYear: session.academicYear,
           openingDate: session.openingDate,
           closingDate: session.closingDate,
           recipientEmails: userEmails
         });
-        console.log(`✅ Sent form opening notification to ${userEmails.length} users`);
+        const userEmailFailures = describeEmailFailures('"forms open"', userEmailResult);
+        if (userEmailFailures) {
+          results.errors.push(`Year ${session.academicYear} opened, but ${userEmailFailures.message}`);
+        }
         console.log(`ℹ️  Super admin notifications NOT sent (only sent when forms close)`);
 
         // CRITICAL: Mark session as notified - prevents duplicate notifications
@@ -309,11 +333,13 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesOpened: updateResult.count,
             openingDate: session.openingDate.toISOString(),
-            userEmailsSent: userEmails.length,
+            userEmailsAttempted: userEmailResult.attempted,
+            userEmailsSent: userEmailResult.sent,
+            ...(userEmailFailures ? { userEmailsFailed: userEmailFailures.failedRecipients } : {}),
             adminEmailsSent: 0
           },
-          true,
-          undefined,
+          !userEmailFailures,
+          userEmailFailures ? `Forms opened, but ${userEmailFailures.message}` : undefined,
           request
         );
 
@@ -467,7 +493,7 @@ export async function GET(request: NextRequest) {
         // IMPORTANT: Send super admin notification AFTER verification that all forms are closed
         // Users are NOT notified when forms close (only when forms open)
         console.log(`📧 Sending VERIFIED closure confirmation to ${adminEmails.length} super admins...`);
-        await sendAdminFormsClosedNotification(
+        const adminEmailResult = await sendAdminFormsClosedNotification(
           adminEmails,
           session.academicYear,
           {
@@ -475,7 +501,10 @@ export async function GET(request: NextRequest) {
             totalLibraries: totalLibraries
           }
         );
-        console.log(`✅ Super admin confirmation email sent successfully (ONE-TIME notification)`);
+        const adminEmailFailures = describeEmailFailures('"forms closed" admin', adminEmailResult);
+        if (adminEmailFailures) {
+          results.errors.push(`Year ${session.academicYear} closed, but ${adminEmailFailures.message}`);
+        }
 
         // CRITICAL: Mark session as notified - prevents duplicate notifications
         await prisma.surveySession.update({
@@ -497,11 +526,12 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesClosed: updateResult.count,
             closingDate: session.closingDate.toISOString(),
-            emailsSent: adminEmails.length, // Only super admins notified on close
+            emailsSent: adminEmailResult.sent, // Only super admins notified on close
+            ...(adminEmailFailures ? { emailsFailed: adminEmailFailures.failedRecipients } : {}),
             usersNotified: false
           },
-          true,
-          undefined,
+          !adminEmailFailures,
+          adminEmailFailures ? `Forms closed, but ${adminEmailFailures.message}` : undefined,
           request
         );
 

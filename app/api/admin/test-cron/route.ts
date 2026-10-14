@@ -128,14 +128,16 @@ export async function POST(request: NextRequest) {
 
       // Send notifications to users
       try {
-        await sendFormsOpenedNotification({
+        const openingUserEmails = await sendFormsOpenedNotification({
           academicYear: year,
           openingDate,
           closingDate,
           recipientEmails: userEmails
         });
-        console.log(`✅ Sent opening notification to ${userEmails.length} users`);
-        results.emailsSent += userEmails.length;
+        results.emailsSent += openingUserEmails.sent;
+        if (openingUserEmails.failed.length > 0) {
+          results.errors.push(`${openingUserEmails.failed.length} of ${openingUserEmails.attempted} user emails were not accepted by Resend: ${[...new Set(openingUserEmails.failed.map(f => f.reason))].join('; ')}`);
+        }
       } catch (error) {
         const errorMsg = `Failed to send user notifications: ${error instanceof Error ? error.message : 'Unknown error'}`;
         console.error('❌', errorMsg);
@@ -144,7 +146,7 @@ export async function POST(request: NextRequest) {
 
       // Send admin notification
       try {
-        await sendAdminFormsOpenedNotification(
+        const openingAdminEmails = await sendAdminFormsOpenedNotification(
           adminEmails,
           year,
           {
@@ -152,8 +154,10 @@ export async function POST(request: NextRequest) {
             totalLibraries: totalLibraries
           }
         );
-        console.log(`✅ Sent admin notification to ${adminEmails.length} admins`);
-        results.emailsSent += adminEmails.length;
+        results.emailsSent += openingAdminEmails.sent;
+        if (openingAdminEmails.failed.length > 0) {
+          results.errors.push(`${openingAdminEmails.failed.length} of ${openingAdminEmails.attempted} admin emails were not accepted by Resend: ${[...new Set(openingAdminEmails.failed.map(f => f.reason))].join('; ')}`);
+        }
       } catch (error) {
         const errorMsg = `Failed to send admin notifications: ${error instanceof Error ? error.message : 'Unknown error'}`;
         console.error('❌', errorMsg);
@@ -217,14 +221,16 @@ export async function POST(request: NextRequest) {
 
       // Send notifications to users
       try {
-        await sendFormsClosedNotification({
+        const closingUserEmails = await sendFormsClosedNotification({
           academicYear: year,
           openingDate,
           closingDate,
           recipientEmails: userEmails
         });
-        console.log(`✅ Sent closing notification to ${userEmails.length} users`);
-        results.emailsSent += userEmails.length;
+        results.emailsSent += closingUserEmails.sent;
+        if (closingUserEmails.failed.length > 0) {
+          results.errors.push(`${closingUserEmails.failed.length} of ${closingUserEmails.attempted} user emails were not accepted by Resend: ${[...new Set(closingUserEmails.failed.map(f => f.reason))].join('; ')}`);
+        }
       } catch (error) {
         const errorMsg = `Failed to send user notifications: ${error instanceof Error ? error.message : 'Unknown error'}`;
         console.error('❌', errorMsg);
@@ -235,7 +241,7 @@ export async function POST(request: NextRequest) {
       if (stillOpenForms.length === 0) {
         try {
           console.log(`📧 Sending VERIFIED closure confirmation to ${adminEmails.length} super admins...`);
-          await sendAdminFormsClosedNotification(
+          const closingAdminEmails = await sendAdminFormsClosedNotification(
             adminEmails,
             year,
             {
@@ -243,8 +249,10 @@ export async function POST(request: NextRequest) {
               totalLibraries: totalLibraries
             }
           );
-          console.log(`✅ Super admin confirmation email sent successfully`);
-          results.emailsSent += adminEmails.length;
+          results.emailsSent += closingAdminEmails.sent;
+          if (closingAdminEmails.failed.length > 0) {
+            results.errors.push(`${closingAdminEmails.failed.length} of ${closingAdminEmails.attempted} admin emails were not accepted by Resend: ${[...new Set(closingAdminEmails.failed.map(f => f.reason))].join('; ')}`);
+          }
         } catch (error) {
           const errorMsg = `Failed to send admin notifications: ${error instanceof Error ? error.message : 'Unknown error'}`;
           console.error('❌', errorMsg);

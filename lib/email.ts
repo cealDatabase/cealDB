@@ -1,4 +1,5 @@
 // lib/email.ts (server-only)
+import { randomUUID } from 'crypto';
 import { Resend } from 'resend';
 import { formatDateWithWeekday, formatSimpleDate } from './dateFormatting';
 import {
@@ -260,17 +261,166 @@ export interface FormNotificationOptions {
   recipientEmails: string[];
 }
 
+/** What happened to a notification sent to a list of people. */
+export interface NotificationResult {
+  /** Distinct recipients the notification was meant for. */
+  attempted: number;
+  /** Emails Resend accepted for delivery. */
+  sent: number;
+  /** Recipients Resend did not accept, with the reason it gave. */
+  failed: { email: string; reason: string }[];
+}
+
+// Resend takes at most 100 emails per batch request.
+const BATCH_SIZE = 100;
+// Resend allows 2 requests per second per team by default.
+const BATCH_GAP_MS = 600;
+const MAX_ATTEMPTS = 3;
+// Retries stop once this much time has gone by, so a Resend outage cannot
+// run the cron job into its time limit before it records what happened.
+const RETRY_BUDGET_MS = 25_000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+type ResendError = { name?: string; message?: string; statusCode?: number | null };
+
+/**
+ * Rate limiting, a server error, or no response at all. Quota errors are also
+ * HTTP 429 but will not clear by retrying, so they are not retried.
+ */
+function isRetryable(error: ResendError): boolean {
+  if (error.name === 'rate_limit_exceeded' || error.name === 'concurrent_idempotent_requests') return true;
+  if (error.name === 'daily_quota_exceeded' || error.name === 'monthly_quota_exceeded') return false;
+  const status = error.statusCode;
+  return status === null || status === undefined || status >= 500;
+}
+
+function retryDelayMs(headers: Record<string, string> | null | undefined, attempt: number): number {
+  const retryAfter = Number(headers?.['retry-after']);
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return Math.min(retryAfter * 1000, 5_000);
+  return 1_000 * 2 ** (attempt - 1); // 1s, 2s
+}
+
+function failAll(recipients: string[], reason: string): NotificationResult {
+  return {
+    attempted: recipients.length,
+    sent: 0,
+    failed: recipients.map((email) => ({ email, reason })),
+  };
+}
+
+/**
+ * Send the same email to each recipient separately (nobody sees anyone
+ * else's address) and report what Resend actually accepted.
+ *
+ * The Resend SDK does not throw when a send fails; it returns `{ error }`.
+ * Counting settled promises therefore reported every email as sent, even
+ * when Resend had rejected them - which it does when a few hundred requests
+ * arrive at once, because of its rate limit. This sends in batches of 100,
+ * spaced out, retries rate limiting and server errors, and counts the
+ * emails Resend accepted.
+ */
+export async function sendToEachRecipient(
+  resend: Pick<Resend, 'batch'>,
+  recipients: string[],
+  message: { from: string; subject: string; html: string },
+): Promise<NotificationResult> {
+  // One email per address, however many accounts share it.
+  const seen = new Set<string>();
+  const unique = recipients
+    .map((email) => email.trim())
+    .filter((email) => {
+      const key = email.toLowerCase();
+      if (!email || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  const result: NotificationResult = { attempted: unique.length, sent: 0, failed: [] };
+  // A retried request carries the same key, so Resend never delivers a batch
+  // twice even when a response is lost after it was accepted.
+  const runId = randomUUID();
+  const retryDeadline = Date.now() + RETRY_BUDGET_MS;
+
+  for (let start = 0; start < unique.length; start += BATCH_SIZE) {
+    if (start > 0) await sleep(BATCH_GAP_MS);
+    const chunk = unique.slice(start, start + BATCH_SIZE);
+    let lastReason = 'Unknown error';
+    let accepted = false;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      let response: Awaited<ReturnType<typeof sendBatch>>;
+      try {
+        response = await sendBatch(resend, chunk, message, `${runId}-${start}`);
+      } catch (err) {
+        response = {
+          data: null,
+          error: { name: 'application_error', statusCode: null, message: err instanceof Error ? err.message : String(err) },
+          headers: null,
+        };
+      }
+
+      if (response.data && !response.error) {
+        // Permissive validation: the valid addresses go out and each invalid
+        // one is reported by its position in the batch.
+        const rejected = response.data.errors ?? [];
+        const rejectedIndexes = new Set(rejected.map((e) => e.index));
+        for (const e of rejected) {
+          result.failed.push({ email: chunk[e.index] ?? `(batch position ${e.index})`, reason: e.message });
+        }
+        result.sent += chunk.length - rejectedIndexes.size;
+        accepted = true;
+        break;
+      }
+
+      const error: ResendError = response.error ?? {};
+      lastReason = error.message || error.name || 'Unknown error';
+      const delay = retryDelayMs(response.headers, attempt);
+      if (attempt === MAX_ATTEMPTS || !isRetryable(error) || Date.now() + delay > retryDeadline) break;
+      console.warn(`Resend batch attempt ${attempt} failed (${lastReason}); retrying in ${delay}ms`);
+      await sleep(delay);
+    }
+
+    if (!accepted) {
+      for (const email of chunk) result.failed.push({ email, reason: lastReason });
+    }
+  }
+
+  return result;
+}
+
+function sendBatch(
+  resend: Pick<Resend, 'batch'>,
+  chunk: string[],
+  message: { from: string; subject: string; html: string },
+  idempotencyKey: string,
+) {
+  return resend.batch.send(
+    chunk.map((to) => ({ ...message, to })),
+    { batchValidation: 'permissive' as const, idempotencyKey },
+  );
+}
+
+function logNotificationResult(label: string, result: NotificationResult): void {
+  const line = `${label}: ${result.sent}/${result.attempted} emails accepted by Resend`;
+  if (result.failed.length === 0) {
+    console.log(`✅ ${line}`);
+  } else {
+    console.error(`❌ ${line}; ${result.failed.length} failed:`, result.failed);
+  }
+}
+
 /**
  * Send notification to all CEAL members that forms are now open
  * Uses Resend Broadcast API for mass distribution
  */
 export async function sendFormsOpenedNotification(
   options: FormNotificationOptions
-): Promise<boolean> {
+): Promise<NotificationResult> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return failAll(options.recipientEmails, 'RESEND_API_KEY is not configured');
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -358,25 +508,16 @@ export async function sendFormsOpenedNotification(
       </html>
     `;
 
-    // Send to all recipients
-    const emailPromises = options.recipientEmails.map(email => 
-      resend.emails.send({
-        from: "CEAL Statistics Database <notifications@cealstats.org>",
-        to: email,
-        subject: `🔓 CEAL Statistics Database Forms Open for ${options.academicYear} - Action Required`,
-        html: emailTemplate
-      })
-    );
-
-    const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
-    
-    console.log(`✅ Forms opened notification: ${successCount}/${options.recipientEmails.length} emails sent successfully`);
-    
-    return successCount > 0;
+    const result = await sendToEachRecipient(resend, options.recipientEmails, {
+      from: "CEAL Statistics Database <notifications@cealstats.org>",
+      subject: `🔓 CEAL Statistics Database Forms Open for ${options.academicYear} - Action Required`,
+      html: emailTemplate,
+    });
+    logNotificationResult('Forms opened notification', result);
+    return result;
   } catch (error) {
     console.error('Forms opened notification failed:', error);
-    return false;
+    return failAll(options.recipientEmails, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -385,11 +526,11 @@ export async function sendFormsOpenedNotification(
  */
 export async function sendFormsClosedNotification(
   options: FormNotificationOptions
-): Promise<boolean> {
+): Promise<NotificationResult> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return failAll(options.recipientEmails, 'RESEND_API_KEY is not configured');
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -454,25 +595,16 @@ export async function sendFormsClosedNotification(
       </html>
     `;
 
-    // Send to all recipients
-    const emailPromises = options.recipientEmails.map(email => 
-      resend.emails.send({
-        from: "CEAL Statistics Database <notifications@cealstats.org>",
-        to: email,
-        subject: `🔒 CEAL Statistics Database Forms Closed for ${options.academicYear}`,
-        html: emailTemplate
-      })
-    );
-
-    const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
-    
-    console.log(`✅ Forms closed notification: ${successCount}/${options.recipientEmails.length} emails sent successfully`);
-    
-    return successCount > 0;
+    const result = await sendToEachRecipient(resend, options.recipientEmails, {
+      from: "CEAL Statistics Database <notifications@cealstats.org>",
+      subject: `🔒 CEAL Statistics Database Forms Closed for ${options.academicYear}`,
+      html: emailTemplate,
+    });
+    logNotificationResult('Forms closed notification', result);
+    return result;
   } catch (error) {
     console.error('Forms closed notification failed:', error);
-    return false;
+    return failAll(options.recipientEmails, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -483,11 +615,11 @@ export async function sendAdminFormsOpenedNotification(
   adminEmails: string[],
   academicYear: number,
   stats: { librariesOpened: number; totalLibraries: number }
-): Promise<boolean> {
+): Promise<NotificationResult> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return failAll(adminEmails, 'RESEND_API_KEY is not configured');
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -563,24 +695,16 @@ export async function sendAdminFormsOpenedNotification(
       </html>
     `;
 
-    const emailPromises = adminEmails.map(email => 
-      resend.emails.send({
-        from: "CEAL Statistics Database System <system@cealstats.org>",
-        to: email,
-        subject: `✅ Admin Alert: Forms Automatically Opened for ${academicYear}`,
-        html: emailTemplate
-      })
-    );
-
-    const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
-    
-    console.log(`✅ Admin notification: ${successCount}/${adminEmails.length} emails sent`);
-    
-    return successCount > 0;
+    const result = await sendToEachRecipient(resend, adminEmails, {
+      from: "CEAL Statistics Database System <system@cealstats.org>",
+      subject: `✅ Admin Alert: Forms Automatically Opened for ${academicYear}`,
+      html: emailTemplate,
+    });
+    logNotificationResult('Admin forms opened notification', result);
+    return result;
   } catch (error) {
     console.error('Admin forms opened notification failed:', error);
-    return false;
+    return failAll(adminEmails, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -591,11 +715,11 @@ export async function sendAdminFormsClosedNotification(
   adminEmails: string[],
   academicYear: number,
   stats: { librariesClosed: number; totalLibraries: number }
-): Promise<boolean> {
+): Promise<NotificationResult> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return failAll(adminEmails, 'RESEND_API_KEY is not configured');
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -672,24 +796,16 @@ export async function sendAdminFormsClosedNotification(
       </html>
     `;
 
-    const emailPromises = adminEmails.map(email => 
-      resend.emails.send({
-        from: "CEAL Statistics Database System <system@cealstats.org>",
-        to: email,
-        subject: `🔒 Admin Alert: Forms Automatically Closed for ${academicYear}`,
-        html: emailTemplate
-      })
-    );
-
-    const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
-    
-    console.log(`✅ Admin notification: ${successCount}/${adminEmails.length} emails sent`);
-    
-    return successCount > 0;
+    const result = await sendToEachRecipient(resend, adminEmails, {
+      from: "CEAL Statistics Database System <system@cealstats.org>",
+      subject: `🔒 Admin Alert: Forms Automatically Closed for ${academicYear}`,
+      html: emailTemplate,
+    });
+    logNotificationResult('Admin forms closed notification', result);
+    return result;
   } catch (error) {
     console.error('Admin forms closed notification failed:', error);
-    return false;
+    return failAll(adminEmails, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
