@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { isSuperAdminDb } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
+import { closeSurveyYear, reopenSurveyYear } from '@/lib/surveyControl';
 
 const prisma = db;
 
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { year, action } = await request.json();
+    const { year, action, closingDate } = await request.json();
 
     // Verify user is super admin (DB-backed, never trust request body)
     if (!(await isSuperAdminDb())) {
@@ -111,25 +112,33 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    let libraryUpdateData = {};
+    // Both actions also update the year's SurveySession, so the daily job
+    // agrees with the admin (lib/surveyControl.ts).
+    let librariesAffected = 0;
     let adminNote = '';
+    let closesAtLabel: string | null = null;
 
     switch (action) {
-      case 'close':
-        libraryUpdateData = { 
-          is_open_for_editing: false,
-          updated_at: new Date()
-        };
+      case 'close': {
+        const result = await closeSurveyYear(year);
+        librariesAffected = result.librariesClosed;
         adminNote = `Forms closed by admin on ${new Date().toISOString()}`;
         break;
-      
-      case 'reopen':
-        libraryUpdateData = { 
-          is_open_for_editing: true,
-          updated_at: new Date()
-        };
+      }
+
+      case 'reopen': {
+        const result = await reopenSurveyYear(year, closingDate ?? null);
+        if (!result.ok) {
+          return NextResponse.json(
+            { error: result.error, needsClosingDate: result.needsClosingDate ?? false, closingDate: result.closingDate },
+            { status: result.status }
+          );
+        }
+        librariesAffected = result.librariesOpened;
+        closesAtLabel = result.closesAtLabel;
         adminNote = `Forms reopened by admin on ${new Date().toISOString()}`;
         break;
+      }
 
       default:
         return NextResponse.json(
@@ -138,11 +147,7 @@ export async function PATCH(request: NextRequest) {
         );
     }
 
-    // Update all library year records for this year
-    const libraryUpdateResult = await prisma.library_Year.updateMany({
-      where: { year: year },
-      data: libraryUpdateData
-    });
+    const libraryUpdateResult = { count: librariesAffected };
 
     // Log the action
     await logUserAction(
@@ -166,7 +171,8 @@ export async function PATCH(request: NextRequest) {
       year: year,
       action: action,
       librariesUpdated: libraryUpdateResult.count,
-      message: `Forms ${action} completed successfully for ${libraryUpdateResult.count} libraries in year ${year}`
+      closesAt: closesAtLabel,
+      message: `Forms ${action} completed successfully for ${libraryUpdateResult.count} libraries in year ${year}${closesAtLabel ? `. They close automatically on ${closesAtLabel}.` : ''}`
     });
 
   } catch (error) {

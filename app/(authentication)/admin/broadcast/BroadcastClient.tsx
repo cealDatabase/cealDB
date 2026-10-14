@@ -205,25 +205,38 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/manual-open-forms', {
+      const openForms = (closingDate?: string) => fetch('/api/admin/manual-open-forms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           year: currentSession.year,
-          userRoles
+          userRoles,
+          ...(closingDate ? { closingDate } : {}),
         })
       });
 
+      let response = await openForms();
+      let data = await response.json();
+
+      // The closing date has passed: the daily job would close the forms
+      // again at its next run, so the server asks for a new closing date.
+      if (response.status === 409 && data.needsClosingDate) {
+        const newClosingDate = window.prompt(
+          `${data.error}\n\nNew closing date (YYYY-MM-DD). Forms close at ${CLOSING_TIME_LABEL} on that day:`
+        );
+        if (!newClosingDate) return;
+        response = await openForms(newClosingDate.trim());
+        data = await response.json();
+      }
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Failed to open forms');
       }
 
-      const result = await response.json();
       await checkCurrentSession();
-      alert(`✅ Successfully opened ${result.librariesOpened} libraries for year ${currentSession.year}!`);
+      alert(`✅ ${data.message}`);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to open forms');
     } finally {
@@ -255,11 +268,12 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to close forms');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to close forms');
       }
 
       await checkCurrentSession();
-      alert('All forms closed successfully');
+      alert('All forms closed successfully. The schedule is updated too, so no reminder or closing notice goes out for them.');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to close forms');
     } finally {
