@@ -219,6 +219,19 @@ export default function EBookDataTableClient({
           .map(([id]) => id)}
         onSetAllAccess={handleAllAccessSelection}
         canEdit={canEdit}
+        accessStatus={
+          <>
+            <span className="text-foreground">
+              {(() => {
+                const held = Array.from(selectionData.values()).filter((s) => s.is_selected).length;
+                return `${held} ${held === 1 ? "entry" : "entries"} held by your institution`;
+              })()}
+            </span>
+            <span aria-live="polite" className="text-xs text-muted-foreground">
+              {isSaving ? "Saving…" : canEdit ? "All changes saved" : ""}
+            </span>
+          </>
+        }
       />
       {showSuperAdminWarning && (
         <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -229,20 +242,6 @@ export default function EBookDataTableClient({
       {!canEdit && libid && (
         <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700">
           🔒 Survey is closed. Selections are read-only.
-        </div>
-      )}
-      {libid && (
-        <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
-          <span>
-            <span className="font-medium text-blue-700">My Access:</span>{" "}
-            {(() => {
-              const held = Array.from(selectionData.values()).filter((s) => s.is_selected).length;
-              return `${held} ${held === 1 ? "entry" : "entries"} held by your institution`;
-            })()}
-          </span>
-          <span aria-live="polite" className="text-xs">
-            {isSaving ? "Saving…" : canEdit ? "All changes saved" : ""}
-          </span>
         </div>
       )}
     </div>
@@ -265,6 +264,7 @@ export default function EBookDataTableClient({
       catalogueCardLabel="E-Book Database"
       stickyHeader
       stickyControls
+      controlsInToolbar
       bulkDelete={canBulkDelete ? {
         endpoint: `/api/ebook/delete-bulk/${year}`,
         itemLabel: "E-Book entries",

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { languages } from "../data/data"
 import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter"
+import { ZoneStrip, type CatalogueToolbarControls } from "@/components/data-table/CatalogueControls";
 import { toast } from "sonner"
 import { useState } from "react"
 import { Download, Loader2, FileSpreadsheet } from "lucide-react"
@@ -19,6 +20,10 @@ interface DataTableToolbarProps<TData> {
   accessSelectedIds?: number[]
   onSetAllAccess?: (ids: number[], selected: boolean) => void
   canEdit?: boolean
+  /** Laid out by the shared DataTable: display switch and bulk manage. */
+  controls?: CatalogueToolbarControls;
+  /** Held count and save status, shown in the My Access strip. */
+  accessStatus?: React.ReactNode;
 }
 
 export function DataTableToolbar<TData>({
@@ -29,6 +34,8 @@ export function DataTableToolbar<TData>({
   accessSelectedIds = [],
   onSetAllAccess,
   canEdit = true,
+  controls,
+  accessStatus,
 }: DataTableToolbarProps<TData>) {
   const router = useRouter()
   const [isSubscribing, setIsSubscribing] = useState(false)
@@ -162,9 +169,16 @@ export function DataTableToolbar<TData>({
     }
   };
 
+  // One layout for the AV, E-Book and E-Journal lists: search, filters and
+  // the display options on the first row; below it the institution's own
+  // My Access actions (blue) and catalogue maintenance (amber), each in its
+  // own labelled strip - the same colours as the two side columns of an
+  // entry in the list view.
+  const showAdminStrip = canImportPreviousYear || !!controls?.bulk;
+
   return (
-    <div className="flex flex-col items-stretch gap-3 xl:flex-row xl:items-center xl:justify-between">
-      <div className="flex flex-1 flex-wrap items-center gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           placeholder="Search in title, CJK, or romanized..."
           value={(table.getState().globalFilter as string) ?? ""}
@@ -200,69 +214,79 @@ export function DataTableToolbar<TData>({
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div>
-      
-      <div className='flex w-full flex-wrap gap-2 xl:w-auto xl:justify-end'>
-        {canImportPreviousYear && (
+        <div className="ml-auto flex items-center gap-2">
           <Button
-            onClick={handleImportPreviousYear}
+            onClick={handleExportExcel}
             variant="outline"
             size="sm"
-            className='h-8 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
-            disabled={isImporting}
-            title={`Import ${year - 1} catalogue entries`}
+            className="h-8"
+            disabled={isExportingExcel}
+            title={isExportingExcel ? "Preparing Excel export..." : "Export to Excel"}
           >
-            {isImporting ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Download className='mr-2 h-4 w-4' />}
-            {isImporting ? "Importing..." : `Import ${year - 1} Entries`}
+            {isExportingExcel ? (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            ) : (
+              <FileSpreadsheet className='mr-2 h-4 w-4 text-green-600' />
+            )}
+            {isExportingExcel ? "Preparing..." : "Export Excel"}
           </Button>
-        )}
-        {/* Export Excel button visible to all users */}
-      <Button
-        onClick={handleExportExcel}
-        variant="outline"
-        size="sm"
-        className='h-8 bg-green-50 hover:bg-green-100 border-green-200'
-        disabled={isExportingExcel}
-        title={isExportingExcel ? "Preparing Excel export..." : "Export to Excel"}
-      >
-        {isExportingExcel ? (
-          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-        ) : (
-          <FileSpreadsheet className='mr-2 h-4 w-4 text-green-600' />
-        )}
-        {isExportingExcel ? "Preparing..." : "Export Excel"}
-      </Button>
+          {controls?.viewToggle}
+        </div>
+      </div>
 
-        {/* Action visible only to Super Admin (not role 2) */}
-        {showAccessControls && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onSetAllAccess?.(matchingAccessIds, !allMatchingAccessSelected)}
-            disabled={!canEdit || !onSetAllAccess || matchingAccessIds.length === 0}
-            className="h-8 border-blue-200 bg-blue-50 hover:bg-blue-100"
-          >
-            {allMatchingAccessSelected
-              ? "Clear My Access selection"
-              : `Select all ${matchingAccessIds.length} for My Access`}
-          </Button>
-        )}
-        {showAccessControls && (
-          <Button
-            onClick={handleDirectSubscribe}
-            disabled={!canEdit || selectedIds.length === 0 || isSubscribing}
-            className="h-8 bg-blue-600 text-white hover:bg-blue-700"
-            title={
-              selectedIds.length === 0
-                ? "Select at least one row"
-                : "Add to My Access"
-            }
-          >
-            {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
-          </Button>
-        )}
-      </div>
+      {libid && !bulkMode && (
+        <ZoneStrip tone="access" label="My Access" status={accessStatus}>
+          {showAccessControls && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onSetAllAccess?.(matchingAccessIds, !allMatchingAccessSelected)}
+                disabled={!canEdit || !onSetAllAccess || matchingAccessIds.length === 0}
+                className="h-8 border-blue-300 bg-white text-blue-900 hover:bg-blue-100"
+              >
+                {allMatchingAccessSelected
+                  ? "Clear My Access selection"
+                  : `Select all ${matchingAccessIds.length} for My Access`}
+              </Button>
+              <Button
+                onClick={handleDirectSubscribe}
+                disabled={!canEdit || selectedIds.length === 0 || isSubscribing}
+                className="h-8 bg-blue-600 text-white hover:bg-blue-700"
+                title={
+                  selectedIds.length === 0
+                    ? "Select at least one row"
+                    : "Add to My Access"
+                }
+              >
+                {isSubscribing ? "Subscribing..." : `Add to My Access (${selectedIds.length})`}
+              </Button>
+            </>
+          )}
+        </ZoneStrip>
+      )}
+
+      {controls?.bulkMode
+        ? controls.bulk
+        : showAdminStrip && (
+            <ZoneStrip tone="admin" label="Admin">
+              {canImportPreviousYear && (
+                <Button
+                  onClick={handleImportPreviousYear}
+                  variant="outline"
+                  size="sm"
+                  className="h-8 border-amber-300 bg-white text-amber-900 hover:bg-amber-100"
+                  disabled={isImporting}
+                  title={`Import ${year - 1} catalogue entries`}
+                >
+                  {isImporting ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Download className='mr-2 h-4 w-4' />}
+                  {isImporting ? "Importing..." : `Import ${year - 1} Entries`}
+                </Button>
+              )}
+              {controls?.bulk}
+            </ZoneStrip>
+          )}
     </div>
-  )
+  );
 }

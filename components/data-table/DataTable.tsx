@@ -35,6 +35,7 @@ import { DataTablePagination } from "@/components/data-table/DataTablePagination
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import type { CatalogueToolbarControls } from "@/components/data-table/CatalogueControls";
 
 interface DataTableProps<TData extends { id: number; counts?: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,7 +45,7 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
    * TanStack `table` instance so that consumer components can wire up search
    * boxes, faceted filters, etc.
    */
-  Toolbar?: React.ComponentType<{ table: TableInstance<TData> }>;
+  Toolbar?: React.ComponentType<{ table: TableInstance<TData>; controls?: CatalogueToolbarControls }>;
   /**
    * User roles for permission checking (e.g., for copy functionality)
    */
@@ -79,6 +80,11 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
     endpoint: string;
     itemLabel: string;
   };
+  /**
+   * The toolbar lays out the display switch and bulk manage itself (the three
+   * survey catalogues), instead of the row of them under the toolbar.
+   */
+  controlsInToolbar?: boolean;
 }
 
 type DisplayMode = "cards" | "table";
@@ -320,6 +326,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   stickyHeader = false,
   stickyControls = false,
   bulkDelete,
+  controlsInToolbar = false,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -657,54 +664,107 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const hasAccessZone = tableColumns.some((column) => column.id === "user_selection");
   const hasAdminZone = !!bulkDelete || tableColumns.some((column) => column.id === "actions");
 
-  const tableControls = (
+  // While bulk manage is on, this bar replaces the button that turns it on.
+  const bulkBar = bulkDelete && bulkMode ? (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2">
+      <p className="flex items-center gap-2 text-sm text-amber-950">
+        <ShieldCheck className="h-4 w-4 text-amber-700" aria-hidden="true" />
+        <span className="font-semibold">Admin bulk manage:</span> {selectedBulkIds.length} selected
+        <span className="text-amber-800/80">· My Access checkboxes are hidden until you press Done</span>
+      </p>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 border-amber-300 bg-white hover:bg-amber-100"
+          disabled={matchingBulkRows.length === 0 || isBulkDeleting}
+          onClick={toggleAllMatchingBulkRows}
+        >
+          {allMatchingRowsSelected
+            ? "Clear selection"
+            : `Select all ${matchingBulkRows.length} matching`}
+        </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          className="h-8"
+          disabled={selectedBulkIds.length === 0 || isBulkDeleting}
+          onClick={handleBulkDelete}
+        >
+          <Trash2 className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+          {isBulkDeleting ? "Deleting…" : `Delete selected (${selectedBulkIds.length})`}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 text-amber-900 hover:bg-amber-100"
+          onClick={exitBulkMode}
+          disabled={isBulkDeleting}
+        >
+          <X className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
+          Done
+        </Button>
+      </div>
+    </div>
+  ) : null;
+
+  const bulkManageButton = bulkDelete && !bulkMode ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="h-8 border-amber-300 bg-white text-amber-900 hover:bg-amber-100"
+      onClick={() => setBulkMode(true)}
+      title="Select several entries to delete or copy them"
+    >
+      <ShieldCheck className="mr-1.5 h-4 w-4" aria-hidden="true" />
+      Bulk manage
+    </Button>
+  ) : null;
+
+  const viewToggle = catalogueCardLabel ? (
+    <div className="inline-flex items-center rounded-md border bg-muted/40 p-0.5" aria-label="Display mode">
+      <Button
+        type="button"
+        variant={displayMode === "cards" ? "secondary" : "ghost"}
+        size="icon"
+        className="h-7 w-7"
+        onClick={() => setDisplayMode("cards")}
+        aria-pressed={displayMode === "cards"}
+        aria-label="List view"
+        title="List view"
+      >
+        <List className="h-4 w-4" aria-hidden="true" />
+      </Button>
+      <Button
+        type="button"
+        variant={displayMode === "table" ? "secondary" : "ghost"}
+        size="icon"
+        className="h-7 w-7"
+        onClick={() => setDisplayMode("table")}
+        aria-pressed={displayMode === "table"}
+        aria-label="Table view"
+        title="Table view"
+      >
+        <Table2 className="h-4 w-4" aria-hidden="true" />
+      </Button>
+    </div>
+  ) : null;
+
+  const tableControls = controlsInToolbar ? (
+    Toolbar && (
+      <Toolbar
+        table={table}
+        controls={{ viewToggle, bulk: bulkBar ?? bulkManageButton, bulkMode: !!bulkBar }}
+      />
+    )
+  ) : (
     <>
       {Toolbar && <Toolbar table={table} />}
-      {bulkDelete && bulkMode && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2">
-          <p className="flex items-center gap-2 text-sm text-amber-950">
-            <ShieldCheck className="h-4 w-4 text-amber-700" aria-hidden="true" />
-            <span className="font-semibold">Admin bulk manage:</span> {selectedBulkIds.length} selected
-            <span className="text-amber-800/80">· My Access checkboxes are hidden until you press Done</span>
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-8 border-amber-300 bg-white hover:bg-amber-100"
-              disabled={matchingBulkRows.length === 0 || isBulkDeleting}
-              onClick={toggleAllMatchingBulkRows}
-            >
-              {allMatchingRowsSelected
-                ? "Clear selection"
-                : `Select all ${matchingBulkRows.length} matching`}
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              className="h-8"
-              disabled={selectedBulkIds.length === 0 || isBulkDeleting}
-              onClick={handleBulkDelete}
-            >
-              <Trash2 className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-              {isBulkDeleting ? "Deleting…" : `Delete selected (${selectedBulkIds.length})`}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 text-amber-900 hover:bg-amber-100"
-              onClick={exitBulkMode}
-              disabled={isBulkDeleting}
-            >
-              <X className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
-              Done
-            </Button>
-          </div>
-        </div>
-      )}
+      {bulkBar}
     </>
   );
 
@@ -717,7 +777,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           {tableControls}
         </div>
       ) : tableControls}
-      {(catalogueCardLabel || bulkDelete) && (
+      {controlsInToolbar ? (
+        <p className="text-sm font-medium text-foreground">
+          {table.getFilteredRowModel().rows.length} entries
+        </p>
+      ) : (catalogueCardLabel || bulkDelete) && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="text-sm font-medium text-foreground">
@@ -737,47 +801,8 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
             )}
           </div>
           <div className="flex items-center gap-2">
-            {bulkDelete && !bulkMode && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-8 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                onClick={() => setBulkMode(true)}
-                title="Select several entries to delete or copy them"
-              >
-                <ShieldCheck className="mr-1.5 h-4 w-4" aria-hidden="true" />
-                Bulk manage
-              </Button>
-            )}
-            {catalogueCardLabel && (
-              <div className="inline-flex items-center rounded-md border bg-muted/40 p-0.5" aria-label="Display mode">
-                <Button
-                  type="button"
-                  variant={displayMode === "cards" ? "secondary" : "ghost"}
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setDisplayMode("cards")}
-                  aria-pressed={displayMode === "cards"}
-                  aria-label="List view"
-                  title="List view"
-                >
-                  <List className="h-4 w-4" aria-hidden="true" />
-                </Button>
-                <Button
-                  type="button"
-                  variant={displayMode === "table" ? "secondary" : "ghost"}
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setDisplayMode("table")}
-                  aria-pressed={displayMode === "table"}
-                  aria-label="Table view"
-                  title="Table view"
-                >
-                  <Table2 className="h-4 w-4" aria-hidden="true" />
-                </Button>
-              </div>
-            )}
+            {bulkManageButton}
+            {viewToggle}
           </div>
         </div>
       )}
