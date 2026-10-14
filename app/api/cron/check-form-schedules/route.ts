@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { Resend } from 'resend';
 import { 
-  sendFormsOpenedNotification, 
   sendFormsClosedNotification,
   sendAdminFormsClosedNotification,
   type NotificationResult,
 } from '@/lib/email';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
 import { getSurveyDates } from '@/lib/surveyDates';
-import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from '@/lib/userUtils';
+import { getSuperAdminEmails, getLibraryYearCount } from '@/lib/userUtils';
 import { logUserAction } from '@/lib/auditLogger';
 import { formatDateRange } from '@/lib/dateFormatting';
 
@@ -60,17 +59,20 @@ function describeEmailFailures(what: string, result: NotificationResult) {
  *      • After sending: notifiedOnClose=true
  *      • Will NEVER be sent again once marked
  * 
- * 3. USER NOTIFICATION EMAILS (Sent ONCE per event):
- *    - Forms Opened: Notifies users when forms open
- *    - Forms Closed: NOT sent to users (only admins are notified)
- *    - Same duplicate prevention as admin notifications
+ * 3. NO SEPARATE "FORMS OPEN" EMAIL TO USERS:
+ *    - The broadcast (1) is the opening announcement. Opening forms sends
+ *      nothing more: a second email to every user is redundant, and on the
+ *      Resend free plan it would use up the 100-a-day allowance for
+ *      transactional email, leaving none for password resets on opening day.
+ *    - Super admins can still email one user or institution from the user
+ *      admin page (/api/admin/send-individual-email).
  * 
  * ═══════════════════════════════════════════════════════════════
  * EXECUTION FLOW
  * ═══════════════════════════════════════════════════════════════
  * 
  * STEP 1: Check for pending broadcasts (backup safety net)
- * STEP 2: Check for sessions to open (send user notifications only)
+ * STEP 2: Check for sessions to open (no email; the broadcast announces it)
  * STEP 3: Check for sessions to close (send admin notifications only)
  * 
  * All actions include audit logging and comprehensive error handling.
@@ -266,9 +268,8 @@ export async function GET(request: NextRequest) {
     // ========================================
     // STEP 2: Check for sessions to OPEN
     // ========================================
-    // NOTE: These are FORM STATUS NOTIFICATIONS (not broadcasts)
-    // - User emails: Notify when forms are opened
-    // - Admin emails: NOT sent in this step (only sent in STEP 3 when forms close)
+    // - No email here: the broadcast (STEP 1, or Resend's own schedule) is the
+    //   opening announcement. See "NO SEPARATE FORMS OPEN EMAIL" above.
     // - DUPLICATE PREVENTION: Only processes where notifiedOnOpen=false
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
@@ -294,26 +295,7 @@ export async function GET(request: NextRequest) {
 
         console.log(`✅ Opened ${updateResult.count} libraries for year ${session.academicYear}`);
 
-        // Get email recipients
-        const userEmails = await getAllActiveUserEmails();
-
-        console.log(`📧 Sending notifications to ${userEmails.length} users`);
-
-        // Send notifications to all users. A failed email does not stop the
-        // forms from opening; it is reported below and in the audit log.
-        const userEmailResult = await sendFormsOpenedNotification({
-          academicYear: session.academicYear,
-          openingDate: session.openingDate,
-          closingDate: session.closingDate,
-          recipientEmails: userEmails
-        });
-        const userEmailFailures = describeEmailFailures('"forms open"', userEmailResult);
-        if (userEmailFailures) {
-          results.errors.push(`Year ${session.academicYear} opened, but ${userEmailFailures.message}`);
-        }
-        console.log(`ℹ️  Super admin notifications NOT sent (only sent when forms close)`);
-
-        // CRITICAL: Mark session as notified - prevents duplicate notifications
+        // CRITICAL: Mark session as opened - the cron never opens it again
         await prisma.surveySession.update({
           where: { id: session.id },
           data: {
@@ -333,13 +315,11 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesOpened: updateResult.count,
             openingDate: session.openingDate.toISOString(),
-            userEmailsAttempted: userEmailResult.attempted,
-            userEmailsSent: userEmailResult.sent,
-            ...(userEmailFailures ? { userEmailsFailed: userEmailFailures.failedRecipients } : {}),
+            userEmailsSent: 0, // the broadcast is the announcement
             adminEmailsSent: 0
           },
-          !userEmailFailures,
-          userEmailFailures ? `Forms opened, but ${userEmailFailures.message}` : undefined,
+          true,
+          undefined,
           request
         );
 
