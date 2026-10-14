@@ -338,8 +338,8 @@ export default function Part1GettingStarted({ lang }: PartProps) {
             { zh: 'Super Admin Toolkit', en: 'Super Admin Toolkit' },
             { zh: '红色', en: 'Red' },
             {
-              zh: 'Survey Dates、Broadcast、Email Templates、Manage Users、Add User、Manage Libraries、Add Library、Published Reports、Audit Logs',
-              en: 'Survey Dates, Broadcast, Email Templates, Manage Users, Add User, Manage Libraries, Add Library, Published Reports, Audit Logs',
+              zh: 'Survey Dates、Broadcast、Email Templates、Email Send Status、Manage Users、Add User、Manage Libraries、Add Library、Published Reports、Audit Logs',
+              en: 'Survey Dates, Broadcast, Email Templates, Email Send Status, Manage Users, Add User, Manage Libraries, Add Library, Published Reports, Audit Logs',
             },
             { zh: '只有角色 1/4', en: 'Only roles 1/4' },
           ],
@@ -382,6 +382,10 @@ export default function Part1GettingStarted({ lang }: PartProps) {
           <li>
             <Code>/admin/email-templates</Code> —{' '}
             {lang === 'zh' ? '编辑邮件模板' : 'Edit email templates'}
+          </li>
+          <li>
+            <Code>/admin/email-status</Code> —{' '}
+            {lang === 'zh' ? '邮件发送状态 / 每日额度' : 'Email send status / daily quota'}
           </li>
           <li>
             <Code>/admin/users</Code> —{' '}

@@ -17,6 +17,7 @@ import {
   FileBarChart,
   FileText,
   BookMarked,
+  MailCheck,
 } from "lucide-react";
 
 export const forms = [
@@ -273,6 +274,15 @@ export const superAdminActions = [
       iconColor: 'text-green-700',
       iconBg: 'bg-green-100',
       description: 'Edit the three broadcast emails (pre-announcement, forms-open, 1-week-before-close reminder) and the individual resend template. Subject, HTML body, and placeholders for opening/closing dates.',
+    },
+    {
+      category: 'survey',
+      title: 'Email Send Status',
+      href: '/admin/email-status',
+      icon: MailCheck,
+      iconColor: 'text-teal-600',
+      iconBg: 'bg-teal-100',
+      description: 'Every email the system has sent: whether Resend accepted it, who it did not reach and why, delivery status from Resend, and how much of the daily limit of 100 transactional emails is used.',
     },
 
     // ── Users ───────────────────────────────────────────────────────────────

@@ -756,6 +756,12 @@ export default function Part3AdminPages({ lang }: PartProps) {
         )}
       </ul>
 
+      <P
+        lang={lang}
+        zh="发出去之后，到 /admin/email-status（工具箱里的 Email Send Status 卡片）看结果：每次发送（开表广播、一周提醒、模板广播、“forms closed” 通知、单独邮件）是否被 Resend 接收，哪些地址没收到、原因是什么；点 Check 向 Resend 查投递情况（delivered / bounced / suppressed）；左上角是最近 24 小时用掉的事务邮件数，免费版每天 100 封。广播不占这 100 封。"
+        en="After a send, check /admin/email-status (the Email Send Status card in the toolkit): for every send (opening broadcast, one-week reminder, template broadcast, “forms closed” notice, individual email) it shows whether Resend accepted it and which addresses it did not reach and why. Check asks Resend what happened next (delivered / bounced / suppressed). The top-left card counts the transactional emails of the last 24 hours against the free plan's 100 a day; broadcasts do not count toward it."
+      />
+
       {/* ---------- 3.D.4 Users ---------- */}
       <SectionH4
         id="s-3-D-4"
