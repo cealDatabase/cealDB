@@ -133,156 +133,84 @@ export default function CreateAVForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+            {/* Same field order as the Edit dialog: titles, subtitle and
+                series, publisher; then description, data source, notes;
+                then counts. One field per row so the order reads top-down. */}
             {/* Basic Information Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold border-b pb-2">
                 Basic Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>English Title*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter the title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>English Title*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="subtitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Subtitle</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter the subtitle (optional)" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="cjk_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CJK Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter CJK title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="cjk_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CJK Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter CJK title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="romanized_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Romanized Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter romanized title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="romanized_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Romanized Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter romanized title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name="subtitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subtitle</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the subtitle (optional)" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Publication Details Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">
-                Publication Details
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="publisher"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Publisher</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter publisher" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="data_source"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data Source</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter data source" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type*</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select AV type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {type.map((typeOption) => (
-                            <SelectItem key={typeOption.value} value={typeOption.value}>
-                              {typeOption.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="counts"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Counts</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          placeholder="0"
-                          {...field}
-                          value={field.value ?? ""}
-                          onChange={(e) => field.onChange(
-                            e.target.value === "" ? undefined : Number(e.target.value)
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="publisher"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Publisher</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter publisher" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Additional Information Section */}
@@ -311,6 +239,20 @@ export default function CreateAVForm({
 
               <FormField
                 control={form.control}
+                name="data_source"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data Source</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter data source" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
@@ -326,6 +268,63 @@ export default function CreateAVForm({
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* Counts Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold border-b pb-2">
+                Counts & Type
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="counts"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Counts</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(
+                            e.target.value === "" ? undefined : Number(e.target.value)
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type*</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select AV type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {type.map((typeOption) => (
+                            <SelectItem key={typeOption.value} value={typeOption.value}>
+                              {typeOption.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* Languages Section */}

@@ -133,69 +133,70 @@ export default function CreateEJournalForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+            {/* Same field order as the Edit dialog: titles, subtitle and
+                series, publisher; then description, data source, notes;
+                then counts. One field per row so the order reads top-down. */}
             {/* Basic Information Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold border-b pb-2">
                 Basic Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="cjk_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CJK Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter CJK title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>English Title*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="subtitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Subtitle</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter the subtitle (optional)" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="cjk_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CJK Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter CJK title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>English Title*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter the title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="romanized_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Romanized Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter romanized title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="romanized_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Romanized Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter romanized title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="subtitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subtitle</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the subtitle (optional)" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -210,57 +211,98 @@ export default function CreateEJournalForm({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="publisher"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Publisher</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter publisher" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="vendor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vendor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter vendor" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            {/* Publication Details Section */}
+            {/* Additional Information Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold border-b pb-2">
-                Publication Details
+                Additional Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="publisher"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Publisher</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter publisher" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter description (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="vendor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vendor</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter vendor" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="data_source"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data Source</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter data source" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="data_source"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data Source</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter data source" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter any additional notes (optional)"
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Counts Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold border-b pb-2">
+                Counts
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -303,49 +345,6 @@ export default function CreateEJournalForm({
                   )}
                 />
               </div>
-            </div>
-
-            {/* Additional Information Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">
-                Additional Information
-              </h3>
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter description (optional)"
-                        className="min-h-[80px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter any additional notes (optional)"
-                        className="min-h-[80px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             {/* Languages Section */}
