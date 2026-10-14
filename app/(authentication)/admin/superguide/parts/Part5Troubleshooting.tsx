@@ -432,7 +432,7 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
         {lang === 'zh' ? (
           <>
             <li>
-              Vercel Dashboard → Project → Cron Jobs 标签页。看本日 8:00 / 20:00 那两次的状态。
+              Vercel Dashboard → Project → Cron Jobs 标签页。看本日 UTC 04:00 / 08:00 那两次的状态。
             </li>
             <li>
               如果状态是 <strong>Failed</strong>：点开看 invocation log，错误信息。
@@ -451,8 +451,8 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
         ) : (
           <>
             <li>
-              Vercel Dashboard → Project → Cron Jobs tab. Check today's 8:00 /
-              20:00 runs.
+              Vercel Dashboard → Project → Cron Jobs tab. Check today's 04:00 /
+              08:00 UTC runs.
             </li>
             <li>
               If status <strong>Failed</strong>: click into invocation log, see

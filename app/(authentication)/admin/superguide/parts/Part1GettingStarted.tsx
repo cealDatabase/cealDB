@@ -501,8 +501,8 @@ export default function Part1GettingStarted({ lang }: PartProps) {
           [
             { zh: <Code>Cron Job</Code>, en: <Code>Cron Job</Code> },
             {
-              zh: 'Vercel 每天自动跑两次（UTC 8am / 8pm，即东部 4am / 4pm）的后台任务。它去检查"是不是到点开表/关表/发提醒了"。',
-              en: 'A background task Vercel runs twice daily (UTC 8am/8pm = ET 4am/4pm). It checks "is it time to open/close forms or send reminders?"',
+              zh: 'Vercel 每天自动跑两次（UTC 04:00 / 08:00；夏令时期间即美东 0 点 / 凌晨 4 点）的后台任务。它去检查"是不是到点开表/关表/发提醒了"。',
+              en: 'A background task Vercel runs twice daily (UTC 04:00/08:00 = midnight/4 AM Eastern in daylight time). It checks "is it time to open/close forms or send reminders?"',
             },
           ],
         ]}
