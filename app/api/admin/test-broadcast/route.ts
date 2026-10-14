@@ -3,7 +3,14 @@ import db from '@/lib/db';
 import { isSuperAdminDb } from '@/lib/auth';
 import { Resend } from 'resend';
 import { getSurveyDates } from '@/lib/surveyDates';
-import { formatAsEasternTime } from '@/lib/timezoneUtils';
+import {
+  openingInstant,
+  closingInstant,
+  formatOpeningDate,
+  formatClosingDate,
+  OPENING_TIME_LABEL,
+  CLOSING_TIME_LABEL,
+} from '@/lib/surveyTime';
 
 const prisma = db;
 
@@ -37,9 +44,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse dates
-    const openDate = new Date(openingDate);
-    const closeDate = new Date(closingDate);
+    // Parse dates. A bare YYYY-MM-DD is a calendar date: it opens at 12:00 AM
+    // Eastern and closes at 11:59 PM Pacific. Anything else is an instant.
+    const isDateKey = (v: unknown) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.trim());
+    const openDate = isDateKey(openingDate) ? openingInstant(openingDate) : new Date(openingDate);
+    const closeDate = isDateKey(closingDate) ? closingInstant(closingDate) : new Date(closingDate);
 
     // Calculate survey dates (for email content only)
     const surveyDates = getSurveyDates(year, openDate, closeDate);
@@ -120,11 +129,11 @@ export async function POST(request: NextRequest) {
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #666; font-weight: bold;">Test Opening Date:</td>
-                <td style="padding: 8px 0;">${formatAsEasternTime(openDate)}</td>
+                <td style="padding: 8px 0;">${formatOpeningDate(openDate)} at ${OPENING_TIME_LABEL}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #666; font-weight: bold;">Test Closing Date:</td>
-                <td style="padding: 8px 0;">${formatAsEasternTime(closeDate)} at 11:59 PM PT</td>
+                <td style="padding: 8px 0;">${formatClosingDate(closeDate)} at ${CLOSING_TIME_LABEL}</td>
               </tr>
             </table>
           </div>

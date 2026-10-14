@@ -5,7 +5,15 @@ import { Container } from '@/components/Container'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { formatSimpleDate, formatDateWithWeekday } from '@/lib/dateFormatting'
+import {
+  openingInstant,
+  closingInstant,
+  formatOpeningDate,
+  formatClosingDate,
+  formatDateKey,
+  OPENING_TIME_LABEL,
+  CLOSING_TIME_LABEL,
+} from '@/lib/surveyTime'
 import { SlashIcon } from 'lucide-react'
 import {
   Breadcrumb,
@@ -93,14 +101,10 @@ export default function SurveySchedulePage() {
     setShowPreview(false)
 
     try {
-      // Parse the date components and create Pacific Time dates
-      const [openYear, openMonth, openDay] = openingDate.split('-').map(Number)
-      const [closeYear, closeMonth, closeDay] = closingDate.split('-').map(Number)
-      
-      // Convert to Pacific Time: 12:00 AM Pacific = 8:00 AM UTC
-      const openDateTime = new Date(Date.UTC(openYear, openMonth - 1, openDay, 8, 0, 0)).toISOString()
-      // Convert to Pacific Time: 11:59 PM Pacific on day D = 7:59 AM UTC on day D+1
-      const closeDateTime = new Date(Date.UTC(closeYear, closeMonth - 1, closeDay + 1, 7, 59, 0)).toISOString()
+      // 12:00 AM Eastern on the opening date, 11:59 PM Pacific on the closing
+      // date, daylight saving resolved per date (lib/surveyTime.ts).
+      const openDateTime = openingInstant(openingDate).toISOString()
+      const closeDateTime = closingInstant(closingDate).toISOString()
 
       const response = await fetch('/api/admin/survey-sessions', {
         method: 'POST',
@@ -156,9 +160,6 @@ export default function SurveySchedulePage() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return formatSimpleDate(dateString)
-  }
 
   const getSessionStatus = (session: SurveySession) => {
     const now = new Date()
@@ -280,7 +281,7 @@ export default function SurveySchedulePage() {
 
             <div>
               <label htmlFor="schedule-opening-date" className="block text-sm font-medium text-gray-700 mb-2">
-                Opening Date * <span className="text-xs text-gray-500">(12:00 AM Pacific)</span>
+                Opening Date * <span className="text-xs text-gray-500">({OPENING_TIME_LABEL})</span>
               </label>
               <input
                 id="schedule-opening-date"
@@ -294,7 +295,7 @@ export default function SurveySchedulePage() {
 
             <div>
               <label htmlFor="schedule-closing-date" className="block text-sm font-medium text-gray-700 mb-2">
-                Closing Date * <span className="text-xs text-gray-500">(11:59 PM Pacific)</span>
+                Closing Date * <span className="text-xs text-gray-500">({CLOSING_TIME_LABEL})</span>
               </label>
               <input
                 id="schedule-closing-date"
@@ -358,10 +359,10 @@ export default function SurveySchedulePage() {
                       {session.academicYear}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {formatDate(session.openingDate)}
+                      {formatOpeningDate(session.openingDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {formatDate(session.closingDate)}
+                      {formatClosingDate(session.closingDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {(() => {
@@ -433,8 +434,8 @@ export default function SurveySchedulePage() {
                       
                       <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mb-3">
                         <p className="text-sm"><strong>📅 Submission Period:</strong></p>
-                        <p className="text-sm"><strong>Opens:</strong> {openingDate ? `${formatSimpleDate(openingDate)} at 12:00 AM Pacific` : 'Not set'}</p>
-                        <p className="text-sm"><strong>Closes:</strong> {closingDate ? `${formatSimpleDate(closingDate)} at 11:59 PM Pacific` : 'Not set'}</p>
+                        <p className="text-sm"><strong>Opens:</strong> {openingDate ? `${formatDateKey(openingDate)} at ${OPENING_TIME_LABEL}` : 'Not set'}</p>
+                        <p className="text-sm"><strong>Closes:</strong> {closingDate ? `${formatDateKey(closingDate)} at ${CLOSING_TIME_LABEL}` : 'Not set'}</p>
                       </div>
                       
                       <p className="mb-3 text-sm">Please submit your library's statistical data before the closing date. You can access the forms by signing in to your account.</p>
@@ -459,8 +460,8 @@ export default function SurveySchedulePage() {
                         <p className="text-sm"><strong>📊 Statistics:</strong></p>
                         <p className="text-sm">• Libraries Updated: {formStatus?.totalLibraries || 0}</p>
                         <p className="text-sm">• Notification Emails Sent: ~{formStatus?.totalLibraries || 0}</p>
-                        <p className="text-sm">• Opening Date: {openingDate ? `${formatSimpleDate(openingDate)} at 12:00 AM Pacific` : 'Not set'}</p>
-                        <p className="text-sm">• Closing Date: {closingDate ? `${formatSimpleDate(closingDate)} at 11:59 PM Pacific` : 'Not set'}</p>
+                        <p className="text-sm">• Opening Date: {openingDate ? `${formatDateKey(openingDate)} at ${OPENING_TIME_LABEL}` : 'Not set'}</p>
+                        <p className="text-sm">• Closing Date: {closingDate ? `${formatDateKey(closingDate)} at ${CLOSING_TIME_LABEL}` : 'Not set'}</p>
                       </div>
                       
                       <p className="text-sm text-gray-600">No manual action required. The system will automatically close forms on the scheduled date.</p>

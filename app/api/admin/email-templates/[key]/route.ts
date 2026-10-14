@@ -8,6 +8,7 @@ import {
   renderTemplateString,
 } from '@/lib/emailTemplate';
 import { logUserAction } from '@/lib/auditLogger';
+import { getSurveyDates } from '@/lib/surveyDates';
 
 const prisma = db;
 
@@ -95,8 +96,10 @@ export async function GET(
     }
 
     if (!year || isNaN(year)) year = new Date().getFullYear();
-    if (!openDate) openDate = new Date(Date.UTC(year, 9, 1, 7, 0, 0));   // Oct 1
-    if (!closeDate) closeDate = new Date(Date.UTC(year, 11, 2, 6, 59, 0)); // Dec 2
+    // Same fallbacks as everywhere else (Oct 1 / Dec 2), from one place.
+    const fallbackDates = getSurveyDates(year);
+    if (!openDate) openDate = fallbackDates.openingDate;
+    if (!closeDate) closeDate = fallbackDates.closingDate;
 
     const ctx = buildTemplateContext(year, openDate, closeDate);
     preview = {

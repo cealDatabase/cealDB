@@ -1,6 +1,7 @@
 'use client'
 
 import { Container } from '@/components/Container'
+import { openingDateKey, closingDateKey, OPENING_TIME_LABEL } from '@/lib/surveyTime'
 import { Button } from '@/components/ui/button'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -104,23 +105,18 @@ export default function OpenYearPage() {
                     const data = await response.json();
                     console.log('📅 Fetched current dates:', data);
                     
-                    // Extract and format dates - convert from UTC to Pacific date
                     if (data.success && data.dates) {
-                        // Helper to extract date portion from ISO string in UTC
-                        const extractUTCDate = (isoString: string): string => {
-                            const date = new Date(isoString);
-                            // Get UTC date components
-                            const year = date.getUTCFullYear();
-                            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-                            const day = String(date.getUTCDate()).padStart(2, '0');
-                            return `${year}-${month}-${day}`;
-                        };
-                        
+                        // Read each date on the calendar of the zone it is set in:
+                        // opening on Eastern, closing on Pacific. The closing instant
+                        // (11:59 PM Pacific) is already the next day in UTC, so taking
+                        // the UTC date pre-filled the closing field a day late - two,
+                        // with the API's old double conversion - and saving the form
+                        // unchanged would have moved the deadline.
                         const openDate = data.dates.openingDate 
-                            ? extractUTCDate(data.dates.openingDate)
+                            ? openingDateKey(data.dates.openingDate)
                             : `${year}-10-01`;
                         const closeDate = data.dates.closingDate
-                            ? extractUTCDate(data.dates.closingDate)
+                            ? closingDateKey(data.dates.closingDate)
                             : `${year}-12-02`;
                         
                         setCurrentDates({
@@ -213,7 +209,7 @@ export default function OpenYearPage() {
                                                     });
                                                 })()}
                                             </p>
-                                            <p className="text-xs text-emerald-600 mt-1">12:00 AM Pacific Time</p>
+                                            <p className="text-xs text-emerald-600 mt-1">{OPENING_TIME_LABEL}</p>
                                         </div>
                                         <div className="bg-white/70 rounded-lg p-4 border border-blue-200">
                                             <p className="text-xs text-blue-700 font-semibold mb-1">CLOSING DATE</p>
@@ -221,7 +217,7 @@ export default function OpenYearPage() {
                                                 {(() => {
                                                     if (!currentDates.closing_date) return 'N/A';
                                                     const [y, m, d] = currentDates.closing_date.split('-').map(Number);
-                                                    const date = new Date(y, m - 1, d-2);
+                                                    const date = new Date(y, m - 1, d);
                                                     return date.toLocaleDateString('en-US', { 
                                                         month: 'short', 
                                                         day: 'numeric',
@@ -313,7 +309,7 @@ export default function OpenYearPage() {
                                         onChange={(e) => setOpeningDate(e.target.value)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">Forms will open at 12:00 AM Pacific Time</p>
+                                    <p className="mt-1 text-xs text-gray-500">Forms will open at {OPENING_TIME_LABEL}</p>
                                 </div>
 
                                 <div>

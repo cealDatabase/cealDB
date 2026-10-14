@@ -1,6 +1,13 @@
 // lib/email.ts (server-only)
 import { Resend } from 'resend';
 import { formatDateWithWeekday, formatSimpleDate } from './dateFormatting';
+import {
+  formatOpeningDate,
+  openingDateKey,
+  closingDateKey,
+  OPENING_TIME_LABEL,
+  CLOSING_TIME_LABEL,
+} from './surveyTime';
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -267,7 +274,12 @@ export async function sendFormsOpenedNotification(
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const totalDays = Math.ceil((options.closingDate.getTime() - options.openingDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Calendar days from the opening date to the closing date, both included.
+    // Subtracting the instants would count the extra hours between 12:00 AM
+    // Eastern and 11:59 PM Pacific and round up to one day too many.
+    const dayMs = 1000 * 60 * 60 * 24;
+    const dayIndex = (key: string) => Date.UTC(+key.slice(0, 4), +key.slice(5, 7) - 1, +key.slice(8, 10)) / dayMs;
+    const totalDays = dayIndex(closingDateKey(options.closingDate)) - dayIndex(openingDateKey(options.openingDate)) + 1;
 
     const emailTemplate = `
       <!DOCTYPE html>
@@ -311,8 +323,8 @@ export async function sendFormsOpenedNotification(
             <div class="info-box">
               <h3 style="color: #374151; margin-top: 0; font-size: 18px;">📅 Important Dates</h3>
               <ul style="list-style: none; padding: 0;">
-                <li><strong>Forms Opened:</strong> ${formatDateWithWeekday(options.openingDate)} at 12:00 AM Pacific Time</li>
-                <li><strong>Forms Close:</strong> ${formatDateWithWeekday(options.closingDate)} at 11:59 PM Pacific Time</li>
+                <li><strong>Forms Opened:</strong> ${formatOpeningDate(options.openingDate, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} at ${OPENING_TIME_LABEL}</li>
+                <li><strong>Forms Close:</strong> ${formatDateWithWeekday(options.closingDate)} at ${CLOSING_TIME_LABEL}</li>
                 <li><strong>Submission Period:</strong> ${totalDays} days</li>
               </ul>
             </div>
@@ -412,7 +424,7 @@ export async function sendFormsClosedNotification(
             <div class="info-box">
               <h3 style="color: #991b1b; margin-top: 0; font-size: 18px;">📅 Session Summary</h3>
               <ul style="list-style: none; padding: 0;">
-                <li><strong>Forms Opened:</strong> ${formatSimpleDate(options.openingDate)}</li>
+                <li><strong>Forms Opened:</strong> ${formatOpeningDate(options.openingDate)}</li>
                 <li><strong>Forms Closed:</strong> ${formatSimpleDate(options.closingDate)}</li>
                 <li><strong>Status:</strong> Submissions are no longer accepted</li>
               </ul>
