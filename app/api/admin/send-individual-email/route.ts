@@ -57,7 +57,23 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Failed to send individual email:', error);
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+      const reason = error.message || error.name || 'Unknown error';
+      // Recorded so the Email Send Status page shows the failure and why.
+      try {
+        await logUserAction(
+          'CREATE',
+          'Email',
+          'failed',
+          null,
+          { to: email, year, mode: 'individual' },
+          false,
+          `Resend did not accept the email: ${reason}`,
+          request,
+        );
+      } catch (logErr) {
+        console.error('Audit log failed for individual email:', logErr);
+      }
+      return NextResponse.json({ error: `Failed to send email: ${reason}` }, { status: 500 });
     }
 
     // Audit log

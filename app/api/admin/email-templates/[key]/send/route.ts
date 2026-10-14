@@ -121,6 +121,21 @@ export async function POST(
     })).id;
   } catch (err) {
     console.error(`[email-templates/${templateKey}/send] Resend error:`, err);
+    // Recorded so the Email Send Status page shows the failure and why.
+    try {
+      await logUserAction(
+        'CREATE',
+        'EmailBroadcast',
+        `manual:${templateKey}`,
+        null,
+        { templateKey, academicYear: session.academicYear, subject: rendered.subject },
+        false,
+        err instanceof Error ? err.message : String(err),
+        request,
+      );
+    } catch (logErr) {
+      console.warn('[email-templates] Audit log failed:', logErr);
+    }
     return NextResponse.json(
       {
         error: 'Resend rejected the broadcast',

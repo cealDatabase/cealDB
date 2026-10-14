@@ -540,6 +540,7 @@ export async function GET(request: NextRequest) {
             academicYear: session.academicYear,
             librariesClosed: updateResult.count,
             closingDate: session.closingDate.toISOString(),
+            emailsAttempted: adminEmailResult.attempted,
             emailsSent: adminEmailResult.sent, // Only super admins notified on close
             ...(adminEmailFailures ? { emailsFailed: adminEmailFailures.failedRecipients } : {}),
             usersNotified: false

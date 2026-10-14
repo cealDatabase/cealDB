@@ -12,8 +12,12 @@ import { BROADCAST_FROM, sendBroadcastNow } from "@/lib/email"
 const prisma = db
 
 export async function POST(request: NextRequest) {
+  // Recorded with a failure, so the Email Send Status page can tell which
+  // year and which kind of send it was.
+  let logContext: Record<string, unknown> | null = null
   try {
     const { openingDate, closingDate, year, sendImmediately = false } = await request.json()
+    logContext = { year, send_mode: sendImmediately ? "immediate" : "scheduled" }
 
     // Verify user is super admin (DB-backed, never trust request body)
     if (!(await isSuperAdminDb())) {
@@ -367,6 +371,9 @@ export async function POST(request: NextRequest) {
         opening_date: openDate.toISOString(),
         closing_date: closeDate.toISOString(),
         broadcast_id: broadcast.data?.id || "unknown",
+        // "scheduled" only checked the broadcast with Resend; the daily job
+        // sends it on the opening date (Email Send Status page).
+        send_mode: sendImmediately ? "immediate" : "scheduled",
         libraries_opened: updateResult.count,
       },
       true,
@@ -401,7 +408,7 @@ export async function POST(request: NextRequest) {
         "Library_Year",
         "failed",
         null,
-        null,
+        logContext,
         false,
         error instanceof Error ? error.message : "Unknown error",
         request,
