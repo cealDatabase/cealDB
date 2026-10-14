@@ -357,8 +357,8 @@ export default function Part2AnnualCycle({ lang }: PartProps) {
                 en: '"Survey is now open"',
               },
               {
-                zh: '🤖 自动 — cron 在开表日发送（Resend scheduledAt 主，cron 备）',
-                en: '🤖 Auto — cron sends on opening day (Resend scheduledAt + cron backup)',
+                zh: '🤖 自动 — cron 在开表时间发送（用当时的模板内容；发送失败会在下次运行时重试，审计日志标红）',
+                en: '🤖 Auto — cron sends it at the opening time (current template; a failed send is retried at the next run and shows in red in the audit log)',
               },
             ],
             [

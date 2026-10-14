@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { 
   sendFormsClosedNotification,
   sendAdminFormsClosedNotification,
+  sendBroadcastNow,
   type NotificationResult,
 } from '@/lib/email';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
@@ -43,8 +44,12 @@ function describeEmailFailures(what: string, result: NotificationResult) {
  * 
  * 1. BROADCAST EMAILS (Sent ONCE per year when scheduled):
  *    - Announces survey opening to all users via Resend audience list
- *    - Primary method: Resend's scheduledAt sends automatically
- *    - Backup method: This cron sends if Resend fails
+ *    - Sent by this job (STEP 1) at the first run after the opening time.
+ *      Resend does not send it on its own: scheduling on /admin/broadcast
+ *      only leaves a draft there. Sending here uses the template and dates
+ *      as they are on the day.
+ *    - If Resend refuses it, the event stays pending, the failure is in the
+ *      audit log, and the next run tries again.
  *    - DUPLICATE PREVENTION:
  *      • Only processes events with status='pending'
  *      • Checks Library_Year.broadcast_sent=false before sending
@@ -71,7 +76,7 @@ function describeEmailFailures(what: string, result: NotificationResult) {
  * EXECUTION FLOW
  * ═══════════════════════════════════════════════════════════════
  * 
- * STEP 1: Check for pending broadcasts (backup safety net)
+ * STEP 1: Send the opening broadcast once its time has come
  * STEP 2: Check for sessions to open (no email; the broadcast announces it)
  * STEP 3: Check for sessions to close (send admin notifications only)
  * 
@@ -110,11 +115,10 @@ export async function GET(request: NextRequest) {
 
   try {
     // ========================================
-    // STEP 1: Check for PENDING BROADCASTS (Backup Safety Net)
+    // STEP 1: Send PENDING BROADCASTS whose time has come
     // ========================================
-    // CRITICAL: This is a backup in case Resend's scheduledAt fails
-    // - Primary method: Resend automatically sends via scheduledAt parameter
-    // - Backup method: This cron sends any missed broadcasts
+    // This is what sends a scheduled opening broadcast; Resend holds only a
+    // draft (see the header above).
     // - DUPLICATE PREVENTION: Only processes broadcasts with status='pending'
     // - Once sent, status changes to 'completed' and will NEVER be sent again
     const pendingBroadcasts = await prisma.scheduledEvent.findMany({
@@ -127,7 +131,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    console.log(`📧 Found ${pendingBroadcasts.length} pending broadcasts to check (backup safety net)`);
+    console.log(`📧 Found ${pendingBroadcasts.length} pending broadcasts due`);
     
     // Additional safety check: Filter out broadcasts that were already sent
     // This prevents duplicate sends if there's a database sync issue
@@ -206,19 +210,14 @@ export async function GET(request: NextRequest) {
 
         // Legacy hardcoded HTML removed — content now comes from EmailTemplate.broadcast_open_forms (see lib/emailTemplate.ts)
 
-        // Send broadcast immediately (Resend didn't send it)
-        const broadcast = await resend.broadcasts.create({
-          audienceId: audienceId,
-          from: 'CEAL Statistics Database <noreply@cealstats.org>',
+        // Throws if Resend does not create or send it; the event then stays
+        // pending (see catch below). It used to be marked sent either way.
+        const { id: broadcastId } = await sendBroadcastNow(resend, {
+          audienceId,
           subject: emailSubject,
-          html: emailTemplate
+          html: emailTemplate,
         });
-
-        // Send it immediately since it's already past scheduled time
-        if (broadcast.data?.id) {
-          await resend.broadcasts.send(broadcast.data.id);
-          console.log('✅ BACKUP broadcast sent immediately:', broadcast.data.id);
-        }
+        console.log('✅ Opening broadcast sent:', broadcastId);
 
         // CRITICAL: Mark broadcast as sent - this prevents duplicate sends
         await prisma.library_Year.updateMany({
@@ -232,7 +231,7 @@ export async function GET(request: NextRequest) {
           data: {
             status: 'completed',
             completed_at: new Date(),
-            notes: 'Sent by backup cron (Resend scheduledAt may have failed)'
+            notes: 'Sent by the scheduled job on the opening date'
           }
         });
         
@@ -247,9 +246,9 @@ export async function GET(request: NextRequest) {
           {
             year: event.year,
             action: 'BROADCAST_SENT',
-            broadcast_id: broadcast.data?.id,
+            broadcast_id: broadcastId,
             scheduled_date: event.scheduled_date.toISOString(),
-            sent_via: 'backup_cron',
+            sent_via: 'cron',
             duplicate_prevention: 'status=completed, broadcast_sent=true'
           },
           true,
@@ -259,17 +258,33 @@ export async function GET(request: NextRequest) {
 
         results.broadcasts_sent.push(event.year);
       } catch (error) {
-        const errorMsg = `Failed to send backup broadcast for year ${event.year}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        const reason = (error instanceof Error ? error.message : 'Unknown error').replace(/\.$/, '');
+        const errorMsg = `Opening broadcast for year ${event.year} was not sent: ${reason}. It stays pending; the next run tries again.`;
         console.error('❌', errorMsg);
         results.errors.push(errorMsg);
+        // Shown in red in the audit log, so a super admin sees it without
+        // reading the cron output.
+        await logUserAction(
+          'CREATE',
+          'ScheduledEvent',
+          event.id.toString(),
+          null,
+          {
+            year: event.year,
+            action: 'BROADCAST_FAILED',
+            scheduled_date: event.scheduled_date.toISOString(),
+          },
+          false,
+          errorMsg,
+          request
+        );
       }
     }
 
     // ========================================
     // STEP 2: Check for sessions to OPEN
     // ========================================
-    // - No email here: the broadcast (STEP 1, or Resend's own schedule) is the
-    //   opening announcement. See "NO SEPARATE FORMS OPEN EMAIL" above.
+    // - No email here: the broadcast (STEP 1) is the opening announcement. See "NO SEPARATE FORMS OPEN EMAIL" above.
     // - DUPLICATE PREVENTION: Only processes where notifiedOnOpen=false
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
@@ -371,15 +386,13 @@ export async function GET(request: NextRequest) {
             );
             const rendered = await renderTemplate('broadcast_closing_reminder', ctx);
 
-            const created = await reminderResend.broadcasts.create({
+            // Throws if Resend does not send it, so the reminder is not
+            // marked sent and the next run tries again.
+            const { id: bid } = await sendBroadcastNow(reminderResend, {
               audienceId: reminderAudience,
-              from: 'CEAL Statistics Database <noreply@cealstats.org>',
               subject: rendered.subject,
               html: rendered.html,
             });
-            const bid = created.data?.id;
-            if (!bid) throw new Error('Resend did not return a broadcast id');
-            await reminderResend.broadcasts.send(bid);
 
             await prisma.surveySession.update({
               where: { id: session.id },
@@ -405,9 +418,20 @@ export async function GET(request: NextRequest) {
             console.log(`✅ Closing reminder sent for year ${session.academicYear} (broadcast ${bid})`);
             results.broadcasts_sent.push(session.academicYear);
           } catch (sendErr) {
-            const msg = `Failed to send closing reminder for year ${session.academicYear}: ${sendErr instanceof Error ? sendErr.message : 'Unknown error'}`;
+            const reason = (sendErr instanceof Error ? sendErr.message : 'Unknown error').replace(/\.$/, '');
+            const msg = `Closing reminder for year ${session.academicYear} was not sent: ${reason}. The next run tries again.`;
             console.error('❌', msg);
             results.errors.push(msg);
+            await logUserAction(
+              'CREATE',
+              'EmailBroadcast',
+              `auto:broadcast_closing_reminder:${session.academicYear}`,
+              null,
+              { templateKey: 'broadcast_closing_reminder', academicYear: session.academicYear },
+              false,
+              msg,
+              request,
+            );
           }
         }
       }
@@ -536,7 +560,7 @@ export async function GET(request: NextRequest) {
         closed: results.closed,
         errors: results.errors
       },
-      message: `Sent ${results.broadcasts_sent.length} broadcasts (backup), opened ${results.opened.length} sessions, closed ${results.closed.length} sessions${results.errors.length > 0 ? `, ${results.errors.length} errors` : ''}`
+      message: `Sent ${results.broadcasts_sent.length} broadcasts, opened ${results.opened.length} sessions, closed ${results.closed.length} sessions${results.errors.length > 0 ? `, ${results.errors.length} errors` : ''}`
     });
 
   } catch (error) {

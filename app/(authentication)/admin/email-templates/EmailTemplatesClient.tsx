@@ -414,7 +414,7 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
                     auto_on_open: {
                       color: 'bg-green-50 border-green-200 text-green-900',
                       title: 'Automatic — sent on the opening date',
-                      body: 'This is delivered automatically when the scheduled opening date is reached (via Resend scheduledAt + the daily cron as backup). You can only edit content here — timing is controlled by the SurveySession.',
+                      body: 'This is delivered automatically at the scheduled opening time by the site\'s daily job, using this template as it is then, so edits made after scheduling still go out. If Resend refuses it, the job tries again at its next run and the failure shows in red in the audit log. You can only edit content here — timing is controlled by the SurveySession.',
                     },
                     auto_one_week_before_close: {
                       color: 'bg-amber-50 border-amber-200 text-amber-900',

@@ -401,6 +401,50 @@ function sendBatch(
   );
 }
 
+/** Sender for broadcasts to the CEAL audience. */
+export const BROADCAST_FROM = 'CEAL Statistics Database <noreply@cealstats.org>';
+
+function describeResendError(error: ResendError | null | undefined): string {
+  if (!error) return 'Resend returned no broadcast id';
+  return error.message || error.name || 'Unknown error';
+}
+
+/**
+ * Create a broadcast to the CEAL audience and send it now.
+ *
+ * The SDK does not throw when Resend refuses a request; it returns
+ * `{ error }`. Callers awaited `broadcasts.send` without looking at the
+ * result, so a broadcast Resend never sent was recorded as sent and never
+ * tried again. This throws instead, with Resend's reason, so the caller can
+ * leave the job pending and report what went wrong.
+ */
+export async function sendBroadcastNow(
+  resend: Pick<Resend, 'broadcasts'>,
+  message: { audienceId: string; subject: string; html: string },
+): Promise<{ id: string }> {
+  const created = await resend.broadcasts.create({
+    audienceId: message.audienceId,
+    from: BROADCAST_FROM,
+    subject: message.subject,
+    html: message.html,
+  });
+  const id = created.data?.id;
+  if (created.error || !id) {
+    throw new Error(`Resend did not create the broadcast: ${describeResendError(created.error)}`);
+  }
+
+  const sent = await resend.broadcasts.send(id);
+  if (sent.error) {
+    // The reply can be lost after Resend has accepted the send. Check before
+    // calling it a failure, or the retry would send the broadcast twice.
+    const check = await resend.broadcasts.get(id);
+    const status = check.data?.status;
+    if (status === 'sent' || status === 'queued') return { id };
+    throw new Error(`Resend created broadcast ${id} but did not send it: ${describeResendError(sent.error)}`);
+  }
+  return { id };
+}
+
 function logNotificationResult(label: string, result: NotificationResult): void {
   const line = `${label}: ${result.sent}/${result.attempted} emails accepted by Resend`;
   if (result.failed.length === 0) {
