@@ -143,6 +143,8 @@ export default function EditAVModal({
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
+          {/* Titles, subtitle, publisher; the data source follows the
+              description it supports; numbers and type after the text. */}
           <div>
             <label className='text-sm font-medium'>Title</label>
             <Input
@@ -184,6 +186,16 @@ export default function EditAVModal({
           </div>
 
           <div>
+            <label className='text-sm font-medium'>Publisher</label>
+            <Input
+              value={formData.publisher}
+              onChange={(e) =>
+                setFormData({ ...formData, publisher: e.target.value })
+              }
+            />
+          </div>
+
+          <div>
             <label className='text-sm font-medium'>Description</label>
             <textarea
               className='w-full border rounded px-2 py-1 min-h-[80px] resize-y'
@@ -195,23 +207,11 @@ export default function EditAVModal({
           </div>
 
           <div>
-            <label className='text-sm font-medium'>Counts</label>
+            <label className='text-sm font-medium'>Data Source</label>
             <Input
-              type='number' // ✅ ensure numeric
-              inputMode='numeric'
-              value={formData.counts}
+              value={formData.data_source}
               onChange={(e) =>
-                setFormData({ ...formData, counts: Number(e.target.value) })
-              }
-            />
-          </div>
-
-          <div>
-            <label className='text-sm font-medium'>Publisher</label>
-            <Input
-              value={formData.publisher}
-              onChange={(e) =>
-                setFormData({ ...formData, publisher: e.target.value })
+                setFormData({ ...formData, data_source: e.target.value })
               }
             />
           </div>
@@ -228,11 +228,13 @@ export default function EditAVModal({
           </div>
 
           <div>
-            <label className='text-sm font-medium'>Data Source</label>
+            <label className='text-sm font-medium'>Counts</label>
             <Input
-              value={formData.data_source}
+              type='number' // ✅ ensure numeric
+              inputMode='numeric'
+              value={formData.counts}
               onChange={(e) =>
-                setFormData({ ...formData, data_source: e.target.value })
+                setFormData({ ...formData, counts: Number(e.target.value) })
               }
             />
           </div>
