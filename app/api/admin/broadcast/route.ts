@@ -7,6 +7,7 @@ import { getSurveyDates } from "@/lib/surveyDates"
 import { openingInstant, closingInstant, CLOSING_TIME_LABEL } from "@/lib/surveyTime"
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 import { buildTemplateContext, renderTemplate } from "@/lib/emailTemplate"
+import { BROADCAST_FROM, sendBroadcastNow } from "@/lib/email"
 
 const prisma = db
 
@@ -152,25 +153,19 @@ export async function POST(request: NextRequest) {
     if (sendImmediately) {
       console.log("🚀 IMMEDIATE MODE: Sending broadcast and opening forms NOW")
 
-      // Send broadcast via Resend
+      // Send broadcast via Resend. If Resend does not send it, nothing below
+      // runs: the forms stay as they are and the super admin sees Resend's
+      // reason and can try again. The send result used to go unchecked, so a
+      // failed send still opened the forms and reported success.
       try {
-        // Step 1: Create the broadcast (saves as draft)
-        broadcast = await resend.broadcasts.create({
-          audienceId: audienceId,
-          from: "CEAL Statistics Database <noreply@cealstats.org>",
-          subject: emailSubject,
-          html: emailTemplate,
-        })
-
-        console.log("✅ Broadcast created with ID:", broadcast.data?.id)
-
-        // Step 2: Send the broadcast immediately
-        if (broadcast.data?.id) {
-          await resend.broadcasts.send(broadcast.data.id)
-          console.log("✅ Broadcast sent immediately:", broadcast.data.id)
-        } else {
-          throw new Error("No broadcast ID returned from Resend")
+        broadcast = {
+          data: await sendBroadcastNow(resend, {
+            audienceId,
+            subject: emailSubject,
+            html: emailTemplate,
+          }),
         }
+        console.log("✅ Broadcast sent immediately:", broadcast.data.id)
       } catch (emailError) {
         console.error("❌ Failed to send broadcast email:", emailError)
         throw new Error(
@@ -256,27 +251,31 @@ export async function POST(request: NextRequest) {
     // BRANCH 2: SCHEDULE BROADCAST FOR LATER
     // ========================================
     else {
-      console.log("📅 SCHEDULED MODE: Creating scheduled broadcast via Resend")
+      console.log("📅 SCHEDULED MODE: the daily job sends the broadcast on the opening date")
 
-      // Schedule broadcast via Resend with scheduledAt parameter
+      // Resend does not send this one on its own. A broadcast created without
+      // `send: true` is a draft, and the `scheduledAt` this used to pass is
+      // ignored without it. The daily job (check-form-schedules, STEP 1)
+      // sends the broadcast at the opening time, with the template and dates
+      // as they are then. Creating the draft now still checks, while there is
+      // time to fix it, that Resend accepts the key, the audience and the
+      // email; a refusal used to pass silently.
       try {
-        // Create broadcast with schedule time (TypeScript workaround)
-        const broadcastOptions: any = {
-          audienceId: audienceId,
-          from: "CEAL Statistics Database <noreply@cealstats.org>",
+        broadcast = await resend.broadcasts.create({
+          audienceId,
+          from: BROADCAST_FROM,
           subject: emailSubject,
           html: emailTemplate,
-          scheduledAt: openDate.toISOString(), // Resend will automatically send at this time
+        })
+        if (broadcast.error || !broadcast.data?.id) {
+          throw new Error(broadcast.error?.message || "Resend returned no broadcast id")
         }
-        
-        broadcast = await resend.broadcasts.create(broadcastOptions)
-
-        console.log("✅ Broadcast scheduled with ID:", broadcast.data?.id)
-        console.log("✅ Will be sent automatically on:", openDate.toISOString())
+        console.log("✅ Draft accepted by Resend:", broadcast.data.id)
+        console.log("✅ The daily job sends the broadcast on:", openDate.toISOString())
       } catch (emailError) {
         console.error("❌ Failed to schedule broadcast email:", emailError)
         throw new Error(
-          "Failed to schedule broadcast email: " + (emailError instanceof Error ? emailError.message : "Unknown error"),
+          "Resend did not accept the broadcast, so nothing was scheduled: " + (emailError instanceof Error ? emailError.message : "Unknown error"),
         )
       }
 
@@ -352,7 +351,7 @@ export async function POST(request: NextRequest) {
 
       console.log("📅 Created SurveySession for year", year, "(scheduled, not yet open)")
       console.log("📅 Created 3 separate scheduled events for form automation:")
-      console.log("   1. BROADCAST on", openDate.toISOString(), "(handled by Resend)")
+      console.log("   1. BROADCAST on", openDate.toISOString(), "(sent by cron)")
       console.log("   2. FORM_OPENING on", openDate.toISOString(), "(needs cron job)")
       console.log("   3. FORM_CLOSING on", closeDate.toISOString(), "(needs cron job)")
     }

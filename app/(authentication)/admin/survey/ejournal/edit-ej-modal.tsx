@@ -127,15 +127,16 @@ export default function EditEjournalModal({
         </DialogHeader>
 
         <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-2'>
+          {/* Titles, subtitle and series, then publisher and vendor; the
+              data source follows the description it supports. */}
           {[
             ["Title", "title"],
-            ["Subtitle", "subtitle"],
             ["CJK Title", "cjk_title"],
             ["Romanized Title", "romanized_title"],
+            ["Subtitle", "subtitle"],
+            ["Series", "series"],
             ["Publisher", "publisher"],
             ["Vendor", "vendor"],
-            ["Data Source", "data_source"],
-            ["Series", "series"],
           ].map(([label, key]) => (
             <div key={key}>
               <label className='text-sm font-medium'>{label}</label>
@@ -155,6 +156,16 @@ export default function EditEjournalModal({
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
+              }
+            />
+          </div>
+
+          <div>
+            <label className='text-sm font-medium'>Data Source</label>
+            <Input
+              value={formData.data_source}
+              onChange={(e) =>
+                setFormData({ ...formData, data_source: e.target.value })
               }
             />
           </div>

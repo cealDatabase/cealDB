@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isSuperAdminDb } from '@/lib/auth';
 import { Resend } from 'resend';
+import { sendBroadcastNow } from '@/lib/email';
 import db from '@/lib/db';
 import {
   DEFAULT_TEMPLATES,
@@ -111,17 +112,13 @@ export async function POST(
   const resend = new Resend(process.env.RESEND_API_KEY);
   let broadcastId: string | undefined;
   try {
-    const created = await resend.broadcasts.create({
+    // Throws if Resend does not create or send it. The send result used to
+    // go unchecked, so a refused send was still reported as sent.
+    broadcastId = (await sendBroadcastNow(resend, {
       audienceId,
-      from: 'CEAL Statistics Database <noreply@cealstats.org>',
       subject: rendered.subject,
       html: rendered.html,
-    });
-    broadcastId = created.data?.id;
-    if (!broadcastId) {
-      throw new Error('Resend did not return a broadcast id');
-    }
-    await resend.broadcasts.send(broadcastId);
+    })).id;
   } catch (err) {
     console.error(`[email-templates/${templateKey}/send] Resend error:`, err);
     return NextResponse.json(

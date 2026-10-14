@@ -304,15 +304,18 @@ export function getColumns(
         const id = (row.original as any).id as number;
         const { is_selected } = getSelectionState(id);
         
+        // Centred like the header above it (label over checkbox).
         return (
-          <Checkbox
-            checked={is_selected}
-            onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
-            disabled={!canEdit}
-            aria-label='My Access: your institution holds this entry'
-            title='My Access: your institution holds this entry'
-            className='border-blue-500 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600'
-          />
+          <div className="flex justify-center">
+            <Checkbox
+              checked={is_selected}
+              onCheckedChange={(value) => onSelectionChange?.(id, !!value)}
+              disabled={!canEdit}
+              aria-label='My Access: your institution holds this entry'
+              title='My Access: your institution holds this entry'
+              className='border-blue-500 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600'
+            />
+          </div>
         );
       },
       enableSorting: false,
