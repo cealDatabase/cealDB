@@ -210,6 +210,12 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
   const accessCell = renderCell("user_selection");
   const actionsCell = renderCell("actions");
   const adminSelectCell = renderCell("bulk_delete");
+  // Which member institutions hold this entry. The column only exists for
+  // roles allowed to see it (not plain members), so the card follows suit.
+  const hasSubscribers = !!getCell("subscribers");
+  const subscriberCount = Array.isArray(record.subscribers)
+    ? record.subscribers.length
+    : record.subscribers ? 1 : 0;
 
   return (
     <article
@@ -260,7 +266,7 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
             )}
           </div>
 
-          {stats.length > 0 && (
+          {(stats.length > 0 || hasSubscribers) && (
             <dl className="flex shrink-0 gap-5 text-right">
               {stats.map(([name, value]) => (
                 <div key={name}>
@@ -268,6 +274,14 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
                   <dd className="text-base font-semibold tabular-nums">{value || "—"}</dd>
                 </div>
               ))}
+              {hasSubscribers && (
+                <div title="Member institutions that hold this entry. Click the number to see them.">
+                  <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Subscribers</dt>
+                  <dd className="text-base font-semibold tabular-nums">
+                    {subscriberCount > 0 ? renderCell("subscribers") : "0"}
+                  </dd>
+                </div>
+              )}
             </dl>
           )}
         </div>
@@ -476,6 +490,11 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       : [bulkDeleteColumn, ...withoutAccess];
   }, [bulkDelete, bulkMode, bulkDeleteColumn, columns]);
 
+  const goToFirstPage = () =>
+    setPagination((current: { pageIndex: number; pageSize: number }) =>
+      current.pageIndex === 0 ? current : { ...current, pageIndex: 0 }
+    );
+
   const table = useReactTable({
     data,
     columns: tableColumns,
@@ -507,10 +526,22 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       });
     },
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    // A new search, filter or sort starts from the first page. Without this a
+    // search typed on page 2 showed an empty page 2 while its matches sat on
+    // page 1, because automatic page resets are off (see below).
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      goToFirstPage();
+    },
+    onColumnFiltersChange: (updater) => {
+      setColumnFilters(updater);
+      goToFirstPage();
+    },
     onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: (updater) => {
+      setGlobalFilter(updater);
+      goToFirstPage();
+    },
     onPaginationChange: setPagination,
     // Saving edits refreshes the catalogue data. Keep the reader on their
     // current page instead of letting TanStack Table reset to page one.
@@ -526,6 +557,20 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     // on, so the only "select all" on screen is the bulk-manage one.
     meta: { bulkMode: !!bulkDelete && bulkMode },
   });
+
+  // A page that no longer exists - the list shrank after a delete, or a page
+  // number restored from an earlier visit is past the end of a search from
+  // the URL - shows "No results" although there are matches. Fall back to
+  // the last page that has rows.
+  const pageCount = table.getPageCount();
+  React.useEffect(() => {
+    if (pagination.pageIndex > 0 && pagination.pageIndex >= pageCount) {
+      setPagination((current: { pageIndex: number; pageSize: number }) => ({
+        ...current,
+        pageIndex: Math.max(0, pageCount - 1),
+      }));
+    }
+  }, [pageCount, pagination.pageIndex]);
 
   const selectedBulkIds = table
     .getSelectedRowModel()
@@ -582,6 +627,27 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
       listTopRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     });
   };
+
+  // The detailed table scrolls inside its own box so its header row can stay
+  // in view. Size that box to the screen space left under the sticky year bar
+  // (5.25rem) and the sticky search/filter bar, so the header is never tucked
+  // underneath them.
+  const controlsRef = React.useRef<HTMLDivElement>(null);
+  const [controlsHeight, setControlsHeight] = React.useState(0);
+  React.useEffect(() => {
+    const element = controlsRef.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => setControlsHeight(element.offsetHeight));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [stickyControls]);
+  const tableBoxStyle: React.CSSProperties | undefined = stickyHeader
+    ? {
+        maxHeight: stickyControls
+          ? `max(18rem, calc(100vh - 5.25rem - ${controlsHeight}px - 4rem))`
+          : "70vh",
+      }
+    : undefined;
 
   const exitBulkMode = () => {
     table.resetRowSelection();
@@ -647,7 +713,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     // bar is pushed down over the first rows and the column headers.
     <div ref={listTopRef} className={cn("space-y-3", stickyControls ? "scroll-mt-[5.25rem]" : "scroll-mt-4")}>
       {stickyControls ? (
-        <div className="sticky top-[5.25rem] z-30 -mx-2 space-y-2 border-y bg-white/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        <div ref={controlsRef} className="sticky top-[5.25rem] z-30 -mx-2 space-y-2 border-y bg-white/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
           {tableControls}
         </div>
       ) : tableControls}
@@ -733,10 +799,15 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         </div>
       ) : (
         <div
-          className={`rounded-md border ${stickyHeader ? "max-h-[70vh] overflow-auto" : "overflow-x-auto"}`}
+          className={`rounded-md border ${stickyHeader ? "overflow-auto" : "overflow-x-auto"}`}
+          style={tableBoxStyle}
           suppressHydrationWarning
         >
-          <Table suppressHydrationWarning>
+          {/* With a sticky header this box must be the only scroll container:
+              the table's own wrapper scrolls sideways, and a sticky header
+              sticks to its nearest scroll container. That wrapper never
+              scrolls vertically, so the header used to scroll away. */}
+          <Table suppressHydrationWarning containerClassName={stickyHeader ? "overflow-visible" : undefined}>
             <TableHeader className={stickyHeader ? "sticky top-0 z-20 bg-background shadow-sm" : undefined}>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
