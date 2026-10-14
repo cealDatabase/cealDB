@@ -1,8 +1,22 @@
 // /app/api/admin/open-new-year/route.ts
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { isSuperAdminDb } from "@/lib/auth";
+import { openingInstant, closingInstant } from "@/lib/surveyTime";
 
 export async function POST(req: Request) {
+  // Super admin only. Middleware only checks that the caller is signed in, so
+  // without this any member could reschedule a year that is already
+  // collecting - rewriting every library's dates and resetting the session's
+  // notification flags, which made the next cron run re-send the "forms open"
+  // email to everyone.
+  if (!(await isSuperAdminDb())) {
+    return NextResponse.json(
+      { error: "Unauthorized. Super admin access required." },
+      { status: 403 }
+    );
+  }
+
   try {
     console.log("Creating new year form records...");
 
@@ -22,21 +36,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Convert dates to Pacific Time to prevent timezone issues
-    // Input "2025-10-15" should be Oct 15 at 12:00 AM Pacific, not UTC midnight
-    const toPacificMidnight = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
-    };
-    
-    const toPacificEndOfDay = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
-      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
-    };
-
-    const openDate = toPacificMidnight(openingDate);
-    const closeDate = toPacificEndOfDay(closingDate);
+    // Forms open at 12:00 AM Eastern and close at 11:59 PM Pacific, with
+    // daylight saving resolved for each date (see lib/surveyTime.ts).
+    const openDate = openingInstant(openingDate);
+    const closeDate = closingInstant(closingDate);
 
     console.log('📅 Date Summary:');
     console.log('  Opening:', openingDate, '→', openDate.toISOString());
@@ -68,6 +71,19 @@ export async function POST(req: Request) {
     }
 
     console.log(`Found ${libraries.length} libraries`);
+
+    // Looked up before the libraries so a library added part-way through the
+    // year can be created in the year's current state (see below).
+    const existingSession = await db.surveySession.findUnique({
+      where: { academicYear: targetYear }
+    });
+    // Re-running this page mid-collection to pick up a newly joined library is
+    // the documented fix for a missing Library_Year row. Re-running it used to
+    // reset the session so the cron re-opened the whole year, which opened the
+    // new library but also re-sent the "forms open" email to every user. The
+    // session is no longer reset, so a library created while the year is open
+    // has to be created open itself, or it would stay closed for the year.
+    const yearIsOpen = existingSession?.isOpen === true;
 
     // Step 3: Create or update Library_Year records for each library for the current year
     const createdRecords = [];
@@ -115,7 +131,8 @@ export async function POST(req: Request) {
             data: {
               library: library.id,
               year: targetYear,
-              is_open_for_editing: false, // Forms remain CLOSED until scheduled opening
+              // Closed until the scheduled opening, unless the year is already open.
+              is_open_for_editing: yearIsOpen,
               opening_date: openDate,      // Set opening date
               closing_date: closeDate,     // Set closing date
               updated_at: new Date(),
@@ -147,21 +164,27 @@ export async function POST(req: Request) {
     // Step 4: Create or update SurveySession for automatic form opening/closing
     console.log('📋 Creating/updating SurveySession for automatic scheduling...');
     
-    const existingSession = await db.surveySession.findUnique({
-      where: { academicYear: targetYear }
-    });
-
     let sessionAction = 'created';
     if (existingSession) {
-      // Update existing session with new dates
+      // Only the dates move. This used to reset isOpen and every notified*
+      // flag as well, so adjusting the dates of a year that had already opened
+      // made the cron treat it as never opened: it re-sent the "forms open"
+      // email to every user and, if the new closing date had passed, closed
+      // all forms in the same run. A year that has not opened yet has all of
+      // these false already, so preserving them changes nothing for it.
+      //
+      // The one flag worth resetting is the one-week reminder: if the closing
+      // date moves more than a week out, the reminder should fire again ahead
+      // of the new date.
+      const reminderDue =
+        closeDate.getTime() !== existingSession.closingDate.getTime() &&
+        closeDate.getTime() - Date.now() > 7 * 24 * 60 * 60 * 1000;
       await db.surveySession.update({
         where: { academicYear: targetYear },
         data: {
           openingDate: openDate,
           closingDate: closeDate,
-          isOpen: false,
-          notifiedOnOpen: false,
-          notifiedOnClose: false,
+          ...(reminderDue ? { notifiedClosingReminder: false } : {}),
         }
       });
       sessionAction = 'updated';

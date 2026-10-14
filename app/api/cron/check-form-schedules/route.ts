@@ -7,6 +7,7 @@ import {
   sendAdminFormsClosedNotification
 } from '@/lib/email';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
+import { getSurveyDates } from '@/lib/surveyDates';
 import { getSuperAdminEmails, getAllActiveUserEmails, getLibraryYearCount } from '@/lib/userUtils';
 import { logUserAction } from '@/lib/auditLogger';
 import { formatDateRange } from '@/lib/dateFormatting';
@@ -158,8 +159,22 @@ export async function GET(request: NextRequest) {
 
         const session = libraryYears[0];
         const currentYear = new Date().getFullYear();
-        const openDateObj = session.opening_date ? new Date(session.opening_date) : new Date(Date.UTC(event.year, 9, 1, 7, 0, 0));
-        const closeDateObj = session.closing_date ? new Date(session.closing_date) : new Date(Date.UTC(event.year, 11, 2, 6, 59, 0));
+        // Dates for the email come from the SurveySession: it is what this job
+        // opens and closes on, so the email states the dates that will actually
+        // apply. Library_Year rows written by the broadcast route carried the
+        // closing date one day late, so reading them put the wrong deadline in
+        // front of every member. Library_Year, then the defaults, are fallbacks.
+        const surveySession = await prisma.surveySession.findUnique({
+          where: { academicYear: event.year },
+          select: { openingDate: true, closingDate: true },
+        });
+        const fallbackDates = getSurveyDates(event.year);
+        const openDateObj = surveySession?.openingDate
+          ? new Date(surveySession.openingDate)
+          : session.opening_date ? new Date(session.opening_date) : fallbackDates.openingDate;
+        const closeDateObj = surveySession?.closingDate
+          ? new Date(surveySession.closingDate)
+          : session.closing_date ? new Date(session.closing_date) : fallbackDates.closingDate;
 
         // Load editable template (DB-backed, falls back to built-in default)
         const _ctx = buildTemplateContext(event.year, openDateObj, closeDateObj);

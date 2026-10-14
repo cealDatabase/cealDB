@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/Container';
+import { formatOpeningDate, formatClosingDate } from '@/lib/surveyTime';
 import { Button } from '@/components/ui/button';
 import {
   AlertCircle,
@@ -222,7 +223,7 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
       `This will IMMEDIATELY send the "${active.name}" broadcast to the entire CEAL audience.\n\n` +
       `Subject: ${previewSubject}\n` +
       (session
-        ? `Year: ${session.year}\nOpening: ${new Date(session.openingDate).toLocaleDateString()}\nClosing: ${new Date(session.closingDate).toLocaleDateString()}\n\n`
+        ? `Year: ${session.year}\nOpening: ${formatOpeningDate(session.openingDate, { year: 'numeric', month: 'numeric', day: 'numeric' })}\nClosing: ${formatClosingDate(session.closingDate, { year: 'numeric', month: 'numeric', day: 'numeric' })}\n\n`
         : '\n') +
       `Make sure you have SAVED the latest edits first — the email uses the saved version, not unsaved changes.\n\n` +
       `Proceed?`;
@@ -448,8 +449,8 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
                           {session && (
                             <p className="text-xs mt-2 opacity-80">
                               Current session: year {session.year}, opens{' '}
-                              {new Date(session.openingDate).toLocaleDateString()}, closes{' '}
-                              {new Date(session.closingDate).toLocaleDateString()}.
+                              {formatOpeningDate(session.openingDate, { year: 'numeric', month: 'numeric', day: 'numeric' })}, closes{' '}
+                              {formatClosingDate(session.closingDate, { year: 'numeric', month: 'numeric', day: 'numeric' })}.
                             </p>
                           )}
                         </div>

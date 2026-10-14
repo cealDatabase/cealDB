@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { isSuperAdminDb } from '@/lib/auth';
 import { getSurveyDates } from '@/lib/surveyDates';
+import { openingInstant, closingInstant } from '@/lib/surveyTime';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
@@ -95,22 +96,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Convert dates to Pacific Time to prevent timezone issues
-    // IMPORTANT: When user selects 12/19, forms should close at 11:59 PM Pacific on 12/19
-    // This is stored as 12/20 7:59 AM UTC (PST = UTC-8)
-    const toPacificMidnight = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 12:00 AM Pacific = 8:00 AM UTC
-    };
-    
-    const toPacificEndOfDay = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      // User picks date D → close at 11:59 PM Pacific on D → store as D+1 7:59 AM UTC
-      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
-    };
-
-    const openDate = toPacificMidnight(openingDate);
-    const closeDate = toPacificEndOfDay(closingDate);
+    // 12:00 AM Eastern on the opening date, 11:59 PM Pacific on the closing
+    // date, daylight saving resolved per date (lib/surveyTime.ts).
+    const openDate = openingInstant(openingDate);
+    const closeDate = closingInstant(closingDate);
     
     if (closeDate <= openDate) {
       return NextResponse.json(

@@ -3,7 +3,16 @@
  * Handles automatic date calculations for the CEAL Statistics Database survey system
  */
 
-import { formatShortDate, formatDateWithWeekday, formatSimpleDate } from './dateFormatting';
+import { formatDateWithWeekday } from './dateFormatting';
+import {
+  openingInstant,
+  closingInstant,
+  openingDateKey,
+  closingDateKey,
+  formatOpeningDate,
+  formatClosingDate,
+  CLOSING_TIME_LABEL,
+} from './surveyTime';
 
 export interface SurveyDates {
   openingDate: Date;
@@ -29,31 +38,35 @@ export function getSurveyDates(
   const pastYear = year - 1;
   const nextYear = year + 1;
 
-  // Helper function to convert date string to Pacific Time midnight
-  const toPacificMidnight = (dateInput: Date | string): Date => {
-    const raw = typeof dateInput === 'string' ? dateInput : dateInput.toISOString();
-    const dateStr = raw.split('T')[0];
-    const [y, m, d] = dateStr.split('-').map(Number);
-    // Create date at midnight Pacific Time by adding 7 or 8 hours to UTC
-    // Use 8 hours (PST) as default - this ensures the date stays correct year-round
-    return new Date(Date.UTC(y, m - 1, d, 8, 0, 0));
+  // A custom date arrives either as a bare YYYY-MM-DD (from a form) or as an
+  // instant already stored in the database. An instant has to be read on the
+  // calendar of the zone it was set in. Reading it off the UTC calendar - what
+  // this used to do - moved every closing date a day later, because 11:59 PM
+  // Pacific is already the next day in UTC; callers that passed a stored
+  // closing date back in got it shifted again.
+  //
+  // A Date at exactly UTC midnight is a bare date that went through
+  // `new Date("YYYY-MM-DD")`, so it is read as that date. No stored opening or
+  // closing instant falls on UTC midnight (they sit at 04:00-08:00 UTC), so
+  // this cannot mistake one for the other.
+  const dateKeyOf = (input: Date | string): string | null => {
+    if (typeof input === 'string') {
+      return /^\d{4}-\d{2}-\d{2}$/.test(input.trim()) ? input.trim() : null;
+    }
+    const isUtcMidnight =
+      input.getUTCHours() === 0 && input.getUTCMinutes() === 0 &&
+      input.getUTCSeconds() === 0 && input.getUTCMilliseconds() === 0;
+    return isUtcMidnight ? input.toISOString().slice(0, 10) : null;
   };
+  const toOpening = (input: Date | string): Date =>
+    openingInstant(dateKeyOf(input) ?? openingDateKey(input));
+  const toClosing = (input: Date | string): Date =>
+    closingInstant(dateKeyOf(input) ?? closingDateKey(input));
 
-  // Helper function to convert date string to Pacific Time 11:59 PM
-  const toPacificEndOfDay = (dateInput: Date | string): Date => {
-    const raw = typeof dateInput === 'string' ? dateInput : dateInput.toISOString();
-    const dateStr = raw.split('T')[0];
-    const [y, m, d] = dateStr.split('-').map(Number);
-    // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
-    // Example: 12/19 11:59 PM PST = 12/20 7:59 AM UTC
-    return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
-  };
-
-  // Default opening date: October 1, current year at 12:00 AM Pacific
-  const defaultOpening = new Date(Date.UTC(currentYear, 9, 1, 7, 0, 0)); // Oct 1, 12:00 AM Pacific (UTC-7)
-  
-  // Default closing date: December 2, current year at 11:59 PM Pacific
-  const defaultClosing = new Date(Date.UTC(currentYear, 11, 2, 6, 59, 0)); // Dec 2, 11:59 PM Pacific (UTC-8)
+  // Fallbacks for a year with no dates set yet. The real dates are set by the
+  // super admin each year; these only fill the gap until then.
+  const defaultOpening = openingInstant(`${currentYear}-10-01`); // Oct 1, 12:00 AM Eastern
+  const defaultClosing = closingInstant(`${currentYear}-12-02`); // Dec 2, 11:59 PM Pacific
 
   // Fiscal year period (FIXED - not customizable)
   const fiscalStart = new Date(Date.UTC(pastYear, 6, 1, 0, 0, 0)); // July 1, past year
@@ -63,8 +76,8 @@ export function getSurveyDates(
   const publication = new Date(Date.UTC(nextYear, 1, 1, 0, 0, 0)); // February 1, next year
 
   return {
-    openingDate: customOpeningDate ? toPacificMidnight(customOpeningDate) : defaultOpening,
-    closingDate: customClosingDate ? toPacificEndOfDay(customClosingDate) : defaultClosing,
+    openingDate: customOpeningDate ? toOpening(customOpeningDate) : defaultOpening,
+    closingDate: customClosingDate ? toClosing(customClosingDate) : defaultClosing,
     fiscalYearStart: fiscalStart,
     fiscalYearEnd: fiscalEnd,
     publicationDate: publication,
@@ -80,7 +93,7 @@ export function getSurveyDates(
 export function formatSurveyDate(date: Date, includeTime: boolean = false): string {
   if (includeTime) {
     // For dates with time, show the date part with time text in Pacific Time
-    return `${formatDateWithWeekday(date)} at 11:59 PM Pacific`;
+    return `${formatDateWithWeekday(date)} at ${CLOSING_TIME_LABEL}`;
   }
   return formatDateWithWeekday(date);
 }
@@ -92,7 +105,12 @@ export function formatSurveyDate(date: Date, includeTime: boolean = false): stri
  */
 export function formatFiscalYear(year: number): string {
   const dates = getSurveyDates(year);
-  return `${formatSimpleDate(dates.fiscalYearStart)} to ${formatSimpleDate(dates.fiscalYearEnd)}`;
+  // The fiscal-year bounds are defined at UTC midnight, so format them in UTC.
+  // In Pacific time July 1 00:00 UTC is still June 30, which printed the year
+  // as "June 30, 2025 to June 30, 2026".
+  const utc = (d: Date) =>
+    d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  return `${utc(dates.fiscalYearStart)} to ${utc(dates.fiscalYearEnd)}`;
 }
 
 /**
@@ -124,8 +142,9 @@ export function getShortDateRange(
 ): string {
   const dates = getSurveyDates(year, customOpeningDate, customClosingDate);
   
-  const openMonth = formatShortDate(dates.openingDate).replace(/, \d{4}$/, ''); // Remove year
-  const closeMonth = formatShortDate(dates.closingDate);
+  const short: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  const openMonth = formatOpeningDate(dates.openingDate, short).replace(/, \d{4}$/, ''); // Remove year
+  const closeMonth = formatClosingDate(dates.closingDate, short);
   
   return `${openMonth} - ${closeMonth}`;
 }

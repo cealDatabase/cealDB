@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon
 import Link from 'next/link'
 import { LocalDateTime } from '@/components/LocalDateTime'
 import { getSurveyDates, formatSurveyDate } from '@/lib/surveyDates'
+import { formatOpeningDate, formatClosingDate, openingDateKey, closingDateKey, OPENING_TIME_LABEL, CLOSING_TIME_LABEL } from '@/lib/surveyTime'
 import EnhancedSessionQueue from '@/components/EnhancedSessionQueue'
 import {
   Breadcrumb,
@@ -108,21 +109,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     setError(null);
 
     try {
-      // Extract UTC date to avoid timezone conversion issues
-      const extractUTCDate = (isoString: string): string => {
-        const date = new Date(isoString);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
 
-      const openingDate = extractUTCDate(session.opening_date);
-
-      // Subtract 1 day from closing date
-      const closingDateObj = new Date(session.closing_date);
-      closingDateObj.setUTCDate(closingDateObj.getUTCDate() - 1);
-      const closingDate = extractUTCDate(closingDateObj.toISOString());
+      // Read each date on the calendar of its zone: opening on Eastern,
+      // closing on Pacific (11:59 PM Pacific is already the next day in UTC).
+      const openingDate = openingDateKey(session.opening_date);
+      const closingDate = closingDateKey(session.closing_date);
 
 
       const response = await fetch(
@@ -164,19 +155,9 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
     setError(null);
 
     try {
-      // Extract UTC date to avoid timezone conversion issues
-      const extractUTCDate = (isoString: string): string => {
-        const date = new Date(isoString);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
 
-      const openingDate = extractUTCDate(scheduledSession.opening_date);
-      const closingDateObj = new Date(scheduledSession.closing_date);
-      closingDateObj.setUTCDate(closingDateObj.getUTCDate() - 1);
-      const closingDate = extractUTCDate(closingDateObj.toISOString());
+      const openingDate = openingDateKey(scheduledSession.opening_date);
+      const closingDate = closingDateKey(scheduledSession.closing_date);
 
       // Send broadcast using Resend Broadcast API
       const response = await fetch('/api/admin/broadcast', {
@@ -604,9 +585,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       <div className="flex-1">
                         <div className="font-bold text-gray-900">📅 Schedule for Opening Date</div>
                         <div className="text-sm text-gray-600 mt-1">
-                          Broadcast will be sent automatically on <strong>{new Date(scheduledSession.opening_date).toLocaleDateString('en-US', {
-                            timeZone: "America/Los_Angeles"
-                          })}</strong> when forms open.
+                          Broadcast will be sent automatically on <strong>{formatOpeningDate(scheduledSession.opening_date, { year: 'numeric', month: 'numeric', day: 'numeric' })}</strong> when forms open.
                         </div>
                       </div>
                     </div>
@@ -629,9 +608,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                   <li className="flex items-start gap-2">
                     <span className="font-bold mt-1">•</span>
                     <span>
-                      <strong>Opening:</strong> {new Date(scheduledSession.opening_date).toLocaleDateString('en-US', {
-                        timeZone: "America/Los_Angeles"
-                      })} at <strong>12:00 AM PT</strong>
+                      <strong>Opening:</strong> {formatOpeningDate(scheduledSession.opening_date, { year: 'numeric', month: 'numeric', day: 'numeric' })} at <strong>{OPENING_TIME_LABEL}</strong>
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -755,7 +732,7 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">📅</span>
-                        <span><strong>Scheduled closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at 11:59 PM PT - Forms will automatically close</span>
+                        <span><strong>Scheduled closing:</strong> {formatClosingDate(scheduledSession.closing_date)} at {CLOSING_TIME_LABEL} - Forms will automatically close</span>
                       </li>
                     </ul>
                   </>
@@ -769,11 +746,11 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">2️⃣</span>
-                        <span><strong>Form Opening:</strong> <LocalDateTime dateString={scheduledSession.opening_date} dateOnly={true} /> at 12:00 AM PT - Forms will open automatically</span>
+                        <span><strong>Form Opening:</strong> {formatOpeningDate(scheduledSession.opening_date)} at {OPENING_TIME_LABEL} - Forms will open automatically</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">3️⃣</span>
-                        <span><strong>Form Closing:</strong> <LocalDateTime dateString={scheduledSession.closing_date} dateOnly={true} /> at 11:59 PM PT - Forms will close automatically</span>
+                        <span><strong>Form Closing:</strong> {formatClosingDate(scheduledSession.closing_date)} at {CLOSING_TIME_LABEL} - Forms will close automatically</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold">📋</span>

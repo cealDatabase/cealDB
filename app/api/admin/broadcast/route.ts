@@ -4,6 +4,7 @@ import { isSuperAdminDb } from '@/lib/auth'
 import { Resend } from "resend"
 import { logUserAction } from "@/lib/auditLogger"
 import { getSurveyDates } from "@/lib/surveyDates"
+import { openingInstant, closingInstant, CLOSING_TIME_LABEL } from "@/lib/surveyTime"
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 import { buildTemplateContext, renderTemplate } from "@/lib/emailTemplate"
 
@@ -25,20 +26,10 @@ export async function POST(request: NextRequest) {
 
     console.log(`📧 Broadcast mode: ${sendImmediately ? "IMMEDIATE" : "SCHEDULED"}`)
 
-    // Convert dates to Pacific Time to prevent timezone issues
-    const toPacificMidnight = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
-    };
-    
-    const toPacificEndOfDay = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
-      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
-    };
-
-    const openDate = toPacificMidnight(openingDate)
-    const closeDate = toPacificEndOfDay(closingDate)
+    // 12:00 AM Eastern / 11:59 PM Pacific, daylight saving resolved per date
+    // (lib/surveyTime.ts).
+    const openDate = openingInstant(openingDate)
+    const closeDate = closingInstant(closingDate)
 
     console.log("📅 Date Summary:")
     console.log("  Opening:", openingDate, "→", openDate.toISOString())
@@ -385,7 +376,7 @@ export async function POST(request: NextRequest) {
     )
 
     const responseMessage = sendImmediately
-      ? `Broadcast sent immediately and ${updateResult.count} libraries opened for year ${year}. Forms will automatically close on ${formatDateWithWeekday(closeDate)} at 11:59 PM UTC.`
+      ? `Broadcast sent immediately and ${updateResult.count} libraries opened for year ${year}. Forms will automatically close on ${formatDateWithWeekday(closeDate)} at ${CLOSING_TIME_LABEL}.`
       : `Session scheduled for year ${year}. Three separate events created: 1) Broadcast email, 2) Form opening, 3) Form closing. All events can be managed individually in the Session Queue. ${updateResult.count} libraries scheduled.`
 
     return NextResponse.json({
@@ -444,20 +435,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Convert dates to Pacific Time to prevent timezone issues
-    const toPacificMidnight = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      return new Date(Date.UTC(y, m - 1, d, 8, 0, 0)); // 8 AM UTC = 12 AM PST
-    };
-    
-    const toPacificEndOfDay = (dateStr: string): Date => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      // To represent 11:59 PM Pacific on day D: next day at 7:59 AM UTC
-      return new Date(Date.UTC(y, m - 1, d + 1, 7, 59, 0));
-    };
-
-    const openDate = toPacificMidnight(openingDate)
-    const closeDate = toPacificEndOfDay(closingDate)
+    // 12:00 AM Eastern / 11:59 PM Pacific, daylight saving resolved per date
+    // (lib/surveyTime.ts).
+    const openDate = openingInstant(openingDate)
+    const closeDate = closingInstant(closingDate)
 
     // Calculate fiscal year dates
     const fiscalYearStart = new Date(Number.parseInt(year) - 1, 6, 1) // July 1

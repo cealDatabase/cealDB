@@ -141,12 +141,11 @@ const FormsPage = async ({ searchParams }: { searchParams: Promise<{ libraryName
     }
   }
 
-  const openingDate = new Date(surveyDates.fullOpeningDate).toLocaleDateString('en-US', {
-    timeZone: "America/New_York"
-  })
-  const closingDate = new Date(surveyDates.fullClosingDate).toLocaleDateString('en-US', {
-    timeZone: "America/Los_Angeles"
-  })
+  // Pre-formatted on the server: opening on the Eastern calendar, closing on
+  // the Pacific calendar. Re-parsing the long date strings here read them at
+  // UTC midnight and showed the opening date a day early.
+  const openingDate = surveyDates.openingDateLabel
+  const closingDate = surveyDates.closingDateLabel
 
   // Three-state status from surveyDates
   const { status, daysUntilOpening, daysUntilClosing, daysSinceClosed } = surveyDates
