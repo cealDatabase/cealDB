@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from 'react';
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
@@ -67,6 +67,20 @@ export default function ForgotPage() {
         </div>
       )
       }
+
+      {/* No new email: one went to this address in the last 10 minutes. */}
+      {error && !error.includes("successfully") && !error.includes("Error") && (
+        <div className="rounded-md bg-blue-50 p-4 mt-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Clock className="h-5 w-5 text-blue-400" aria-hidden="true" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">{error}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && error.includes("Error") && (
         <div className="rounded-md bg-red-50 p-4 mt-8">

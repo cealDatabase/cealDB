@@ -16,6 +16,15 @@ interface UserInfo {
   name: string;
 }
 
+/** What /api/check-user did about the setup / reset email. */
+interface ResetStatus {
+  emailSent?: boolean;
+  /** Resend did not take it (for example, the day's quota is used up). */
+  emailFailed?: boolean;
+  /** No new email: one went out less than 10 minutes ago. */
+  retryInMinutes?: number;
+}
+
 export default function SignInPage() {
   const router = useRouter();
   const [error, setError] = React.useState<any>(undefined);
@@ -23,6 +32,7 @@ export default function SignInPage() {
   const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
   const [checkingUser, setCheckingUser] = React.useState(false);
   const [emailCheckError, setEmailCheckError] = React.useState<any>(null);
+  const [resetStatus, setResetStatus] = React.useState<ResetStatus | null>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [cookieConsent, setCookieConsent] = React.useState<'accepted' | 'declined' | null>(null);
@@ -114,7 +124,8 @@ export default function SignInPage() {
       if (result.userStatus === 'NEEDS_PASSWORD_SETUP') {
         // Both password setup and reset scenarios lead to the same guidance
         setStep('RESET_GUIDANCE');
-        setEmailCheckError(result); // This contains the guidance message
+        // Not an error: it was shown in the red "Account Check Failed" box.
+        setResetStatus(result);
       } else if (result.userStatus === 'READY_FOR_PASSWORD') {
         setStep('PASSWORD');
       }
@@ -132,7 +143,36 @@ export default function SignInPage() {
     setStep('EMAIL');
     setUserInfo(null);
     setEmailCheckError(null);
+    setResetStatus(null);
     setError(undefined);
+  };
+
+  // Ask for the setup / reset email again. The server sends at most one
+  // every 10 minutes and says when the next one can go.
+  const handleResendEmail = async () => {
+    if (!userInfo) return;
+    setCheckingUser(true);
+    setEmailCheckError(null);
+    try {
+      const response = await fetch('/api/check-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userInfo.email }),
+      });
+      const result = await response.json();
+      if (result.success && result.userStatus === 'NEEDS_PASSWORD_SETUP') {
+        setResetStatus(result);
+      } else if (!result.success) {
+        setEmailCheckError(result);
+      }
+    } catch {
+      setEmailCheckError({
+        message: 'Unable to send the email.',
+        hint: 'Please check your connection and try again.'
+      });
+    } finally {
+      setCheckingUser(false);
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -336,11 +376,28 @@ export default function SignInPage() {
               <p className="text-sm font-medium text-blue-800">
                 {userInfo.email}
               </p>
-              <p className="text-xs text-blue-600 mt-1">Password setup link sent</p>
+              <p className="text-xs text-blue-600 mt-1">
+                {resetStatus?.emailFailed
+                  ? 'The email could not be sent'
+                  : resetStatus?.retryInMinutes
+                    ? 'Password setup link sent a few minutes ago'
+                    : 'Password setup link sent'}
+              </p>
               {/* Footer Note */}
             </div>
           </div>
           <p className="text-start text-xs text-gray-500 mt-1">The password setup link will expire in 24 hours</p>
+          {resetStatus?.retryInMinutes ? (
+            <p className="text-start text-sm text-gray-700">
+              We send at most one email every 10 minutes, so no new email was sent. Please use the one
+              already in your inbox (check your spam folder too), or ask for a new one in{' '}
+              {resetStatus.retryInMinutes} minute{resetStatus.retryInMinutes === 1 ? '' : 's'}.
+            </p>
+          ) : resetStatus?.emailFailed ? (
+            <p className="text-start text-sm text-red-700">
+              Please try again in a few minutes, or contact your CEAL administrator.
+            </p>
+          ) : null}
 
           {/* Simple Instructions */}
           <div className="space-y-3">
@@ -373,8 +430,13 @@ export default function SignInPage() {
 
           {/* Actions */}
           <div className="flex flex-col gap-3">
-            <Button variant="outline" className="w-full bg-transparent">
-              Resend Email
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
+              onClick={handleResendEmail}
+              disabled={checkingUser}
+            >
+              {checkingUser ? 'Sending...' : 'Resend Email'}
             </Button>
             <Button
               variant="outline"
