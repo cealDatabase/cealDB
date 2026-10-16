@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import db from '@/lib/db'
 import { isSuperAdminDb } from '@/lib/auth'
-
-const prisma = db
+import { logUserAction } from '@/lib/auditLogger'
+import { reopenSurveyYear } from '@/lib/surveyControl'
 
 /**
  * Manual endpoint to open forms immediately
@@ -10,7 +9,7 @@ const prisma = db
  */
 export async function POST(request: NextRequest) {
   try {
-    const { year } = await request.json()
+    const { year, closingDate } = await request.json()
 
     // Verify user is super admin (DB-backed, never trust request body)
     if (!(await isSuperAdminDb())) {
@@ -29,60 +28,42 @@ export async function POST(request: NextRequest) {
 
     console.log(`🔓 Manually opening forms for year ${year}`)
 
-    // Update all Library_Year records to open forms
-    const updateResult = await prisma.library_Year.updateMany({
-      where: { year: parseInt(year) },
-      data: { is_open_for_editing: true }
-    })
-
-    console.log(`✅ Opened ${updateResult.count} libraries for year ${year}`)
-
-    // Update SurveySession if it exists
-    const session = await prisma.surveySession.findFirst({
-      where: { academicYear: parseInt(year) }
-    })
-
-    if (session) {
-      // When a super admin manually reopens, treat this as a fresh open:
-      //   - isOpen: true
-      //   - notifiedOnOpen: true   (we are not sending an email here, but the act
-      //                              of manual-open is itself the notification;
-      //                              flipping to true prevents the cron from also
-      //                              sending one for this same opening)
-      //   - notifiedOnClose: false (so when the closing date arrives, the cron
-      //                              will send a fresh "forms closed" admin
-      //                              notification — previously it was stuck true
-      //                              after a previous close cycle)
-      await prisma.surveySession.update({
-        where: { id: session.id },
-        data: {
-          isOpen: true,
-          notifiedOnOpen: true,
-          notifiedOnClose: false,
-          notifiedClosingReminder: false, // also reset, in case admin extended closingDate
-        } as any
-      })
-      console.log(`✅ Updated SurveySession for year ${year} (reset notifiedOnClose + notifiedClosingReminder for the new close cycle)`)
+    // Shared with the form-session "reopen" action; see lib/surveyControl.ts
+    // for how this keeps the daily job in step with the manual open.
+    const result = await reopenSurveyYear(parseInt(year), closingDate ?? null)
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: result.error, needsClosingDate: result.needsClosingDate ?? false, closingDate: result.closingDate },
+        { status: result.status }
+      )
     }
 
-    // Update any pending FORM_OPENING events to completed
-    await prisma.scheduledEvent.updateMany({
-      where: {
+    await logUserAction(
+      "UPDATE",
+      "Library_Year",
+      `year_${year}`,
+      null,
+      {
         year: parseInt(year),
-        event_type: "FORM_OPENING",
-        status: "pending"
+        action: "manual_open",
+        libraries_affected: result.librariesOpened,
+        closes_at: result.closesAt?.toISOString() ?? null,
+        new_closing_date: closingDate ?? null,
       },
-      data: {
-        status: "completed",
-        completed_at: new Date(),
-        notes: "Manually opened via admin panel"
-      }
-    })
+      true,
+      undefined,
+      request
+    )
+
+    console.log(`✅ Opened ${result.librariesOpened} libraries for year ${year}`)
 
     return NextResponse.json({
       success: true,
-      message: `Successfully opened ${updateResult.count} libraries for year ${year}`,
-      librariesOpened: updateResult.count,
+      message: result.closesAtLabel
+        ? `Successfully opened ${result.librariesOpened} libraries for year ${year}. They close automatically on ${result.closesAtLabel}.`
+        : `Successfully opened ${result.librariesOpened} libraries for year ${year}. No schedule exists for this year, so they stay open until closed manually.`,
+      librariesOpened: result.librariesOpened,
+      closesAt: result.closesAt?.toISOString() ?? null,
       year: year
     })
 

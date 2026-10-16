@@ -441,7 +441,7 @@ export default function Part2AnnualCycle({ lang }: PartProps) {
       <MonthCard
         lang={lang}
         color="green"
-        month={{ zh: '10 月 1 日 8am UTC', en: 'Oct 1, 8am UTC' }}
+        month={{ zh: '10 月 1 日 美东 0 点', en: 'Oct 1, 12 AM Eastern' }}
         title={{
           zh: '🤖 Cron 自动开表 + 广播给所有用户',
           en: '🤖 Cron auto-opens forms + broadcasts to all users',
@@ -451,12 +451,12 @@ export default function Part2AnnualCycle({ lang }: PartProps) {
           lang={lang}
           zh={
             <>
-              凌晨（美东 4am）Vercel cron 自动触发 <Code>/api/cron/check-form-schedules</Code>。它会：
+              美东 0 点（夏令时期间即 UTC 04:00 那次运行；冬令时由 UTC 08:00 那次，即美东凌晨 3 点）Vercel cron 自动触发 <Code>/api/cron/check-form-schedules</Code>。它会：
             </>
           }
           en={
             <>
-              At dawn (4 AM Eastern) Vercel cron triggers{' '}
+              At midnight Eastern (the 04:00 UTC run in daylight time; in standard time the 08:00 UTC run, 3 AM Eastern) Vercel cron triggers{' '}
               <Code>/api/cron/check-form-schedules</Code>. It will:
             </>
           }

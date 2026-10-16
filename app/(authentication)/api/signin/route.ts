@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { verifyPassword, generateJWTToken, generateResetToken } from '@/lib/auth';
+import { verifyPassword, generateJWTToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { claimResetEmail, releaseResetEmail, retryMessage } from '@/lib/passwordResetEmail';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,37 +82,27 @@ export async function POST(request: NextRequest) {
 
     // Check if user needs password reset (password is null or requires_password_reset is true)
     if (!user.password || user.requires_password_reset) {
-      // Generate password reset token
-      const resetToken = generateResetToken();
-      const resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-      
-      // Update user with reset token
-      await db.user.update({
-        where: { id: user.id },
-        data: {
-          password_reset_token: resetToken,
-          password_reset_expires: resetExpires,
-          requires_password_reset: true
-        }
-      });
-
       // Determine if this is initial password setup (NULL password) or reset
       const isInitialSetup = !user.password;
-      
-      // Send appropriate email
-      const emailSent = await sendPasswordResetEmail(
-        user.username, 
-        user.firstname || user.lastname || user.username, 
-        resetToken,
-        isInitialSetup
-      );
+
+      // At most one email per account every 10 minutes (daily email quota).
+      const claim = await claimResetEmail(user.id);
+      if (claim.ok) {
+        const emailSent = await sendPasswordResetEmail(
+          user.username,
+          user.firstname || user.lastname || user.username,
+          claim.token,
+          isInitialSetup
+        );
+        if (!emailSent) await releaseResetEmail(user.id, claim.token);
+      }
 
       return NextResponse.json(
         {
           success: false,
           errorType: isInitialSetup ? 'PASSWORD_SETUP_REQUIRED' : 'PASSWORD_RESET_REQUIRED',
           message: isInitialSetup ? 'Password setup required for your account.' : 'Password reset required.',
-          hint: isInitialSetup ? 
+          hint: !claim.ok ? retryMessage(claim.retryInMinutes) : isInitialSetup ?
             'A password setup link has been sent to your email address.' :
             'As part of our security enhancement, you must set a new password. Check your email for reset instructions.',
           suggestions: [
@@ -120,8 +111,10 @@ export async function POST(request: NextRequest) {
             'Contact CEAL admin if you don\'t receive the email',
             'Check your spam/junk folder'
           ],
-          hasEmail: true,
-          resetToken: resetToken
+          // The link goes only to the account's own inbox. This reply used
+          // to include it, which let anyone who knew an address set that
+          // account's password without the email.
+          hasEmail: true
         },
         { status: 200 }
       );

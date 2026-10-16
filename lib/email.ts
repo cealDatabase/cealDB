@@ -273,7 +273,8 @@ export interface NotificationResult {
 
 // Resend takes at most 100 emails per batch request.
 const BATCH_SIZE = 100;
-// Resend allows 2 requests per second per team by default.
+// Resend's default rate limit is 10 requests per second per team (it was 2),
+// shared by every key on the team; the gap keeps a large send well under it.
 const BATCH_GAP_MS = 600;
 const MAX_ATTEMPTS = 3;
 // Retries stop once this much time has gone by, so a Resend outage cannot

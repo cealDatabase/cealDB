@@ -41,14 +41,14 @@ export default function Part4Automation({ lang }: PartProps) {
         lang={lang}
         zh={
           <>
-            Vercel cron 每天 <strong>UTC 8:00 / 20:00</strong>（美东 4am / 4pm，美西 1am / 1pm）跑两次。
+            Vercel cron 每天 <strong>UTC 04:00 / 08:00</strong>（夏令时期间即美东 0 点 / 凌晨 4 点，美西前一天 9pm / 凌晨 1 点）跑两次。
             它访问 <Code>/api/cron/check-form-schedules</Code>，做以下检查：
           </>
         }
         en={
           <>
-            Vercel cron runs twice daily at <strong>UTC 8:00 / 20:00</strong>{' '}
-            (4am/4pm Eastern, 1am/1pm Pacific). It hits{' '}
+            Vercel cron runs twice daily at <strong>UTC 04:00 / 08:00</strong>{' '}
+            (midnight/4 AM Eastern and 9 PM/1 AM Pacific in daylight time). It hits{' '}
             <Code>/api/cron/check-form-schedules</Code>, which does the
             following checks:
           </>
@@ -58,7 +58,7 @@ export default function Part4Automation({ lang }: PartProps) {
       <div className="my-5 rounded-lg border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 overflow-x-auto">
         <pre className="text-xs leading-6 font-mono whitespace-pre text-gray-800">
 {`  ┌──────────────────────────────────────────────────────────────┐
-  │  ${lang === 'zh' ? 'Vercel Cron 触发（UTC 8am / 8pm）' : 'Vercel Cron triggers (UTC 8am / 8pm)'}                    │
+  │  ${lang === 'zh' ? 'Vercel Cron 触发（UTC 04:00 / 08:00）' : 'Vercel Cron triggers (UTC 04:00 / 08:00)'}                │
   └─────────────────────────────┬────────────────────────────────┘
                                 │
                                 ▼
@@ -95,20 +95,25 @@ export default function Part4Automation({ lang }: PartProps) {
         type="info"
         lang={lang}
         title={{
-          zh: '为什么是 UTC 8am？',
-          en: 'Why UTC 8am?',
+          zh: '为什么是 UTC 04:00 和 08:00？',
+          en: 'Why 04:00 and 08:00 UTC?',
         }}
       >
         {lang === 'zh' ? (
           <>
-            因为 closing date 是太平洋时间 11:59pm，UTC 7:59am。Cron 在 UTC 8:00 跑（仅滞后 1 分钟），
-            可以在关闭后第一时间执行关表逻辑。20:00 那次是日间二次保险。
+            开表按美东 0 点，关表按太平洋时间 11:59pm。UTC 04:00 在夏令时期间正好是美东 0 点，开表日一开始就开表
+            （冬令时美东 0 点是 UTC 05:00，由 08:00 那次开，即美东凌晨 3 点）。UTC 08:00 紧跟在太平洋时间 11:59pm
+            之后（冬令时为 UTC 07:59，夏令时为 06:59），关表日一结束就关表。Vercel 免费版会在设定的那个小时内执行，可能晚几十分钟。
           </>
         ) : (
           <>
-            Because closing date is Pacific 11:59pm = UTC 7:59am. Cron runs at
-            UTC 8:00 (just 1 minute later) so the close logic fires immediately
-            after closing time. The 20:00 run is a daytime backup.
+            Forms open at midnight Eastern and close at 11:59 PM Pacific. In
+            daylight time 04:00 UTC is midnight Eastern, so forms open as the
+            opening day starts (in standard time midnight Eastern is 05:00 UTC
+            and the 08:00 run opens them, at 3 AM Eastern). 08:00 UTC comes just
+            after 11:59 PM Pacific (07:59 UTC in standard time, 06:59 in
+            daylight time), so forms close as soon as the closing day ends. On
+            the Hobby plan Vercel runs each job some time within its hour.
           </>
         )}
       </Callout>

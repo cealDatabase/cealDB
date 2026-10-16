@@ -208,8 +208,8 @@ export default function Part8Glossary({ lang }: PartProps) {
         terms={[
           {
             term: 'Cron Job (定时任务)',
-            zh: <>每天 UTC 8:00 + UTC 20:00 自动跑的服务端脚本（Vercel 配置）。检查所有 ScheduledEvent，到点执行。</>,
-            en: <>Server script auto-running daily at UTC 8:00 + UTC 20:00 (Vercel configured). Checks ScheduledEvent rows and triggers what's due.</>,
+            zh: <>每天 UTC 04:00 + UTC 08:00 自动跑的服务端脚本（Vercel 配置）。根据 SurveySession 和 ScheduledEvent，到点开表、发广播、发提醒、关表。</>,
+            en: <>Server script auto-running daily at UTC 04:00 + UTC 08:00 (Vercel configured). Opens forms, sends the broadcast and reminder, and closes forms when due, from SurveySession and ScheduledEvent rows.</>,
           },
           {
             term: 'ScheduledEvent',
@@ -333,9 +333,9 @@ export default function Part8Glossary({ lang }: PartProps) {
             en: <>Reverting production to a previous stable deploy. Done via Vercel Deployments → Promote to Production.</>,
           },
           {
-            term: 'Pacific Time (PT) / UTC',
-            zh: <>所有面向用户的日期都是 Pacific Time（CEAL 总部时区）。所有数据库时间戳都是 UTC。Cron 在 UTC 8:00 + 20:00 跑。</>,
-            en: <>All user-facing dates are Pacific Time (CEAL HQ tz). All DB timestamps are UTC. Cron runs at UTC 8:00 + 20:00.</>,
+            term: 'Eastern / Pacific Time / UTC',
+            zh: <>开表按美东时间 0 点，关表按太平洋时间 11:59pm（夏令时会自动换算）。所有数据库时间戳都是 UTC。Cron 在 UTC 04:00 + 08:00 跑。</>,
+            en: <>Forms open at 12:00 AM Eastern and close at 11:59 PM Pacific (daylight saving handled automatically). All DB timestamps are UTC. Cron runs at UTC 04:00 + 08:00.</>,
           },
         ]}
       />

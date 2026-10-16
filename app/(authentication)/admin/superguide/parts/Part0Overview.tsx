@@ -293,7 +293,7 @@ export default function Part0Overview({ lang }: PartProps) {
       >
         {lang === 'zh' ? (
           <>
-            标 🤖 <strong>Cron</strong> 的步骤是 <strong>Vercel 服务器每天自动跑两次</strong>（美东 4am 和 4pm），你
+            标 🤖 <strong>Cron</strong> 的步骤是 <strong>Vercel 服务器每天自动跑两次</strong>（UTC 04:00 和 08:00，夏令时期间即美东 0 点和凌晨 4 点），你
             <strong>不需要</strong>手动做。你的责任只有：① 9 月把日期设好；② 10-12 月监控；
             ③ 12-1 月审核数据并生成报告；④ 2 月把出版的 PDF 链接放上去。整个一年你
             <strong>不需要写一行代码</strong>。
@@ -302,7 +302,7 @@ export default function Part0Overview({ lang }: PartProps) {
           <>
             Steps marked 🤖 <strong>Cron</strong> are{' '}
             <strong>run automatically by Vercel servers twice a day</strong>{' '}
-            (4am and 4pm Eastern). You <strong>do not need to do them manually</strong>. Your responsibilities are
+            (04:00 and 08:00 UTC: midnight and 4 AM Eastern in daylight time). You <strong>do not need to do them manually</strong>. Your responsibilities are
             only: (1) set dates in September; (2) monitor in Oct-Dec; (3) review
             data and generate reports in Dec-Jan; (4) upload published PDF link
             in Feb. You will not need to write a single line of code all year.
@@ -341,7 +341,7 @@ export default function Part0Overview({ lang }: PartProps) {
          ┌────────────────────────────────────────────┐
          │   VERCEL  (${lang === 'zh' ? '托管 Next.js 应用' : 'hosts Next.js app'})           │
          │   • ${lang === 'zh' ? '运行所有页面和 API 路由' : 'Runs all pages and API routes'}            │
-         │   • ${lang === 'zh' ? 'Cron Jobs: 每天 8am / 8pm UTC 自动跑' : 'Cron Jobs: runs auto at 8am/8pm UTC daily'}  │
+         │   • ${lang === 'zh' ? 'Cron Jobs: 每天 UTC 04:00 / 08:00 自动跑' : 'Cron Jobs: runs 04:00/08:00 UTC daily'}  │
          └──────┬─────────────────────┬───────────────┘
                 │                     │
                 ▼                     ▼
@@ -366,8 +366,8 @@ export default function Part0Overview({ lang }: PartProps) {
           [
             { zh: 'Vercel', en: 'Vercel' },
             {
-              zh: '托管整个网站，跑所有页面和 API。也跑 cron 任务（每天 8am/8pm UTC）。',
-              en: 'Hosts the whole website, runs all pages and APIs. Also runs cron jobs (8am/8pm UTC daily).',
+              zh: '托管整个网站，跑所有页面和 API。也跑 cron 任务（每天 UTC 04:00 / 08:00）。',
+              en: 'Hosts the whole website, runs all pages and APIs. Also runs cron jobs (04:00/08:00 UTC daily).',
             },
             {
               zh: '🔴 整个网站打不开。立刻联系开发者。',

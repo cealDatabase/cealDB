@@ -1,8 +1,8 @@
 "use server";
 
 import db from "@/lib/db";
-import { generateResetToken } from "@/lib/auth";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { claimResetEmail, releaseResetEmail, retryMessage } from "@/lib/passwordResetEmail";
 
 export default async function forgotAction(
   currentState: any,
@@ -36,28 +36,21 @@ export default async function forgotAction(
       return "Error: Account is deactivated.\n\nPlease contact the CEAL administrator.";
     }
 
-    // Generate reset token
-    const resetToken = generateResetToken();
-    const resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Update user with reset token
-    await db.user.update({
-      where: { id: user.id },
-      data: {
-        password_reset_token: resetToken,
-        password_reset_expires: resetExpires,
-        requires_password_reset: true,
-      },
-    });
+    // At most one email per account every 10 minutes (daily email quota).
+    const claim = await claimResetEmail(user.id);
+    if (!claim.ok) {
+      return retryMessage(claim.retryInMinutes);
+    }
 
     // Send reset email
     const emailSent = await sendPasswordResetEmail(
       emailStr,
       user.username,
-      resetToken
+      claim.token
     );
 
     if (!emailSent) {
+      await releaseResetEmail(user.id, claim.token);
       console.error(`Failed to send password reset email to ${user.username}`);
       return "Error: Unable to send password reset email. Please try again later.";
     }
