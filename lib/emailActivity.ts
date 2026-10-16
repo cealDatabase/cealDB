@@ -244,39 +244,49 @@ export function isResendId(id: string | null): id is string {
   return !!id && RESEND_ID.test(id);
 }
 
-// Resend allows 2 requests per second per team by default.
-const REQUEST_GAP_MS = 550;
+// Resend's default limit is 10 requests per second, shared by every key on
+// the team, so the sends and the daily job use it too. Lookups stay well
+// under it.
+const REQUEST_GAP_MS = 250;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function getResend(): Resend | null {
   return process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 }
 
-type ResendError = { message?: string; name?: string } | null | undefined;
+type ResendError = { message?: string; name?: string; statusCode?: number | null } | null | undefined;
 
 function describe(error: ResendError): string {
+  // Reading anything from Resend needs a key with Full access; a key with
+  // Sending access can only send.
+  if (error?.name === 'restricted_api_key') {
+    return 'RESEND_API_KEY can only send emails. Reading the status needs a key with Full access (Resend → API Keys).';
+  }
   return error?.message || error?.name || 'Resend did not answer';
 }
 
 export interface BroadcastStatus {
   status: string | null;
   sentAt: string | null;
-  /** Totals from Resend's metrics, for the counts Resend returned. */
+  /** Delivery totals from Resend's email metrics, when it has them. */
   counts: Record<string, number> | null;
   countsError: string | null;
-  /** Addresses that bounced or were suppressed, when Resend lists them. */
-  problems: { email: string; type: string }[];
-  problemsError: string | null;
   error: string | null;
 }
 
 const BROADCAST_METRICS = ['sent', 'delivered', 'bounced', 'complained', 'suppressed', 'failed', 'delivery_delayed'] as const;
 
-/** What Resend says about one broadcast: its status, delivery totals, and who it did not reach. */
+/**
+ * What Resend says about one broadcast: its status and delivery totals.
+ *
+ * The totals come from the email metrics endpoint (GET /emails/metrics),
+ * which takes a broadcast id. Resend's per-broadcast metrics and recipient
+ * endpoints would also list the addresses, but they are a private beta and
+ * answer 404 on most accounts, so they are not used; who bounced is in the
+ * Resend dashboard.
+ */
 export async function getBroadcastStatus(id: string): Promise<BroadcastStatus> {
-  const empty: BroadcastStatus = {
-    status: null, sentAt: null, counts: null, countsError: null, problems: [], problemsError: null, error: null,
-  };
+  const empty: BroadcastStatus = { status: null, sentAt: null, counts: null, countsError: null, error: null };
   const resend = getResend();
   if (!resend) return { ...empty, error: 'RESEND_API_KEY is not configured' };
 
@@ -302,28 +312,17 @@ export async function getBroadcastStatus(id: string): Promise<BroadcastStatus> {
       for (const [key, value] of Object.entries(metrics.data.totals ?? {})) {
         if (typeof value === 'number') counts[key] = value;
       }
-      result.counts = counts;
+      // All zero means Resend has nothing for it: it went out minutes ago,
+      // or it is older than the plan keeps data.
+      if (Object.values(counts).some((n) => n > 0)) {
+        result.counts = counts;
+      } else {
+        result.countsError =
+          'Resend has no delivery totals for it yet. It may have gone out in the last few minutes, or be older than your plan keeps data.';
+      }
     }
   } catch (err) {
     result.countsError = err instanceof Error ? err.message : String(err);
-  }
-
-  for (const type of ['bounced', 'suppressed'] as const) {
-    try {
-      await sleep(REQUEST_GAP_MS);
-      const listed = await resend.broadcasts.recipients(id, { type, limit: 100 });
-      if (listed.error || !listed.data) {
-        result.problemsError = describe(listed.error);
-        break;
-      }
-      for (const r of listed.data.data) {
-        const bounce = (r as { bounce_type?: string }).bounce_type;
-        result.problems.push({ email: r.email, type: bounce ? `${type} (${bounce})` : type });
-      }
-    } catch (err) {
-      result.problemsError = err instanceof Error ? err.message : String(err);
-      break;
-    }
   }
 
   return result;
@@ -348,48 +347,107 @@ export async function getEmailStatus(id: string): Promise<EmailStatus> {
   return { lastEvent: got.data.last_event, to: got.data.to, subject: got.data.subject, createdAt: got.data.created_at, error: null };
 }
 
+/**
+ * How much of the free plan's email quota is used.
+ *
+ * The free plan allows 100 emails a day and 3,000 a month. The day is the
+ * UTC calendar day: it resets at 00:00 UTC, not 24 hours after a send. Sent
+ * and received emails count, each To, CC and BCC address separately;
+ * broadcasts do not count.
+ */
+export interface QuotaStatus {
+  /**
+   * usage_api: Resend's usage endpoint (GET /usage);
+   * headers:   the x-resend-daily-quota / x-resend-monthly-quota headers;
+   * count:     counted here from the email list, received emails missing.
+   */
+  source: 'usage_api' | 'headers' | 'count';
+  dailyUsed: number;
+  /** Null on a paid plan, which has no daily limit. */
+  dailyLimit: number | null;
+  dailyResetsAt: string;
+  monthlyUsed: number | null;
+  monthlyLimit: number | null;
+  monthlyResetsAt: string | null;
+}
+
 export interface RecentEmails {
   emails: { id: string; to: string[]; subject: string; createdAt: string; lastEvent: string }[];
-  /** Transactional emails Resend created in the last 24 hours. */
-  last24h: number;
-  /** True when there were more emails than were read, so last24h is a lower bound. */
+  /** True when there were more emails than were read. */
   incomplete: boolean;
-  /** Quota headers on Resend's reply, if it sends any. */
-  quotaHeaders: Record<string, string>;
+  quota: QuotaStatus | null;
   error: string | null;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_PAGES = 3;
+const FREE_DAILY_LIMIT = 100;
+const FREE_MONTHLY_LIMIT = 3000;
+
+function nextUtcMidnight(now = new Date()): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+}
+
+function headerCount(headers: Record<string, string> | null | undefined, name: string): number | null {
+  const value = headers?.[name];
+  if (value === undefined) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
 
 /**
- * Transactional emails from the last 24 hours, newest first, read from
- * Resend's email list. The free plan allows 100 a day; broadcasts are not
- * part of this list or of that quota.
+ * Transactional emails from the last 24 hours, newest first, and the quota
+ * used. Broadcasts are not in Resend's email list or in the quota.
+ *
+ * The usage figures come from Resend's usage endpoint when the account has
+ * it (it is a private beta), then from the quota headers on Resend's
+ * replies, and otherwise from counting the list since 00:00 UTC.
  */
 export async function getRecentEmails(): Promise<RecentEmails> {
-  const result: RecentEmails = { emails: [], last24h: 0, incomplete: false, quotaHeaders: {}, error: null };
+  const result: RecentEmails = { emails: [], incomplete: false, quota: null, error: null };
   const resend = getResend();
   if (!resend) return { ...result, error: 'RESEND_API_KEY is not configured' };
 
+  let headers: Record<string, string> = {};
+  try {
+    const usage = await resend.usage.get();
+    headers = { ...(usage.headers ?? {}) };
+    const e = usage.data?.emails;
+    if (!usage.error && e?.daily && e.monthly) {
+      result.quota = {
+        source: 'usage_api',
+        dailyUsed: e.daily.used,
+        dailyLimit: e.daily.limit,
+        dailyResetsAt: e.daily.resets_at,
+        monthlyUsed: e.monthly.used,
+        monthlyLimit: e.monthly.limit,
+        monthlyResetsAt: e.monthly.resets_at,
+      };
+    }
+  } catch {
+    // Not available on this account; the list and its headers are used.
+  }
+
+  const dayStart = nextUtcMidnight().getTime() - DAY_MS;
   const since = Date.now() - DAY_MS;
+  let todayCount = 0;
   let after: string | undefined;
   for (let page = 0; page < MAX_PAGES; page++) {
-    if (page > 0) await sleep(REQUEST_GAP_MS);
+    await sleep(REQUEST_GAP_MS);
     const listed = await resend.emails.list(after ? { limit: 100, after } : { limit: 100 });
-    for (const [name, value] of Object.entries(listed.headers ?? {})) {
-      if (/quota/i.test(name)) result.quotaHeaders[name] = value;
-    }
+    headers = { ...headers, ...(listed.headers ?? {}) };
     if (listed.error || !listed.data) {
       result.error = describe(listed.error);
       break;
     }
     let reachedOlder = false;
     for (const e of listed.data.data) {
-      if (new Date(e.created_at).getTime() < since) {
+      const at = new Date(e.created_at).getTime();
+      if (at < since) {
         reachedOlder = true;
         break;
       }
+      if (at >= dayStart) todayCount += e.to.length + (e.cc?.length ?? 0) + (e.bcc?.length ?? 0);
       result.emails.push({ id: e.id, to: e.to, subject: e.subject, createdAt: e.created_at, lastEvent: e.last_event });
     }
     const last = listed.data.data[listed.data.data.length - 1];
@@ -397,6 +455,34 @@ export async function getRecentEmails(): Promise<RecentEmails> {
     if (page === MAX_PAGES - 1) result.incomplete = true;
     after = last.id;
   }
-  result.last24h = result.emails.length;
+
+  if (!result.quota) {
+    // Resend reports the quota used so far on its replies; the daily header
+    // is sent only on the free plan.
+    const daily = headerCount(headers, 'x-resend-daily-quota');
+    const monthly = headerCount(headers, 'x-resend-monthly-quota');
+    const resetsAt = nextUtcMidnight().toISOString();
+    if (daily !== null) {
+      result.quota = {
+        source: 'headers',
+        dailyUsed: daily,
+        dailyLimit: FREE_DAILY_LIMIT,
+        dailyResetsAt: resetsAt,
+        monthlyUsed: monthly,
+        monthlyLimit: monthly !== null ? FREE_MONTHLY_LIMIT : null,
+        monthlyResetsAt: null,
+      };
+    } else if (!result.error) {
+      result.quota = {
+        source: 'count',
+        dailyUsed: todayCount,
+        dailyLimit: FREE_DAILY_LIMIT,
+        dailyResetsAt: resetsAt,
+        monthlyUsed: monthly,
+        monthlyLimit: monthly !== null ? FREE_MONTHLY_LIMIT : null,
+        monthlyResetsAt: null,
+      };
+    }
+  }
   return result;
 }

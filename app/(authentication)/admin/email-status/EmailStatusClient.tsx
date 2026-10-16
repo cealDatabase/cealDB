@@ -39,8 +39,6 @@ interface BroadcastStatus {
   sentAt: string | null;
   counts: Record<string, number> | null;
   countsError: string | null;
-  problems: { email: string; type: string }[];
-  problemsError: string | null;
   error: string | null;
 }
 
@@ -52,11 +50,20 @@ interface EmailStatus {
   error: string | null;
 }
 
+interface QuotaStatus {
+  source: 'usage_api' | 'headers' | 'count';
+  dailyUsed: number;
+  dailyLimit: number | null;
+  dailyResetsAt: string;
+  monthlyUsed: number | null;
+  monthlyLimit: number | null;
+  monthlyResetsAt: string | null;
+}
+
 interface RecentEmails {
   emails: { id: string; to: string[]; subject: string; createdAt: string; lastEvent: string }[];
-  last24h: number;
   incomplete: boolean;
-  quotaHeaders: Record<string, string>;
+  quota: QuotaStatus | null;
   error: string | null;
 }
 
@@ -66,12 +73,18 @@ type Delivery =
   | { state: 'email'; data: EmailStatus }
   | { state: 'error'; message: string };
 
-// Resend free plan: 100 transactional emails a day, 3,000 a month.
-const DAILY_LIMIT = 100;
 // "Check delivery status" looks up this many of the newest sends.
 const CHECK_LATEST = 10;
-// Resend allows 2 requests per second; lookups from this page go one at a time.
-const LOOKUP_GAP_MS = 600;
+// Lookups from this page go one at a time, well under Resend's rate limit
+// (10 requests per second by default, shared by every key on the team).
+const LOOKUP_GAP_MS = 300;
+
+const QUOTA_SOURCE: Record<QuotaStatus['source'], string> = {
+  usage_api: 'From Resend’s usage figures.',
+  headers: 'As reported by Resend.',
+  count:
+    'Counted from Resend’s list of sent emails. Emails the account receives also count and are not in the list.',
+};
 
 type Tone = 'green' | 'blue' | 'amber' | 'red' | 'gray';
 
@@ -322,9 +335,9 @@ export default function EmailStatusClient() {
     return Object.entries(totals).sort((a, b) => b[1] - a[1]);
   }, [recent]);
 
-  const used = recent?.last24h ?? 0;
-  const usedPct = Math.min(100, Math.round((used / DAILY_LIMIT) * 100));
-  const usedTone = used >= 90 ? 'bg-red-500' : used >= 70 ? 'bg-amber-500' : 'bg-green-500';
+  const quota = recent?.quota ?? null;
+  const usedShare = quota?.dailyLimit ? quota.dailyUsed / quota.dailyLimit : 0;
+  const usedTone = usedShare >= 0.9 ? 'bg-red-500' : usedShare >= 0.7 ? 'bg-amber-500' : 'bg-green-500';
 
   return (
     <Container className="py-8">
@@ -359,8 +372,8 @@ export default function EmailStatusClient() {
         <p className="text-muted-foreground max-w-4xl">
           Every email the system has sent, whether Resend accepted it, and what happened to it after.
           Broadcasts go to the CEAL audience in Resend. Transactional emails (individual emails, the
-          &ldquo;forms closed&rdquo; notice, account emails) count against the free plan&rsquo;s{' '}
-          {DAILY_LIMIT} a day.
+          &ldquo;forms closed&rdquo; notice, account emails) count against the free plan&rsquo;s 100 a day
+          and 3,000 a month; broadcasts do not.
         </p>
       </div>
 
@@ -368,7 +381,7 @@ export default function EmailStatusClient() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-lg border bg-white p-4">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-gray-600">Transactional emails, last 24 hours</div>
+            <div className="text-sm font-medium text-gray-600">Transactional emails today</div>
             <button
               type="button"
               onClick={() => void loadRecent()}
@@ -379,26 +392,27 @@ export default function EmailStatusClient() {
               <RefreshCw className={`w-4 h-4 ${recentLoading ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          {recent && !recentError ? (
+          {quota ? (
             <>
               <div className="mt-1 text-2xl font-bold text-gray-900">
-                {used}
-                {recent.incomplete ? '+' : ''} <span className="text-base font-normal text-gray-500">/ {DAILY_LIMIT}</span>
+                {quota.dailyUsed}
+                {quota.source === 'count' && recent?.incomplete ? '+' : ''}{' '}
+                <span className="text-base font-normal text-gray-500">
+                  {quota.dailyLimit !== null ? `/ ${quota.dailyLimit}` : '(no daily limit on this plan)'}
+                </span>
               </div>
-              <div className="mt-2 h-2 rounded bg-gray-100 overflow-hidden">
-                <div className={`h-full ${usedTone}`} style={{ width: `${usedPct}%` }} />
-              </div>
-              <p className="mt-2 text-xs text-gray-500">
-                From Resend&rsquo;s email list. Broadcasts are not counted. The monthly limit is 3,000.
-              </p>
-              {Object.keys(recent.quotaHeaders).length > 0 && (
-                <p className="mt-1 text-xs text-gray-500">
-                  Resend reports:{' '}
-                  {Object.entries(recent.quotaHeaders)
-                    .map(([k, v]) => `${k} ${v}`)
-                    .join(', ')}
-                </p>
+              {quota.dailyLimit !== null && (
+                <div className="mt-2 h-2 rounded bg-gray-100 overflow-hidden">
+                  <div className={`h-full ${usedTone}`} style={{ width: `${Math.min(100, Math.round(usedShare * 100))}%` }} />
+                </div>
               )}
+              <p className="mt-2 text-xs text-gray-500">
+                The day runs on UTC: it starts again at <LocalDateTime dateString={quota.dailyResetsAt} />.
+                {quota.monthlyUsed !== null && quota.monthlyLimit !== null && (
+                  <> This month: {quota.monthlyUsed} of {quota.monthlyLimit.toLocaleString('en-US')}.</>
+                )}{' '}
+                {QUOTA_SOURCE[quota.source]}
+              </p>
             </>
           ) : recentError ? (
             <p className="mt-2 text-sm text-red-700">Resend did not answer: {recentError}</p>
@@ -503,7 +517,6 @@ export default function EmailStatusClient() {
                 shown.map((r) => {
                   const open = expanded.has(r.id);
                   const d = delivery[r.id];
-                  const bounces = d?.state === 'broadcast' ? d.data.problems : [];
                   const lookupError =
                     d?.state === 'error' ? d.message : d?.state === 'email' || d?.state === 'broadcast' ? d.data.error : null;
                   return (
@@ -563,27 +576,19 @@ export default function EmailStatusClient() {
                                 {d.data.countsError && (
                                   <p className="text-gray-600">Delivery totals not available: {d.data.countsError}</p>
                                 )}
-                                {bounces.length > 0 && (
-                                  <>
-                                    <div className="font-medium text-gray-800">Not delivered</div>
-                                    <ul className="mt-1 space-y-0.5">
-                                      {bounces.map((p, i) => (
-                                        <li key={i} className="text-gray-700">
-                                          <span className="font-mono text-xs">{p.email}</span> — {p.type}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </>
-                                )}
-                                {d.data.problemsError && (
-                                  <p className="text-gray-600">Bounce list not available: {d.data.problemsError}</p>
-                                )}
+                                {d.data.counts &&
+                                  ['bounced', 'complained', 'suppressed', 'failed'].some((k) => (d.data.counts?.[k] ?? 0) > 0) && (
+                                    <p className="text-gray-700">
+                                      To see which addresses were not reached, open this broadcast in the Resend
+                                      dashboard (Broadcasts).
+                                    </p>
+                                  )}
                               </div>
                             )}
                             {lookupError && (
                               <p className="text-gray-600">
-                                Resend did not return the status: {lookupError}. Resend keeps email details for a
-                                limited time on the free plan.
+                                Resend did not return the status: {lookupError}. Resend keeps email details only
+                                for your plan&rsquo;s data retention period.
                               </p>
                             )}
                             {(r.broadcastId || r.emailId) && (
@@ -591,12 +596,12 @@ export default function EmailStatusClient() {
                                 Resend {r.broadcastId ? 'broadcast' : 'email'} id:{' '}
                                 <span className="font-mono">{r.broadcastId ?? r.emailId}</span> ·{' '}
                                 <a
-                                  href={`https://resend.com/${r.broadcastId ? 'broadcasts' : 'emails'}/${r.broadcastId ?? r.emailId}`}
+                                  href={`https://resend.com/${r.broadcastId ? 'broadcasts' : 'emails'}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-blue-700 underline"
                                 >
-                                  Open in Resend
+                                  Resend dashboard: {r.broadcastId ? 'Broadcasts' : 'Emails'}
                                 </a>
                               </p>
                             )}
