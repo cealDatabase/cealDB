@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Container } from '@/components/Container';
 import { Button } from '@/components/ui/button';
 import { LocalDateTime } from '@/components/LocalDateTime';
+import { EmailErrorCode } from '@/components/EmailErrorBox';
+import type { EmailError } from '@/lib/emailError';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,6 +34,8 @@ interface SendRecord {
   failed: { email: string; reason: string }[];
   broadcastId: string | null;
   emailId: string | null;
+  /** For a failure: the error code to copy. */
+  errorCode: EmailError | null;
 }
 
 interface BroadcastStatus {
@@ -242,6 +246,10 @@ export default function EmailStatusClient() {
   const [checking, setChecking] = useState(false);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [problemsOnly, setProblemsOnly] = useState(false);
+  // Looking up an error code someone sent (EM-… or LOG-…).
+  const [refQuery, setRefQuery] = useState('');
+  const [refResult, setRefResult] = useState<{ ref: string; records: SendRecord[] } | null>(null);
+  const [refLoading, setRefLoading] = useState(false);
 
   // Every Resend lookup waits for the one before it.
   const queue = useRef<Promise<void>>(Promise.resolve());
@@ -310,7 +318,28 @@ export default function EmailStatusClient() {
     [enqueue],
   );
 
-  const shown = useMemo(() => (problemsOnly ? records.filter(hasProblem) : records), [records, problemsOnly]);
+  const shown = useMemo(
+    () => refResult?.records ?? (problemsOnly ? records.filter(hasProblem) : records),
+    [records, problemsOnly, refResult],
+  );
+
+  const findRef = async () => {
+    const ref = refQuery.trim();
+    if (!ref) return;
+    setRefLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/email-status?ref=${encodeURIComponent(ref)}`, { cache: 'no-store' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to look up the error code');
+      setRefResult({ ref, records: data.records });
+      setExpanded(new Set(data.records.map((r: SendRecord) => r.id)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to look up the error code');
+    } finally {
+      setRefLoading(false);
+    }
+  };
   const problemCount = useMemo(() => records.filter(hasProblem).length, [records]);
   const lastSend = records.find((r) => r.kind !== 'opening_broadcast_scheduled');
 
@@ -472,6 +501,25 @@ export default function EmailStatusClient() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <h2 className="text-xl font-semibold text-gray-900">Send history</h2>
           <div className="flex flex-wrap items-center gap-3">
+            <form
+              className="flex items-center gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void findRef();
+              }}
+            >
+              <input
+                value={refQuery}
+                onChange={(e) => setRefQuery(e.target.value)}
+                placeholder="Error code, e.g. EM-7KQ2M9XA"
+                aria-label="Find an error code"
+                className="w-56 rounded border border-gray-300 px-2 py-1 font-mono text-sm"
+              />
+              <Button type="submit" variant="outline" size="sm" disabled={refLoading || !refQuery.trim()}>
+                {refLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : null}
+                Find
+              </Button>
+            </form>
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
               Problems only
@@ -485,6 +533,33 @@ export default function EmailStatusClient() {
             </Button>
           </div>
         </div>
+
+        {refResult && (
+          <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
+            <span>
+              {refResult.records.length > 0 ? (
+                <>
+                  Showing the entry for error code <span className="font-mono font-semibold">{refResult.ref}</span>.
+                </>
+              ) : (
+                <>
+                  No entry has error code <span className="font-mono font-semibold">{refResult.ref}</span>. Check it was
+                  copied in full (EM- and 8 letters or digits).
+                </>
+              )}
+            </span>
+            <button
+              type="button"
+              className="text-blue-800 underline"
+              onClick={() => {
+                setRefResult(null);
+                setRefQuery('');
+              }}
+            >
+              Show all
+            </button>
+          </div>
+        )}
 
         <div className="rounded-lg border bg-white overflow-x-auto">
           <table className="w-full text-sm">
@@ -540,6 +615,9 @@ export default function EmailStatusClient() {
                         <td className="px-3 py-2 whitespace-nowrap">{r.by}</td>
                         <td className="px-3 py-2">
                           <ResultCell r={r} />
+                          {r.errorCode && (
+                            <div className="mt-1 font-mono text-[11px] text-red-700">{r.errorCode.ref}</div>
+                          )}
                         </td>
                         <td className="px-3 py-2">
                           <DeliveryCell r={r} d={d} onCheck={() => void checkDelivery(r)} />
@@ -554,6 +632,7 @@ export default function EmailStatusClient() {
                                 <span className="font-medium">Error:</span> {r.error}
                               </p>
                             )}
+                            {r.errorCode && <EmailErrorCode error={r.errorCode} forAdmin />}
                             {r.failed.length > 0 && !(r.failed.length === 1 && r.failed[0].reason === r.error) && (
                               <div>
                                 <div className="font-medium text-gray-800">Not accepted by Resend</div>
@@ -623,8 +702,9 @@ export default function EmailStatusClient() {
           <strong>Delivery</strong> is what happened after: <em>Delivered</em> means the recipient&rsquo;s
           mail server took it; <em>Bounced</em> means it refused it (for example, the address no longer
           exists); <em>Suppressed</em> means Resend did not send it because that address bounced or
-          complained before. Account emails (welcome, password reset) are not in this list; they appear
-          in the transactional list below.
+          complained before. Account emails (welcome, password reset) appear in this list only when
+          Resend did not take them; the ones it took are in the transactional list below. Someone who
+          sends you an error code: type it into the box above to find what happened.
         </p>
       </section>
 

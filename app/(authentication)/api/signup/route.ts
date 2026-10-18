@@ -2,6 +2,9 @@ import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
 import { generateResetToken, requireRoles } from "@/lib/auth";
 import { sendWelcomeEmail, addUserToResendContacts } from "@/lib/email";
+import { emailErrorFrom, type EmailError } from "@/lib/emailError";
+import { logEmailFailure } from "@/lib/auditLogger";
+import { releaseResetEmail } from "@/lib/passwordResetEmail";
 
 export async function POST(request: Request) {
   try {
@@ -123,42 +126,44 @@ export async function POST(request: Request) {
       }
     });
 
-    // Add user to Resend contacts for broadcast communications (silent operation)
-    // This runs in the background and won't affect the signup flow
-    addUserToResendContacts(username.toLowerCase(), newUser.firstname, newUser.lastname)
-      .catch(error => {
-        // Silent fail - just log the error, don't break signup
-        console.error('Background: Failed to add user to Resend contacts:', error);
-      });
+    // Add the user to the Resend audience broadcasts go to. Someone not on
+    // it gets no broadcasts, so a failure is reported (it used to be only
+    // logged); the account is created either way.
+    let contactError: EmailError | null = null;
+    const contact = await addUserToResendContacts(username.toLowerCase(), newUser.firstname, newUser.lastname);
+    if (!contact.ok) {
+      contactError = emailErrorFrom(contact.failure, 'new-account-contact');
+      await logEmailFailure(contactError, { mode: 'contact', to: username.toLowerCase() }, request);
+    }
 
     // ----------------- Send welcome email with password setup -----------------
-    try {
-      const emailSent = await sendWelcomeEmail(username, username, resetToken);
-      
-      if (emailSent) {
-        console.log(`📧 Welcome email sent to: ${username}`);
-        return Response.json({
-          success: true,
-          message: "Account created successfully! Check your email to set up your password.",
-          hint: "We've sent password setup instructions to your email address."
-        });
-      } else {
-        // If email fails, we should still return success since user was created
-        console.log(`⚠️ User created but email failed for: ${username}`);
-        return Response.json({
-          success: true,
-          message: "Account created successfully! Please contact your administrator for password setup.",
-          hint: "There was an issue sending the setup email. Please contact your CEAL administrator."
-        });
-      }
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      return Response.json({
-        success: true,
-        message: "Account created successfully! Please contact your administrator for password setup.",
-        hint: "There was an issue sending the setup email. Please contact your CEAL administrator."
-      });
+    let emailError: EmailError | null = null;
+    const welcome = await sendWelcomeEmail(username, username, resetToken);
+    if (welcome.ok) {
+      console.log(`📧 Welcome email sent to: ${username}`);
+    } else {
+      console.log(`⚠️ User created but email failed for: ${username}`);
+      emailError = emailErrorFrom(welcome.failure, 'new-account-email');
+      await logEmailFailure(emailError, { mode: 'welcome', to: username.toLowerCase() }, request);
+      // No email went out, so the 10-minute wait does not apply: the person
+      // can get the link from the sign-in page straight away.
+      await releaseResetEmail(newUser.id, resetToken).catch((err) =>
+        console.error('Could not lift the 10-minute wait for the new account:', err),
+      );
     }
+
+    return Response.json({
+      success: true,
+      emailSent: welcome.ok,
+      message: welcome.ok
+        ? "Account created successfully! Check your email to set up your password."
+        : "Account created successfully! Please contact your administrator for password setup.",
+      hint: welcome.ok
+        ? "We've sent password setup instructions to your email address."
+        : "There was an issue sending the setup email. Please contact your CEAL administrator.",
+      emailError,
+      contactError,
+    });
 
   } catch (error) {
     console.error('Signup error:', error);

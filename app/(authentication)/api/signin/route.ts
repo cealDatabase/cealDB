@@ -3,6 +3,8 @@ import db from '@/lib/db';
 import { verifyPassword, generateJWTToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
 import { claimResetEmail, releaseResetEmail, retryMessage } from '@/lib/passwordResetEmail';
+import { emailErrorFrom, publicEmailError, type EmailError } from '@/lib/emailError';
+import { logEmailFailure } from '@/lib/auditLogger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,14 +89,23 @@ export async function POST(request: NextRequest) {
 
       // At most one email per account every 10 minutes (daily email quota).
       const claim = await claimResetEmail(user.id);
+      let emailError: EmailError | null = null;
       if (claim.ok) {
-        const emailSent = await sendPasswordResetEmail(
+        const sent = await sendPasswordResetEmail(
           user.username,
           user.firstname || user.lastname || user.username,
           claim.token,
           isInitialSetup
         );
-        if (!emailSent) await releaseResetEmail(user.id, claim.token);
+        if (!sent.ok) {
+          await releaseResetEmail(user.id, claim.token);
+          emailError = emailErrorFrom(sent.failure, 'signin-password-email');
+          await logEmailFailure(
+            emailError,
+            { mode: isInitialSetup ? 'password_setup' : 'password_reset', to: user.username },
+            request,
+          );
+        }
       }
 
       return NextResponse.json(
@@ -102,7 +113,9 @@ export async function POST(request: NextRequest) {
           success: false,
           errorType: isInitialSetup ? 'PASSWORD_SETUP_REQUIRED' : 'PASSWORD_RESET_REQUIRED',
           message: isInitialSetup ? 'Password setup required for your account.' : 'Password reset required.',
-          hint: !claim.ok ? retryMessage(claim.retryInMinutes) : isInitialSetup ?
+          hint: !claim.ok ? retryMessage(claim.retryInMinutes) : emailError ?
+            'The email could not be sent. Please try again in a few minutes, or contact your CEAL administrator.' :
+            isInitialSetup ?
             'A password setup link has been sent to your email address.' :
             'As part of our security enhancement, you must set a new password. Check your email for reset instructions.',
           suggestions: [
@@ -114,7 +127,8 @@ export async function POST(request: NextRequest) {
           // The link goes only to the account's own inbox. This reply used
           // to include it, which let anyone who knew an address set that
           // account's password without the email.
-          hasEmail: true
+          hasEmail: true,
+          ...(emailError ? { emailError: publicEmailError(emailError) } : {}),
         },
         { status: 200 }
       );

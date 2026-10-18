@@ -1,6 +1,7 @@
 import db from './db';
 import { headers } from 'next/headers';
 import { getCurrentUser } from './auth';
+import { type EmailError, emailErrorLogFields } from './emailError';
 
 export interface AuditLogData {
   userId?: number;
@@ -107,6 +108,28 @@ export async function logUserAction(
     success,
     errorMessage,
   }, request);
+}
+
+/**
+ * Record an email Resend did not take, with its error code, so the Email
+ * Send Status page lists it (lib/emailActivity.ts). `mode` says which email
+ * it was: password_reset, password_setup, welcome or contact.
+ */
+export async function logEmailFailure(
+  error: EmailError,
+  details: { mode: string; to: string } & Record<string, unknown>,
+  request?: Request,
+) {
+  await logUserAction(
+    'CREATE',
+    'Email',
+    'failed',
+    null,
+    { ...details, ...emailErrorLogFields(error) },
+    false,
+    error.message ?? error.code,
+    request,
+  );
 }
 
 // Helper function to get record before deletion/update

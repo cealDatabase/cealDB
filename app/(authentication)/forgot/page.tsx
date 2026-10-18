@@ -6,10 +6,14 @@ import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
+import { EmailErrorCode } from "@/components/EmailErrorBox";
 import forgotAction from "./forgotAction";
 
 export default function ForgotPage() {
-  const [error, formAction] = React.useActionState(forgotAction, undefined);
+  const [state, formAction] = React.useActionState(forgotAction, undefined);
+  // A failed send also carries an error code the person can copy.
+  const error = typeof state === "string" ? state : state?.message;
+  const emailError = typeof state === "object" ? state.emailError : null;
 
   return (
     <AuthLayout
@@ -95,6 +99,11 @@ export default function ForgotPage() {
               <h3 className="text-sm font-medium text-red-700 whitespace-pre-line">
                 {error}
               </h3>
+              {emailError && (
+                <div className="mt-3">
+                  <EmailErrorCode error={emailError} forAdmin={false} />
+                </div>
+              )}
             </div>
           </div>
         </div>

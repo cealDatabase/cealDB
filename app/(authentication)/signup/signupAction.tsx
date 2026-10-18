@@ -1,6 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { EmailError } from "@/lib/emailError";
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -11,6 +12,10 @@ interface SignupResult {
   success: boolean;
   message: string;
   error?: string;
+  /** The password setup email was not sent. */
+  emailError?: EmailError | null;
+  /** The account was not added to the broadcast list. */
+  contactError?: EmailError | null;
 }
 
 export default async function signupAction(
@@ -54,7 +59,12 @@ export default async function signupAction(
       console.log(`✅ Account created successfully for: ${username}`);
       return {
         success: true,
-        message: `Account created successfully for ${username}! Password setup email has been sent.`
+        // It used to say the email was sent even when it was not.
+        message: json.emailSent === false
+          ? `Account created for ${username}, but the password setup email was not sent. They can get it by entering their email on the sign-in page, or try again later.`
+          : `Account created successfully for ${username}! Password setup email has been sent.`,
+        emailError: json.emailError ?? null,
+        contactError: json.contactError ?? null,
       };
     } else {
       // Return specific error message from API
