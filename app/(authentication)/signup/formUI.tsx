@@ -25,11 +25,15 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { SingleLibraryType } from "@/types/types"; // Import the LibraryType type
 
 import signupAction from "./signupAction";
+import { EmailErrorBox } from "@/components/EmailErrorBox";
+import type { EmailError } from "@/lib/emailError";
 
 interface SignupResult {
   success: boolean;
   message: string;
   error?: string;
+  emailError?: EmailError | null;
+  contactError?: EmailError | null;
 }
 
 export default function SignUpForm({
@@ -181,6 +185,20 @@ export default function SignUpForm({
                 </h3>
               </div>
             </div>
+          </div>
+        )}
+        {result?.success && result.emailError && (
+          <div className="mt-4">
+            <EmailErrorBox forAdmin message="The password setup email was not sent." error={result.emailError} />
+          </div>
+        )}
+        {result?.success && result.contactError && (
+          <div className="mt-4">
+            <EmailErrorBox
+              forAdmin
+              message="This account was not added to the broadcast list in Resend, so it will not get broadcasts (such as the forms open email) until it is added there."
+              error={result.contactError}
+            />
           </div>
         )}
         {result && !result.success && (

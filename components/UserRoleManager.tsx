@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,8 @@ import {
   Download
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmailErrorBox } from "@/components/EmailErrorBox";
+import type { EmailError } from "@/lib/emailError";
 
 interface User {
   id: number;
@@ -57,6 +59,12 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
   const [sendingUserId, setSendingUserId] = useState<number | null>(null);
+  // Stays on screen (a toast goes away before it can be copied).
+  const [sendError, setSendError] = useState<{ message: string; code: EmailError | null } | null>(null);
+  const sendErrorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (sendError) sendErrorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [sendError]);
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
@@ -150,6 +158,7 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
 
   const handleSendOpeningEmail = async (user: User) => {
     setSendingUserId(user.id);
+    setSendError(null);
     try {
       const response = await fetch('/api/admin/send-individual-email', {
         method: 'POST',
@@ -158,7 +167,10 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send email');
+        const message = data.error || 'Failed to send email';
+        toast.error(message);
+        setSendError({ message: `Forms open email to ${user.username} was not sent. ${message}`, code: data.emailError ?? null });
+        return;
       }
       toast.success(`Email sent to ${user.username}`);
     } catch (error) {
@@ -231,6 +243,18 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
 
   return (
     <div className="space-y-6">
+      {sendError && (
+        <div ref={sendErrorRef} className="relative">
+          <EmailErrorBox forAdmin message={sendError.message} error={sendError.code} />
+          <button
+            type="button"
+            onClick={() => setSendError(null)}
+            className="absolute right-3 top-3 text-xs text-red-700 underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

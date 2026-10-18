@@ -9,6 +9,7 @@ import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 import { buildTemplateContext, renderTemplate } from "@/lib/emailTemplate"
 import { BROADCAST_FROM, sendBroadcastNow } from "@/lib/email"
 import { cancelPendingEvents } from "@/lib/surveyControl"
+import { EmailFailure, emailErrorFrom, emailErrorLogFields, resendFailure } from "@/lib/emailError"
 
 const prisma = db
 
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     // Check if RESEND_API_KEY is available
     if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json({ error: "Email service not configured" }, { status: 500 })
+      throw new EmailFailure("Email service not configured: RESEND_API_KEY is not set", "config_missing")
     }
 
     // Initialize Resend at runtime
@@ -135,11 +136,9 @@ export async function POST(request: NextRequest) {
     // Get audience ID from environment
     const audienceId = process.env.RESEND_BROADCAST_LIST_ID
     if (!audienceId) {
-      return NextResponse.json(
-        {
-          error: "Broadcast audience ID not configured. Please set RESEND_BROADCAST_LIST_ID in environment variables.",
-        },
-        { status: 500 },
+      throw new EmailFailure(
+        "Broadcast audience ID not configured. Please set RESEND_BROADCAST_LIST_ID in environment variables.",
+        "config_missing",
       )
     }
 
@@ -173,8 +172,11 @@ export async function POST(request: NextRequest) {
         console.log("✅ Broadcast sent immediately:", broadcast.data.id)
       } catch (emailError) {
         console.error("❌ Failed to send broadcast email:", emailError)
-        throw new Error(
+        // Keeps Resend's error name for the error code (lib/emailError.ts).
+        throw new EmailFailure(
           "Failed to send broadcast email: " + (emailError instanceof Error ? emailError.message : "Unknown error"),
+          emailError instanceof EmailFailure ? emailError.code : "application_error",
+          emailError instanceof EmailFailure ? emailError.status : null,
         )
       }
 
@@ -277,14 +279,18 @@ export async function POST(request: NextRequest) {
           html: emailTemplate,
         })
         if (broadcast.error || !broadcast.data?.id) {
-          throw new Error(broadcast.error?.message || "Resend returned no broadcast id")
+          throw broadcast.error
+            ? resendFailure("Resend did not accept the broadcast, so nothing was scheduled", broadcast.error)
+            : new EmailFailure("Resend did not accept the broadcast, so nothing was scheduled: Resend returned no broadcast id", "application_error")
         }
         console.log("✅ Draft accepted by Resend:", broadcast.data.id)
         console.log("✅ The daily job sends the broadcast on:", openDate.toISOString())
       } catch (emailError) {
         console.error("❌ Failed to schedule broadcast email:", emailError)
-        throw new Error(
+        if (emailError instanceof EmailFailure) throw emailError
+        throw new EmailFailure(
           "Resend did not accept the broadcast, so nothing was scheduled: " + (emailError instanceof Error ? emailError.message : "Unknown error"),
+          "application_error",
         )
       }
 
@@ -410,6 +416,17 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Broadcast API Error:", error)
 
+    // An error code the super admin can copy (lib/emailError.ts); the same
+    // code is on this failure's line on the Email Send Status page.
+    const emailError = emailErrorFrom(
+      error,
+      logContext?.send_mode === "immediate"
+        ? "open-close-send-now"
+        : logContext?.send_mode === "scheduled"
+          ? "open-close-schedule"
+          : "open-close",
+    )
+
     // Log the error
     try {
       await logUserAction(
@@ -417,7 +434,7 @@ export async function POST(request: NextRequest) {
         "Library_Year",
         "failed",
         null,
-        logContext,
+        { ...logContext, ...emailErrorLogFields(emailError) },
         false,
         error instanceof Error ? error.message : "Unknown error",
         request,
@@ -430,6 +447,7 @@ export async function POST(request: NextRequest) {
       {
         error: "Failed to open forms and send broadcast",
         detail: error instanceof Error ? error.message : "Unknown error",
+        emailError,
       },
       { status: 500 },
     )

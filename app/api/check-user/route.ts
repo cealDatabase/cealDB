@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { sendPasswordResetEmail } from '@/lib/email';
 import { claimResetEmail, releaseResetEmail } from '@/lib/passwordResetEmail';
+import { emailErrorFrom, publicEmailError, type EmailError } from '@/lib/emailError';
+import { logEmailFailure } from '@/lib/auditLogger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -85,14 +87,24 @@ export async function POST(request: NextRequest) {
       // the link in an earlier email stays valid.
       const claim = await claimResetEmail(user.id, { keepValidToken: true });
       let emailSent = false;
+      let emailError: EmailError | null = null;
       if (claim.ok) {
-        emailSent = await sendPasswordResetEmail(
+        const sent = await sendPasswordResetEmail(
           user.username,
           user.firstname || user.lastname || user.username,
           claim.token,
           needsPasswordSetup
         );
-        if (!emailSent) await releaseResetEmail(user.id, claim.token);
+        emailSent = sent.ok;
+        if (!sent.ok) {
+          await releaseResetEmail(user.id, claim.token);
+          emailError = emailErrorFrom(sent.failure, 'signin-password-email');
+          await logEmailFailure(
+            emailError,
+            { mode: needsPasswordSetup ? 'password_setup' : 'password_reset', to: user.username },
+            request,
+          );
+        }
         console.log(`📧 ${needsPasswordSetup ? 'Password setup' : 'Password reset'} email sent to ${user.username}: ${emailSent}`);
       } else {
         console.log(`📧 ${user.username} was emailed a link less than 10 minutes ago; not sending another`);
@@ -107,6 +119,8 @@ export async function POST(request: NextRequest) {
           emailSent,
           // Resend did not take the email (for example, the day's quota is used up).
           emailFailed: claim.ok && !emailSent,
+          // A code the person can copy and send to the CEAL administrator.
+          ...(emailError ? { emailError: publicEmailError(emailError) } : {}),
           ...(claim.ok ? {} : { retryInMinutes: claim.retryInMinutes }),
           // message: needsPasswordSetup ? 
           //   'Welcome! Your account needs a password to be set up.' :

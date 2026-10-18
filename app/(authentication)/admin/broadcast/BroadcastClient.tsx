@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react'
 import { ArrowLeft, Calendar, Send, CheckCircle, AlertCircle, Loader2, SlashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { LocalDateTime } from '@/components/LocalDateTime'
+import { EmailErrorBox } from '@/components/EmailErrorBox'
+import type { EmailError } from '@/lib/emailError'
 import { getSurveyDates, formatSurveyDate } from '@/lib/surveyDates'
 import { formatOpeningDate, formatClosingDate, openingDateKey, closingDateKey, OPENING_TIME_LABEL, CLOSING_TIME_LABEL } from '@/lib/surveyTime'
 import EnhancedSessionQueue from '@/components/EnhancedSessionQueue'
@@ -47,7 +49,11 @@ interface BroadcastClientProps {
 export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
   const [step, setStep] = useState<'preview' | 'confirm' | 'success'>('preview');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // A failed send also carries an error code the super admin can copy.
+  const [errorState, setErrorState] = useState<{ message: string; code: EmailError | null } | null>(null);
+  const error = errorState?.message ?? null;
+  const setError = (message: string | null, code: EmailError | null = null) =>
+    setErrorState(message === null ? null : { message, code });
 
   // Email and session data
   const [emailTemplate, setEmailTemplate] = useState('');
@@ -177,7 +183,8 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || data.error || 'Failed to send broadcast');
+        setError(data.detail || data.error || 'Failed to send broadcast', data.emailError ?? null);
+        return;
       }
 
       console.log('✅ Broadcast sent successfully:', data);
@@ -443,10 +450,9 @@ export default function BroadcastClient({ userRoles }: BroadcastClientProps) {
         )}
 
         {/* Error Display */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800">{error}</p>
+        {errorState && (
+          <div className="mb-6">
+            <EmailErrorBox forAdmin message={errorState.message} error={errorState.code} />
           </div>
         )}
 

@@ -10,6 +10,7 @@ import {
   renderTemplate,
 } from '@/lib/emailTemplate';
 import { logUserAction } from '@/lib/auditLogger';
+import { EmailFailure, emailErrorFrom, emailErrorLogFields } from '@/lib/emailError';
 
 const prisma = db;
 
@@ -96,22 +97,12 @@ export async function POST(
 
   // --- Actually send via Resend --------------------------------------------
   const audienceId = process.env.RESEND_BROADCAST_LIST_ID;
-  if (!audienceId) {
-    return NextResponse.json(
-      { error: 'RESEND_BROADCAST_LIST_ID is not configured.' },
-      { status: 500 },
-    );
-  }
-  if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json(
-      { error: 'RESEND_API_KEY is not configured.' },
-      { status: 500 },
-    );
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY;
   let broadcastId: string | undefined;
   try {
+    if (!audienceId) throw new EmailFailure('RESEND_BROADCAST_LIST_ID is not configured.', 'config_missing');
+    if (!apiKey) throw new EmailFailure('RESEND_API_KEY is not configured.', 'config_missing');
+    const resend = new Resend(apiKey);
     // Throws if Resend does not create or send it. The send result used to
     // go unchecked, so a refused send was still reported as sent.
     broadcastId = (await sendBroadcastNow(resend, {
@@ -121,6 +112,8 @@ export async function POST(
     })).id;
   } catch (err) {
     console.error(`[email-templates/${templateKey}/send] Resend error:`, err);
+    // An error code the super admin can copy (lib/emailError.ts).
+    const emailError = emailErrorFrom(err, 'template-broadcast');
     // Recorded so the Email Send Status page shows the failure and why.
     try {
       await logUserAction(
@@ -128,7 +121,7 @@ export async function POST(
         'EmailBroadcast',
         `manual:${templateKey}`,
         null,
-        { templateKey, academicYear: session.academicYear, subject: rendered.subject },
+        { templateKey, academicYear: session.academicYear, subject: rendered.subject, ...emailErrorLogFields(emailError) },
         false,
         err instanceof Error ? err.message : String(err),
         request,
@@ -138,11 +131,12 @@ export async function POST(
     }
     return NextResponse.json(
       {
-        error: 'Resend rejected the broadcast',
+        error: emailError.code === 'config_missing' ? 'Email service not configured' : 'Resend rejected the broadcast',
         detail: err instanceof Error ? err.message : String(err),
         broadcastId,
+        emailError,
       },
-      { status: 502 },
+      { status: emailError.code === 'config_missing' ? 500 : 502 },
     );
   }
 

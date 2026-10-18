@@ -12,6 +12,7 @@ import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
 import { getSurveyDates } from '@/lib/surveyDates';
 import { getSuperAdminEmails, getLibraryYearCount } from '@/lib/userUtils';
 import { logUserAction } from '@/lib/auditLogger';
+import { EmailFailure, emailErrorFrom, emailErrorLogFields } from '@/lib/emailError';
 import { formatDateRange } from '@/lib/dateFormatting';
 
 const prisma = db;
@@ -212,11 +213,14 @@ export async function GET(request: NextRequest) {
         console.log(`📧 BACKUP: Sending missed broadcast for year ${event.year}`);
 
         // Initialize Resend
+        if (!process.env.RESEND_API_KEY) {
+          throw new EmailFailure('RESEND_API_KEY not configured', 'config_missing');
+        }
         const resend = new Resend(process.env.RESEND_API_KEY);
         const audienceId = process.env.RESEND_BROADCAST_LIST_ID;
 
         if (!audienceId) {
-          throw new Error('RESEND_BROADCAST_LIST_ID not configured');
+          throw new EmailFailure('RESEND_BROADCAST_LIST_ID not configured', 'config_missing');
         }
 
         // Get Library_Year info for this year
@@ -308,7 +312,8 @@ export async function GET(request: NextRequest) {
         const errorMsg = `Opening broadcast for year ${event.year} was not sent: ${reason}. It stays pending; the next run tries again.`;
         console.error('❌', errorMsg);
         results.errors.push(errorMsg);
-        // Shown in red in the audit log, so a super admin sees it without
+        // Shown in red in the audit log and on the Email Send Status page,
+        // with an error code to copy, so a super admin sees it without
         // reading the cron output.
         await logUserAction(
           'CREATE',
@@ -319,6 +324,7 @@ export async function GET(request: NextRequest) {
             year: event.year,
             action: 'BROADCAST_FAILED',
             scheduled_date: event.scheduled_date.toISOString(),
+            ...emailErrorLogFields(emailErrorFrom(error, 'cron-opening-broadcast')),
           },
           false,
           errorMsg,
@@ -415,10 +421,38 @@ export async function GET(request: NextRequest) {
 
       console.log(`⏰ Found ${reminderTargets.length} session(s) needing the 1-week-before-close reminder`);
 
-      if (reminderTargets.length > 0 && !process.env.RESEND_API_KEY) {
-        console.warn('⏰ RESEND_API_KEY missing — skipping closing reminder');
-      } else if (reminderTargets.length > 0 && !process.env.RESEND_BROADCAST_LIST_ID) {
-        console.warn('⏰ RESEND_BROADCAST_LIST_ID missing — skipping closing reminder');
+      // Recorded with an error code, so the Email Send Status page shows it.
+      const logReminderFailure = async (year: number, err: unknown) => {
+        const reason = (err instanceof Error ? err.message : 'Unknown error').replace(/\.$/, '');
+        const msg = `Closing reminder for year ${year} was not sent: ${reason}. The next run tries again.`;
+        console.error('❌', msg);
+        results.errors.push(msg);
+        await logUserAction(
+          'CREATE',
+          'EmailBroadcast',
+          `auto:broadcast_closing_reminder:${year}`,
+          null,
+          {
+            templateKey: 'broadcast_closing_reminder',
+            academicYear: year,
+            ...emailErrorLogFields(emailErrorFrom(err, 'cron-closing-reminder')),
+          },
+          false,
+          msg,
+          request,
+        );
+      };
+
+      const missingSetting = !process.env.RESEND_API_KEY
+        ? 'RESEND_API_KEY'
+        : !process.env.RESEND_BROADCAST_LIST_ID
+          ? 'RESEND_BROADCAST_LIST_ID'
+          : null;
+      if (reminderTargets.length > 0 && missingSetting) {
+        console.warn(`⏰ ${missingSetting} missing — skipping closing reminder`);
+        for (const session of reminderTargets) {
+          await logReminderFailure(session.academicYear, new EmailFailure(`${missingSetting} not configured`, 'config_missing'));
+        }
       } else {
         const reminderResend = new Resend(process.env.RESEND_API_KEY);
         const reminderAudience = process.env.RESEND_BROADCAST_LIST_ID!;
@@ -464,20 +498,7 @@ export async function GET(request: NextRequest) {
             console.log(`✅ Closing reminder sent for year ${session.academicYear} (broadcast ${bid})`);
             results.broadcasts_sent.push(session.academicYear);
           } catch (sendErr) {
-            const reason = (sendErr instanceof Error ? sendErr.message : 'Unknown error').replace(/\.$/, '');
-            const msg = `Closing reminder for year ${session.academicYear} was not sent: ${reason}. The next run tries again.`;
-            console.error('❌', msg);
-            results.errors.push(msg);
-            await logUserAction(
-              'CREATE',
-              'EmailBroadcast',
-              `auto:broadcast_closing_reminder:${session.academicYear}`,
-              null,
-              { templateKey: 'broadcast_closing_reminder', academicYear: session.academicYear },
-              false,
-              msg,
-              request,
-            );
+            await logReminderFailure(session.academicYear, sendErr);
           }
         }
       }

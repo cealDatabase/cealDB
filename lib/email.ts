@@ -9,6 +9,7 @@ import {
   OPENING_TIME_LABEL,
   CLOSING_TIME_LABEL,
 } from './surveyTime';
+import { EmailFailure, resendFailure, resendReason } from './emailError';
 
 const ROOT_URL =
   process.env.NODE_ENV !== "production"
@@ -53,18 +54,37 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   }
 }
 
+/**
+ * What happened to one email. On failure, Resend's error name and status
+ * come with it, so the caller can show an error code (lib/emailError.ts).
+ */
+export type EmailSendResult = { ok: true; id: string | null } | { ok: false; failure: EmailFailure };
+
+const notConfigured = (setting: string): EmailSendResult => ({
+  ok: false,
+  failure: new EmailFailure(`${setting} is not set`, 'config_missing'),
+});
+
+const unexpected = (error: unknown): EmailSendResult => ({
+  ok: false,
+  failure:
+    error instanceof EmailFailure
+      ? error
+      : new EmailFailure(error instanceof Error ? error.message : String(error), 'application_error'),
+});
+
 export async function sendPasswordResetEmail(
   email: string, 
   username: string, 
   resetToken: string,
   isInitialSetup = false
-): Promise<boolean> {
+): Promise<EmailSendResult> {
   const resetUrl = `${ROOT_URL}/reset-password?token=${resetToken}`;
   
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return notConfigured('RESEND_API_KEY');
     }
 
     // Initialize Resend at runtime
@@ -146,14 +166,14 @@ export async function sendPasswordResetEmail(
 
     if (error) {
       console.error('Password reset email sending failed:', error);
-      return false;
+      return { ok: false, failure: resendFailure('Resend did not accept the email', error) };
     }
 
     console.log('Password reset email sent successfully:', data?.id);
-    return true;
+    return { ok: true, id: data?.id ?? null };
   } catch (error) {
     console.error('Password reset email sending failed:', error);
-    return false;
+    return unexpected(error);
   }
 }
 
@@ -161,13 +181,13 @@ export async function sendWelcomeEmail(
   email: string, 
   username: string, 
   resetToken?: string
-): Promise<boolean> {
+): Promise<EmailSendResult> {
   const resetUrl = `${ROOT_URL}/reset-password?token=${resetToken}`;
   
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Email configuration missing: RESEND_API_KEY required');
-      return false;
+      return notConfigured('RESEND_API_KEY');
     }
 
     // Initialize Resend at runtime
@@ -241,14 +261,14 @@ export async function sendWelcomeEmail(
 
     if (error) {
       console.error('Welcome email sending failed:', error);
-      return false;
+      return { ok: false, failure: resendFailure('Resend did not accept the email', error) };
     }
 
     console.log('Welcome email sent successfully:', data?.id);
-    return true;
+    return { ok: true, id: data?.id ?? null };
   } catch (error) {
     console.error('Welcome email sending failed:', error);
-    return false;
+    return unexpected(error);
   }
 }
 
@@ -375,7 +395,7 @@ export async function sendToEachRecipient(
       }
 
       const error: ResendError = response.error ?? {};
-      lastReason = error.message || error.name || 'Unknown error';
+      lastReason = `${error.message || error.name || 'Unknown error'}${error.name ? ` [${error.name}${error.statusCode ? ` ${error.statusCode}` : ''}]` : ''}`;
       const delay = retryDelayMs(response.headers, attempt);
       if (attempt === MAX_ATTEMPTS || !isRetryable(error) || Date.now() + delay > retryDeadline) break;
       console.warn(`Resend batch attempt ${attempt} failed (${lastReason}); retrying in ${delay}ms`);
@@ -405,19 +425,15 @@ function sendBatch(
 /** Sender for broadcasts to the CEAL audience. */
 export const BROADCAST_FROM = 'CEAL Statistics Database <noreply@cealstats.org>';
 
-function describeResendError(error: ResendError | null | undefined): string {
-  if (!error) return 'Resend returned no broadcast id';
-  return error.message || error.name || 'Unknown error';
-}
-
 /**
  * Create a broadcast to the CEAL audience and send it now.
  *
  * The SDK does not throw when Resend refuses a request; it returns
  * `{ error }`. Callers awaited `broadcasts.send` without looking at the
  * result, so a broadcast Resend never sent was recorded as sent and never
- * tried again. This throws instead, with Resend's reason, so the caller can
- * leave the job pending and report what went wrong.
+ * tried again. This throws instead, an EmailFailure with Resend's reason and
+ * error name, so the caller can leave the job pending and report what went
+ * wrong.
  */
 export async function sendBroadcastNow(
   resend: Pick<Resend, 'broadcasts'>,
@@ -431,7 +447,9 @@ export async function sendBroadcastNow(
   });
   const id = created.data?.id;
   if (created.error || !id) {
-    throw new Error(`Resend did not create the broadcast: ${describeResendError(created.error)}`);
+    throw created.error
+      ? resendFailure('Resend did not create the broadcast', created.error)
+      : new EmailFailure('Resend did not create the broadcast: Resend returned no broadcast id', 'application_error');
   }
 
   const sent = await resend.broadcasts.send(id);
@@ -441,7 +459,7 @@ export async function sendBroadcastNow(
     const check = await resend.broadcasts.get(id);
     const status = check.data?.status;
     if (status === 'sent' || status === 'queued') return { id };
-    throw new Error(`Resend created broadcast ${id} but did not send it: ${describeResendError(sent.error)}`);
+    throw resendFailure(`Resend created broadcast ${id} but did not send it`, sent.error);
   }
   return { id };
 }
@@ -855,23 +873,23 @@ export async function sendAdminFormsClosedNotification(
 }
 
 /**
- * Add a new user to Resend contacts for broadcast communications
- * This is a backend-only operation with no frontend feedback
+ * Add a new user to the Resend audience that broadcasts go to. Someone not
+ * on it gets no broadcasts, so a failure is reported, not only logged.
  */
 export async function addUserToResendContacts(
   email: string,
   firstName?: string | null,
   lastName?: string | null
-): Promise<boolean> {
+): Promise<EmailSendResult> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.error('Resend contact creation skipped: RESEND_API_KEY not configured');
-      return false;
+      return notConfigured('RESEND_API_KEY');
     }
 
     if (!process.env.RESEND_BROADCAST_LIST_ID) {
       console.error('Resend contact creation skipped: RESEND_BROADCAST_LIST_ID not configured');
-      return false;
+      return notConfigured('RESEND_BROADCAST_LIST_ID');
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -886,15 +904,16 @@ export async function addUserToResendContacts(
     });
 
     if (error) {
+      // Already on the list is what this was for.
+      if (/already exists/i.test(resendReason(error))) return { ok: true, id: null };
       console.error('Failed to add contact to Resend:', error);
-      return false;
+      return { ok: false, failure: resendFailure('Resend did not add the contact to the broadcast list', error) };
     }
 
     console.log(`✅ Added user to Resend contacts: ${email} (Contact ID: ${data?.id})`);
-    return true;
+    return { ok: true, id: data?.id ?? null };
   } catch (error) {
-    // Silent fail - don't break user signup if Resend fails
     console.error('Resend contact creation error:', error);
-    return false;
+    return unexpected(error);
   }
 }

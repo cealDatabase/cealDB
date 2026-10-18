@@ -4,6 +4,8 @@ import { hashPassword } from '@/lib/auth';
 import { validatePassword } from '@/lib/password';
 import { sendPasswordResetEmail } from '@/lib/email';
 import { claimResetEmail, releaseResetEmail, retryMessage } from '@/lib/passwordResetEmail';
+import { emailErrorFrom, publicEmailError } from '@/lib/emailError';
+import { logEmailFailure } from '@/lib/auditLogger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -127,14 +129,30 @@ async function handlePasswordResetRequest(email: string) {
     }
 
     // Send reset email
-    const emailSent = await sendPasswordResetEmail(
+    const sent = await sendPasswordResetEmail(
       user.username, 
       user.firstname || user.lastname || user.username, 
       claim.token
     );
-    if (!emailSent) await releaseResetEmail(user.id, claim.token);
 
-    console.log(`📧 Password reset email sent to ${user.username}: ${emailSent}`);
+    console.log(`📧 Password reset email sent to ${user.username}: ${sent.ok}`);
+
+    // This used to report success when the email was not sent.
+    if (!sent.ok) {
+      await releaseResetEmail(user.id, claim.token);
+      const emailError = emailErrorFrom(sent.failure, 'password-reset-request');
+      await logEmailFailure(emailError, { mode: 'password_reset', to: user.username });
+      return NextResponse.json(
+        {
+          success: false,
+          errorType: 'EMAIL_NOT_SENT',
+          message: 'The password reset email could not be sent.',
+          hint: 'Please try again in a few minutes, or contact the CEAL admin with the error code.',
+          emailError: publicEmailError(emailError),
+        },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json(
       {

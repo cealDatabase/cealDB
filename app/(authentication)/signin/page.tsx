@@ -7,6 +7,8 @@ import { XCircle, CheckCircle, ArrowLeft, Eye, EyeOff, Cookie, ShieldCheck } fro
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/Fields";
+import { EmailErrorCode } from "@/components/EmailErrorBox";
+import type { EmailError } from "@/lib/emailError";
 import signinAction from "./signinAction";
 
 type SigninStep = 'EMAIL' | 'PASSWORD' | 'RESET_GUIDANCE';
@@ -23,6 +25,8 @@ interface ResetStatus {
   emailFailed?: boolean;
   /** No new email: one went out less than 10 minutes ago. */
   retryInMinutes?: number;
+  /** Why it was not sent, as a code the person can copy. */
+  emailError?: EmailError;
 }
 
 export default function SignInPage() {
@@ -394,9 +398,12 @@ export default function SignInPage() {
               {resetStatus.retryInMinutes} minute{resetStatus.retryInMinutes === 1 ? '' : 's'}.
             </p>
           ) : resetStatus?.emailFailed ? (
-            <p className="text-start text-sm text-red-700">
-              Please try again in a few minutes, or contact your CEAL administrator.
-            </p>
+            <div className="space-y-2">
+              <p className="text-start text-sm text-red-700">
+                Please try again in a few minutes, or contact your CEAL administrator.
+              </p>
+              {resetStatus.emailError && <EmailErrorCode error={resetStatus.emailError} forAdmin={false} />}
+            </div>
           ) : null}
 
           {/* Simple Instructions */}

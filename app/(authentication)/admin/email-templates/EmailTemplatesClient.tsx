@@ -4,6 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/Container';
 import { formatOpeningDate, formatClosingDate } from '@/lib/surveyTime';
+import { EmailErrorBox } from '@/components/EmailErrorBox';
+import type { EmailError } from '@/lib/emailError';
 import { Button } from '@/components/ui/button';
 import {
   AlertCircle,
@@ -90,7 +92,11 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
   const [previewing, setPreviewing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // A failed send also carries an error code the super admin can copy.
+  const [errorState, setErrorState] = useState<{ message: string; code: EmailError | null } | null>(null);
+  const error = errorState?.message ?? null;
+  const setError = (message: string | null, code: EmailError | null = null) =>
+    setErrorState(message === null ? null : { message, code });
   const [info, setInfo] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
 
@@ -241,7 +247,8 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
       const data = await res.json();
       if (!res.ok) {
         const msg = [data.error, data.detail].filter(Boolean).join(' — ');
-        throw new Error(msg || 'Failed to send');
+        setError(msg || 'Failed to send', data.emailError ?? null);
+        return;
       }
       setInfo(`Broadcast sent. Resend broadcast id: ${data.broadcastId ?? '(unknown)'}`);
       await refreshList();
@@ -350,10 +357,9 @@ export default function EmailTemplatesClient({ userRoles }: EmailTemplatesClient
           </p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800 whitespace-pre-wrap">{error}</p>
+        {errorState && (
+          <div className="mb-4">
+            <EmailErrorBox forAdmin message={errorState.message} error={errorState.code} />
           </div>
         )}
         {info && (

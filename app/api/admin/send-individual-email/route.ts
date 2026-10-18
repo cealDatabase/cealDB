@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { isSuperAdminDb } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 import { buildTemplateContext, renderTemplate } from '@/lib/emailTemplate';
+import { EmailFailure, emailErrorFrom, emailErrorLogFields } from '@/lib/emailError';
 
 const prisma = db;
 
@@ -16,7 +17,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: 'Email service not configured',
+          emailError: emailErrorFrom(new EmailFailure('RESEND_API_KEY is not set', 'config_missing'), 'individual-email'),
+        },
+        { status: 500 },
+      );
     }
 
     const { email, year: yearInput } = await request.json();
@@ -58,6 +65,8 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Failed to send individual email:', error);
       const reason = error.message || error.name || 'Unknown error';
+      // An error code the super admin can copy (lib/emailError.ts).
+      const emailError = emailErrorFrom(error, 'individual-email');
       // Recorded so the Email Send Status page shows the failure and why.
       try {
         await logUserAction(
@@ -65,7 +74,7 @@ export async function POST(request: NextRequest) {
           'Email',
           'failed',
           null,
-          { to: email, year, mode: 'individual' },
+          { to: email, year, mode: 'individual', ...emailErrorLogFields(emailError) },
           false,
           `Resend did not accept the email: ${reason}`,
           request,
@@ -73,7 +82,7 @@ export async function POST(request: NextRequest) {
       } catch (logErr) {
         console.error('Audit log failed for individual email:', logErr);
       }
-      return NextResponse.json({ error: `Failed to send email: ${reason}` }, { status: 500 });
+      return NextResponse.json({ error: `Failed to send email: ${reason}`, emailError }, { status: 500 });
     }
 
     // Audit log
@@ -96,7 +105,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('Send individual email error:', err);
     return NextResponse.json(
-      { error: 'Unexpected error sending email' },
+      { error: 'Unexpected error sending email', emailError: emailErrorFrom(err, 'individual-email') },
       { status: 500 },
     );}
 }

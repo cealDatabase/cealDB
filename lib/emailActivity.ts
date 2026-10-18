@@ -8,6 +8,7 @@
 import { Resend } from 'resend';
 import db from '@/lib/db';
 import { DEFAULT_TEMPLATES, type TemplateKey } from '@/lib/emailTemplate';
+import { type EmailError, emailErrorFromLog } from '@/lib/emailError';
 
 export type SendKind =
   | 'opening_broadcast'
@@ -16,6 +17,8 @@ export type SendKind =
   | 'announcement'
   | 'admin_close_notice'
   | 'individual'
+  | 'account_email'
+  | 'broadcast_list'
   | 'testing_tool';
 
 export interface SendRecord {
@@ -39,6 +42,11 @@ export interface SendRecord {
   failed: { email: string; reason: string }[];
   broadcastId: string | null;
   emailId: string | null;
+  /**
+   * For a failure: the error code to copy (lib/emailError.ts). Entries from
+   * before error codes get LOG-<audit log id> as their reference.
+   */
+  errorCode: EmailError | null;
 }
 
 type LogRow = {
@@ -74,6 +82,25 @@ export async function getSendRecords(limit = 200): Promise<SendRecord[]> {
   return rows.map(classify).filter((r): r is SendRecord => r !== null);
 }
 
+/**
+ * The entry an error code points to: EM-… as copied from an error message,
+ * or LOG-<id> for an entry from before error codes. Older than the history
+ * list reaches, too.
+ */
+export async function findSendRecordByRef(ref: string): Promise<SendRecord[]> {
+  const code = ref.trim().toUpperCase();
+  const logId = /^LOG-(\d{1,9})$/.exec(code)?.[1];
+  if (!logId && !/^EM-[A-Z0-9]{8}$/.test(code)) return [];
+  const rows = logId
+    ? await db.$queryRaw<LogRow[]>`
+        SELECT id, username, action, table_name, record_id, new_values, success, error_message, timestamp
+        FROM "AuditLog" WHERE id = ${Number(logId)}`
+    : await db.$queryRaw<LogRow[]>`
+        SELECT id, username, action, table_name, record_id, new_values, success, error_message, timestamp
+        FROM "AuditLog" WHERE new_values->>'ref' = ${code}`;
+  return rows.map(classify).filter((r): r is SendRecord => r !== null);
+}
+
 function obj(value: unknown): Record<string, any> {
   return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, any>) : {};
 }
@@ -103,6 +130,31 @@ function templateName(key: string | null): string {
 }
 
 function classify(row: LogRow): SendRecord | null {
+  const record = classifyRow(row);
+  if (!record || (record.ok && record.failed.length === 0)) return record;
+  const v = obj(row.new_values);
+  return {
+    ...record,
+    errorCode: emailErrorFromLog(v, record.at, row.error_message) ?? {
+      code: 'unknown',
+      status: null,
+      where: record.kind,
+      ref: `LOG-${row.id}`,
+      at: record.at,
+      message: row.error_message ?? record.failed[0]?.reason,
+    },
+  };
+}
+
+/** What an email "mode" in an Email entry was, for the ones sent to one person. */
+const ONE_PERSON_EMAILS: Record<string, { kind: SendKind; label: string }> = {
+  individual: { kind: 'individual', label: 'Individual forms open email' },
+  password_reset: { kind: 'account_email', label: 'Password reset email' },
+  password_setup: { kind: 'account_email', label: 'Password setup email' },
+  welcome: { kind: 'account_email', label: 'New account: password setup email' },
+};
+
+function classifyRow(row: LogRow): SendRecord | null {
   const v = obj(row.new_values);
   const base = {
     id: row.id,
@@ -114,6 +166,7 @@ function classify(row: LogRow): SendRecord | null {
     accepted: null as number | null,
     broadcastId: null as string | null,
     emailId: null as string | null,
+    errorCode: null as EmailError | null,
   };
   const year = num(v.academicYear) ?? num(v.year);
 
@@ -146,16 +199,35 @@ function classify(row: LogRow): SendRecord | null {
     };
   }
 
-  // Individual "forms are open" email from Manage Users.
-  if (row.table_name === 'Email') {
-    const emailId = row.success ? str(row.record_id) : null;
+  // A new account that could not be added to the broadcast list.
+  if (row.table_name === 'Email' && v.mode === 'contact') {
     return {
       ...base,
-      kind: 'individual',
-      label: 'Individual forms open email',
-      channel: 'transactional',
+      kind: 'broadcast_list',
+      label: 'New account: add to the broadcast list',
+      channel: 'broadcast',
       year,
       by: row.username ?? 'Unknown',
+      recipients: str(v.to) ?? 'Unknown',
+      attempted: 1,
+      accepted: row.success ? 1 : 0,
+      failed: row.success ? [] : [{ email: str(v.to) ?? 'Unknown', reason: row.error_message ?? 'Unknown error' }],
+    };
+  }
+
+  // An email to one person: the "forms are open" email from Manage Users,
+  // or a password setup or reset email that Resend did not take.
+  if (row.table_name === 'Email') {
+    const emailId = row.success ? str(row.record_id) : null;
+    const which = ONE_PERSON_EMAILS[typeof v.mode === 'string' ? v.mode : 'individual'] ?? ONE_PERSON_EMAILS.individual;
+    return {
+      ...base,
+      kind: which.kind,
+      label: which.label,
+      channel: 'transactional',
+      year,
+      // Password emails are asked for on public pages: nobody signed in.
+      by: row.username ?? (which.kind === 'account_email' ? 'Sign-in / forgot password page' : 'Unknown'),
       recipients: str(v.to) ?? 'Unknown',
       attempted: 1,
       accepted: row.success ? 1 : 0,
