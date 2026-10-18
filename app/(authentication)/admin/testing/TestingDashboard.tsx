@@ -16,6 +16,8 @@ import {
 
 interface TestingDashboardProps {
   userRoles: string[]
+  /** Off unless the deployment sets ENABLE_TEST_ACTIONS=true (lib/testActions.ts). */
+  actionsEnabled: boolean
 }
 
 interface TestResult {
@@ -26,7 +28,7 @@ interface TestResult {
   error?: string
 }
 
-export default function TestingDashboard({ userRoles }: TestingDashboardProps) {
+export default function TestingDashboard({ userRoles, actionsEnabled }: TestingDashboardProps) {
   const [year, setYear] = useState(new Date().getFullYear())
   const [testEmails, setTestEmails] = useState('')
   const [testMode, setTestMode] = useState(true)
@@ -200,6 +202,17 @@ export default function TestingDashboard({ userRoles }: TestingDashboardProps) {
           Test Actions
         </h2>
 
+        {!actionsEnabled ? (
+          <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 text-sm text-gray-700">
+            <p className="font-semibold text-gray-900 mb-1">Test actions are turned off</p>
+            <p>
+              &ldquo;Test Open Forms&rdquo; and &ldquo;Test Close Forms&rdquo; work on the live database: they open or
+              close every institution&rsquo;s forms for the year, even in Test Mode, and with Test Mode off they
+              email every user. To turn them on, set <code className="font-mono">ENABLE_TEST_ACTIONS=true</code> in
+              Vercel (Settings → Environment Variables) and redeploy.
+            </p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Open Forms Test */}
           <div className="border border-green-200 rounded-lg p-4 bg-green-50">
@@ -267,6 +280,7 @@ export default function TestingDashboard({ userRoles }: TestingDashboardProps) {
             </Button>
           </div>
         </div>
+        )}
       </div>
 
       {/* Results Section */}

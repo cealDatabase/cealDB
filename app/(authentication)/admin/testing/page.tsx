@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import TestingDashboard from './TestingDashboard';
+import { testActionsEnabled } from '@/lib/testActions';
 
 /**
  * Super Admin Testing Dashboard
@@ -51,5 +52,5 @@ export default async function TestingPage() {
     redirect('/admin');
   }
 
-  return <TestingDashboard userRoles={userRoles} />;
+  return <TestingDashboard userRoles={userRoles} actionsEnabled={testActionsEnabled()} />;
 }

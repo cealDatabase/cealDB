@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { isSuperAdminDb } from '@/lib/auth';
+import { testActionsEnabled, TEST_ACTIONS_OFF } from '@/lib/testActions';
 import { 
   sendFormsOpenedNotification, 
   sendFormsClosedNotification,
@@ -41,6 +42,14 @@ export async function POST(request: NextRequest) {
     if (!(await isSuperAdminDb())) {
       return NextResponse.json(
         { error: 'Unauthorized: Super Admin access required' },
+        { status: 403 }
+      );
+    }
+
+    // Changes live data and can email every user: off unless switched on.
+    if (!testActionsEnabled()) {
+      return NextResponse.json(
+        { error: 'Test actions are turned off', detail: TEST_ACTIONS_OFF },
         { status: 403 }
       );
     }
