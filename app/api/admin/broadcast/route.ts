@@ -8,6 +8,7 @@ import { openingInstant, closingInstant, CLOSING_TIME_LABEL } from "@/lib/survey
 import { formatDateRange, formatDateWithWeekday } from "@/lib/dateFormatting"
 import { buildTemplateContext, renderTemplate } from "@/lib/emailTemplate"
 import { BROADCAST_FROM, sendBroadcastNow } from "@/lib/email"
+import { cancelPendingEvents } from "@/lib/surveyControl"
 
 const prisma = db
 
@@ -218,6 +219,10 @@ export async function POST(request: NextRequest) {
         console.log(`✅ Created new SurveySession for year ${year}`)
       }
 
+      // A pending broadcast from an earlier schedule would otherwise be
+      // treated as still to send.
+      await cancelPendingEvents(Number.parseInt(String(year)), "Replaced: the session was scheduled again")
+
       // Create COMPLETED scheduled events for record keeping
       await prisma.scheduledEvent.createMany({
         data: [
@@ -325,6 +330,10 @@ export async function POST(request: NextRequest) {
         })
         console.log(`✅ Created new SurveySession for year ${year} (scheduled)`)
       }
+
+      // Scheduling again replaces the earlier schedule: its events would
+      // otherwise stay pending, and each pending broadcast was sent.
+      await cancelPendingEvents(Number.parseInt(String(year)), "Replaced: the session was scheduled again")
 
       // Create three SEPARATE pending scheduled events
       await prisma.scheduledEvent.createMany({

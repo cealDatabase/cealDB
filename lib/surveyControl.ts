@@ -127,3 +127,36 @@ export async function reopenSurveyYear(year: number, newClosingDateKey?: string 
     closesAtLabel: session && closingDate ? `${formatClosingDate(closingDate)} at ${CLOSING_TIME_LABEL}` : null,
   };
 }
+
+/**
+ * Retire the year's pending scheduled events before a new schedule replaces
+ * them. Scheduling a year again used to add a second set beside the first,
+ * and the daily job then sent the opening broadcast once for each.
+ */
+export async function cancelPendingEvents(year: number, note: string) {
+  return db.scheduledEvent.updateMany({
+    where: { year, status: 'pending' },
+    data: { status: 'cancelled', cancelled_at: new Date(), notes: note },
+  });
+}
+
+/**
+ * Move the year's pending events to new dates. The daily job sends the
+ * opening broadcast at its event's time but opens the forms on the
+ * session's date, so changing the session alone sent the broadcast at the
+ * old time.
+ */
+export async function moveScheduledEvents(year: number, openingDate: Date | null, closingDate: Date | null) {
+  if (openingDate) {
+    await db.scheduledEvent.updateMany({
+      where: { year, status: 'pending', event_type: { in: ['BROADCAST', 'FORM_OPENING'] } },
+      data: { scheduled_date: openingDate },
+    });
+  }
+  if (closingDate) {
+    await db.scheduledEvent.updateMany({
+      where: { year, status: 'pending', event_type: 'FORM_CLOSING' },
+      data: { scheduled_date: closingDate },
+    });
+  }
+}
