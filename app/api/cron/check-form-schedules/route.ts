@@ -171,7 +171,43 @@ export async function GET(request: NextRequest) {
 
     console.log(`📧 Processing ${broadcastsToProcess.length} broadcasts after duplicate check (prevented ${pendingBroadcasts.length - broadcastsToProcess.length} duplicates)`);
 
+    // One opening broadcast per year: the most recent schedule. A year
+    // scheduled more than once had a pending broadcast from each schedule,
+    // and every one that was due went out to all members. An earlier one is
+    // cancelled; if the latest is not due yet, nothing is sent until it is.
+    const latestPendingByYear = new Map<number, number>();
+    if (broadcastsToProcess.length > 0) {
+      const allPending = await prisma.scheduledEvent.findMany({
+        where: {
+          event_type: 'BROADCAST',
+          status: 'pending',
+          year: { in: [...new Set(broadcastsToProcess.map((e) => e.year))] },
+        },
+        select: { id: true, year: true },
+      });
+      for (const e of allPending) {
+        latestPendingByYear.set(e.year, Math.max(latestPendingByYear.get(e.year) ?? 0, e.id));
+      }
+    }
+    const broadcastsToSend = [];
     for (const event of broadcastsToProcess) {
+      const latestId = latestPendingByYear.get(event.year);
+      if (latestId !== undefined && latestId !== event.id) {
+        console.log(`⚠️ DUPLICATE PREVENTED: Broadcast event #${event.id} for year ${event.year} was replaced by event #${latestId}. Cancelling it.`);
+        await prisma.scheduledEvent.update({
+          where: { id: event.id },
+          data: {
+            status: 'cancelled',
+            cancelled_at: new Date(),
+            notes: `Replaced by event #${latestId} (the year was scheduled again); one broadcast is sent per year`,
+          },
+        });
+      } else {
+        broadcastsToSend.push(event);
+      }
+    }
+
+    for (const event of broadcastsToSend) {
       try {
         console.log(`📧 BACKUP: Sending missed broadcast for year ${event.year}`);
 

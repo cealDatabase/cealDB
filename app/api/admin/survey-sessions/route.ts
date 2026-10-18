@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSessionRoleIds, requireRoles } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
+import { moveScheduledEvents } from '@/lib/surveyControl';
 
 const prisma = db;
 
@@ -229,6 +230,8 @@ export async function PUT(request: NextRequest) {
       where: { academicYear: parseInt(academicYear) },
       data: updateData
     });
+    // Keep a scheduled broadcast on the new opening date.
+    await moveScheduledEvents(parseInt(academicYear), updateData.openingDate ?? null, updateData.closingDate ?? null);
 
     // Log the action
     await logUserAction(

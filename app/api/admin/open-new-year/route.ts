@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { isSuperAdminDb } from "@/lib/auth";
 import { openingInstant, closingInstant } from "@/lib/surveyTime";
+import { moveScheduledEvents } from "@/lib/surveyControl";
 
 export async function POST(req: Request) {
   // Super admin only. Middleware only checks that the caller is signed in, so
@@ -187,6 +188,8 @@ export async function POST(req: Request) {
           ...(reminderDue ? { notifiedClosingReminder: false } : {}),
         }
       });
+      // Keep a scheduled broadcast on the new opening date.
+      await moveScheduledEvents(targetYear, openDate, closeDate);
       sessionAction = 'updated';
       console.log(`🔄 Updated existing SurveySession for year ${targetYear}`);
     } else {
