@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { hashPassword, generateResetToken } from '@/lib/auth';
+import { hashPassword } from '@/lib/auth';
 import { validatePassword } from '@/lib/password';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { claimResetEmail, releaseResetEmail, retryMessage } from '@/lib/passwordResetEmail';
 
 export async function POST(request: NextRequest) {
   try {
@@ -111,26 +112,27 @@ async function handlePasswordResetRequest(email: string) {
       );
     }
 
-    // Generate reset token
-    const resetToken = generateResetToken();
-    const resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Update user with reset token
-    await db.user.update({
-      where: { id: user.id },
-      data: {
-        password_reset_token: resetToken,
-        password_reset_expires: resetExpires,
-        requires_password_reset: true
-      }
-    });
+    // At most one email per account every 10 minutes (daily email quota).
+    const claim = await claimResetEmail(user.id);
+    if (!claim.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          errorType: 'RECENTLY_SENT',
+          message: retryMessage(claim.retryInMinutes),
+          retryInMinutes: claim.retryInMinutes,
+        },
+        { status: 429 }
+      );
+    }
 
     // Send reset email
     const emailSent = await sendPasswordResetEmail(
       user.username, 
       user.firstname || user.lastname || user.username, 
-      resetToken
+      claim.token
     );
+    if (!emailSent) await releaseResetEmail(user.id, claim.token);
 
     console.log(`📧 Password reset email sent to ${user.username}: ${emailSent}`);
 

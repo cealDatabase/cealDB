@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { generateResetToken } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { claimResetEmail, releaseResetEmail } from '@/lib/passwordResetEmail';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,33 +81,22 @@ export async function POST(request: NextRequest) {
     if (needsPasswordSetup || needsPasswordReset) {
       console.log(`🔄 PASSWORD ${needsPasswordSetup ? 'SETUP' : 'RESET'} REQUIRED for user: "${email}"`);
       
-      // Generate reset token if one doesn't exist or is expired
-      let resetToken = user.password_reset_token;
-      let resetExpires = user.password_reset_expires;
-      
-      if (!resetToken || !resetExpires || resetExpires < new Date()) {
-        resetToken = generateResetToken();
-        resetExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-        
-        await db.user.update({
-          where: { id: user.id },
-          data: {
-            password_reset_token: resetToken,
-            password_reset_expires: resetExpires,
-            requires_password_reset: true
-          }
-        });
+      // At most one email per account every 10 minutes (daily email quota);
+      // the link in an earlier email stays valid.
+      const claim = await claimResetEmail(user.id, { keepValidToken: true });
+      let emailSent = false;
+      if (claim.ok) {
+        emailSent = await sendPasswordResetEmail(
+          user.username,
+          user.firstname || user.lastname || user.username,
+          claim.token,
+          needsPasswordSetup
+        );
+        if (!emailSent) await releaseResetEmail(user.id, claim.token);
+        console.log(`📧 ${needsPasswordSetup ? 'Password setup' : 'Password reset'} email sent to ${user.username}: ${emailSent}`);
+      } else {
+        console.log(`📧 ${user.username} was emailed a link less than 10 minutes ago; not sending another`);
       }
-
-      // Send appropriate email
-      const emailSent = await sendPasswordResetEmail(
-        user.username,
-        user.firstname || user.lastname || user.username,
-        resetToken,
-        needsPasswordSetup
-      );
-
-      console.log(`📧 ${needsPasswordSetup ? 'Password setup' : 'Password reset'} email sent to ${user.username}: ${emailSent}`);
 
       return NextResponse.json(
         {
@@ -115,6 +104,10 @@ export async function POST(request: NextRequest) {
           userStatus: 'NEEDS_PASSWORD_SETUP',
           needsPasswordSetup,
           needsPasswordReset,
+          emailSent,
+          // Resend did not take the email (for example, the day's quota is used up).
+          emailFailed: claim.ok && !emailSent,
+          ...(claim.ok ? {} : { retryInMinutes: claim.retryInMinutes }),
           // message: needsPasswordSetup ? 
           //   'Welcome! Your account needs a password to be set up.' :
           //   'Your account requires a password reset.',

@@ -341,8 +341,8 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
               没有？说明压根没创建。
             </li>
             <li>
-              检查 /admin/audit-logs。搜
-              <Code>EmailBroadcast</Code>。有 CREATE 行吗？
+              打开 /admin/email-status。列表里有这次广播吗？显示 Accepted 还是 Not sent？Not sent
+              会写出 Resend 给的原因。（也可以在 /admin/audit-logs 里看，红色的行是没发出去的。）
             </li>
             <li>
               检查 SurveySession 的 <Code>notifiedOnOpen</Code>。如果是 true，说明系统认为已经发过了。
@@ -362,8 +362,9 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
               was never created.
             </li>
             <li>
-              /admin/audit-logs. Search <Code>EmailBroadcast</Code>. Any CREATE
-              rows?
+              /admin/email-status. Is the broadcast listed, and does it say
+              Accepted or Not sent? Not sent shows Resend&apos;s reason. (The
+              same entries are in /admin/audit-logs; red rows are failed sends.)
             </li>
             <li>
               SurveySession's <Code>notifiedOnOpen</Code>. If true, system
@@ -432,7 +433,7 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
         {lang === 'zh' ? (
           <>
             <li>
-              Vercel Dashboard → Project → Cron Jobs 标签页。看本日 8:00 / 20:00 那两次的状态。
+              Vercel Dashboard → Project → Cron Jobs 标签页。看本日 UTC 04:00 / 08:00 那两次的状态。
             </li>
             <li>
               如果状态是 <strong>Failed</strong>：点开看 invocation log，错误信息。
@@ -451,8 +452,8 @@ export default function Part5Troubleshooting({ lang }: PartProps) {
         ) : (
           <>
             <li>
-              Vercel Dashboard → Project → Cron Jobs tab. Check today's 8:00 /
-              20:00 runs.
+              Vercel Dashboard → Project → Cron Jobs tab. Check today's 04:00 /
+              08:00 UTC runs.
             </li>
             <li>
               If status <strong>Failed</strong>: click into invocation log, see

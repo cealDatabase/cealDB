@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { isSuperAdminDb } from '@/lib/auth';
+import { isSuperAdminDb, requireRoles } from '@/lib/auth';
 import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
@@ -10,6 +10,16 @@ const prisma = db;
  * Returns events grouped by year with detailed information
  */
 export async function GET(request: NextRequest) {
+  // Read-only data for the toolkit pages: Super Admin and Assistant Admin
+  // (who may view admin pages but not change them). Signed in was the only
+  // check before, so any member could read it.
+  if (!(await requireRoles(1, 4))) {
+    return NextResponse.json(
+      { error: 'Unauthorized: Super Admin or Assistant Admin access required' },
+      { status: 403 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const statusFilter = searchParams.get('status') || 'pending'; // 'pending', 'all', 'completed', 'cancelled'

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import db from '@/lib/db'
-import { isSuperAdminDb } from '@/lib/auth'
+import { isSuperAdminDb, requireRoles } from '@/lib/auth'
 import { Resend } from "resend"
 import { logUserAction } from "@/lib/auditLogger"
 import { getSurveyDates } from "@/lib/surveyDates"
@@ -12,8 +12,12 @@ import { BROADCAST_FROM, sendBroadcastNow } from "@/lib/email"
 const prisma = db
 
 export async function POST(request: NextRequest) {
+  // Recorded with a failure, so the Email Send Status page can tell which
+  // year and which kind of send it was.
+  let logContext: Record<string, unknown> | null = null
   try {
     const { openingDate, closingDate, year, sendImmediately = false } = await request.json()
+    logContext = { year, send_mode: sendImmediately ? "immediate" : "scheduled" }
 
     // Verify user is super admin (DB-backed, never trust request body)
     if (!(await isSuperAdminDb())) {
@@ -367,6 +371,9 @@ export async function POST(request: NextRequest) {
         opening_date: openDate.toISOString(),
         closing_date: closeDate.toISOString(),
         broadcast_id: broadcast.data?.id || "unknown",
+        // "scheduled" only checked the broadcast with Resend; the daily job
+        // sends it on the opening date (Email Send Status page).
+        send_mode: sendImmediately ? "immediate" : "scheduled",
         libraries_opened: updateResult.count,
       },
       true,
@@ -401,7 +408,7 @@ export async function POST(request: NextRequest) {
         "Library_Year",
         "failed",
         null,
-        null,
+        logContext,
         false,
         error instanceof Error ? error.message : "Unknown error",
         request,
@@ -421,6 +428,16 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  // Read-only data for the toolkit pages: Super Admin and Assistant Admin
+  // (who may view admin pages but not change them). Signed in was the only
+  // check before, so any member could read it.
+  if (!(await requireRoles(1, 4))) {
+    return NextResponse.json(
+      { error: 'Unauthorized: Super Admin or Assistant Admin access required' },
+      { status: 403 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const year = searchParams.get("year")
