@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { handleP2002WithSequenceFix, SEQUENCE_TABLES } from "@/lib/sequenceFixer";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { canAccessLibrary, requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -177,6 +178,21 @@ export async function POST(req: Request) {
         return book;
       }),
       SEQUENCE_TABLES.EBOOK
+    );
+
+    // The list reads this entry to tell where a row came from. Without it a
+    // new row is "Legacy / source unverified", which only Super Admins see:
+    // a new global entry was hidden from every institution, and a member's
+    // own new entry disappeared from their list. (AV always logged it.)
+    await logUserAction(
+      "CREATE",
+      "List_EBook",
+      newBook.id.toString(),
+      undefined,
+      { title: newBook.title, year, counts: titles, is_global: Boolean(is_global), languages: Array.isArray(language) ? language.length : 0 },
+      true,
+      undefined,
+      req
     );
 
     return NextResponse.json({ success: true, newBook });

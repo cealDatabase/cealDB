@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { canAccessLibrary, requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(req: Request) {
   try {
@@ -174,6 +175,21 @@ export async function POST(req: Request) {
 
       return journal;
     });
+
+    // The list reads this entry to tell where a row came from. Without it a
+    // new row is "Legacy / source unverified", which only Super Admins see:
+    // a new global entry was hidden from every institution, and a member's
+    // own new entry disappeared from their list. (AV always logged it.)
+    await logUserAction(
+      "CREATE",
+      "List_EJournal",
+      newJournal.id.toString(),
+      undefined,
+      { title: newJournal.title, year, journals: j, is_global: Boolean(is_global), languages: Array.isArray(language) ? language.length : 0 },
+      true,
+      undefined,
+      req
+    );
 
     return NextResponse.json({ success: true, newJournal });
   } catch (err: any) {
