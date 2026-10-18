@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 const ROOT_URL =
@@ -34,10 +35,13 @@ export default async function signupAction(
     console.log(`🔄 Creating account for: ${username}`);
 
     // Send to our api route (no password needed - user will set via email)
+    // The route creates accounts only for a signed-in Super Admin or
+    // Assistant Admin, so the request carries this admin's session.
     const res = await fetch(ROOT_URL + "/api/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Cookie: (await cookies()).toString(),
       },
       body: JSON.stringify({ username, institution, userrole }),
     });

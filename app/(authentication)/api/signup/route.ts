@@ -1,10 +1,26 @@
 import db from "@/lib/db";
 import { getUserByUserName } from "@/data/fetchPrisma";
-import { generateResetToken } from "@/lib/auth";
+import { generateResetToken, requireRoles } from "@/lib/auth";
 import { sendWelcomeEmail, addUserToResendContacts } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
+    // Only the people the /signup page is for: Super Admin (1) and Assistant
+    // Admin (4), checked against the database via the signed session. This
+    // route had no check, so anyone could create an account with any role,
+    // Super Admin included, for an address they read.
+    if (!(await requireRoles(1, 4))) {
+      return Response.json(
+        {
+          success: false,
+          errorType: 'UNAUTHORIZED',
+          message: "Only a Super Admin or Assistant Admin can create accounts.",
+          hint: "Sign in with a Super Admin or Assistant Admin account and try again."
+        },
+        { status: 403 }
+      );
+    }
+
     // read data off request body
     const body = await request.json();
     const { username, institution, userrole } = body;
