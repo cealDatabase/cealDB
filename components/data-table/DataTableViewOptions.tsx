@@ -17,7 +17,8 @@ interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
-const columnLabels: Record<string, string> = {
+/** Column names in words, also used by the list view's sort menu (DataTable). */
+export const columnLabels: Record<string, string> = {
   import_origin: "Origin",
   origin_institution: "Created by institution",
   cjk_title: "CJK title",

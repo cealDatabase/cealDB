@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import type { CatalogueToolbarControls } from "@/components/data-table/CatalogueControls";
+import { columnLabels } from "@/components/data-table/DataTableViewOptions";
 
 interface DataTableProps<TData extends { id: number; counts?: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -88,6 +89,26 @@ interface DataTableProps<TData extends { id: number; counts?: number }, TValue> 
 }
 
 type DisplayMode = "cards" | "table";
+
+// Catalogue lists open in English title order, A to Z, in both views. An
+// entry with no English title sorts by the title its card shows instead.
+const DEFAULT_CATALOGUE_SORT: SortingState = [{ id: "title", desc: false }];
+const titleCollator = new Intl.Collator("en", { sensitivity: "base", numeric: true });
+const displayTitle = (record: Record<string, unknown>) =>
+  String(record.title || record.cjk_title || record.romanized_title || "").trim();
+function catalogueTitleSort<TData extends { id: number }>(a: Row<TData>, b: Row<TData>): number {
+  const left = a.original as TData & Record<string, unknown>;
+  const right = b.original as TData & Record<string, unknown>;
+  return titleCollator.compare(displayTitle(left), displayTitle(right)) || left.id - right.id;
+}
+
+// Columns the list view's sort menu offers, in this order, when the list
+// has them; the numeric ones sort "low to high" rather than "A to Z".
+const LIST_SORT_COLUMNS = [
+  "title", "cjk_title", "romanized_title", "publisher", "vendor", "type",
+  "counts", "volumes", "chapters", "journals", "dbs", "subscribers", "import_origin",
+];
+const NUMERIC_SORT_COLUMNS = new Set(["counts", "volumes", "chapters", "journals", "dbs", "subscribers"]);
 
 function textValue(value: unknown): string {
   if (Array.isArray(value)) {
@@ -332,8 +353,19 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   
-  // Initialize sorting state as empty (hydration-safe)
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  // Catalogue lists start in English title order; other tables unsorted.
+  // Either way the same on the server and in the browser (hydration-safe).
+  const defaultSorting = React.useMemo<SortingState>(
+    () =>
+      catalogueCardLabel && columns.some((column) => "accessorKey" in column && column.accessorKey === "title")
+        ? DEFAULT_CATALOGUE_SORT
+        : [],
+    [catalogueCardLabel, columns],
+  );
+  const [sorting, setSorting] = React.useState<SortingState>(defaultSorting);
+  // Set once the sort saved for this tab has been read, so the highlighted
+  // entry's page is worked out in the order the list ends up in.
+  const [sortingRestored, setSortingRestored] = React.useState(false);
   
   // Initialize row selection as empty (hydration-safe)
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
@@ -374,6 +406,7 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
           // Ignore invalid saved state
         }
       }
+      setSortingRestored(true);
     }
   }, [tableKey, columns]);
   
@@ -483,19 +516,33 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     size: 50,
   }), []);
 
+  // On catalogue lists the English title sorts the way the cards read
+  // (catalogueTitleSort).
+  const sortableColumns = React.useMemo(
+    () =>
+      catalogueCardLabel
+        ? columns.map((column) =>
+            "accessorKey" in column && column.accessorKey === "title"
+              ? { ...column, sortingFn: catalogueTitleSort<TData> }
+              : column,
+          )
+        : columns,
+    [catalogueCardLabel, columns],
+  );
+
   const tableColumns = React.useMemo(() => {
-    if (!bulkDelete || !bulkMode) return columns;
+    if (!bulkDelete || !bulkMode) return sortableColumns;
     // Bulk manage swaps the My Access column out instead of sitting beside it.
     // Two checkbox columns on one row - one that records your institution's
     // holdings and saves immediately, one that only marks rows to delete or
     // copy - read as the same control, and ticking the wrong one quietly
     // changes a library's survey data. One mode, one kind of checkbox.
-    const withoutAccess = columns.filter((column) => column.id !== "user_selection");
+    const withoutAccess = sortableColumns.filter((column) => column.id !== "user_selection");
     const actionsIndex = withoutAccess.findIndex((column) => column.id === "actions");
     return actionsIndex >= 0
       ? [...withoutAccess.slice(0, actionsIndex), bulkDeleteColumn, ...withoutAccess.slice(actionsIndex)]
       : [bulkDeleteColumn, ...withoutAccess];
-  }, [bulkDelete, bulkMode, bulkDeleteColumn, columns]);
+  }, [bulkDelete, bulkMode, bulkDeleteColumn, sortableColumns]);
 
   const goToFirstPage = () =>
     setPagination((current: { pageIndex: number; pageSize: number }) =>
@@ -564,6 +611,22 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     // on, so the only "select all" on screen is the bulk-manage one.
     meta: { bulkMode: !!bulkDelete && bulkMode },
   });
+
+  // Open on the page that holds the highlighted entry (one just created or
+  // edited), counted in the order the list is shown in. The callers count
+  // in the order the data came in, which is not the order shown once the
+  // list is sorted.
+  const placedHighlight = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (!highlightRowId || !sortingRestored || placedHighlight.current === highlightRowId) return;
+    const index = table.getPrePaginationRowModel().rows.findIndex((row) => row.original.id === highlightRowId);
+    if (index === -1) return;
+    placedHighlight.current = highlightRowId;
+    const pageIndex = Math.floor(index / pagination.pageSize);
+    if (pageIndex !== pagination.pageIndex) {
+      setPagination((current: { pageIndex: number; pageSize: number }) => ({ ...current, pageIndex }));
+    }
+  }, [highlightRowId, sortingRestored, sorting, globalFilter, columnFilters, data, pagination.pageSize, pagination.pageIndex, table]);
 
   // A page that no longer exists - the list shrank after a delete, or a page
   // number restored from an earlier visit is past the end of a search from
@@ -754,6 +817,61 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
     </div>
   ) : null;
 
+  // The list view has no column headers, so it says how it is sorted and
+  // lets the reader change it; the table view's headers do the same.
+  const currentSort = sorting[0] ? `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}` : "";
+  const isDefaultSort =
+    sorting.length === defaultSorting.length &&
+    sorting.every((sort, i) => sort.id === defaultSorting[i]?.id && sort.desc === defaultSorting[i]?.desc);
+  const sortOrder = (id: string) => {
+    const index = LIST_SORT_COLUMNS.indexOf(id);
+    return index === -1 ? LIST_SORT_COLUMNS.length : index;
+  };
+  const sortOptions = table
+    .getAllLeafColumns()
+    .filter((column) => column.getCanSort() && column.getIsVisible() && (LIST_SORT_COLUMNS.includes(column.id) || currentSort.startsWith(`${column.id}:`)))
+    .sort((a, b) => sortOrder(a.id) - sortOrder(b.id))
+    .flatMap((column) => {
+      const numeric = NUMERIC_SORT_COLUMNS.has(column.id);
+      const label = columnLabels[column.id] ?? column.id;
+      return [
+        { value: `${column.id}:asc`, label: `${label}: ${numeric ? "low to high" : "A to Z"}` },
+        { value: `${column.id}:desc`, label: `${label}: ${numeric ? "high to low" : "Z to A"}` },
+      ];
+    });
+  const listSortControl =
+    catalogueCardLabel && displayMode === "cards" ? (
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <label className="flex items-center gap-2">
+          Sort by
+          <select
+            value={currentSort}
+            onChange={(event) => {
+              const [id, direction] = event.target.value.split(":");
+              table.setSorting(id ? [{ id, desc: direction === "desc" }] : []);
+            }}
+            className="h-8 rounded-md border bg-white px-2 text-sm text-foreground"
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+            <option value="">Order added</option>
+          </select>
+        </label>
+        {!isDefaultSort && defaultSorting.length > 0 && (
+          <button
+            type="button"
+            onClick={() => table.setSorting(defaultSorting)}
+            className="text-xs text-blue-700 underline hover:text-blue-900"
+          >
+            Back to English title A to Z
+          </button>
+        )}
+      </div>
+    ) : null;
+
   const tableControls = controlsInToolbar ? (
     Toolbar && (
       <Toolbar
@@ -778,15 +896,19 @@ export function DataTable<TData extends { id: number; counts?: number }, TValue>
         </div>
       ) : tableControls}
       {controlsInToolbar ? (
-        <p className="text-sm font-medium text-foreground">
-          {table.getFilteredRowModel().rows.length} entries
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium text-foreground">
+            {table.getFilteredRowModel().rows.length} entries
+          </p>
+          {listSortControl}
+        </div>
       ) : (catalogueCardLabel || bulkDelete) && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
             <span className="text-sm font-medium text-foreground">
               {table.getFilteredRowModel().rows.length} entries
             </span>
+            {listSortControl}
             {hasAccessZone && (
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-sm border border-blue-200 bg-blue-100" aria-hidden="true" />
