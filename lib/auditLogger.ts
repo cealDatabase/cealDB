@@ -113,7 +113,7 @@ export async function logUserAction(
 /**
  * Record an email Resend did not take, with its error code, so the Email
  * Send Status page lists it (lib/emailActivity.ts). `mode` says which email
- * it was: password_reset, password_setup, welcome or contact.
+ * it was: password_reset, password_setup, welcome, contact or contact_remove.
  */
 export async function logEmailFailure(
   error: EmailError,

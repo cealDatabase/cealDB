@@ -125,7 +125,7 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
 
   const handleDeleteUser = async (user: User) => {
     const userName = getUserDisplayName(user);
-    const confirmMessage = `Are you sure you want to delete ${userName}?\n\nThis will permanently delete:\n• User account\n• All role assignments\n• All library associations\n• All active sessions\n\nAudit logs will be preserved for historical records.\n\nThis action CANNOT be undone.`;
+    const confirmMessage = `Are you sure you want to delete ${userName}?\n\nThis will permanently delete:\n• User account\n• All role assignments\n• All library associations\n• All active sessions\n• Their contact in Resend, so broadcasts stop going to them\n\nAudit logs will be preserved for historical records.\n\nThis action CANNOT be undone.`;
     
     if (!window.confirm(confirmMessage)) {
       return;
@@ -148,6 +148,13 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
       setUsers(prevUsers => prevUsers.filter(u => u.id !== user.id));
       
       toast.success(`User ${userName} deleted successfully`);
+      // The account is gone, but Resend still has them: say so, with the code.
+      if (data.contactError) {
+        setSendError({
+          message: `${userName} was deleted, but could not be removed from the broadcast list in Resend, so broadcasts will still go to ${user.username}. Remove them in Resend → Contacts, or send the copied details to whoever looks after the site.`,
+          code: data.contactError,
+        });
+      }
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to delete user');
@@ -244,15 +251,17 @@ export function UserRoleManager({ isSuperAdmin = false }: UserRoleManagerProps) 
   return (
     <div className="space-y-6">
       {sendError && (
-        <div ref={sendErrorRef} className="relative">
+        <div ref={sendErrorRef} className="space-y-1">
           <EmailErrorBox forAdmin message={sendError.message} error={sendError.code} />
-          <button
-            type="button"
-            onClick={() => setSendError(null)}
-            className="absolute right-3 top-3 text-xs text-red-700 underline"
-          >
-            Dismiss
-          </button>
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => setSendError(null)}
+              className="text-xs text-red-700 underline"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
       <Card>

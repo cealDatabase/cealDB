@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isSuperAdminDb } from "@/lib/auth";
 import db from "@/lib/db";
-import { logUserAction } from "@/lib/auditLogger";
+import { logEmailFailure, logUserAction } from "@/lib/auditLogger";
+import { removeUserFromResendContacts } from "@/lib/email";
+import { emailErrorFrom, type EmailError } from "@/lib/emailError";
 
 // DELETE - Delete a user and all related records (Super Admin only)
 export async function DELETE(
@@ -102,9 +104,20 @@ export async function DELETE(
       request
     );
 
+    // Take them off the Resend broadcast list too, or they keep getting
+    // broadcasts. The account is already gone either way; a failure is
+    // reported with an error code and listed on Email Send Status.
+    let contactError: EmailError | null = null;
+    const removed = await removeUserFromResendContacts(userToDelete.username.toLowerCase());
+    if (!removed.ok) {
+      contactError = emailErrorFrom(removed.failure, 'delete-user-contact');
+      await logEmailFailure(contactError, { mode: 'contact_remove', to: userToDelete.username.toLowerCase() }, request);
+    }
+
     return NextResponse.json({
       success: true,
       message: "User and all related records deleted successfully",
+      contactError,
       deletedUser: {
         id: userToDelete.id,
         username: userToDelete.username,

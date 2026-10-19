@@ -199,12 +199,13 @@ function classifyRow(row: LogRow): SendRecord | null {
     };
   }
 
-  // A new account that could not be added to the broadcast list.
-  if (row.table_name === 'Email' && v.mode === 'contact') {
+  // A new account that could not be added to the broadcast list, or a
+  // deleted one that could not be taken off it.
+  if (row.table_name === 'Email' && (v.mode === 'contact' || v.mode === 'contact_remove')) {
     return {
       ...base,
       kind: 'broadcast_list',
-      label: 'New account: add to the broadcast list',
+      label: v.mode === 'contact' ? 'New account: add to the broadcast list' : 'Deleted account: remove from the broadcast list',
       channel: 'broadcast',
       year,
       by: row.username ?? 'Unknown',

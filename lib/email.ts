@@ -917,3 +917,33 @@ export async function addUserToResendContacts(
     return unexpected(error);
   }
 }
+
+/**
+ * Take a deleted user out of Resend, so broadcasts stop going to them.
+ * The contact is deleted (Resend contacts are shared by every segment),
+ * matching what deleting the account does here. Not being in Resend is
+ * what this is for, so "not found" counts as done.
+ */
+export async function removeUserFromResendContacts(email: string): Promise<EmailSendResult> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Resend contact removal skipped: RESEND_API_KEY not configured');
+      return notConfigured('RESEND_API_KEY');
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { error } = await resend.contacts.remove({ email });
+
+    if (error) {
+      if (error.name === 'not_found' || error.statusCode === 404) return { ok: true, id: null };
+      console.error('Failed to remove contact from Resend:', error);
+      return { ok: false, failure: resendFailure('Resend did not remove the contact from the broadcast list', error) };
+    }
+
+    console.log(`✅ Removed deleted user from Resend contacts: ${email}`);
+    return { ok: true, id: null };
+  } catch (error) {
+    console.error('Resend contact removal error:', error);
+    return unexpected(error);
+  }
+}
