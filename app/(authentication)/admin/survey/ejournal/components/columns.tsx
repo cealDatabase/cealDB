@@ -262,6 +262,9 @@ export function getColumns(
   // matching the role checks on the update/delete APIs.
   const shouldShowActions = userRoles.some((role) => role === "1" || role === "3");
   const isSuperAdmin = userRoles.includes("1");
+  // Where an entry came from is for the catalogue staff, not members
+  // (lib/catalogueOrigin.ts; the page also leaves it out of their data).
+  const canSeeOrigin = userRoles.some((role) => role === "1" || role === "3");
 
   const allColumns: ColumnDef<EJournalRow | listEJournalWithSelection>[] = [
     // User selection checkbox column (new)
@@ -331,32 +334,34 @@ export function getColumns(
         ),
       } as ColumnDef<EJournalRow>]
       : []),
-    {
-      accessorKey: "import_origin",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Origin" />,
-      filterFn: (row, id, value) => {
-        const selected = value as string[];
-        return !selected?.length || selected.includes(String(row.getValue(id) ?? ""));
-      },
-      cell: ({ row }) => {
-        const origin = row.getValue("import_origin") as string | null | undefined;
-        if (!origin) return null;
-        const colorClass = origin === "Legacy / source unverified"
-          ? "bg-slate-100 text-slate-700"
-          : origin.includes("Admin-edited")
-            ? "bg-cyan-100 text-cyan-800"
-          : origin.includes("Promoted to Global")
-            ? "bg-fuchsia-100 text-fuchsia-800"
-          : origin.endsWith("Admin-created")
-            ? "bg-violet-100 text-violet-800"
-            : origin.includes("Global")
-              ? "bg-blue-100 text-blue-800"
-              : origin.startsWith(`${year} `)
-                ? "bg-emerald-100 text-emerald-800"
-                : "bg-amber-100 text-amber-800";
-        return <span className={`rounded px-2 py-1 text-xs font-medium ${colorClass}`}>{origin}</span>;
-      },
-    },
+    ...(canSeeOrigin ? [
+      {
+        accessorKey: "import_origin",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Origin" />,
+        filterFn: (row, id, value) => {
+          const selected = value as string[];
+          return !selected?.length || selected.includes(String(row.getValue(id) ?? ""));
+        },
+        cell: ({ row }) => {
+          const origin = row.getValue("import_origin") as string | null | undefined;
+          if (!origin) return null;
+          const colorClass = origin === "Legacy / source unverified"
+            ? "bg-slate-100 text-slate-700"
+            : origin.includes("Admin-edited")
+              ? "bg-cyan-100 text-cyan-800"
+            : origin.includes("Promoted to Global")
+              ? "bg-fuchsia-100 text-fuchsia-800"
+            : origin.endsWith("Admin-created")
+              ? "bg-violet-100 text-violet-800"
+              : origin.includes("Global")
+                ? "bg-blue-100 text-blue-800"
+                : origin.startsWith(`${year} `)
+                  ? "bg-emerald-100 text-emerald-800"
+                  : "bg-amber-100 text-amber-800";
+          return <span className={`rounded px-2 py-1 text-xs font-medium ${colorClass}`}>{origin}</span>;
+        },
+      } as ColumnDef<EJournalRow | listEJournalWithSelection>,
+    ] : []),
     ...(isSuperAdmin ? [{
       accessorKey: "origin_institution",
       header: ({ column }: any) => <DataTableColumnHeader column={column} title="Created by institution" />,
