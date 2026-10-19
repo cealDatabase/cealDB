@@ -12,6 +12,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { SurveyNotOpenNotice } from "@/components/SurveyNotOpenNotice";
 import db from "@/lib/db";
 import { canAccessLibrary, getSessionRoleIds } from "@/lib/auth";
+import { withoutHiddenOrigins } from "@/lib/catalogueOrigin";
 import { canViewSurveyYearLists } from "@/lib/surveyVisibility";
 
 async function EbookSinglePage(
@@ -22,7 +23,8 @@ async function EbookSinglePage(
     initialSearch?: string,
     newRecordId?: number
 ) {
-  const canReviewAllInstitutions = (await getSessionRoleIds()).some((role) => role === 1 || role === 3);
+  const roleIds = await getSessionRoleIds();
+  const canReviewAllInstitutions = roleIds.some((role) => role === 1 || role === 3);
   // Non-review roles must have an institution context. This prevents a direct
   // URL without libid from exposing other institutions' current local entries.
   const tasks = libid
@@ -42,7 +44,7 @@ async function EbookSinglePage(
 
     return (
         <EBookDataTableClient
-            data={tasks}
+            data={withoutHiddenOrigins(tasks, roleIds)}
             year={yearPassIn}
             roleIdPassIn={roleIdPassIn}
             libid={libid}

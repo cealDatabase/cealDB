@@ -148,6 +148,25 @@ export async function GET(request: NextRequest) {
     // This prevents duplicate sends if there's a database sync issue
     const broadcastsToProcess = [];
     for (const event of pendingBroadcasts) {
+      // No opening broadcast for a year whose survey has already closed: it
+      // would announce forms that are closed.
+      const yearSession = await prisma.surveySession.findUnique({
+        where: { academicYear: event.year },
+        select: { closingDate: true },
+      });
+      if (yearSession && yearSession.closingDate <= now) {
+        console.log(`⚠️ SKIPPED: Broadcast for year ${event.year} is pending but that survey closed on ${yearSession.closingDate.toISOString()}. Cancelling it.`);
+        await prisma.scheduledEvent.update({
+          where: { id: event.id },
+          data: {
+            status: 'cancelled',
+            cancelled_at: new Date(),
+            notes: `Not sent: the ${event.year} survey had already closed (${yearSession.closingDate.toISOString()})`,
+          },
+        });
+        continue;
+      }
+
       const libraryYearCheck = await prisma.library_Year.findFirst({
         where: { 
           year: event.year,
@@ -338,10 +357,18 @@ export async function GET(request: NextRequest) {
     // ========================================
     // - No email here: the broadcast (STEP 1) is the opening announcement. See "NO SEPARATE FORMS OPEN EMAIL" above.
     // - DUPLICATE PREVENTION: Only processes where notifiedOnOpen=false
+    // - A year whose closing date has passed is never opened. Its session can
+    //   still be marked not yet opened (it was opened and closed by hand, or
+    //   this job did not run); opening it here reopened last year's forms,
+    //   STEP 3 closed them again a moment later and emailed super admins a
+    //   "forms closed" notice.
     const sessionsToOpen = await prisma.surveySession.findMany({
       where: {
         openingDate: {
           lte: now // Opening date has passed
+        },
+        closingDate: {
+          gt: now // Not already closed
         },
         isOpen: false, // Not currently open
         notifiedOnOpen: false // Haven't sent notification yet (DUPLICATE PREVENTION)
@@ -371,6 +398,13 @@ export async function GET(request: NextRequest) {
           }
         });
         console.log(`✅ DUPLICATE PREVENTION: Session ${session.academicYear} marked as notifiedOnOpen=true. Notification will NEVER be sent again.`);
+
+        // Marked done so the session queue does not show it as still to come
+        // (opening by hand does the same, lib/surveyControl.ts).
+        await prisma.scheduledEvent.updateMany({
+          where: { year: session.academicYear, event_type: 'FORM_OPENING', status: 'pending' },
+          data: { status: 'completed', completed_at: new Date(), notes: 'Opened by the scheduled job' },
+        });
 
         // Log the action
         await logUserAction(
@@ -586,6 +620,12 @@ export async function GET(request: NextRequest) {
           }
         });
         console.log(`✅ DUPLICATE PREVENTION: Session ${session.academicYear} marked as notifiedOnClose=true. Notification will NEVER be sent again.`);
+
+        // Marked done so the session queue does not show it as still to come.
+        await prisma.scheduledEvent.updateMany({
+          where: { year: session.academicYear, event_type: 'FORM_CLOSING', status: 'pending' },
+          data: { status: 'completed', completed_at: new Date(), notes: 'Closed by the scheduled job' },
+        });
 
         // Log the action
         await logUserAction(
