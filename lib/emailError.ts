@@ -19,6 +19,7 @@ export const EMAIL_PLACES = {
   'individual-email': 'Manage Users: forms open email to one person',
   'new-account-email': 'New account: password setup email',
   'new-account-contact': 'New account: add to the broadcast list',
+  'delete-user-contact': 'Manage Users: delete account, remove from the broadcast list',
   'forgot-password': 'Forgot password page: reset email',
   'signin-password-email': 'Sign-in page: password setup or reset email',
   'password-reset-request': 'Password reset request: reset email',
