@@ -17,7 +17,6 @@ import {
   FileBarChart,
   FileText,
   BookMarked,
-  MailCheck,
 } from "lucide-react";
 
 export const forms = [
@@ -257,6 +256,20 @@ export const superAdminActions = [
       iconBg: 'bg-green-100',
       description: `Open forms for year ${currentYear}. Creates new Library_Year records for all libraries, enabling them to submit survey data for the current year.`,
     },
+    // In the order the yearly work is done: set the dates, get the emails
+    // ready, then open (or close) the forms.
+    {
+      category: 'survey',
+      title: 'Email',
+      href: '/admin/email-templates',
+      primaryLabel: 'Email Templates',
+      secondaryHref: '/admin/email-status',
+      secondaryLabel: 'Sent Status',
+      icon: MailOpen,
+      iconColor: 'text-green-700',
+      iconBg: 'bg-green-100',
+      description: 'Email Templates: edit the broadcast emails (pre-announcement, forms-open, 1-week-before-close reminder) and the individual email. Sent Status: what was sent, whether Resend accepted it, delivery, error codes, and today\'s use of the 100-a-day limit.',
+    },
     {
       category: 'survey',
       title: 'Open/Close Annual Surveys',
@@ -265,24 +278,6 @@ export const superAdminActions = [
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-100',
       description: 'Open or close forms for editing and send broadcast notifications to CEAL members via email.',
-    },
-    {
-      category: 'survey',
-      title: 'Email Templates',
-      href: '/admin/email-templates',
-      icon: MailOpen,
-      iconColor: 'text-green-700',
-      iconBg: 'bg-green-100',
-      description: 'Edit the three broadcast emails (pre-announcement, forms-open, 1-week-before-close reminder) and the individual resend template. Subject, HTML body, and placeholders for opening/closing dates.',
-    },
-    {
-      category: 'survey',
-      title: 'Email Send Status',
-      href: '/admin/email-status',
-      icon: MailCheck,
-      iconColor: 'text-teal-600',
-      iconBg: 'bg-teal-100',
-      description: 'Every email the system has sent: whether Resend accepted it, who it did not reach and why, delivery status from Resend, and how much of the daily limit of 100 transactional emails is used.',
     },
 
     // ── Users ───────────────────────────────────────────────────────────────

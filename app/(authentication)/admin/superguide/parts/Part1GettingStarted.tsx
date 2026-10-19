@@ -232,7 +232,7 @@ export default function Part1GettingStarted({ lang }: PartProps) {
           zh={
             <>
               <Code>/admin</Code> 页面分几个区块。如果你是 Super Admin，应当看到最下面有一块带红色边框的
-              "Super Admin Toolkit"，里面有 Survey Dates、Broadcast、Email Templates、Manage Users 等卡片。
+              "Super Admin Toolkit"，里面依次有 Survey Dates、Email（Email Templates 和 Sent Status）、Open/Close Annual Surveys、Manage Users 等卡片。
               如果<strong>看不到这一块</strong>，说明你的账号没被赋予 Role 1。回到第 1 步让前任检查。
             </>
           }
@@ -241,7 +241,8 @@ export default function Part1GettingStarted({ lang }: PartProps) {
               The <Code>/admin</Code> page is split into several sections. If
               you are Super Admin, you should see a red-bordered{' '}
               <strong>"Super Admin Toolkit"</strong> at the bottom with cards
-              for Survey Dates, Broadcast, Email Templates, Manage Users, etc.
+              for, in order, Survey Dates, Email (Email Templates and Sent
+              Status), Open/Close Annual Surveys, Manage Users, etc.
               If you <strong>don't see it</strong>, your account was not given
               Role 1. Go back to Step 1 and have the outgoing admin fix it.
             </>

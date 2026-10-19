@@ -459,9 +459,9 @@ async function UserLoggedInPage() {
                               <p className='text-sm text-muted-foreground mb-3 line-clamp-6'>
                                 {action.description}
                               </p>
-                              <div className='flex items-center gap-2'>
+                              <div className='flex flex-wrap items-center gap-2'>
                                 <Button variant='outline' size='sm' asChild>
-                                  <Link href={action.href}>Access</Link>
+                                  <Link href={action.href}>{action.primaryLabel ?? "Access"}</Link>
                                 </Button>
                                 {action.secondaryHref && (
                                   <Button variant='outline' size='sm' asChild>
