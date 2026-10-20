@@ -13,6 +13,7 @@ import { SurveyNotOpenNotice } from "@/components/SurveyNotOpenNotice";
 import db from "@/lib/db";
 import { canAccessLibrary, getSessionRoleIds } from "@/lib/auth";
 import { withoutHiddenOrigins } from "@/lib/catalogueOrigin";
+import { myAccessInstitution } from "@/lib/myAccessInstitution";
 import { canViewSurveyYearLists } from "@/lib/surveyVisibility";
 
 async function EJournalSinglePage(
@@ -42,6 +43,8 @@ async function EJournalSinglePage(
         isOpenForEditing = ly?.is_open_for_editing ?? false;
     }
 
+    const myAccess = await myAccessInstitution(libid, roleIds);
+
     return (
         <EJournalDataTableClient
             data={withoutHiddenOrigins(tasks, roleIds)}
@@ -52,6 +55,7 @@ async function EJournalSinglePage(
             initialSearch={initialSearch}
             newRecordId={newRecordId}
             isOpenForEditing={isOpenForEditing}
+            {...myAccess}
         />
     );
 }

@@ -237,7 +237,9 @@ export function getColumns(
   onSelectionChange?: (id: number, selected: boolean) => void,
   selectionData?: Map<number, { is_selected: boolean; custom_count: number | null }>,
   canEdit: boolean = true,
-  showAccessSelection: boolean = true
+  showAccessSelection: boolean = true,
+  // The header box ticks the whole page at once, saved in one go.
+  onSelectRows?: (ids: number[], selected: boolean) => void
 ): ColumnDef<EJournalRow | listEJournalWithSelection>[] {
   // Parse role cookie (can be JSON array or single value)
   let userRoles: string[] = [];
@@ -291,9 +293,12 @@ export function getColumns(
             <Checkbox
               checked={allSelected || (someSelected && "indeterminate")}
               onCheckedChange={(value) => {
-                rows.forEach(row => {
-                  onSelectionChange?.((row.original as any).id, !!value);
-                });
+                const ids = rows.map(row => (row.original as any).id as number);
+                if (onSelectRows) {
+                  onSelectRows(ids, !!value);
+                } else {
+                  ids.forEach(id => onSelectionChange?.(id, !!value));
+                }
               }}
               disabled={!canEdit}
               aria-label='My Access: mark every entry on this page as held by your institution'

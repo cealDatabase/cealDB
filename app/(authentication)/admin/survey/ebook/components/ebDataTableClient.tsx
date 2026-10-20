@@ -5,9 +5,10 @@ import { listEBookWithSelection } from "./getEBookList";
 import { getColumns } from "./columns";
 import { DataTable } from "@/components/data-table/DataTable";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { confirmMyAccessBulk, confirmMyAccessChange } from "@/lib/myAccessConfirm";
 
 export default function EBookDataTableClient({
   data,
@@ -18,6 +19,8 @@ export default function EBookDataTableClient({
   initialSearch,
   newRecordId,
   isOpenForEditing = true,
+  libraryName,
+  confirmAccessChanges = false,
 }: {
   data: listEBook[] | listEBookWithSelection[];
   year: number;
@@ -27,6 +30,10 @@ export default function EBookDataTableClient({
   initialSearch?: string;
   newRecordId?: number;
   isOpenForEditing?: boolean;
+  /** The institution whose My Access this page changes. */
+  libraryName?: string;
+  /** Ask which institution before changing My Access (lib/myAccessConfirm.ts). */
+  confirmAccessChanges?: boolean;
 }) {
   const isSuperAdmin = (userRoles ?? []).includes("1");
   const canBulkDelete = (userRoles ?? []).some((role) => ["1", "3"].includes(role));
@@ -101,6 +108,17 @@ export default function EBookDataTableClient({
     [libid, year]
   );
 
+  // Roles that work on many institutions confirm which one they are
+  // changing before the first tick on the page (lib/myAccessConfirm.ts).
+  const institutionName = libraryName ?? `institution ${libid}`;
+  const confirmedFor = useRef<number | null>(null);
+  const confirmInstitution = useCallback(() => {
+    if (!confirmAccessChanges || !libid || confirmedFor.current === libid) return true;
+    if (!confirmMyAccessChange(institutionName, year)) return false;
+    confirmedFor.current = libid;
+    return true;
+  }, [confirmAccessChanges, libid, institutionName, year]);
+
   // Handle selection change (auto-save immediately)
   const handleSelectionChange = useCallback(
     (id: number, selected: boolean) => {
@@ -108,6 +126,7 @@ export default function EBookDataTableClient({
         toast.error("Survey is closed. Editing is disabled.");
         return;
       }
+      if (!confirmInstitution()) return;
       setSelectionData((prev) => {
         const newMap = new Map(prev);
         const existing = newMap.get(id);
@@ -121,7 +140,7 @@ export default function EBookDataTableClient({
         );
       }
     },
-    [canEdit, libid, persistOne]
+    [canEdit, libid, persistOne, confirmInstitution]
   );
 
   const handleAllAccessSelection = useCallback(
@@ -134,6 +153,10 @@ export default function EBookDataTableClient({
       const previous = selectionData;
       const changedIds = ids.filter((id) => (previous.get(id)?.is_selected ?? false) !== selected);
       if (changedIds.length === 0) return;
+      if (confirmAccessChanges && libid) {
+        if (!confirmMyAccessBulk(changedIds.length, selected, institutionName, year)) return;
+        confirmedFor.current = libid;
+      }
 
       setSelectionData((current) => {
         const next = new Map(current);
@@ -173,13 +196,13 @@ export default function EBookDataTableClient({
         setIsSaving(false);
       }
     },
-    [canEdit, libid, selectionData, year]
+    [canEdit, libid, selectionData, year, confirmAccessChanges, institutionName]
   );
 
   // Get columns with callbacks
   const columns = useMemo(
-    () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, !!libid),
-    [year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, libid]
+    () => getColumns(year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, !!libid, handleAllAccessSelection),
+    [year, roleIdPassIn, handleSelectionChange, selectionData, canEdit, libid, handleAllAccessSelection]
   );
 
   // Clean up URL and remove highlight after 3 seconds
@@ -224,7 +247,7 @@ export default function EBookDataTableClient({
             <span className="text-foreground">
               {(() => {
                 const held = Array.from(selectionData.values()).filter((s) => s.is_selected).length;
-                return `${held} ${held === 1 ? "entry" : "entries"} held by your institution`;
+                return `${held} ${held === 1 ? "entry" : "entries"} held by ${confirmAccessChanges ? institutionName : "your institution"}`;
               })()}
             </span>
             <span aria-live="polite" className="text-xs text-muted-foreground">

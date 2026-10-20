@@ -13,6 +13,7 @@ import { SurveyNotOpenNotice } from "@/components/SurveyNotOpenNotice";
 import db from "@/lib/db";
 import { canAccessLibrary, getSessionRoleIds } from "@/lib/auth";
 import { withoutHiddenOrigins } from "@/lib/catalogueOrigin";
+import { myAccessInstitution } from "@/lib/myAccessInstitution";
 import { canViewSurveyYearLists } from "@/lib/surveyVisibility";
 
 async function EbookSinglePage(
@@ -42,6 +43,8 @@ async function EbookSinglePage(
         isOpenForEditing = ly?.is_open_for_editing ?? false;
     }
 
+    const myAccess = await myAccessInstitution(libid, roleIds);
+
     return (
         <EBookDataTableClient
             data={withoutHiddenOrigins(tasks, roleIds)}
@@ -52,6 +55,7 @@ async function EbookSinglePage(
             initialSearch={initialSearch}
             newRecordId={newRecordId}
             isOpenForEditing={isOpenForEditing}
+            {...myAccess}
         />
     );
 }
