@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import CreateEBookFormClient from "../components/forms/createEBookFormClient";
 import { Container } from "@/components/Container";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import { entryInstitutions } from "@/lib/myAccessInstitution";
 
 async function CreateEBookContent({
   year,
@@ -25,6 +26,7 @@ async function CreateEBookContent({
   }
 
   const selectedYear = Number(year);
+  const { institutions, viewedInstitutionId } = await entryInstitutions(selectedYear);
 
   return (
     <div className='p-6'>
@@ -37,6 +39,8 @@ async function CreateEBookContent({
           selectedYear={selectedYear}
           userRoles={userRoles}
           libraryId={libraryId ? Number(libraryId) : undefined}
+          institutions={institutions}
+          viewedInstitutionId={viewedInstitutionId}
         />
       </Container>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { EntryInstitution } from "@/lib/myAccessInstitution";
 import { useAutoSequenceFix } from "@/hooks/useAutoSequenceFix";
 import CreateEJournalForm from "./createEJournalForm";
 
@@ -7,10 +8,14 @@ export default function CreateEJournalFormClient({
   selectedYear,
   userRoles,
   libraryId,
+  institutions,
+  viewedInstitutionId,
 }: {
   selectedYear: number;
   userRoles: string[];
   libraryId?: number;
+  institutions?: EntryInstitution[];
+  viewedInstitutionId?: number;
 }) {
   // Auto-fix sequences when page loads
   const { isFixing, hasRun } = useAutoSequenceFix(true);
@@ -26,6 +31,8 @@ export default function CreateEJournalFormClient({
         selectedYear={selectedYear}
         userRoles={userRoles}
         libraryId={libraryId}
+        institutions={institutions}
+        viewedInstitutionId={viewedInstitutionId}
       />
     </>
   );

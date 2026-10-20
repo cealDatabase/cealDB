@@ -24,6 +24,9 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { EntryInstitutionSelect } from "@/components/EntryInstitutionSelect";
+import { confirmInstitutionEntry } from "@/lib/myAccessConfirm";
+import type { EntryInstitution } from "@/lib/myAccessInstitution";
 
 // Form validation schema
 const formSchema = z.object({
@@ -49,10 +52,15 @@ export default function CreateEBookForm({
   selectedYear,
   userRoles,
   libraryId,
+  institutions = [],
+  viewedInstitutionId,
 }: {
   selectedYear: number;
   userRoles: string[];
   libraryId?: number;
+  /** For admins: the institutions an entry that is not shared may belong to. */
+  institutions?: EntryInstitution[];
+  viewedInstitutionId?: number;
 }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,6 +70,10 @@ export default function CreateEBookForm({
   
   // Member (role 2) can only create library-specific entries
   const isMemberOnly = userRoles.length === 1 && userRoles[0] === "2";
+
+  // An admin's entry that is not shared belongs to the institution chosen
+  // here, first the one being viewed. The server no longer picks one.
+  const [institutionId, setInstitutionId] = useState(viewedInstitutionId ? String(viewedInstitutionId) : "");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -83,17 +95,30 @@ export default function CreateEBookForm({
     },
   });
 
+  const isGlobal = form.watch("is_global");
+
   const onSubmit = async (values: FormValues) => {
+    const institution = canCreateGlobal && !values.is_global
+      ? institutions.find((choice) => String(choice.id) === institutionId)
+      : undefined;
+    if (canCreateGlobal && !values.is_global) {
+      if (!institution) {
+        toast.error("Choose the institution this entry belongs to.");
+        return;
+      }
+      if (!confirmInstitutionEntry(values.title, institution.name, selectedYear)) return;
+    }
     setIsSubmitting(true);
     try {
-      // For members (role 2), force is_global to false and add library_id
+      // For members (role 2), force is_global to false and add their
+      // library_id; an admin's entry that is not shared names its institution.
       const submissionData = {
         ...values,
         libraryyear: selectedYear,
         volumes: values.volumes || null,
         chapters: values.chapters || null,
         is_global: isMemberOnly ? false : values.is_global,
-        library_id: isMemberOnly && libraryId ? libraryId : undefined,
+        library_id: isMemberOnly ? libraryId : institution?.id,
       };
 
       const response = await fetch("/api/ebook/create", {
@@ -415,12 +440,21 @@ export default function CreateEBookForm({
                       <div className="space-y-1 leading-none">
                         <FormLabel>Global Resource</FormLabel>
                         <FormDescription>
-                          Check this if this is a globally available resource (default for admins).
+                          Check this if this is a globally available resource (default for admins). Untick it for an entry that belongs to one institution.
                         </FormDescription>
                       </div>
                     </FormItem>
                   )}
                 />
+
+                {!isGlobal && (
+                  <EntryInstitutionSelect
+                    institutions={institutions}
+                    value={institutionId}
+                    onChange={setInstitutionId}
+                    year={selectedYear}
+                  />
+                )}
               </div>
             )}
 

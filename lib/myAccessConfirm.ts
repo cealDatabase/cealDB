@@ -28,3 +28,11 @@ export function confirmMyAccessBulk(count: number, selected: boolean, libraryNam
       : `Take ${entries} out of ${libraryName}'s ${year} My Access?\n\nThis is saved straight away.`
   );
 }
+
+/** Asked before an admin creates an entry that belongs to one institution. */
+export function confirmInstitutionEntry(title: string, libraryName: string, year: number): boolean {
+  return window.confirm(
+    `Create "${title}" as ${libraryName}'s own entry?\n\n` +
+      `It is not shared with other institutions, and it is checked in ${libraryName}'s ${year} My Access.`
+  );
+}

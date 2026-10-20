@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import CreateEJournalFormClient from "../components/forms/createEJournalFormClient";
 import { Container } from "@/components/Container";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import { entryInstitutions } from "@/lib/myAccessInstitution";
 
 async function CreateEJournalContent({
   year,
@@ -25,6 +26,7 @@ async function CreateEJournalContent({
   }
 
   const selectedYear = Number(year);
+  const { institutions, viewedInstitutionId } = await entryInstitutions(selectedYear);
 
   return (
     <div className='p-6'>
@@ -37,6 +39,8 @@ async function CreateEJournalContent({
           selectedYear={selectedYear}
           userRoles={userRoles}
           libraryId={libraryId ? Number(libraryId) : undefined}
+          institutions={institutions}
+          viewedInstitutionId={viewedInstitutionId}
         />
       </Container>
     </div>

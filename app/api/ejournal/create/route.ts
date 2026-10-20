@@ -52,7 +52,8 @@ export async function POST(req: Request) {
     if (!is_global) {
       // For library-specific entries, find the Library_Year record
       if (library_id) {
-        // Member-created entry: find Library_Year by both year and library
+        // An institution's own entry (created by its member, or by an admin
+        // who chose it): find its Library_Year
         const libraryYearRecord = await db.library_Year.findFirst({
           where: { 
             year: year,
@@ -85,23 +86,13 @@ export async function POST(req: Request) {
 
         libraryYearId = libraryYearRecord.id;
       } else {
-        // Admin-created entry: find any Library_Year by year
-        const libraryYearRecord = await db.library_Year.findFirst({
-          where: { year: year },
-          select: { id: true, is_open_for_editing: true }
-        });
-
-        if (!libraryYearRecord) {
-          return NextResponse.json(
-            { error: `Library year ${year} not found. Please ensure the year exists in the system.` },
-            { status: 404 }
-          );
-        }
-
-        // Admin-created entries are catalogue maintenance (Super Admin / E-Resource
-        // Editor, checked above), which is allowed at every stage of the survey.
-
-        libraryYearId = libraryYearRecord.id;
+        // An entry that is not shared belongs to the institution named by
+        // whoever creates it. This used to take any Library_Year of the year,
+        // attaching the entry to whichever institution came first.
+        return NextResponse.json(
+          { error: "Choose the institution this entry belongs to." },
+          { status: 400 }
+        );
       }
     }
 
