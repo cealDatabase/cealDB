@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear } from "@/lib/libraryYearHelper";
+import { editedCopies, withEditedCopies } from "@/lib/editedCopies";
 
 export async function POST(req: Request) {
   try {
@@ -128,6 +129,20 @@ export async function POST(req: Request) {
           recordId: Number(recordId),
           unsubscribed: false,
           error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+
+    // Manage Access shows an edited entry as the institution's own version.
+    // Taking out either one takes out both, so no version is left behind to
+    // be counted in My Forms (lib/editedCopies.ts).
+    const removedIds = unsubscribeResults.filter(r => r.unsubscribed).map(r => r.recordId);
+    if (removedIds.length > 0) {
+      const tiedIds = withEditedCopies(removedIds, await editedCopies("ebook", libraryYearId))
+        .filter(id => !removedIds.includes(id));
+      if (tiedIds.length > 0) {
+        await db.libraryYear_ListEBook.deleteMany({
+          where: { libraryyear_id: libraryYearId, listebook_id: { in: tiedIds } },
         });
       }
     }

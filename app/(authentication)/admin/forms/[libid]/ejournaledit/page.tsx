@@ -14,6 +14,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 import { canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
+import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
 
 // Define the component props interface for typing (matching actual database schema)
 interface EJournalSubscriptionManagementClientProps {
@@ -191,14 +192,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     const canWrite = await canWriteLibraryYear(libraryYearRecord);
 
     // Get current E-Journal subscriptions selected by the user (is_selected=true
-    // OR a custom_count override has been entered).
-    const subscriptions = await db.libraryYear_ListEJournal.findMany({
+    // OR a custom_count override has been entered), an edited entry as the
+    // institution's own version, and only entries still in this year's list
+    // (lib/editedCopies.ts).
+    const allSubscriptions = await db.libraryYear_ListEJournal.findMany({
       where: {
         libraryyear_id: libraryYearRecord!.id,
-        OR: [
-          { is_selected: true },
-          { custom_count: { not: null } },
-        ],
       },
       select: {
         libraryyear_id: true,
@@ -218,6 +217,12 @@ export default async function Page({ params, searchParams }: PageProps) {
         } 
       },
     });
+    const subscriptions = heldAccessRows(
+      allSubscriptions,
+      (s) => s.listejournal_id,
+      (s) => s.List_EJournal.List_EJournal_Counts.length > 0,
+      await editedCopies("ejournal", libraryYearRecord!.id),
+    );
 
     const subscribedEJournals = subscriptions.map((s) => s.List_EJournal);
     
