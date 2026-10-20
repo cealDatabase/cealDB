@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { filterEBookSubscriptions, filterEJournalSubscriptions, filterAVSubscriptions } from "@/lib/subscription-filter";
+import { heldAVAccess, heldEBookAccess, heldEJournalAccess } from "@/lib/heldAccess";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logAuditEvent } from "@/lib/auditLogger";
+import { canAccessLibrary } from "@/lib/auth";
 
 export async function GET(
   req: Request,
@@ -21,6 +22,11 @@ export async function GET(
 
     const libraryId = Number(libid);
     const currentYear = Number(year);
+
+    // One institution's numbers: only for those who may act on it.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Find Library_Year record for the library and year
     let libraryYear = await db.library_Year.findFirst({
@@ -60,36 +66,10 @@ export async function GET(
       noncjk: 0,
     };
 
-    // 1. Fetch E-Book subscriptions (ONLY library-specific subscriptions)
-    const ebookSubscriptions = await db.libraryYear_ListEBook.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_EBook: {
-          include: {
-            List_EBook_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_EBook_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process E-Books (only from subscriptions - no global items unless subscribed)
-    const allEBooks = ebookSubscriptions.map(sub => sub.List_EBook).filter(Boolean);
-    console.log(`[Import All] E-Books before filter: ${allEBooks.length}`);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredEBooks = filterEBookSubscriptions(allEBooks);
-    console.log(`[Import All] E-Books after filter: ${filteredEBooks.length}`);
+    // 1. E-Books this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const filteredEBooks = (await heldEBookAccess(libraryYear.id, resolvedYear)).map(sub => sub.List_EBook);
+    console.log(`[Import All] E-Books held: ${filteredEBooks.length}`);
 
     // Count number of access records (subscriptions) by language
     for (const ebook of filteredEBooks) {
@@ -127,36 +107,10 @@ export async function GET(
       }
     }
 
-    // 2. Fetch E-Journal subscriptions (ONLY library-specific subscriptions)
-    const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_EJournal: {
-          include: {
-            List_EJournal_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_EJournal_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process E-Journals (only from subscriptions - no global items unless subscribed)
-    const allEJournals = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
-    console.log(`[Import All] E-Journals before filter: ${allEJournals.length}`);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredEJournals = filterEJournalSubscriptions(allEJournals);
-    console.log(`[Import All] E-Journals after filter: ${filteredEJournals.length}`);
+    // 2. E-Journals this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const filteredEJournals = (await heldEJournalAccess(libraryYear.id, resolvedYear)).map(sub => sub.List_EJournal);
+    console.log(`[Import All] E-Journals held: ${filteredEJournals.length}`);
 
     // Count number of access records (subscriptions) by language
     for (const ejournal of filteredEJournals) {
@@ -190,36 +144,10 @@ export async function GET(
       }
     }
 
-    // 3. Fetch Audio-Visual subscriptions (ONLY library-specific subscriptions)
-    const avSubscriptions = await db.libraryYear_ListAV.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_AV: {
-          include: {
-            List_AV_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_AV_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process AVs (only from subscriptions - no global items unless subscribed)
-    const allAVs = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
-    console.log(`[Import All] AVs before filter: ${allAVs.length}`);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredAVs = filterAVSubscriptions(allAVs);
-    console.log(`[Import All] AVs after filter: ${filteredAVs.length}`);
+    // 3. AVs this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const filteredAVs = (await heldAVAccess(libraryYear.id, resolvedYear)).map(sub => sub.List_AV);
+    console.log(`[Import All] AVs held: ${filteredAVs.length}`);
 
     // Count number of access records (subscriptions) by language
     for (const av of filteredAVs) {

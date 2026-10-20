@@ -14,7 +14,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 import { canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
-import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
+import { heldEBookAccess } from "@/lib/heldAccess";
 
 // Dynamic import for client component
 const EBookSubscriptionManagementClient = dynamic(
@@ -158,90 +158,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     const libraryYearRecord = await findOrCreateLibraryYear(libid, year);
     const canWrite = await canWriteLibraryYear(libraryYearRecord);
 
-    // Get current E-Book subscriptions selected by the user (is_selected=true
-    // OR a custom_count override has been entered), an edited entry as the
-    // institution's own version, and only entries still in this year's list
-    // (lib/editedCopies.ts).
-    const allSubscriptions = await db.libraryYear_ListEBook.findMany({
-      where: {
-        libraryyear_id: libraryYearRecord!.id,
-      },
-      select: {
-        libraryyear_id: true,
-        listebook_id: true,
-        is_selected: true,
-        custom_count: true,
-        List_EBook: {
-          include: {
-            List_EBook_Counts: {
-              where: { year },
-              select: { titles: true, volumes: true, chapters: true }
-            },
-            List_EBook_Language: {
-              select: { Language: { select: { short: true } } }
-            }
-          }
-        } 
-      },
-    });
-    const subscriptions = heldAccessRows(
-      allSubscriptions,
-      (s) => s.listebook_id,
-      (s) => s.List_EBook.List_EBook_Counts.length > 0,
-      await editedCopies("ebook", libraryYearRecord!.id),
-    );
-
-    const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
-    
-    // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + publisher + subtitle) to find duplicates
-    const recordsByIdentifier = new Map<string, typeof subscribedEBooks[0][]>();
-    
-    subscribedEBooks.forEach((ebook) => {
-      const identifier = `${ebook.title?.toLowerCase() || ''}_${ebook.publisher?.toLowerCase() || ''}_${ebook.subtitle?.toLowerCase() || ''}`;
-      if (!recordsByIdentifier.has(identifier)) {
-        recordsByIdentifier.set(identifier, []);
-      }
-      recordsByIdentifier.get(identifier)!.push(ebook);
-    });
-    
-    // For each group, prefer library-specific over global
-    const filteredEBooks = Array.from(recordsByIdentifier.values()).map((group) => {
-      // If there's a library-specific record (is_global = false), use that
-      const librarySpecific = group.find(ebook => !ebook.is_global);
-      return librarySpecific || group[0]; // fallback to first if all are global
-    });
-    
-    // Filter original subscriptions to match filtered EBooks. Merge state
-    // (custom_count, is_selected) from any deduped twin so the kept row's
-    // display reflects the user's actual input even if it landed on a
-    // global twin record.
-    const filteredEBookIds = new Set(filteredEBooks.map((ebook) => ebook.id));
-    const groupOfEBookId = new Map<number, string>();
-    for (const [key, group] of recordsByIdentifier) {
-      group.forEach((eb) => groupOfEBookId.set(eb.id, key));
-    }
-    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
-    for (const sub of subscriptions) {
-      const key = groupOfEBookId.get(sub.List_EBook.id);
-      if (!key) continue;
-      const keptEB = filteredEBooks.find((eb) => groupOfEBookId.get(eb.id) === key);
-      if (!keptEB) continue;
-      if (!consolidatedByKept.has(keptEB.id)) {
-        const own = subscriptions.find((s) => s.List_EBook.id === keptEB.id);
-        consolidatedByKept.set(keptEB.id, { ...(own ?? sub), List_EBook: keptEB as any });
-      }
-      const target = consolidatedByKept.get(keptEB.id)!;
-      if (target.custom_count == null && sub.custom_count != null) {
-        target.custom_count = sub.custom_count;
-      }
-      if (!target.is_selected && sub.is_selected) {
-        target.is_selected = sub.is_selected;
-      }
-    }
-    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
-      (sub) => filteredEBookIds.has(sub.List_EBook.id)
-    );
+    // What this institution holds this year: the rows ticked or given a
+    // count of their own, for entries still in this year's list, an edited
+    // entry as the institution's own version, each entry once. The My Forms
+    // imports count the same rows (lib/heldAccess.ts).
+    const filteredSubscriptions = await heldEBookAccess(libraryYearRecord!.id, year);
+    const filteredEBooks = filteredSubscriptions.map((sub) => sub.List_EBook);
     
     if (filteredEBooks.length === 0) {
       return (

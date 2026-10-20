@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { filterEBookSubscriptions } from '@/lib/subscription-filter';
+import { heldEBookAccess } from '@/lib/heldAccess';
 import { isSuperAdmin } from '@/lib/libraryYearHelper';
 import { logAuditEvent } from '@/lib/auditLogger';
+import { canAccessLibrary } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -18,6 +19,11 @@ export async function GET(
         { error: 'Invalid library ID or year' },
         { status: 400 }
       );
+    }
+
+    // One institution's numbers: only for those who may act on it.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Find Library_Year record for the library and year
@@ -50,34 +56,9 @@ export async function GET(
 
     const resolvedYear = libraryYear.year;
 
-    // Fetch E-Book subscriptions for this library and year (ONLY subscribed items)
-    const ebookSubscriptions = await db.libraryYear_ListEBook.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_EBook: {
-          include: {
-            List_EBook_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_EBook_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process only library-specific subscriptions (no global items unless subscribed)
-    const allEBooks = ebookSubscriptions.map(sub => sub.List_EBook).filter(Boolean);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredEBooks = filterEBookSubscriptions(allEBooks);
+    // The E-Books this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const heldEBooks = await heldEBookAccess(libraryYear.id, resolvedYear);
 
     // Group by language
     const countsByLanguage = {
@@ -88,9 +69,10 @@ export async function GET(
     };
 
     // Process each E-Book entry
-    for (const ebook of filteredEBooks) {
+    for (const { List_EBook: ebook, custom_count } of heldEBooks) {
       if (!ebook) continue;
-      const count = ebook.List_EBook_Counts?.[0]?.titles || 0;
+      // A count of the institution's own replaces the list's titles, as in Manage Access.
+      const count = custom_count ?? ebook.List_EBook_Counts?.[0]?.titles ?? 0;
 
       for (const langEntry of ebook.List_EBook_Language) {
         const langShort = langEntry.Language.short?.toUpperCase();

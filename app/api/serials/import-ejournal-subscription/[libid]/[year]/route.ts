@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { filterEJournalSubscriptions } from '@/lib/subscription-filter';
+import { heldEJournalAccess } from '@/lib/heldAccess';
+import { canAccessLibrary } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -16,6 +17,11 @@ export async function GET(
         { error: 'Invalid library ID or year' },
         { status: 400 }
       );
+    }
+
+    // One institution's numbers: only for those who may act on it.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Find Library_Year record for the library and year
@@ -34,34 +40,9 @@ export async function GET(
       );
     }
 
-    // Fetch E-Journal subscriptions for this library and year (ONLY subscribed items)
-    const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_EJournal: {
-          include: {
-            List_EJournal_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_EJournal_Counts: {
-              where: {
-                year: year,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process only library-specific subscriptions (no global items unless subscribed)
-    const allEJournals = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredEJournals = filterEJournalSubscriptions(allEJournals);
+    // The E-Journals this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const heldEJournals = await heldEJournalAccess(libraryYear.id, year);
 
     // Group by language
     const countsByLanguage = {
@@ -72,9 +53,9 @@ export async function GET(
     };
 
     // Process each E-Journal entry
-    for (const ejournal of filteredEJournals) {
+    for (const { List_EJournal: ejournal, custom_count } of heldEJournals) {
       if (!ejournal) continue;
-      const count = ejournal.List_EJournal_Counts?.[0]?.journals || 0;
+      const count = custom_count ?? ejournal.List_EJournal_Counts?.[0]?.journals ?? 0;
 
       for (const langEntry of ejournal.List_EJournal_Language) {
         const langShort = langEntry.Language.short?.toUpperCase();

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { filterAVSubscriptions } from "@/lib/subscription-filter";
+import { heldAVAccess } from "@/lib/heldAccess";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logAuditEvent } from "@/lib/auditLogger";
+import { canAccessLibrary } from "@/lib/auth";
 
 export async function GET(
   req: Request,
@@ -21,6 +22,11 @@ export async function GET(
 
     const libraryId = Number(libid);
     const currentYear = Number(year);
+
+    // One institution's numbers: only for those who may act on it.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Find Library_Year record for the library and year
     let libraryYear = await db.library_Year.findFirst({
@@ -52,35 +58,9 @@ export async function GET(
 
     const resolvedYear = libraryYear.year;
 
-    // Fetch AV subscriptions for this library and year (ONLY subscribed items)
-    // Include language information
-    const avSubscriptions = await db.libraryYear_ListAV.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_AV: {
-          include: {
-            List_AV_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_AV_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process only library-specific subscriptions (no global items unless subscribed)
-    const allAVEntries = avSubscriptions.map(sub => sub.List_AV).filter(Boolean);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredAVEntries = filterAVSubscriptions(allAVEntries);
+    // The AV entries this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const heldAV = await heldAVAccess(libraryYear.id, resolvedYear);
 
     // Group by type and language
     const countsByType = {
@@ -91,14 +71,15 @@ export async function GET(
     };
 
     // Process each AV entry (using filtered list to avoid duplicates)
-    for (const av of filteredAVEntries) {
+    for (const { List_AV: av, custom_count } of heldAV) {
       if (!av || !av.type) continue;
 
       const type = av.type.toLowerCase();
       if (!countsByType[type as keyof typeof countsByType]) continue;
 
       // Get counts for this year
-      const count = av.List_AV_Counts?.[0]?.titles || 0;
+      // A count of the institution's own replaces the list's, as in Manage Access.
+      const count = custom_count ?? av.List_AV_Counts?.[0]?.titles ?? 0;
 
       // Map languages
       for (const langEntry of av.List_AV_Language) {

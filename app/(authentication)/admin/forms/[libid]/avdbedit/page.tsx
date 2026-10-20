@@ -16,7 +16,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 import { canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
-import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
+import { heldAVAccess } from "@/lib/heldAccess";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -136,97 +136,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     const libraryYearRecord = await findOrCreateLibraryYear(libid, year);
     const canWrite = await canWriteLibraryYear(libraryYearRecord);
 
-    // Get all current subscriptions for this library and year with counts.
-    // Junction table provides per-library state (is_selected, custom_count);
-    // List_AV_Counts provides the global title count fallback.
-    // Only items the user actually selected in the survey (is_selected=true
-    // OR has a custom_count) are shown, an edited entry as the institution's
-    // own version, and only entries still in this year's list
-    // (lib/editedCopies.ts).
-    const allSubscriptions = await db.libraryYear_ListAV.findMany({
-      where: {
-        libraryyear_id: libraryYearRecord!.id,
-      },
-      select: {
-        libraryyear_id: true,
-        listav_id: true,
-        is_selected: true,
-        custom_count: true,
-        List_AV: {
-          include: {
-            List_AV_Counts: {
-              where: { year },
-              select: { titles: true }
-            },
-            List_AV_Language: {
-              select: { Language: { select: { short: true } } }
-            }
-          }
-        }
-      },
-    });
-    const subscriptions = heldAccessRows(
-      allSubscriptions,
-      (s) => s.listav_id,
-      (s) => s.List_AV.List_AV_Counts.length > 0,
-      await editedCopies("av", libraryYearRecord!.id),
-    );
-
-    const subscribedAVs = subscriptions.map((s) => s.List_AV);
-    
-    // Filter out global records when library-specific versions exist
-    // Group by unique identifier (title + type + subtitle) to find duplicates
-    const recordsByIdentifier = new Map<string, typeof subscribedAVs[0][]>();
-    
-    subscribedAVs.forEach((av) => {
-      const identifier = `${av.title?.toLowerCase() || ''}_${av.type?.toLowerCase() || ''}_${av.subtitle?.toLowerCase() || ''}`;
-      if (!recordsByIdentifier.has(identifier)) {
-        recordsByIdentifier.set(identifier, []);
-      }
-      recordsByIdentifier.get(identifier)!.push(av);
-    });
-    
-    // For each group, prefer library-specific over global
-    const filteredAVs = Array.from(recordsByIdentifier.values()).map((group) => {
-      // If there's a library-specific record (is_global = false), use that
-      const librarySpecific = group.find(av => !av.is_global);
-      return librarySpecific || group[0]; // fallback to first if all are global
-    });
-    
-    // Filter original subscriptions to match filtered AVs.
-    // If a global twin's junction row has custom_count or is_selected set
-    // (legacy/orphaned data from before dedup), merge that state into the
-    // library-specific row that survives the dedup so the display reflects
-    // the user's intent.
-    const filteredAVIds = new Set(filteredAVs.map((av) => av.id));
-    const groupOfAVId = new Map<number, string>();
-    for (const [key, group] of recordsByIdentifier) {
-      group.forEach((av) => groupOfAVId.set(av.id, key));
-    }
-    const consolidatedByKept = new Map<number, typeof subscriptions[0]>();
-    for (const sub of subscriptions) {
-      const key = groupOfAVId.get(sub.List_AV.id);
-      if (!key) continue;
-      const keptAv = filteredAVs.find((av) => groupOfAVId.get(av.id) === key);
-      if (!keptAv) continue;
-      const existing = consolidatedByKept.get(keptAv.id);
-      if (!existing) {
-        // Start with the kept-row's own subscription (if present) or the twin
-        const own = subscriptions.find((s) => s.List_AV.id === keptAv.id);
-        consolidatedByKept.set(keptAv.id, { ...(own ?? sub), List_AV: keptAv as any });
-      }
-      const target = consolidatedByKept.get(keptAv.id)!;
-      // Merge state: prefer non-null custom_count, OR is_selected
-      if (target.custom_count == null && sub.custom_count != null) {
-        target.custom_count = sub.custom_count;
-      }
-      if (!target.is_selected && sub.is_selected) {
-        target.is_selected = sub.is_selected;
-      }
-    }
-    const filteredSubscriptions = Array.from(consolidatedByKept.values()).filter(
-      (sub) => filteredAVIds.has(sub.List_AV.id)
-    );
+    // What this institution holds this year: the rows ticked or given a
+    // count of their own, for entries still in this year's list, an edited
+    // entry as the institution's own version, each entry once. The My Forms
+    // imports count the same rows (lib/heldAccess.ts).
+    const filteredSubscriptions = await heldAVAccess(libraryYearRecord!.id, year);
+    const filteredAVs = filteredSubscriptions.map((sub) => sub.List_AV);
     
     if (filteredAVs.length === 0) {
       return (
