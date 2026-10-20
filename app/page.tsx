@@ -41,10 +41,16 @@ export default async function Index() {
               <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-20" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {/* 1957: CEAL statistics began. 1999: this online database launched (see History) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
+                <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">1957</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wider">Statistics Founded</div>
+              </Card>
+
               <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">
                 <div className="text-4xl md:text-5xl font-bold text-stone-600 mb-2">1999</div>
-                <div className="text-sm text-muted-foreground uppercase tracking-wider">Founded</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wider">Database Launched</div>
               </Card>
 
               <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all duration-300">

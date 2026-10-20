@@ -14,6 +14,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 import { canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
+import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
 
 // Dynamic import for client component
 const EBookSubscriptionManagementClient = dynamic(
@@ -158,14 +159,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     const canWrite = await canWriteLibraryYear(libraryYearRecord);
 
     // Get current E-Book subscriptions selected by the user (is_selected=true
-    // OR a custom_count override has been entered).
-    const subscriptions = await db.libraryYear_ListEBook.findMany({
+    // OR a custom_count override has been entered), an edited entry as the
+    // institution's own version, and only entries still in this year's list
+    // (lib/editedCopies.ts).
+    const allSubscriptions = await db.libraryYear_ListEBook.findMany({
       where: {
         libraryyear_id: libraryYearRecord!.id,
-        OR: [
-          { is_selected: true },
-          { custom_count: { not: null } },
-        ],
       },
       select: {
         libraryyear_id: true,
@@ -185,6 +184,12 @@ export default async function Page({ params, searchParams }: PageProps) {
         } 
       },
     });
+    const subscriptions = heldAccessRows(
+      allSubscriptions,
+      (s) => s.listebook_id,
+      (s) => s.List_EBook.List_EBook_Counts.length > 0,
+      await editedCopies("ebook", libraryYearRecord!.id),
+    );
 
     const subscribedEBooks = subscriptions.map((s) => s.List_EBook);
     

@@ -16,6 +16,7 @@ import { FallbackYearBanner } from "@/components/FallbackYearBanner";
 import { getVisibleSurveyYear, canViewSurveyYearLists } from "@/lib/surveyVisibility";
 import { canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
+import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
 
 // Dynamic import for client component
 const SubscriptionManagementClient = dynamic(() => import('./SubscriptionManagementClient'), {
@@ -138,15 +139,13 @@ export default async function Page({ params, searchParams }: PageProps) {
     // Get all current subscriptions for this library and year with counts.
     // Junction table provides per-library state (is_selected, custom_count);
     // List_AV_Counts provides the global title count fallback.
-    // Filter to only show items the user actually selected in the survey
-    // (is_selected=true OR has a custom_count).
-    const subscriptions = await db.libraryYear_ListAV.findMany({
+    // Only items the user actually selected in the survey (is_selected=true
+    // OR has a custom_count) are shown, an edited entry as the institution's
+    // own version, and only entries still in this year's list
+    // (lib/editedCopies.ts).
+    const allSubscriptions = await db.libraryYear_ListAV.findMany({
       where: {
         libraryyear_id: libraryYearRecord!.id,
-        OR: [
-          { is_selected: true },
-          { custom_count: { not: null } },
-        ],
       },
       select: {
         libraryyear_id: true,
@@ -163,9 +162,15 @@ export default async function Page({ params, searchParams }: PageProps) {
               select: { Language: { select: { short: true } } }
             }
           }
-        } 
+        }
       },
     });
+    const subscriptions = heldAccessRows(
+      allSubscriptions,
+      (s) => s.listav_id,
+      (s) => s.List_AV.List_AV_Counts.length > 0,
+      await editedCopies("av", libraryYearRecord!.id),
+    );
 
     const subscribedAVs = subscriptions.map((s) => s.List_AV);
     
