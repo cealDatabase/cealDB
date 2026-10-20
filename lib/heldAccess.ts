@@ -16,7 +16,7 @@
 // dropped the others.
 
 import db from "@/lib/db";
-import { editedCopies, heldAccessRows } from "@/lib/editedCopies";
+import { editedCopiesByLibraryYear, heldAccessRows } from "@/lib/editedCopies";
 
 type AccessRow = { is_selected: boolean | null; custom_count: number | null };
 
@@ -47,9 +47,21 @@ function onePerEntry<R extends AccessRow, E extends { is_global: boolean | null 
 
 const lower = (value: string | null) => value?.toLowerCase() || "";
 
+/** Rows grouped by Library_Year id, with an empty list for each id asked for. */
+function byLibraryYear<R extends { libraryyear_id: number }>(libraryYearIds: number[], rows: R[]) {
+  const groups = new Map<number, R[]>(libraryYearIds.map((id) => [id, []]));
+  for (const row of rows) groups.get(row.libraryyear_id)?.push(row);
+  return groups;
+}
+
 export async function heldAVAccess(libraryYearId: number, year: number) {
+  return (await heldAVAccessByLibraryYear([libraryYearId], year)).get(libraryYearId)!;
+}
+
+/** The same for many institution-years at once, keyed by Library_Year id. */
+export async function heldAVAccessByLibraryYear(libraryYearIds: number[], year: number) {
   const rows = await db.libraryYear_ListAV.findMany({
-    where: { libraryyear_id: libraryYearId },
+    where: { libraryyear_id: { in: libraryYearIds } },
     select: {
       libraryyear_id: true,
       listav_id: true,
@@ -63,18 +75,28 @@ export async function heldAVAccess(libraryYearId: number, year: number) {
       },
     },
   });
-  const held = heldAccessRows(
-    rows,
-    (row) => row.listav_id,
-    (row) => row.List_AV.List_AV_Counts.length > 0,
-    await editedCopies("av", libraryYearId),
-  );
-  return onePerEntry(held, (row) => row.List_AV, (av) => `${lower(av.title)}_${lower(av.type)}_${lower(av.subtitle)}`);
+  const copies = await editedCopiesByLibraryYear("av", libraryYearIds);
+  const held = new Map<number, typeof rows>();
+  for (const [libraryYearId, own] of byLibraryYear(libraryYearIds, rows)) {
+    const ticked = heldAccessRows(
+      own,
+      (row) => row.listav_id,
+      (row) => row.List_AV.List_AV_Counts.length > 0,
+      copies.get(libraryYearId)!,
+    );
+    held.set(libraryYearId, onePerEntry(ticked, (row) => row.List_AV, (av) => `${lower(av.title)}_${lower(av.type)}_${lower(av.subtitle)}`));
+  }
+  return held;
 }
 
 export async function heldEBookAccess(libraryYearId: number, year: number) {
+  return (await heldEBookAccessByLibraryYear([libraryYearId], year)).get(libraryYearId)!;
+}
+
+/** The same for many institution-years at once, keyed by Library_Year id. */
+export async function heldEBookAccessByLibraryYear(libraryYearIds: number[], year: number) {
   const rows = await db.libraryYear_ListEBook.findMany({
-    where: { libraryyear_id: libraryYearId },
+    where: { libraryyear_id: { in: libraryYearIds } },
     select: {
       libraryyear_id: true,
       listebook_id: true,
@@ -88,22 +110,32 @@ export async function heldEBookAccess(libraryYearId: number, year: number) {
       },
     },
   });
-  const held = heldAccessRows(
-    rows,
-    (row) => row.listebook_id,
-    (row) => row.List_EBook.List_EBook_Counts.length > 0,
-    await editedCopies("ebook", libraryYearId),
-  );
-  return onePerEntry(
-    held,
-    (row) => row.List_EBook,
-    (ebook) => `${lower(ebook.title)}_${lower(ebook.publisher)}_${lower(ebook.subtitle)}`,
-  );
+  const copies = await editedCopiesByLibraryYear("ebook", libraryYearIds);
+  const held = new Map<number, typeof rows>();
+  for (const [libraryYearId, own] of byLibraryYear(libraryYearIds, rows)) {
+    const ticked = heldAccessRows(
+      own,
+      (row) => row.listebook_id,
+      (row) => row.List_EBook.List_EBook_Counts.length > 0,
+      copies.get(libraryYearId)!,
+    );
+    held.set(libraryYearId, onePerEntry(
+      ticked,
+      (row) => row.List_EBook,
+      (ebook) => `${lower(ebook.title)}_${lower(ebook.publisher)}_${lower(ebook.subtitle)}`,
+    ));
+  }
+  return held;
 }
 
 export async function heldEJournalAccess(libraryYearId: number, year: number) {
+  return (await heldEJournalAccessByLibraryYear([libraryYearId], year)).get(libraryYearId)!;
+}
+
+/** The same for many institution-years at once, keyed by Library_Year id. */
+export async function heldEJournalAccessByLibraryYear(libraryYearIds: number[], year: number) {
   const rows = await db.libraryYear_ListEJournal.findMany({
-    where: { libraryyear_id: libraryYearId },
+    where: { libraryyear_id: { in: libraryYearIds } },
     select: {
       libraryyear_id: true,
       listejournal_id: true,
@@ -117,16 +149,21 @@ export async function heldEJournalAccess(libraryYearId: number, year: number) {
       },
     },
   });
-  const held = heldAccessRows(
-    rows,
-    (row) => row.listejournal_id,
-    (row) => row.List_EJournal.List_EJournal_Counts.length > 0,
-    await editedCopies("ejournal", libraryYearId),
-  );
-  return onePerEntry(
-    held,
-    (row) => row.List_EJournal,
-    (ejournal) =>
-      `${lower(ejournal.title)}_${lower(ejournal.publisher)}_${lower(ejournal.subtitle)}_${lower(ejournal.series)}`,
-  );
+  const copies = await editedCopiesByLibraryYear("ejournal", libraryYearIds);
+  const held = new Map<number, typeof rows>();
+  for (const [libraryYearId, own] of byLibraryYear(libraryYearIds, rows)) {
+    const ticked = heldAccessRows(
+      own,
+      (row) => row.listejournal_id,
+      (row) => row.List_EJournal.List_EJournal_Counts.length > 0,
+      copies.get(libraryYearId)!,
+    );
+    held.set(libraryYearId, onePerEntry(
+      ticked,
+      (row) => row.List_EJournal,
+      (ejournal) =>
+        `${lower(ejournal.title)}_${lower(ejournal.publisher)}_${lower(ejournal.subtitle)}_${lower(ejournal.series)}`,
+    ));
+  }
+  return held;
 }
