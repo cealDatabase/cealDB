@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import CreateAVFormClient from "../components/forms/createAVFormClient";
 import { Container } from "@/components/Container";
 import { SurveyBreadcrumb } from "@/components/SurveyBreadcrumb";
+import { entryInstitutions } from "@/lib/myAccessInstitution";
 
 async function CreateAVContent({
   year,
@@ -25,6 +26,7 @@ async function CreateAVContent({
   }
 
   const selectedYear = Number(year);
+  const { institutions, viewedInstitutionId } = await entryInstitutions(selectedYear);
 
   return (
     <div className='p-6'>
@@ -37,6 +39,8 @@ async function CreateAVContent({
           selectedYear={selectedYear}
           userRoles={userRoles}
           libraryId={libraryId ? Number(libraryId) : undefined}
+          institutions={institutions}
+          viewedInstitutionId={viewedInstitutionId}
         />
       </Container>
     </div>
