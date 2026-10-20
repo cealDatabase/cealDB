@@ -138,8 +138,10 @@ export async function POST(req: Request) {
 
         // 2) Link to Library_Year (m–m) - only for non-global records
         if (!is_global && libraryYearId) {
+          // An institution's own new entry is held by it: ticked in its My Access,
+          // so it shows in Manage Access and counts in My Forms straight away.
           await tx.libraryYear_ListEBook.createMany({
-            data: [{ libraryyear_id: libraryYearId, listebook_id: book.id }],
+            data: [{ libraryyear_id: libraryYearId, listebook_id: book.id, is_selected: !!library_id }],
             skipDuplicates: true,
           });
         }

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { filterEJournalSubscriptions } from "@/lib/subscription-filter";
+import { heldEJournalAccess } from "@/lib/heldAccess";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { logAuditEvent } from "@/lib/auditLogger";
+import { canAccessLibrary } from "@/lib/auth";
 
 export async function GET(
   req: Request,
@@ -21,6 +22,11 @@ export async function GET(
 
     const libraryId = Number(libid);
     const currentYear = Number(year);
+
+    // One institution's numbers: only for those who may act on it.
+    if (!(await canAccessLibrary(libraryId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Find Library_Year record for the library and year
     let libraryYear = await db.library_Year.findFirst({
@@ -52,35 +58,9 @@ export async function GET(
 
     const resolvedYear = libraryYear.year;
 
-    // Fetch E-Journal subscriptions for this library and year (ONLY subscribed items)
-    // Include language information
-    const ejournalSubscriptions = await db.libraryYear_ListEJournal.findMany({
-      where: {
-        libraryyear_id: libraryYear.id,
-      },
-      include: {
-        List_EJournal: {
-          include: {
-            List_EJournal_Language: {
-              include: {
-                Language: true,
-              },
-            },
-            List_EJournal_Counts: {
-              where: {
-                year: resolvedYear,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Process only library-specific subscriptions (no global items unless subscribed)
-    const allEJournalEntries = ejournalSubscriptions.map(sub => sub.List_EJournal).filter(Boolean);
-
-    // Filter to prefer library-specific records over global (prevents duplicate counting)
-    const filteredEJournalEntries = filterEJournalSubscriptions(allEJournalEntries);
+    // The E-Journals this institution holds this year, exactly as its Manage
+    // Access lists them (lib/heldAccess.ts).
+    const heldEJournals = await heldEJournalAccess(libraryYear.id, resolvedYear);
 
     // Group by language for purchased electronic serials
     const countsByLanguage = {
@@ -91,11 +71,12 @@ export async function GET(
     };
 
     // Process each E-Journal entry (using filtered list to avoid duplicates)
-    for (const ejournal of filteredEJournalEntries) {
+    for (const { List_EJournal: ejournal, custom_count } of heldEJournals) {
       if (!ejournal) continue;
 
       // Get counts for this year (journals count)
-      const count = ejournal.List_EJournal_Counts?.[0]?.journals || 0;
+      // A count of the institution's own replaces the list's, as in Manage Access.
+      const count = custom_count ?? ejournal.List_EJournal_Counts?.[0]?.journals ?? 0;
 
       // Map languages
       for (const langEntry of ejournal.List_EJournal_Language) {

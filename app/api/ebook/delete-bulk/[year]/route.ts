@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { requireRoles } from "@/lib/auth";
 import { copiesMadeOf } from "@/lib/editedCopies";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(
   request: Request,
@@ -23,16 +24,20 @@ export async function POST(
 
   try {
     const editedVersions = await copiesMadeOf("ebook", ids);
+    const countsWhere = { listebook: { in: ids }, year: yearNum };
+    const accessWhere = { listebook_id: { in: [...ids, ...editedVersions] }, Library_Year: { year: yearNum } };
+    // What is deleted goes into the audit log, so a mistaken delete can be put back.
+    const [counts, myAccess] = await Promise.all([
+      db.list_EBook_Counts.findMany({ where: countsWhere }),
+      db.libraryYear_ListEBook.findMany({ where: accessWhere }),
+    ]);
     const [result] = await db.$transaction([
-      db.list_EBook_Counts.deleteMany({
-        where: { listebook: { in: ids }, year: yearNum },
-      }),
+      db.list_EBook_Counts.deleteMany({ where: countsWhere }),
       // Out of this year's list, the entry is no longer held this year: take
       // it, and institutions' edited versions of it, out of their My Access.
-      db.libraryYear_ListEBook.deleteMany({
-        where: { listebook_id: { in: [...ids, ...editedVersions] }, Library_Year: { year: yearNum } },
-      }),
+      db.libraryYear_ListEBook.deleteMany({ where: accessWhere }),
     ]);
+    await logUserAction("DELETE", "List_EBook", "bulk", { year: yearNum, ids, counts, myAccess }, null, true, undefined, request);
     return NextResponse.json({ success: true, deleted: result.count });
   } catch (error) {
     console.error("Bulk delete E-Book failed:", error);
