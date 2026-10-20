@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { isSuperAdminDb } from "@/lib/auth";
 import { openingInstant, closingInstant } from "@/lib/surveyTime";
 import { moveScheduledEvents } from "@/lib/surveyControl";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(req: Request) {
   // Super admin only. Middleware only checks that the caller is signed in, so
@@ -206,6 +207,19 @@ export async function POST(req: Request) {
       });
       console.log(`✅ Created new SurveySession for year ${targetYear}`);
     }
+
+    await logUserAction("UPDATE", "Library_Year", `year_${targetYear}`,
+      existingSession ? { openingDate: existingSession.openingDate, closingDate: existingSession.closingDate } : undefined,
+      {
+        year: targetYear,
+        openingDate: openDate,
+        closingDate: closeDate,
+        surveySession: sessionAction,
+        created: successCount,
+        updated: updatedCount,
+        failed: createdRecords.filter((r) => r.action === 'error').length,
+      },
+      true, undefined, req);
 
     // Step 5: Confirm Library_Year table has been updated and return results
     const totalLibraryYearRecords = await db.library_Year.count({

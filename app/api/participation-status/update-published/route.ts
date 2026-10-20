@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { isSuperAdminDb } from '@/lib/auth';
 import db from '@/lib/db';
+import { logUserAction } from '@/lib/auditLogger';
 
 const prisma = db;
 
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const before = await prisma.entry_Status.findMany({
+      where: { libraryyear: { in: updates.map((u: { libraryYearId: number }) => u.libraryYearId) } },
+      select: { libraryyear: true, espublished: true },
+    });
+
     const updatePromises = updates.map(async ({ libraryYearId, published }) => {
       // Update the Entry_Status record associated with this Library_Year
       return prisma.entry_Status.update({
@@ -45,6 +51,11 @@ export async function POST(request: NextRequest) {
     });
 
     await Promise.all(updatePromises);
+
+    await logUserAction('UPDATE', 'Entry_Status', 'espublished',
+      { published: Object.fromEntries(before.map((row) => [row.libraryyear, row.espublished])) },
+      { published: Object.fromEntries(updates.map((u: { libraryYearId: number; published: boolean }) => [u.libraryYearId, u.published])) },
+      true, undefined, request);
 
     return NextResponse.json({
       success: true,

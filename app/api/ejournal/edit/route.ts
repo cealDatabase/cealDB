@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { logUserAction } from "@/lib/auditLogger";
+import { catalogueEntryForAudit, changedFields } from "@/lib/auditChanges";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
@@ -86,6 +87,8 @@ export async function POST(req: Request) {
     }
 
     const libraryYearId = libraryYearRecord.id;
+    // The entry as it is before this save, for the audit log.
+    const before = await catalogueEntryForAudit("ejournal", ejournalId, yearNum);
     const safeJournals = Number.isFinite(Number(journals)) ? Number(journals) : 0;
     const safeDbs = Number.isFinite(Number(dbs)) ? Number(dbs) : 0;
 
@@ -168,12 +171,17 @@ export async function POST(req: Request) {
       resultRecord = newEJournal;
       isNewRecord = true;
 
+      // What the institution's version changes from the shared entry. The
+      // original_id in old_values is what ties the copy to that entry
+      // (lib/editedCopies.ts), so it stays as it was.
+      const fromOriginal = changedFields(before, await catalogueEntryForAudit("ejournal", newEJournal.id, yearNum), ["id", "is_global", "libraryyear", "updated_at", "source_entry_id", "shared_by_admin_edit", "promoted_to_global_id", "promoted_from_libraryyear_id"]);
       await logUserAction(
         "CREATE",
         "List_EJournal",
         newEJournal.id.toString(),
-        { original_id: ejournalId, is_global: true },
+        { ...fromOriginal.old, original_id: ejournalId, is_global: true },
         {
+          ...fromOriginal.new,
           title: newEJournal.title,
           is_global: false,
           libraryyear: libraryYearId,
@@ -235,12 +243,13 @@ export async function POST(req: Request) {
 
       resultRecord = updated;
 
+      const changes = changedFields(before, await catalogueEntryForAudit("ejournal", ejournalId, yearNum));
       await logUserAction(
         "UPDATE",
         "List_EJournal",
         ejournalId.toString(),
-        undefined,
-        { title: updated.title },
+        changes.old,
+        { ...changes.new, year: yearNum, title: updated.title },
         true,
         undefined,
         req

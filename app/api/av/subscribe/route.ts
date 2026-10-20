@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import db from "@/lib/db";
 import { canAccessLibrary } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
 export async function POST(req: Request) {
@@ -131,6 +132,12 @@ export async function POST(req: Request) {
           error: error instanceof Error ? error.message : "Unknown error"
         });
       }
+    }
+
+    const added = subscriptionResults.filter(r => r.subscribed && !r.alreadySubscribed).map(r => r.recordId);
+    if (added.length > 0) {
+      await logUserAction("CREATE", "LibraryYear_ListAV", libraryYearId, undefined,
+        { year: Number(year), libraryId: Number(libid), added }, true, undefined, req);
     }
 
     const successCount = subscriptionResults.filter(r => r.subscribed).length;

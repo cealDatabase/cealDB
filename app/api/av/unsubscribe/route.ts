@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
 import { canWriteLibraryYear } from "@/lib/libraryYearHelper";
 import { editedCopies, withEditedCopies } from "@/lib/editedCopies";
 
@@ -87,6 +88,8 @@ export async function POST(req: Request) {
     // Remove subscription entries from LibraryYear_ListAV junction table
     const unsubscribeResults = [];
     const libraryYearId = libraryYearRecord.id;
+    // The My Access rows taken out, as they were, for the audit log.
+    const removedRows: { listav_id: number; is_selected: boolean | null; custom_count: number | null }[] = [];
 
     for (const recordId of validRecordIds) {
       try {
@@ -117,6 +120,11 @@ export async function POST(req: Request) {
             },
           });
 
+          removedRows.push({
+            listav_id: existingSubscription.listav_id,
+            is_selected: existingSubscription.is_selected,
+            custom_count: existingSubscription.custom_count,
+          });
           unsubscribeResults.push({
             recordId: Number(recordId),
             unsubscribed: true,
@@ -141,10 +149,18 @@ export async function POST(req: Request) {
       const tiedIds = withEditedCopies(removedIds, await editedCopies("av", libraryYearId))
         .filter(id => !removedIds.includes(id));
       if (tiedIds.length > 0) {
+        removedRows.push(...await db.libraryYear_ListAV.findMany({
+          where: { libraryyear_id: libraryYearId, listav_id: { in: tiedIds } },
+          select: { listav_id: true, is_selected: true, custom_count: true },
+        }));
         await db.libraryYear_ListAV.deleteMany({
           where: { libraryyear_id: libraryYearId, listav_id: { in: tiedIds } },
         });
       }
+    }
+    if (removedRows.length > 0) {
+      await logUserAction("DELETE", "LibraryYear_ListAV", libraryYearId, { removed: removedRows },
+        { year: Number(year), libraryId: Number(libid) }, true, undefined, req);
     }
 
     const successCount = unsubscribeResults.filter(r => r.unsubscribed).length;

@@ -2,8 +2,11 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { getSessionRoleIds, requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
+import { catalogueEntryForAudit, changedFields } from "@/lib/auditChanges";
 
 export async function POST(req: Request) {
+  let auditId: number | null = null;
   try {
   // Mutates the shared, cross-institution catalog record, so this is limited to
   // Super Admin / E-Resource Editor — matching the
@@ -43,6 +46,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    auditId = ejId;
+    const before = await catalogueEntryForAudit("ejournal", ejId, y);
 
     const j = Number.isFinite(Number(journals ?? counts))
       ? Number(journals ?? counts)
@@ -95,9 +100,14 @@ export async function POST(req: Request) {
       }
     });
 
+    // The dialog sends every field; log only what this save changed.
+    const changes = changedFields(before, await catalogueEntryForAudit("ejournal", ejId, y));
+    await logUserAction("UPDATE", "List_EJournal", ejId, changes.old, { ...changes.new, year: y }, true, undefined, req);
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("E-Journal update failed:", error);
+    await logUserAction("UPDATE", "List_EJournal", auditId ?? undefined, undefined, undefined, false, error?.message || "Unknown error", req);
     return NextResponse.json(
       { error: "Failed to update E-Journal", detail: error?.message },
       { status: 500 }

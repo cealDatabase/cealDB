@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { getSessionRoleIds, requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
+import { catalogueEntryForAudit, changedFields } from "@/lib/auditChanges";
 
 export async function POST(req: Request) {
+  let auditId: number | null = null;
   try {
   // Mutates the shared, cross-institution catalog record, so this is limited to
   // Super Admin / E-Resource Editor — matching the
@@ -33,6 +36,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    auditId = ebookId;
+    const before = await catalogueEntryForAudit("ebook", ebookId, y);
 
     const titles = Number.isFinite(Number(counts)) ? Number(counts) : 0;
     const vol = volumes == null || volumes === "" ? null : Number(volumes);
@@ -88,9 +93,14 @@ export async function POST(req: Request) {
       }
     });
 
+    // The dialog sends every field; log only what this save changed.
+    const changes = changedFields(before, await catalogueEntryForAudit("ebook", ebookId, y));
+    await logUserAction("UPDATE", "List_EBook", ebookId, changes.old, { ...changes.new, year: y }, true, undefined, req);
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("API error (update Ebook):", error);
+    await logUserAction("UPDATE", "List_EBook", auditId ?? undefined, undefined, undefined, false, error?.message || "Unknown error", req);
     return NextResponse.json(
       { error: "Failed to update Ebook.", detail: error?.message },
       { status: 500 }
