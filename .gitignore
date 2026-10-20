@@ -29,6 +29,9 @@ _.env
 *.zip
 ceal_code_files_db/*
 *.sql
+# Hand-written setup SQL with no data in it, kept in the repo.
+!scripts/data-change-log.sql
+!scripts/data-change-log-uninstall.sql
 
 # dependencies
 /node_modules

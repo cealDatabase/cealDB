@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model DataChangeLog
+ * 
+ */
+export type DataChangeLog = $Result.DefaultSelection<Prisma.$DataChangeLogPayload>
+/**
  * Model Electronic
  * 
  */
@@ -228,8 +233,8 @@ export type Volume_Holdings = $Result.DefaultSelection<Prisma.$Volume_HoldingsPa
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Electronics
- * const electronics = await prisma.electronic.findMany()
+ * // Fetch zero or more DataChangeLogs
+ * const dataChangeLogs = await prisma.dataChangeLog.findMany()
  * ```
  *
  *
@@ -251,8 +256,8 @@ export class PrismaClient<
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more Electronics
-   * const electronics = await prisma.electronic.findMany()
+   * // Fetch zero or more DataChangeLogs
+   * const dataChangeLogs = await prisma.dataChangeLog.findMany()
    * ```
    *
    *
@@ -341,6 +346,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.dataChangeLog`: Exposes CRUD operations for the **DataChangeLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DataChangeLogs
+    * const dataChangeLogs = await prisma.dataChangeLog.findMany()
+    * ```
+    */
+  get dataChangeLog(): Prisma.DataChangeLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.electronic`: Exposes CRUD operations for the **Electronic** model.
     * Example usage:
     * ```ts
@@ -1196,6 +1211,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    DataChangeLog: 'DataChangeLog',
     Electronic: 'Electronic',
     Electronic_Books: 'Electronic_Books',
     EmailTemplate: 'EmailTemplate',
@@ -1252,10 +1268,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "electronic" | "electronic_Books" | "emailTemplate" | "entry_Status" | "fiscal_Support" | "library" | "libraryYear_ListAV" | "libraryYear_ListEBook" | "libraryYear_ListEJournal" | "list_AV" | "list_AV_Counts" | "list_AV_Language" | "listCustomOtherHoldings" | "list_EBook" | "list_EBook_Counts" | "list_EBook_Language" | "list_EJournal" | "list_EJournal_Counts" | "list_EJournal_Language" | "monographic_Acquisitions" | "other_Holdings" | "personnel_Support" | "public_Services" | "publishedReport" | "exclude_Year" | "reflibrarytype" | "reflibraryregion" | "language" | "library_Year" | "user" | "session" | "verificationToken" | "auditLog" | "user_Library" | "role" | "users_Roles" | "scheduledEvent" | "serials" | "surveySession" | "unprocessed_Backlog_Materials" | "volume_Holdings"
+      modelProps: "dataChangeLog" | "electronic" | "electronic_Books" | "emailTemplate" | "entry_Status" | "fiscal_Support" | "library" | "libraryYear_ListAV" | "libraryYear_ListEBook" | "libraryYear_ListEJournal" | "list_AV" | "list_AV_Counts" | "list_AV_Language" | "listCustomOtherHoldings" | "list_EBook" | "list_EBook_Counts" | "list_EBook_Language" | "list_EJournal" | "list_EJournal_Counts" | "list_EJournal_Language" | "monographic_Acquisitions" | "other_Holdings" | "personnel_Support" | "public_Services" | "publishedReport" | "exclude_Year" | "reflibrarytype" | "reflibraryregion" | "language" | "library_Year" | "user" | "session" | "verificationToken" | "auditLog" | "user_Library" | "role" | "users_Roles" | "scheduledEvent" | "serials" | "surveySession" | "unprocessed_Backlog_Materials" | "volume_Holdings"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      DataChangeLog: {
+        payload: Prisma.$DataChangeLogPayload<ExtArgs>
+        fields: Prisma.DataChangeLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DataChangeLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DataChangeLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          findFirst: {
+            args: Prisma.DataChangeLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DataChangeLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          findMany: {
+            args: Prisma.DataChangeLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>[]
+          }
+          create: {
+            args: Prisma.DataChangeLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          createMany: {
+            args: Prisma.DataChangeLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DataChangeLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>[]
+          }
+          delete: {
+            args: Prisma.DataChangeLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          update: {
+            args: Prisma.DataChangeLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.DataChangeLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DataChangeLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DataChangeLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.DataChangeLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataChangeLogPayload>
+          }
+          aggregate: {
+            args: Prisma.DataChangeLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDataChangeLog>
+          }
+          groupBy: {
+            args: Prisma.DataChangeLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DataChangeLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DataChangeLogCountArgs<ExtArgs>
+            result: $Utils.Optional<DataChangeLogCountAggregateOutputType> | number
+          }
+        }
+      }
       Electronic: {
         payload: Prisma.$ElectronicPayload<ExtArgs>
         fields: Prisma.ElectronicFieldRefs
@@ -4413,6 +4503,7 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    dataChangeLog?: DataChangeLogOmit
     electronic?: ElectronicOmit
     electronic_Books?: Electronic_BooksOmit
     emailTemplate?: EmailTemplateOmit
@@ -4995,6 +5086,1114 @@ export namespace Prisma {
   /**
    * Models
    */
+
+  /**
+   * Model DataChangeLog
+   */
+
+  export type AggregateDataChangeLog = {
+    _count: DataChangeLogCountAggregateOutputType | null
+    _avg: DataChangeLogAvgAggregateOutputType | null
+    _sum: DataChangeLogSumAggregateOutputType | null
+    _min: DataChangeLogMinAggregateOutputType | null
+    _max: DataChangeLogMaxAggregateOutputType | null
+  }
+
+  export type DataChangeLogAvgAggregateOutputType = {
+    id: number | null
+    transaction_id: number | null
+  }
+
+  export type DataChangeLogSumAggregateOutputType = {
+    id: bigint | null
+    transaction_id: bigint | null
+  }
+
+  export type DataChangeLogMinAggregateOutputType = {
+    id: bigint | null
+    changed_at: Date | null
+    table_name: string | null
+    operation: string | null
+    row_key: string | null
+    db_user: string | null
+    application: string | null
+    client_addr: string | null
+    transaction_id: bigint | null
+  }
+
+  export type DataChangeLogMaxAggregateOutputType = {
+    id: bigint | null
+    changed_at: Date | null
+    table_name: string | null
+    operation: string | null
+    row_key: string | null
+    db_user: string | null
+    application: string | null
+    client_addr: string | null
+    transaction_id: bigint | null
+  }
+
+  export type DataChangeLogCountAggregateOutputType = {
+    id: number
+    changed_at: number
+    table_name: number
+    operation: number
+    row_key: number
+    old_values: number
+    new_values: number
+    db_user: number
+    application: number
+    client_addr: number
+    transaction_id: number
+    _all: number
+  }
+
+
+  export type DataChangeLogAvgAggregateInputType = {
+    id?: true
+    transaction_id?: true
+  }
+
+  export type DataChangeLogSumAggregateInputType = {
+    id?: true
+    transaction_id?: true
+  }
+
+  export type DataChangeLogMinAggregateInputType = {
+    id?: true
+    changed_at?: true
+    table_name?: true
+    operation?: true
+    row_key?: true
+    db_user?: true
+    application?: true
+    client_addr?: true
+    transaction_id?: true
+  }
+
+  export type DataChangeLogMaxAggregateInputType = {
+    id?: true
+    changed_at?: true
+    table_name?: true
+    operation?: true
+    row_key?: true
+    db_user?: true
+    application?: true
+    client_addr?: true
+    transaction_id?: true
+  }
+
+  export type DataChangeLogCountAggregateInputType = {
+    id?: true
+    changed_at?: true
+    table_name?: true
+    operation?: true
+    row_key?: true
+    old_values?: true
+    new_values?: true
+    db_user?: true
+    application?: true
+    client_addr?: true
+    transaction_id?: true
+    _all?: true
+  }
+
+  export type DataChangeLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataChangeLog to aggregate.
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataChangeLogs to fetch.
+     */
+    orderBy?: DataChangeLogOrderByWithRelationInput | DataChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DataChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DataChangeLogs
+    **/
+    _count?: true | DataChangeLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DataChangeLogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DataChangeLogSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DataChangeLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DataChangeLogMaxAggregateInputType
+  }
+
+  export type GetDataChangeLogAggregateType<T extends DataChangeLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateDataChangeLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDataChangeLog[P]>
+      : GetScalarType<T[P], AggregateDataChangeLog[P]>
+  }
+
+
+
+
+  export type DataChangeLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataChangeLogWhereInput
+    orderBy?: DataChangeLogOrderByWithAggregationInput | DataChangeLogOrderByWithAggregationInput[]
+    by: DataChangeLogScalarFieldEnum[] | DataChangeLogScalarFieldEnum
+    having?: DataChangeLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DataChangeLogCountAggregateInputType | true
+    _avg?: DataChangeLogAvgAggregateInputType
+    _sum?: DataChangeLogSumAggregateInputType
+    _min?: DataChangeLogMinAggregateInputType
+    _max?: DataChangeLogMaxAggregateInputType
+  }
+
+  export type DataChangeLogGroupByOutputType = {
+    id: bigint
+    changed_at: Date
+    table_name: string
+    operation: string
+    row_key: string | null
+    old_values: JsonValue | null
+    new_values: JsonValue | null
+    db_user: string | null
+    application: string | null
+    client_addr: string | null
+    transaction_id: bigint | null
+    _count: DataChangeLogCountAggregateOutputType | null
+    _avg: DataChangeLogAvgAggregateOutputType | null
+    _sum: DataChangeLogSumAggregateOutputType | null
+    _min: DataChangeLogMinAggregateOutputType | null
+    _max: DataChangeLogMaxAggregateOutputType | null
+  }
+
+  type GetDataChangeLogGroupByPayload<T extends DataChangeLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DataChangeLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DataChangeLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DataChangeLogGroupByOutputType[P]>
+            : GetScalarType<T[P], DataChangeLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DataChangeLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    changed_at?: boolean
+    table_name?: boolean
+    operation?: boolean
+    row_key?: boolean
+    old_values?: boolean
+    new_values?: boolean
+    db_user?: boolean
+    application?: boolean
+    client_addr?: boolean
+    transaction_id?: boolean
+  }, ExtArgs["result"]["dataChangeLog"]>
+
+  export type DataChangeLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    changed_at?: boolean
+    table_name?: boolean
+    operation?: boolean
+    row_key?: boolean
+    old_values?: boolean
+    new_values?: boolean
+    db_user?: boolean
+    application?: boolean
+    client_addr?: boolean
+    transaction_id?: boolean
+  }, ExtArgs["result"]["dataChangeLog"]>
+
+  export type DataChangeLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    changed_at?: boolean
+    table_name?: boolean
+    operation?: boolean
+    row_key?: boolean
+    old_values?: boolean
+    new_values?: boolean
+    db_user?: boolean
+    application?: boolean
+    client_addr?: boolean
+    transaction_id?: boolean
+  }, ExtArgs["result"]["dataChangeLog"]>
+
+  export type DataChangeLogSelectScalar = {
+    id?: boolean
+    changed_at?: boolean
+    table_name?: boolean
+    operation?: boolean
+    row_key?: boolean
+    old_values?: boolean
+    new_values?: boolean
+    db_user?: boolean
+    application?: boolean
+    client_addr?: boolean
+    transaction_id?: boolean
+  }
+
+  export type DataChangeLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "changed_at" | "table_name" | "operation" | "row_key" | "old_values" | "new_values" | "db_user" | "application" | "client_addr" | "transaction_id", ExtArgs["result"]["dataChangeLog"]>
+
+  export type $DataChangeLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DataChangeLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: bigint
+      changed_at: Date
+      table_name: string
+      operation: string
+      row_key: string | null
+      old_values: Prisma.JsonValue | null
+      new_values: Prisma.JsonValue | null
+      db_user: string | null
+      application: string | null
+      client_addr: string | null
+      transaction_id: bigint | null
+    }, ExtArgs["result"]["dataChangeLog"]>
+    composites: {}
+  }
+
+  type DataChangeLogGetPayload<S extends boolean | null | undefined | DataChangeLogDefaultArgs> = $Result.GetResult<Prisma.$DataChangeLogPayload, S>
+
+  type DataChangeLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DataChangeLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DataChangeLogCountAggregateInputType | true
+    }
+
+  export interface DataChangeLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataChangeLog'], meta: { name: 'DataChangeLog' } }
+    /**
+     * Find zero or one DataChangeLog that matches the filter.
+     * @param {DataChangeLogFindUniqueArgs} args - Arguments to find a DataChangeLog
+     * @example
+     * // Get one DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DataChangeLogFindUniqueArgs>(args: SelectSubset<T, DataChangeLogFindUniqueArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DataChangeLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DataChangeLogFindUniqueOrThrowArgs} args - Arguments to find a DataChangeLog
+     * @example
+     * // Get one DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DataChangeLogFindUniqueOrThrowArgs>(args: SelectSubset<T, DataChangeLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataChangeLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogFindFirstArgs} args - Arguments to find a DataChangeLog
+     * @example
+     * // Get one DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DataChangeLogFindFirstArgs>(args?: SelectSubset<T, DataChangeLogFindFirstArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataChangeLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogFindFirstOrThrowArgs} args - Arguments to find a DataChangeLog
+     * @example
+     * // Get one DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DataChangeLogFindFirstOrThrowArgs>(args?: SelectSubset<T, DataChangeLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DataChangeLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DataChangeLogs
+     * const dataChangeLogs = await prisma.dataChangeLog.findMany()
+     * 
+     * // Get first 10 DataChangeLogs
+     * const dataChangeLogs = await prisma.dataChangeLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dataChangeLogWithIdOnly = await prisma.dataChangeLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DataChangeLogFindManyArgs>(args?: SelectSubset<T, DataChangeLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DataChangeLog.
+     * @param {DataChangeLogCreateArgs} args - Arguments to create a DataChangeLog.
+     * @example
+     * // Create one DataChangeLog
+     * const DataChangeLog = await prisma.dataChangeLog.create({
+     *   data: {
+     *     // ... data to create a DataChangeLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends DataChangeLogCreateArgs>(args: SelectSubset<T, DataChangeLogCreateArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DataChangeLogs.
+     * @param {DataChangeLogCreateManyArgs} args - Arguments to create many DataChangeLogs.
+     * @example
+     * // Create many DataChangeLogs
+     * const dataChangeLog = await prisma.dataChangeLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DataChangeLogCreateManyArgs>(args?: SelectSubset<T, DataChangeLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DataChangeLogs and returns the data saved in the database.
+     * @param {DataChangeLogCreateManyAndReturnArgs} args - Arguments to create many DataChangeLogs.
+     * @example
+     * // Create many DataChangeLogs
+     * const dataChangeLog = await prisma.dataChangeLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DataChangeLogs and only return the `id`
+     * const dataChangeLogWithIdOnly = await prisma.dataChangeLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DataChangeLogCreateManyAndReturnArgs>(args?: SelectSubset<T, DataChangeLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DataChangeLog.
+     * @param {DataChangeLogDeleteArgs} args - Arguments to delete one DataChangeLog.
+     * @example
+     * // Delete one DataChangeLog
+     * const DataChangeLog = await prisma.dataChangeLog.delete({
+     *   where: {
+     *     // ... filter to delete one DataChangeLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DataChangeLogDeleteArgs>(args: SelectSubset<T, DataChangeLogDeleteArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DataChangeLog.
+     * @param {DataChangeLogUpdateArgs} args - Arguments to update one DataChangeLog.
+     * @example
+     * // Update one DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DataChangeLogUpdateArgs>(args: SelectSubset<T, DataChangeLogUpdateArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DataChangeLogs.
+     * @param {DataChangeLogDeleteManyArgs} args - Arguments to filter DataChangeLogs to delete.
+     * @example
+     * // Delete a few DataChangeLogs
+     * const { count } = await prisma.dataChangeLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DataChangeLogDeleteManyArgs>(args?: SelectSubset<T, DataChangeLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataChangeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DataChangeLogs
+     * const dataChangeLog = await prisma.dataChangeLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DataChangeLogUpdateManyArgs>(args: SelectSubset<T, DataChangeLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataChangeLogs and returns the data updated in the database.
+     * @param {DataChangeLogUpdateManyAndReturnArgs} args - Arguments to update many DataChangeLogs.
+     * @example
+     * // Update many DataChangeLogs
+     * const dataChangeLog = await prisma.dataChangeLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DataChangeLogs and only return the `id`
+     * const dataChangeLogWithIdOnly = await prisma.dataChangeLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DataChangeLogUpdateManyAndReturnArgs>(args: SelectSubset<T, DataChangeLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DataChangeLog.
+     * @param {DataChangeLogUpsertArgs} args - Arguments to update or create a DataChangeLog.
+     * @example
+     * // Update or create a DataChangeLog
+     * const dataChangeLog = await prisma.dataChangeLog.upsert({
+     *   create: {
+     *     // ... data to create a DataChangeLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DataChangeLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DataChangeLogUpsertArgs>(args: SelectSubset<T, DataChangeLogUpsertArgs<ExtArgs>>): Prisma__DataChangeLogClient<$Result.GetResult<Prisma.$DataChangeLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DataChangeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogCountArgs} args - Arguments to filter DataChangeLogs to count.
+     * @example
+     * // Count the number of DataChangeLogs
+     * const count = await prisma.dataChangeLog.count({
+     *   where: {
+     *     // ... the filter for the DataChangeLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends DataChangeLogCountArgs>(
+      args?: Subset<T, DataChangeLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DataChangeLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DataChangeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DataChangeLogAggregateArgs>(args: Subset<T, DataChangeLogAggregateArgs>): Prisma.PrismaPromise<GetDataChangeLogAggregateType<T>>
+
+    /**
+     * Group by DataChangeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataChangeLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DataChangeLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DataChangeLogGroupByArgs['orderBy'] }
+        : { orderBy?: DataChangeLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DataChangeLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataChangeLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DataChangeLog model
+   */
+  readonly fields: DataChangeLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DataChangeLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DataChangeLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DataChangeLog model
+   */
+  interface DataChangeLogFieldRefs {
+    readonly id: FieldRef<"DataChangeLog", 'BigInt'>
+    readonly changed_at: FieldRef<"DataChangeLog", 'DateTime'>
+    readonly table_name: FieldRef<"DataChangeLog", 'String'>
+    readonly operation: FieldRef<"DataChangeLog", 'String'>
+    readonly row_key: FieldRef<"DataChangeLog", 'String'>
+    readonly old_values: FieldRef<"DataChangeLog", 'Json'>
+    readonly new_values: FieldRef<"DataChangeLog", 'Json'>
+    readonly db_user: FieldRef<"DataChangeLog", 'String'>
+    readonly application: FieldRef<"DataChangeLog", 'String'>
+    readonly client_addr: FieldRef<"DataChangeLog", 'String'>
+    readonly transaction_id: FieldRef<"DataChangeLog", 'BigInt'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DataChangeLog findUnique
+   */
+  export type DataChangeLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which DataChangeLog to fetch.
+     */
+    where: DataChangeLogWhereUniqueInput
+  }
+
+  /**
+   * DataChangeLog findUniqueOrThrow
+   */
+  export type DataChangeLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which DataChangeLog to fetch.
+     */
+    where: DataChangeLogWhereUniqueInput
+  }
+
+  /**
+   * DataChangeLog findFirst
+   */
+  export type DataChangeLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which DataChangeLog to fetch.
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataChangeLogs to fetch.
+     */
+    orderBy?: DataChangeLogOrderByWithRelationInput | DataChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataChangeLogs.
+     */
+    cursor?: DataChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataChangeLogs.
+     */
+    distinct?: DataChangeLogScalarFieldEnum | DataChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * DataChangeLog findFirstOrThrow
+   */
+  export type DataChangeLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which DataChangeLog to fetch.
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataChangeLogs to fetch.
+     */
+    orderBy?: DataChangeLogOrderByWithRelationInput | DataChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataChangeLogs.
+     */
+    cursor?: DataChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataChangeLogs.
+     */
+    distinct?: DataChangeLogScalarFieldEnum | DataChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * DataChangeLog findMany
+   */
+  export type DataChangeLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which DataChangeLogs to fetch.
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataChangeLogs to fetch.
+     */
+    orderBy?: DataChangeLogOrderByWithRelationInput | DataChangeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DataChangeLogs.
+     */
+    cursor?: DataChangeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataChangeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataChangeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataChangeLogs.
+     */
+    distinct?: DataChangeLogScalarFieldEnum | DataChangeLogScalarFieldEnum[]
+  }
+
+  /**
+   * DataChangeLog create
+   */
+  export type DataChangeLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DataChangeLog.
+     */
+    data: XOR<DataChangeLogCreateInput, DataChangeLogUncheckedCreateInput>
+  }
+
+  /**
+   * DataChangeLog createMany
+   */
+  export type DataChangeLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DataChangeLogs.
+     */
+    data: DataChangeLogCreateManyInput | DataChangeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataChangeLog createManyAndReturn
+   */
+  export type DataChangeLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many DataChangeLogs.
+     */
+    data: DataChangeLogCreateManyInput | DataChangeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataChangeLog update
+   */
+  export type DataChangeLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DataChangeLog.
+     */
+    data: XOR<DataChangeLogUpdateInput, DataChangeLogUncheckedUpdateInput>
+    /**
+     * Choose, which DataChangeLog to update.
+     */
+    where: DataChangeLogWhereUniqueInput
+  }
+
+  /**
+   * DataChangeLog updateMany
+   */
+  export type DataChangeLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DataChangeLogs.
+     */
+    data: XOR<DataChangeLogUpdateManyMutationInput, DataChangeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which DataChangeLogs to update
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * Limit how many DataChangeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataChangeLog updateManyAndReturn
+   */
+  export type DataChangeLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * The data used to update DataChangeLogs.
+     */
+    data: XOR<DataChangeLogUpdateManyMutationInput, DataChangeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which DataChangeLogs to update
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * Limit how many DataChangeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataChangeLog upsert
+   */
+  export type DataChangeLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DataChangeLog to update in case it exists.
+     */
+    where: DataChangeLogWhereUniqueInput
+    /**
+     * In case the DataChangeLog found by the `where` argument doesn't exist, create a new DataChangeLog with this data.
+     */
+    create: XOR<DataChangeLogCreateInput, DataChangeLogUncheckedCreateInput>
+    /**
+     * In case the DataChangeLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DataChangeLogUpdateInput, DataChangeLogUncheckedUpdateInput>
+  }
+
+  /**
+   * DataChangeLog delete
+   */
+  export type DataChangeLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+    /**
+     * Filter which DataChangeLog to delete.
+     */
+    where: DataChangeLogWhereUniqueInput
+  }
+
+  /**
+   * DataChangeLog deleteMany
+   */
+  export type DataChangeLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataChangeLogs to delete
+     */
+    where?: DataChangeLogWhereInput
+    /**
+     * Limit how many DataChangeLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataChangeLog without action
+   */
+  export type DataChangeLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataChangeLog
+     */
+    select?: DataChangeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataChangeLog
+     */
+    omit?: DataChangeLogOmit<ExtArgs> | null
+  }
+
 
   /**
    * Model Electronic
@@ -59623,6 +60822,23 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const DataChangeLogScalarFieldEnum: {
+    id: 'id',
+    changed_at: 'changed_at',
+    table_name: 'table_name',
+    operation: 'operation',
+    row_key: 'row_key',
+    old_values: 'old_values',
+    new_values: 'new_values',
+    db_user: 'db_user',
+    application: 'application',
+    client_addr: 'client_addr',
+    transaction_id: 'transaction_id'
+  };
+
+  export type DataChangeLogScalarFieldEnum = (typeof DataChangeLogScalarFieldEnum)[keyof typeof DataChangeLogScalarFieldEnum]
+
+
   export const ElectronicScalarFieldEnum: {
     id: 'id',
     libraryyear: 'libraryyear',
@@ -60622,14 +61838,6 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -60639,22 +61847,44 @@ export namespace Prisma {
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
   /**
    * Field references
    */
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'BigInt'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
     
 
 
   /**
-   * Reference to a field of type 'Int[]'
+   * Reference to a field of type 'BigInt[]'
    */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+  export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -60669,6 +61899,34 @@ export namespace Prisma {
    * Reference to a field of type 'String[]'
    */
   export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -60701,42 +61959,98 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
   /**
    * Deep Input Types
    */
 
+
+  export type DataChangeLogWhereInput = {
+    AND?: DataChangeLogWhereInput | DataChangeLogWhereInput[]
+    OR?: DataChangeLogWhereInput[]
+    NOT?: DataChangeLogWhereInput | DataChangeLogWhereInput[]
+    id?: BigIntFilter<"DataChangeLog"> | bigint | number
+    changed_at?: DateTimeFilter<"DataChangeLog"> | Date | string
+    table_name?: StringFilter<"DataChangeLog"> | string
+    operation?: StringFilter<"DataChangeLog"> | string
+    row_key?: StringNullableFilter<"DataChangeLog"> | string | null
+    old_values?: JsonNullableFilter<"DataChangeLog">
+    new_values?: JsonNullableFilter<"DataChangeLog">
+    db_user?: StringNullableFilter<"DataChangeLog"> | string | null
+    application?: StringNullableFilter<"DataChangeLog"> | string | null
+    client_addr?: StringNullableFilter<"DataChangeLog"> | string | null
+    transaction_id?: BigIntNullableFilter<"DataChangeLog"> | bigint | number | null
+  }
+
+  export type DataChangeLogOrderByWithRelationInput = {
+    id?: SortOrder
+    changed_at?: SortOrder
+    table_name?: SortOrder
+    operation?: SortOrder
+    row_key?: SortOrderInput | SortOrder
+    old_values?: SortOrderInput | SortOrder
+    new_values?: SortOrderInput | SortOrder
+    db_user?: SortOrderInput | SortOrder
+    application?: SortOrderInput | SortOrder
+    client_addr?: SortOrderInput | SortOrder
+    transaction_id?: SortOrderInput | SortOrder
+  }
+
+  export type DataChangeLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: bigint | number
+    AND?: DataChangeLogWhereInput | DataChangeLogWhereInput[]
+    OR?: DataChangeLogWhereInput[]
+    NOT?: DataChangeLogWhereInput | DataChangeLogWhereInput[]
+    changed_at?: DateTimeFilter<"DataChangeLog"> | Date | string
+    table_name?: StringFilter<"DataChangeLog"> | string
+    operation?: StringFilter<"DataChangeLog"> | string
+    row_key?: StringNullableFilter<"DataChangeLog"> | string | null
+    old_values?: JsonNullableFilter<"DataChangeLog">
+    new_values?: JsonNullableFilter<"DataChangeLog">
+    db_user?: StringNullableFilter<"DataChangeLog"> | string | null
+    application?: StringNullableFilter<"DataChangeLog"> | string | null
+    client_addr?: StringNullableFilter<"DataChangeLog"> | string | null
+    transaction_id?: BigIntNullableFilter<"DataChangeLog"> | bigint | number | null
+  }, "id">
+
+  export type DataChangeLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    changed_at?: SortOrder
+    table_name?: SortOrder
+    operation?: SortOrder
+    row_key?: SortOrderInput | SortOrder
+    old_values?: SortOrderInput | SortOrder
+    new_values?: SortOrderInput | SortOrder
+    db_user?: SortOrderInput | SortOrder
+    application?: SortOrderInput | SortOrder
+    client_addr?: SortOrderInput | SortOrder
+    transaction_id?: SortOrderInput | SortOrder
+    _count?: DataChangeLogCountOrderByAggregateInput
+    _avg?: DataChangeLogAvgOrderByAggregateInput
+    _max?: DataChangeLogMaxOrderByAggregateInput
+    _min?: DataChangeLogMinOrderByAggregateInput
+    _sum?: DataChangeLogSumOrderByAggregateInput
+  }
+
+  export type DataChangeLogScalarWhereWithAggregatesInput = {
+    AND?: DataChangeLogScalarWhereWithAggregatesInput | DataChangeLogScalarWhereWithAggregatesInput[]
+    OR?: DataChangeLogScalarWhereWithAggregatesInput[]
+    NOT?: DataChangeLogScalarWhereWithAggregatesInput | DataChangeLogScalarWhereWithAggregatesInput[]
+    id?: BigIntWithAggregatesFilter<"DataChangeLog"> | bigint | number
+    changed_at?: DateTimeWithAggregatesFilter<"DataChangeLog"> | Date | string
+    table_name?: StringWithAggregatesFilter<"DataChangeLog"> | string
+    operation?: StringWithAggregatesFilter<"DataChangeLog"> | string
+    row_key?: StringNullableWithAggregatesFilter<"DataChangeLog"> | string | null
+    old_values?: JsonNullableWithAggregatesFilter<"DataChangeLog">
+    new_values?: JsonNullableWithAggregatesFilter<"DataChangeLog">
+    db_user?: StringNullableWithAggregatesFilter<"DataChangeLog"> | string | null
+    application?: StringNullableWithAggregatesFilter<"DataChangeLog"> | string | null
+    client_addr?: StringNullableWithAggregatesFilter<"DataChangeLog"> | string | null
+    transaction_id?: BigIntNullableWithAggregatesFilter<"DataChangeLog"> | bigint | number | null
+  }
 
   export type ElectronicWhereInput = {
     AND?: ElectronicWhereInput | ElectronicWhereInput[]
@@ -65806,6 +67120,104 @@ export namespace Prisma {
     vhoverall_grand_total?: FloatNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
     vhnotes?: StringNullableWithAggregatesFilter<"Volume_Holdings"> | string | null
     libraryyear?: IntNullableWithAggregatesFilter<"Volume_Holdings"> | number | null
+  }
+
+  export type DataChangeLogCreateInput = {
+    id?: bigint | number
+    changed_at?: Date | string
+    table_name: string
+    operation: string
+    row_key?: string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: string | null
+    application?: string | null
+    client_addr?: string | null
+    transaction_id?: bigint | number | null
+  }
+
+  export type DataChangeLogUncheckedCreateInput = {
+    id?: bigint | number
+    changed_at?: Date | string
+    table_name: string
+    operation: string
+    row_key?: string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: string | null
+    application?: string | null
+    client_addr?: string | null
+    transaction_id?: bigint | number | null
+  }
+
+  export type DataChangeLogUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    changed_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    table_name?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    row_key?: NullableStringFieldUpdateOperationsInput | string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: NullableStringFieldUpdateOperationsInput | string | null
+    application?: NullableStringFieldUpdateOperationsInput | string | null
+    client_addr?: NullableStringFieldUpdateOperationsInput | string | null
+    transaction_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  }
+
+  export type DataChangeLogUncheckedUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    changed_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    table_name?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    row_key?: NullableStringFieldUpdateOperationsInput | string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: NullableStringFieldUpdateOperationsInput | string | null
+    application?: NullableStringFieldUpdateOperationsInput | string | null
+    client_addr?: NullableStringFieldUpdateOperationsInput | string | null
+    transaction_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  }
+
+  export type DataChangeLogCreateManyInput = {
+    id?: bigint | number
+    changed_at?: Date | string
+    table_name: string
+    operation: string
+    row_key?: string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: string | null
+    application?: string | null
+    client_addr?: string | null
+    transaction_id?: bigint | number | null
+  }
+
+  export type DataChangeLogUpdateManyMutationInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    changed_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    table_name?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    row_key?: NullableStringFieldUpdateOperationsInput | string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: NullableStringFieldUpdateOperationsInput | string | null
+    application?: NullableStringFieldUpdateOperationsInput | string | null
+    client_addr?: NullableStringFieldUpdateOperationsInput | string | null
+    transaction_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  }
+
+  export type DataChangeLogUncheckedUpdateManyInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    changed_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    table_name?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    row_key?: NullableStringFieldUpdateOperationsInput | string | null
+    old_values?: NullableJsonNullValueInput | InputJsonValue
+    new_values?: NullableJsonNullValueInput | InputJsonValue
+    db_user?: NullableStringFieldUpdateOperationsInput | string | null
+    application?: NullableStringFieldUpdateOperationsInput | string | null
+    client_addr?: NullableStringFieldUpdateOperationsInput | string | null
+    transaction_id?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   }
 
   export type ElectronicCreateInput = {
@@ -71801,6 +73213,253 @@ export namespace Prisma {
     libraryyear?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
+  export type BigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type StringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type BigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type DataChangeLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    changed_at?: SortOrder
+    table_name?: SortOrder
+    operation?: SortOrder
+    row_key?: SortOrder
+    old_values?: SortOrder
+    new_values?: SortOrder
+    db_user?: SortOrder
+    application?: SortOrder
+    client_addr?: SortOrder
+    transaction_id?: SortOrder
+  }
+
+  export type DataChangeLogAvgOrderByAggregateInput = {
+    id?: SortOrder
+    transaction_id?: SortOrder
+  }
+
+  export type DataChangeLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    changed_at?: SortOrder
+    table_name?: SortOrder
+    operation?: SortOrder
+    row_key?: SortOrder
+    db_user?: SortOrder
+    application?: SortOrder
+    client_addr?: SortOrder
+    transaction_id?: SortOrder
+  }
+
+  export type DataChangeLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    changed_at?: SortOrder
+    table_name?: SortOrder
+    operation?: SortOrder
+    row_key?: SortOrder
+    db_user?: SortOrder
+    application?: SortOrder
+    client_addr?: SortOrder
+    transaction_id?: SortOrder
+  }
+
+  export type DataChangeLogSumOrderByAggregateInput = {
+    id?: SortOrder
+    transaction_id?: SortOrder
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -71821,21 +73480,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type FloatNullableFilter<$PrismaModel = never> = {
@@ -71863,11 +73507,6 @@ export namespace Prisma {
   export type Library_YearNullableScalarRelationFilter = {
     is?: Library_YearWhereInput | null
     isNot?: Library_YearWhereInput | null
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type ElectronicCountOrderByAggregateInput = {
@@ -72481,24 +74120,6 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -72824,32 +74445,6 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_subtotal?: SortOrder
   }
 
-  export type StringFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
   export type EmailTemplateCountOrderByAggregateInput = {
     id?: SortOrder
     key?: SortOrder
@@ -72891,38 +74486,6 @@ export namespace Prisma {
   export type EmailTemplateSumOrderByAggregateInput = {
     id?: SortOrder
     updated_by?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type BoolNullableFilter<$PrismaModel = never> = {
@@ -75449,29 +77012,6 @@ export namespace Prisma {
     token?: SortOrder
     expires?: SortOrder
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
@@ -75530,32 +77070,6 @@ export namespace Prisma {
   export type AuditLogSumOrderByAggregateInput = {
     id?: SortOrder
     user_id?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type LibraryScalarRelationFilter = {
@@ -76300,14 +77814,38 @@ export namespace Prisma {
     libraryyear?: SortOrder
   }
 
-  export type Library_YearCreateNestedOneWithoutElectronicInput = {
-    create?: XOR<Library_YearCreateWithoutElectronicInput, Library_YearUncheckedCreateWithoutElectronicInput>
-    connectOrCreate?: Library_YearCreateOrConnectWithoutElectronicInput
-    connect?: Library_YearWhereUniqueInput
+  export type BigIntFieldUpdateOperationsInput = {
+    set?: bigint | number
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type NullableBigIntFieldUpdateOperationsInput = {
+    set?: bigint | number | null
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
+  }
+
+  export type Library_YearCreateNestedOneWithoutElectronicInput = {
+    create?: XOR<Library_YearCreateWithoutElectronicInput, Library_YearUncheckedCreateWithoutElectronicInput>
+    connectOrCreate?: Library_YearCreateOrConnectWithoutElectronicInput
+    connect?: Library_YearWhereUniqueInput
   }
 
   export type NullableFloatFieldUpdateOperationsInput = {
@@ -76366,14 +77904,6 @@ export namespace Prisma {
     delete?: Library_YearWhereInput | boolean
     connect?: Library_YearWhereUniqueInput
     update?: XOR<XOR<Library_YearUpdateToOneWithWhereWithoutElectronic_BooksInput, Library_YearUpdateWithoutElectronic_BooksInput>, Library_YearUncheckedUpdateWithoutElectronic_BooksInput>
-  }
-
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type Library_YearCreateNestedOneWithoutEntry_StatusInput = {
@@ -78414,26 +79944,40 @@ export namespace Prisma {
     update?: XOR<XOR<Library_YearUpdateToOneWithWhereWithoutVolume_HoldingsInput, Library_YearUpdateWithoutVolume_HoldingsInput>, Library_YearUncheckedUpdateWithoutVolume_HoldingsInput>
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+  export type NestedBigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedStringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringFilter<$PrismaModel> | string
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -78448,6 +79992,153 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
+  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
@@ -78488,17 +80179,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -78513,23 +80193,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -78562,62 +80225,6 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
-  }
-
-  export type NestedStringFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
@@ -78669,29 +80276,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type Library_YearCreateWithoutElectronicInput = {

@@ -120,6 +120,20 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.DataChangeLogScalarFieldEnum = {
+  id: 'id',
+  changed_at: 'changed_at',
+  table_name: 'table_name',
+  operation: 'operation',
+  row_key: 'row_key',
+  old_values: 'old_values',
+  new_values: 'new_values',
+  db_user: 'db_user',
+  application: 'application',
+  client_addr: 'client_addr',
+  transaction_id: 'transaction_id'
+};
+
 exports.Prisma.ElectronicScalarFieldEnum = {
   id: 'id',
   libraryyear: 'libraryyear',
@@ -987,19 +1001,20 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
+  DataChangeLog: 'DataChangeLog',
   Electronic: 'Electronic',
   Electronic_Books: 'Electronic_Books',
   EmailTemplate: 'EmailTemplate',

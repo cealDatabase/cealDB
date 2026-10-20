@@ -1,0 +1,34 @@
+// Every insert, update and delete in the database, written by a trigger on
+// each table (scripts/data-change-log.sql), not by the app.
+//
+// AuditLog says which user did what through the website. This table says
+// what each row looked like before and after, for every write: the website,
+// a script, the Neon SQL editor, or anyone else holding the connection
+// string. A write the website does not log still lands here.
+//
+// - `operation` is INSERT, UPDATE, DELETE or TRUNCATE (a whole table emptied).
+// - `row_key` is the row's primary key; composite keys are joined with ",".
+// - `old_values` / `new_values`: for UPDATE only the columns that changed;
+//   for INSERT the whole new row, for DELETE the whole old row. Password
+//   and token columns are recorded as "[hidden]".
+// - `db_user`, `application` and `client_addr` say which connection wrote
+//   it. lib/db.ts names the website's connections (cealdb-vercel-production,
+//   cealdb-local-<computer>), so any other name came from outside the site.
+//
+// The app only reads this table; the trigger is the only writer.
+model DataChangeLog {
+  id             BigInt   @id @default(autoincrement())
+  changed_at     DateTime @default(now()) @db.Timestamptz(6)
+  table_name     String
+  operation      String
+  row_key        String?
+  old_values     Json?
+  new_values     Json?
+  db_user        String?
+  application    String?
+  client_addr    String?
+  transaction_id BigInt?
+
+  @@index([table_name, row_key])
+  @@index([changed_at])
+}
