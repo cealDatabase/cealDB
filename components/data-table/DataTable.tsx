@@ -169,6 +169,9 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
   const mainTitle = textValue(record.title) || textValue(record.cjk_title) || "Untitled entry";
   const cjkTitle = textValue(record.cjk_title);
   const secondaryTitle = textValue(record.title) && cjkTitle ? cjkTitle : "";
+  // Entries can share a title and differ only here (the AM modules), so it
+  // sits under the title rather than among the facts.
+  const subtitle = textValue(record.subtitle);
   const description = textValue(record.description);
   const notes = textValue(record.notes);
   const source = textValue(record.data_source);
@@ -217,7 +220,6 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
         : [
             [
               ["Romanized", textValue(record.romanized_title)],
-              ["Subtitle", textValue(record.subtitle)],
               ["Series", textValue(record.series) || textValue(record.sub_series_number)],
               ["Language", textValue(record.language)],
               ["Type", textValue(record.type)],
@@ -271,6 +273,7 @@ function CatalogueCard<TData extends { id: number; counts?: number }>({
               )}
               {renderCell("import_origin")}
             </div>
+            {subtitle && <p className="text-sm font-medium text-foreground/80">{subtitle}</p>}
             {(visibleFacts.length > 0 || isValidSource) && (
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-sm">
                 {visibleFacts.map(([name, value]) => (
