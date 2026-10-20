@@ -25,14 +25,25 @@ const AUDIT_TABLE: Record<Catalogue, string> = {
  * entry, each mapped to the entry it was copied from.
  */
 export async function editedCopies(catalogue: Catalogue, libraryYearId: number): Promise<Map<number, number>> {
-  const where = { libraryyear: libraryYearId, is_global: false };
-  const select = { id: true };
+  return (await editedCopiesByLibraryYear(catalogue, [libraryYearId])).get(libraryYearId)!;
+}
+
+/** The same for many institution-years at once, keyed by Library_Year id. */
+export async function editedCopiesByLibraryYear(
+  catalogue: Catalogue,
+  libraryYearIds: number[],
+): Promise<Map<number, Map<number, number>>> {
+  const result = new Map(libraryYearIds.map((id) => [id, new Map<number, number>()]));
+  if (libraryYearIds.length === 0) return result;
+
+  const where = { libraryyear: { in: libraryYearIds }, is_global: false };
+  const select = { id: true, libraryyear: true };
   const own = catalogue === "av"
     ? await db.list_AV.findMany({ where, select })
     : catalogue === "ebook"
       ? await db.list_EBook.findMany({ where, select })
       : await db.list_EJournal.findMany({ where, select });
-  if (own.length === 0) return new Map();
+  if (own.length === 0) return result;
 
   const created = await db.auditLog.findMany({
     where: {
@@ -42,12 +53,16 @@ export async function editedCopies(catalogue: Catalogue, libraryYearId: number):
     },
     select: { record_id: true, old_values: true },
   });
-  const copies = new Map<number, number>();
+  const owner = new Map(own.map((row) => [row.id, row.libraryyear]));
   for (const row of created) {
+    const copyId = Number(row.record_id);
     const originalId = Number((row.old_values as { original_id?: unknown } | null)?.original_id);
-    if (Number.isInteger(originalId) && originalId > 0) copies.set(Number(row.record_id), originalId);
+    const libraryYearId = owner.get(copyId);
+    if (libraryYearId != null && Number.isInteger(originalId) && originalId > 0) {
+      result.get(libraryYearId)?.set(copyId, originalId);
+    }
   }
-  return copies;
+  return result;
 }
 
 /** The copies made of these entries by edits, at every institution. */

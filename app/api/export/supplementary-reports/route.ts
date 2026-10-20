@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import db from '@/lib/db';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'node:buffer';
 import archiver from 'archiver';
 import { logAuditEvent } from '@/lib/auditLogger';
+import { getSessionRoleIds, getSessionUserId } from '@/lib/auth';
+import { heldAVAccessByLibraryYear, heldEBookAccessByLibraryYear, heldEJournalAccessByLibraryYear } from '@/lib/heldAccess';
 
 const prisma = db;
 
@@ -13,43 +14,57 @@ interface UserContext {
   libraryId: number | null;
 }
 
-async function getUserContext(): Promise<UserContext> {
-  const cookieStore = await cookies();
-  const rawEmail = cookieStore.get('uinf')?.value;
-  const roleData = cookieStore.get('role')?.value;
+// Who is asking, from the signed session. The uinf and role cookies can be
+// edited in the browser, so they decide nothing here.
+async function getUserContext(): Promise<UserContext | null> {
+  const userId = await getSessionUserId();
+  if (!userId) return null;
 
-  const userEmail = rawEmail ? decodeURIComponent(rawEmail).toLowerCase() : undefined;
-
-  let roleIds: string[] = [];
-  try {
-    roleIds = roleData ? JSON.parse(roleData) : [];
-  } catch {
-    roleIds = [];
-  }
-
-  // Role "1" = super admin, "3" = e-resource editor
-  const isAdminOrEditor = roleIds.includes('1') || roleIds.includes('3');
+  // Super Admin (1) and E-Resource Editor (3) see every institution.
+  const roleIds = await getSessionRoleIds();
+  const isAdminOrEditor = roleIds.includes(1) || roleIds.includes(3);
 
   let libraryId: number | null = null;
-  if (!isAdminOrEditor && userEmail) {
-    const user = await prisma.user.findFirst({
-      where: { username: { equals: userEmail, mode: 'insensitive' } },
-      include: { User_Library: true }
+  if (!isAdminOrEditor) {
+    const link = await prisma.user_Library.findFirst({
+      where: { user_id: userId },
+      select: { library_id: true },
     });
-    if (user?.User_Library && user.User_Library.length > 0) {
-      libraryId = user.User_Library[0].library_id;
-    }
+    libraryId = link?.library_id ?? null;
   }
 
   return { isAdminOrEditor, libraryId };
 }
 
+/**
+ * What each institution in this user's view holds in a year's My Access,
+ * exactly as its Manage Access lists it (lib/heldAccess.ts): every active
+ * institution for Super Admin and E-Resource Editor, otherwise only the
+ * user's own (none, if the account has no institution).
+ */
+async function heldSelections<R>(
+  year: number,
+  userCtx: UserContext,
+  held: (libraryYearIds: number[], year: number) => Promise<Map<number, R[]>>,
+) {
+  const libraryYears = await prisma.library_Year.findMany({
+    where: {
+      year,
+      is_active: true,
+      ...(userCtx.isAdminOrEditor ? {} : { library: userCtx.libraryId ?? -1 }),
+    },
+    select: { id: true, Library: { select: { library_name: true } } },
+  });
+  const byLibraryYear = await held(libraryYears.map((ly) => ly.id), year);
+  return libraryYears.flatMap((ly) =>
+    (byLibraryYear.get(ly.id) ?? []).map((sub) => ({ ...sub, Library_Year: { Library: ly.Library } }))
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userEmail = cookieStore.get('uinf')?.value;
-
-    if (!userEmail) {
+    const userCtx = await getUserContext();
+    if (!userCtx) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
         { status: 401 }
@@ -68,7 +83,6 @@ export async function GET(request: NextRequest) {
     }
 
     const yearNum = parseInt(year);
-    const userCtx = await getUserContext();
 
     let response: NextResponse;
     if (reportType === 'batch') {
@@ -484,39 +498,9 @@ async function generateAVDatabaseReport(year: number, userCtx: UserContext): Pro
   ];
 
   // --- Sheet 2: Individual Selections by Library ---
-  // Admin/editor: all institutions; member: only their own institution
-  const avSubWhere: any = {
-    Library_Year: {
-      year: year,
-      is_active: true,
-      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
-    }
-  };
-  const avSubscriptions = await prisma.libraryYear_ListAV.findMany({
-    where: avSubWhere,
-    include: {
-      Library_Year: {
-        include: {
-          Library: { select: { library_name: true } }
-        }
-      },
-      List_AV: {
-        include: {
-          List_AV_Counts: {
-            where: { year: year, ishidden: false }
-          },
-          List_AV_Language: {
-            include: { Language: true }
-          }
-        }
-      }
-    },
-    orderBy: {
-      Library_Year: {
-        Library: { library_name: 'asc' }
-      }
-    }
-  });
+  // What each institution holds, as its Manage Access lists it. Admin/editor:
+  // all institutions; member: only their own institution.
+  const avSubscriptions = await heldSelections(year, userCtx, heldAVAccessByLibraryYear);
 
   if (avSubscriptions.length > 0) {
     const indSheet = workbook.addWorksheet('Individual Selections');
@@ -565,7 +549,7 @@ async function generateAVDatabaseReport(year: number, userCtx: UserContext): Pro
         const av = sub.List_AV;
         if (!av) return;
         const languages = av.List_AV_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
-        const titles = av.List_AV_Counts[0]?.titles || 0;
+        const titles = sub.custom_count ?? av.List_AV_Counts[0]?.titles ?? 0;
 
         const row = indSheet.addRow([
           libName,
@@ -752,39 +736,9 @@ async function generateEBookDatabaseReport(year: number, userCtx: UserContext): 
   ];
 
   // --- Sheet 2: Individual Selections by Library ---
-  // Admin/editor: all institutions; member: only their own institution
-  const ebookSubWhere: any = {
-    Library_Year: {
-      year: year,
-      is_active: true,
-      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
-    }
-  };
-  const ebookSubscriptions = await prisma.libraryYear_ListEBook.findMany({
-    where: ebookSubWhere,
-    include: {
-      Library_Year: {
-        include: {
-          Library: { select: { library_name: true } }
-        }
-      },
-      List_EBook: {
-        include: {
-          List_EBook_Counts: {
-            where: { year: year, ishidden: false }
-          },
-          List_EBook_Language: {
-            include: { Language: true }
-          }
-        }
-      }
-    },
-    orderBy: {
-      Library_Year: {
-        Library: { library_name: 'asc' }
-      }
-    }
-  });
+  // What each institution holds, as its Manage Access lists it. Admin/editor:
+  // all institutions; member: only their own institution.
+  const ebookSubscriptions = await heldSelections(year, userCtx, heldEBookAccessByLibraryYear);
 
   if (ebookSubscriptions.length > 0) {
     const indSheet = workbook.addWorksheet('Individual Selections');
@@ -832,7 +786,7 @@ async function generateEBookDatabaseReport(year: number, userCtx: UserContext): 
         const eb = sub.List_EBook;
         if (!eb) return;
         const languages = eb.List_EBook_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
-        const titles = eb.List_EBook_Counts[0]?.titles || 0;
+        const titles = sub.custom_count ?? eb.List_EBook_Counts[0]?.titles ?? 0;
         const volumes = eb.List_EBook_Counts[0]?.volumes || 0;
 
         const row = indSheet.addRow([
@@ -1028,39 +982,9 @@ async function generateEJournalDatabaseReport(year: number, userCtx: UserContext
   ];
 
   // --- Sheet 2: Individual Selections by Library ---
-  // Admin/editor: all institutions; member: only their own institution
-  const ejSubWhere: any = {
-    Library_Year: {
-      year: year,
-      is_active: true,
-      ...((!userCtx.isAdminOrEditor && userCtx.libraryId) ? { library: userCtx.libraryId } : {})
-    }
-  };
-  const ejournalSubscriptions = await prisma.libraryYear_ListEJournal.findMany({
-    where: ejSubWhere,
-    include: {
-      Library_Year: {
-        include: {
-          Library: { select: { library_name: true } }
-        }
-      },
-      List_EJournal: {
-        include: {
-          List_EJournal_Counts: {
-            where: { year: year, ishidden: false }
-          },
-          List_EJournal_Language: {
-            include: { Language: true }
-          }
-        }
-      }
-    },
-    orderBy: {
-      Library_Year: {
-        Library: { library_name: 'asc' }
-      }
-    }
-  });
+  // What each institution holds, as its Manage Access lists it. Admin/editor:
+  // all institutions; member: only their own institution.
+  const ejournalSubscriptions = await heldSelections(year, userCtx, heldEJournalAccessByLibraryYear);
 
   if (ejournalSubscriptions.length > 0) {
     const indSheet = workbook.addWorksheet('Individual Selections');
@@ -1109,7 +1033,7 @@ async function generateEJournalDatabaseReport(year: number, userCtx: UserContext
         const ej = sub.List_EJournal;
         if (!ej) return;
         const languages = ej.List_EJournal_Language.map(l => l.Language?.short || l.Language?.full || '').filter(Boolean).join(', ');
-        const journals = ej.List_EJournal_Counts[0]?.journals || 0;
+        const journals = sub.custom_count ?? ej.List_EJournal_Counts[0]?.journals ?? 0;
         const dbs = ej.List_EJournal_Counts[0]?.dbs || 0;
 
         const row = indSheet.addRow([
