@@ -1,12 +1,18 @@
 import db from "@/lib/db";
 import { NextResponse } from "next/server";
 import { findMaxId } from "@/data/fetchPrisma";
-import { hasValidSession } from "@/lib/auth";
+import { requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
 
 export async function POST(request) {
   try {
-    if (!(await hasValidSession())) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // The same roles that may open the Create New Library page (/create).
+    // A signed-in session alone let any member create an institution.
+    if (!(await requireRoles(1, 4))) {
+      return NextResponse.json(
+        { error: "Only a Super Admin or Assistant Admin can create an institution." },
+        { status: 403 }
+      );
     }
 
     const data = await request.json();
@@ -68,6 +74,8 @@ export async function POST(request) {
     const newLibrary = await db.library.create({
       data: libraryData,
     });
+
+    await logUserAction("CREATE", "Library", newLibrary.id, undefined, newLibrary, true, undefined, request);
 
     return NextResponse.json({ newLibrary });
   } catch (error) {
