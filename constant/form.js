@@ -305,7 +305,7 @@ export const superAdminActions = [
       icon: Database,
       iconColor: 'text-sky-600',
       iconBg: 'bg-sky-100',
-      description: 'Publish institutions once they have completed surveys, and manage their publication status (in Participation Status tab).',
+      description: 'Publish institutions once they have completed surveys, and manage their publication status (in Participation Status tab). Choose which institutions are shown or hidden in lists and reports (in Show or Hide tab).',
     },
 
     // ── Publish Statistics ──────────────────────────────────────────────────

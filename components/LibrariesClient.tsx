@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, FileCheck, FileSpreadsheet } from "lucide-react";
+import { Building2, EyeOff, FileCheck, FileSpreadsheet } from "lucide-react";
 import LibList from "@/components/LibList";
 import ParticipationStatus from "@/components/ParticipationStatus";
 import OrganizationalStructureExport from "@/components/OrganizationalStructureExport";
+import InstitutionVisibility from "@/components/InstitutionVisibility";
 import { SingleLibraryType } from "@/types/types";
 import { Container } from "@/components/Container";
 
 interface LibrariesClientProps {
   isSuperAdmin: boolean;
+  canManageVisibility?: boolean;
 }
 
 function SkeletonCard() {
@@ -23,8 +25,8 @@ function SkeletonCard() {
   );
 }
 
-export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) {
-  const [activeTab, setActiveTab] = useState<'institution' | 'participation' | 'export'>('institution');
+export default function LibrariesClient({ isSuperAdmin, canManageVisibility = false }: LibrariesClientProps) {
+  const [activeTab, setActiveTab] = useState<'institution' | 'participation' | 'export' | 'visibility'>('institution');
   const [libraries, setLibraries] = useState<SingleLibraryType[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) 
         <div className="space-y-6">
           {/* Tab Navigation */}
           <div className="flex justify-center">
-            <div className="inline-flex rounded-md shadow-sm bg-white border border-gray-200">
+            <div className="inline-flex flex-wrap justify-center rounded-md shadow-sm bg-white border border-gray-200">
               <button
                 onClick={() => setActiveTab('institution')}
                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-l-md border-r border-gray-200 ${activeTab === 'institution'
@@ -83,7 +85,7 @@ export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) 
               </button>
               <button
                 onClick={() => setActiveTab('export')}
-                className={`flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-r-md ${activeTab === 'export'
+                className={`flex items-center gap-2 px-6 py-3 text-sm font-medium ${canManageVisibility ? 'border-r border-gray-200' : 'rounded-r-md'} ${activeTab === 'export'
                   ? 'bg-red-800 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
@@ -91,6 +93,18 @@ export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) 
                 <FileSpreadsheet className="w-4 h-4" />
                 Organizational Structure Export
               </button>
+              {canManageVisibility && (
+                <button
+                  onClick={() => setActiveTab('visibility')}
+                  className={`flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-r-md ${activeTab === 'visibility'
+                    ? 'bg-red-800 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                >
+                  <EyeOff className="w-4 h-4" />
+                  Show or Hide
+                </button>
+              )}
             </div>
           </div>
 
@@ -127,6 +141,8 @@ export default function LibrariesClient({ isSuperAdmin }: LibrariesClientProps) 
           {activeTab === 'participation' && <ParticipationStatus isSuperAdmin={isSuperAdmin} />}
 
           {activeTab === 'export' && <OrganizationalStructureExport />}
+
+          {activeTab === 'visibility' && canManageVisibility && <InstitutionVisibility />}
         </div>
       </Container>
     </main>
