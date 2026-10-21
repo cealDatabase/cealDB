@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { logUserAction } from "@/lib/auditLogger";
+import { catalogueEntryForAudit, changedFields } from "@/lib/auditChanges";
 import { hasValidSession, canAccessLibrary } from "@/lib/auth";
 import { canWriteLibraryYear, findOrCreateLibraryYear } from "@/lib/libraryYearHelper";
 
@@ -84,6 +85,8 @@ export async function POST(req: Request) {
     }
 
     const libraryYearId = libraryYearRecord.id;
+    // The entry as it is before this save, for the audit log.
+    const before = await catalogueEntryForAudit("av", avId, yearNum);
     const safeCounts = Number.isFinite(Number(counts)) ? Number(counts) : 0;
 
     let resultRecord: any;
@@ -163,12 +166,17 @@ export async function POST(req: Request) {
       resultRecord = newAV;
       isNewRecord = true;
 
+      // What the institution's version changes from the shared entry. The
+      // original_id in old_values is what ties the copy to that entry
+      // (lib/editedCopies.ts), so it stays as it was.
+      const fromOriginal = changedFields(before, await catalogueEntryForAudit("av", newAV.id, yearNum), ["id", "is_global", "libraryyear", "updated_at", "source_entry_id", "shared_by_admin_edit", "promoted_to_global_id", "promoted_from_libraryyear_id"]);
       await logUserAction(
         "CREATE",
         "List_AV",
         newAV.id.toString(),
-        { original_id: avId, is_global: true },
+        { ...fromOriginal.old, original_id: avId, is_global: true },
         {
+          ...fromOriginal.new,
           title: newAV.title,
           type: newAV.type,
           is_global: false,
@@ -237,12 +245,13 @@ export async function POST(req: Request) {
 
       resultRecord = updated;
 
+      const changes = changedFields(before, await catalogueEntryForAudit("av", avId, yearNum));
       await logUserAction(
         "UPDATE",
         "List_AV",
         avId.toString(),
-        undefined,
-        {
+        changes.old,
+        { ...changes.new, year: yearNum,
           title: updated.title,
           type: updated.type,
         },

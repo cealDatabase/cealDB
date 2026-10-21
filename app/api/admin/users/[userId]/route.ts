@@ -92,12 +92,14 @@ export async function DELETE(
       });
     });
 
-    // Log the deletion
+    // Log the deletion, without the password hash or reset token: anyone who
+    // can read the audit log would otherwise see them.
+    const { password: _password, password_reset_token: _resetToken, ...deletedUser } = userToDelete;
     await logUserAction(
       'DELETE',
       'User',
       userIdNum,
-      userToDelete,
+      deletedUser,
       null,
       true,
       undefined,

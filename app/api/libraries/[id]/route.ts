@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from '@/lib/db';
 import { isSuperAdminDb, getSessionUserId } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
+import { changedFields } from "@/lib/auditChanges";
 
 const prisma = db;
 
@@ -107,6 +109,8 @@ export async function PUT(
       );
     }
 
+    const before = await prisma.library.findUnique({ where: { id: libraryId } });
+
     // Update library data
     const updatedLibrary = await prisma.library.update({
       where: { id: libraryId },
@@ -137,6 +141,10 @@ export async function PUT(
         libraryType: true,
       },
     });
+
+    const { libraryRegion: _region, libraryType: _type, ...after } = updatedLibrary;
+    const changes = changedFields(before, after, ["date_last_changed"]);
+    await logUserAction("UPDATE", "Library", libraryId, changes.old, changes.new, true, undefined, request);
 
     return NextResponse.json({
       success: true,

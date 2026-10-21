@@ -3,8 +3,11 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import db from "@/lib/db";
 import { getSessionRoleIds, requireRoles } from "@/lib/auth";
+import { logUserAction } from "@/lib/auditLogger";
+import { catalogueEntryForAudit, changedFields } from "@/lib/auditChanges";
 
 export async function POST(req: Request) {
+  let auditId: number | null = null;
   try {
   // Mutates the shared, cross-institution catalog record, so this is limited to
   // Super Admin / E-Resource Editor — matching the
@@ -32,6 +35,8 @@ export async function POST(req: Request) {
 
     const y = year == null ? null : Number(year);
     const safeCounts = Number.isFinite(Number(counts)) ? Number(counts) : 0;
+    auditId = avId;
+    const before = await catalogueEntryForAudit("av", avId, y);
 
     // Debug logging
     console.log('🔧 AV Update Request:', {
@@ -84,6 +89,10 @@ export async function POST(req: Request) {
       return av;
     });
 
+    // The dialog sends every field; log only what this save changed.
+    const changes = changedFields(before, await catalogueEntryForAudit("av", avId, y));
+    await logUserAction("UPDATE", "List_AV", avId, changes.old, { ...changes.new, year: y }, true, undefined, req);
+
     // Verify the update in the database
     if (y !== null) {
       const verifyCount = await db.list_AV_Counts.findFirst({
@@ -102,6 +111,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, id: updated.id, counts: safeCounts });
   } catch (error: any) {
     console.error("API error (update AV):", error);
+    await logUserAction("UPDATE", "List_AV", auditId ?? undefined, undefined, undefined, false, error?.message || "Unknown error", req);
     return NextResponse.json(
       { error: "Failed to update AV record.", detail: error?.message },
       { status: 500 }
