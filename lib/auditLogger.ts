@@ -23,6 +23,19 @@ export interface AuditLogData {
   };
 }
 
+// Keys whose values never go into the audit log, at any depth: a password
+// hash, a reset or session token. Anyone who can read the log would see them.
+const SECRET_KEY = /^(password|password_reset_token|sessiontoken|token)$/i;
+
+function withoutSecrets(value: any): any {
+  if (Array.isArray(value)) return value.map(withoutSecrets);
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    return Object.fromEntries(Object.entries(value).map(([key, v]) =>
+      [key, SECRET_KEY.test(key) && v != null ? '[hidden]' : withoutSecrets(v)]));
+  }
+  return value;
+}
+
 export async function logAuditEvent(data: AuditLogData, request?: Request) {
   try {
     // Get current user if not provided
@@ -74,8 +87,8 @@ export async function logAuditEvent(data: AuditLogData, request?: Request) {
         action: data.action,
         table_name: data.tableName || null,
         record_id: data.recordId?.toString() || null,
-        old_values: data.oldValues || null,
-        new_values: enhancedNewValues || null,
+        old_values: withoutSecrets(data.oldValues) || null,
+        new_values: withoutSecrets(enhancedNewValues) || null,
         ip_address: ipAddress,
         user_agent: userAgent,
         success: data.success ?? true,

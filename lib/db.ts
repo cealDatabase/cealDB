@@ -29,6 +29,12 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     adapter,
     log: ['error'],
+    // Library.password is a leftover from the old site, unused here, and many
+    // rows still hold one. Never read it, so no page, API response or audit
+    // log entry can carry it: /api/libraries and /libraries/<id> are public.
+    omit: {
+      library: { password: true },
+    },
   });
 }
 
