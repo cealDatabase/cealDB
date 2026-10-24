@@ -6,7 +6,6 @@ import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { canAccessLibrary } from "@/lib/auth";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
 import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
-import { hasValidPublicServicesData } from "@/lib/formValidation";
 
 export async function POST(req: Request) {
   try {
@@ -139,20 +138,10 @@ export async function POST(req: Request) {
       request: req,
     });
 
+    // Submitting marks the form Submitted whatever its numbers: an
+    // institution can report all zeros (no backlog, say) on purpose.
     if (finalSubmit) {
-      // Only mark as participated if the form has meaningful data (not all zeros)
-      const hasValidData = hasValidPublicServicesData(result);
-      if (hasValidData) {
-        await markEntryStatus(libraryYear.id, 'public-services');
-      } else {
-        // If all zeros, ensure Entry_Status is set to false
-        await db.entry_Status.upsert({
-          where: { libraryyear: libraryYear.id },
-          update: { public_services: false },
-          create: { libraryyear: libraryYear.id, public_services: false },
-        });
-        console.log("Form submitted with all zeros - not marking as participated");
-      }
+      await markEntryStatus(libraryYear.id, 'public-services');
     }
 
     return NextResponse.json({
