@@ -4,7 +4,6 @@ import { markEntryStatus } from "@/lib/entryStatus";
 import { isSuperAdmin } from "@/lib/libraryYearHelper";
 import { canAccessLibrary } from "@/lib/auth";
 import { logPostCollectionEdit } from "@/lib/postCollectionAuditLogger";
-import { hasValidVolumeHoldingsData } from "@/lib/formValidation";
 import { getActiveSurveyYear } from "@/lib/currentSurveyYear";
 
 export async function POST(req: Request) {
@@ -210,20 +209,10 @@ export async function POST(req: Request) {
       request: req,
     });
 
+    // Submitting marks the form Submitted whatever its numbers: an
+    // institution can report all zeros (no backlog, say) on purpose.
     if (finalSubmit) {
-      // Only mark as participated if the form has meaningful data (not all zeros)
-      const hasValidData = hasValidVolumeHoldingsData(volumeHoldings);
-      if (hasValidData) {
-        await markEntryStatus(libraryYear.id, 'volumeHoldings');
-      } else {
-        // If all zeros, ensure Entry_Status is set to false
-        await db.entry_Status.upsert({
-          where: { libraryyear: libraryYear.id },
-          update: { volume_holdings: false },
-          create: { libraryyear: libraryYear.id, volume_holdings: false },
-        });
-        console.log("Form submitted with all zeros - not marking as participated");
-      }
+      await markEntryStatus(libraryYear.id, 'volumeHoldings');
     }
 
     return NextResponse.json({
