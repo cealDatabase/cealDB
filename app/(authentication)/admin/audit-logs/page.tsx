@@ -1,6 +1,6 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import db from '@/lib/db';
+import { requireRoles } from '@/lib/auth';
 import Link from 'next/link';
 import AuditLogViewer from '../../../../components/AuditLogViewer';
 import { Container } from '@/components/Container';
@@ -79,21 +79,12 @@ export default async function AuditLogsPage({
 }: {
   searchParams: Promise<{ page?: string; filter?: string }>;
 }) {
-  // Use the standard cookie-based role check (same as all other admin pages)
-  const cookieStore = await cookies();
-  const roleIds = cookieStore.get('role')?.value;
-
-  let userRoleIds: string[] = [];
-  try {
-    userRoleIds = roleIds ? JSON.parse(roleIds) : [];
-  } catch (error) {
-    console.error('Failed to parse role IDs from cookie:', error);
-    redirect('/admin');
-  }
-
-  // Super Admin (1) or Assistant Admin (4) can view audit logs
-  const canView = userRoleIds.includes('1') || userRoleIds.includes('4');
-  if (!canView) {
+  // Super Admin (1) or Assistant Admin (4) can view audit logs. Checked here
+  // against the signed session and the database, not only in layout.tsx:
+  // the page renders alongside its layout, and an in-app navigation skips the
+  // layout altogether, so a role cookie rewritten in the browser was enough
+  // to read the log.
+  if (!(await requireRoles(1, 4))) {
     redirect('/admin');
   }
 
