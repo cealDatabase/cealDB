@@ -34,7 +34,7 @@ export async function GET(
     }
 
     // Fetch Electronic Books data for this library and year
-    // Include prev+add fields as fallback for records that haven't been re-submitted
+    // Include previous/add/withdrawn fields as fallback for records that have not been re-submitted.
     const electronicBooksData = await db.electronic_Books.findFirst({
       where: {
         libraryyear: libraryYear.id,
@@ -53,6 +53,10 @@ export async function GET(
         ebooks_purchased_add_volumes_japanese: true,
         ebooks_purchased_add_volumes_korean: true,
         ebooks_purchased_add_volumes_noncjk: true,
+        ebooks_purchased_withdrawn_volumes_chinese: true,
+        ebooks_purchased_withdrawn_volumes_japanese: true,
+        ebooks_purchased_withdrawn_volumes_korean: true,
+        ebooks_purchased_withdrawn_volumes_noncjk: true,
       }
     });
 
@@ -67,15 +71,15 @@ export async function GET(
       });
     }
 
-    // Calculate per-language totals: use stored total fields, else compute from prev + add
+    // Calculate per-language totals: use stored total fields, else compute from previous + added - withdrawn.
     const chinese = electronicBooksData.ebooks_purchased_volumes_chinese ??
-      ((electronicBooksData.ebooks_purchased_prev_volumes_chinese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_chinese ?? 0));
+      ((electronicBooksData.ebooks_purchased_prev_volumes_chinese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_chinese ?? 0) - (electronicBooksData.ebooks_purchased_withdrawn_volumes_chinese ?? 0));
     const japanese = electronicBooksData.ebooks_purchased_volumes_japanese ??
-      ((electronicBooksData.ebooks_purchased_prev_volumes_japanese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_japanese ?? 0));
+      ((electronicBooksData.ebooks_purchased_prev_volumes_japanese ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_japanese ?? 0) - (electronicBooksData.ebooks_purchased_withdrawn_volumes_japanese ?? 0));
     const korean = electronicBooksData.ebooks_purchased_volumes_korean ??
-      ((electronicBooksData.ebooks_purchased_prev_volumes_korean ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_korean ?? 0));
+      ((electronicBooksData.ebooks_purchased_prev_volumes_korean ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_korean ?? 0) - (electronicBooksData.ebooks_purchased_withdrawn_volumes_korean ?? 0));
     const noncjk = electronicBooksData.ebooks_purchased_volumes_noncjk ??
-      ((electronicBooksData.ebooks_purchased_prev_volumes_noncjk ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_noncjk ?? 0));
+      ((electronicBooksData.ebooks_purchased_prev_volumes_noncjk ?? 0) + (electronicBooksData.ebooks_purchased_add_volumes_noncjk ?? 0) - (electronicBooksData.ebooks_purchased_withdrawn_volumes_noncjk ?? 0));
 
     // Use stored subtotal if available, otherwise sum the per-language totals
     const total = electronicBooksData.ebooks_purchased_volumes_subtotal ?? (chinese + japanese + korean + noncjk);

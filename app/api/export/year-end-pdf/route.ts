@@ -41,6 +41,11 @@ function sumWithNull(...values: any[]): number | null {
   return values.reduce((sum, val) => sum + parseNum(val), 0);
 }
 
+function calculateEBookHolding(previous: any, added: any, withdrawn: any): number | null {
+  if ([previous, added, withdrawn].every(value => value === null || value === undefined || value === '')) return null;
+  return parseNum(previous) + parseNum(added) - parseNum(withdrawn);
+}
+
 // Helper function to round to 2 decimal places
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
@@ -466,10 +471,11 @@ async function fetchElectronicBooksData(year: number) {
     // Titles subtotals
     r.ebooks_purchased_prev_titles_subtotal = sumWithNull(r.ebooks_purchased_prev_titles_chinese, r.ebooks_purchased_prev_titles_japanese, r.ebooks_purchased_prev_titles_korean, r.ebooks_purchased_prev_titles_noncjk);
     r.ebooks_purchased_add_titles_subtotal = sumWithNull(r.ebooks_purchased_add_titles_chinese, r.ebooks_purchased_add_titles_japanese, r.ebooks_purchased_add_titles_korean, r.ebooks_purchased_add_titles_noncjk);
-    r.ebooks_purchased_titles_chinese = sumWithNull(r.ebooks_purchased_prev_titles_chinese, r.ebooks_purchased_add_titles_chinese);
-    r.ebooks_purchased_titles_japanese = sumWithNull(r.ebooks_purchased_prev_titles_japanese, r.ebooks_purchased_add_titles_japanese);
-    r.ebooks_purchased_titles_korean = sumWithNull(r.ebooks_purchased_prev_titles_korean, r.ebooks_purchased_add_titles_korean);
-    r.ebooks_purchased_titles_noncjk = sumWithNull(r.ebooks_purchased_prev_titles_noncjk, r.ebooks_purchased_add_titles_noncjk);
+    r.ebooks_purchased_withdrawn_titles_subtotal = sumWithNull(r.ebooks_purchased_withdrawn_titles_chinese, r.ebooks_purchased_withdrawn_titles_japanese, r.ebooks_purchased_withdrawn_titles_korean, r.ebooks_purchased_withdrawn_titles_noncjk);
+    r.ebooks_purchased_titles_chinese = calculateEBookHolding(r.ebooks_purchased_prev_titles_chinese, r.ebooks_purchased_add_titles_chinese, r.ebooks_purchased_withdrawn_titles_chinese);
+    r.ebooks_purchased_titles_japanese = calculateEBookHolding(r.ebooks_purchased_prev_titles_japanese, r.ebooks_purchased_add_titles_japanese, r.ebooks_purchased_withdrawn_titles_japanese);
+    r.ebooks_purchased_titles_korean = calculateEBookHolding(r.ebooks_purchased_prev_titles_korean, r.ebooks_purchased_add_titles_korean, r.ebooks_purchased_withdrawn_titles_korean);
+    r.ebooks_purchased_titles_noncjk = calculateEBookHolding(r.ebooks_purchased_prev_titles_noncjk, r.ebooks_purchased_add_titles_noncjk, r.ebooks_purchased_withdrawn_titles_noncjk);
     r.ebooks_purchased_titles_subtotal = sumWithNull(r.ebooks_purchased_titles_chinese, r.ebooks_purchased_titles_japanese, r.ebooks_purchased_titles_korean, r.ebooks_purchased_titles_noncjk);
     r.ebooks_nonpurchased_titles_subtotal = sumWithNull(r.ebooks_nonpurchased_titles_chinese, r.ebooks_nonpurchased_titles_japanese, r.ebooks_nonpurchased_titles_korean, r.ebooks_nonpurchased_titles_noncjk);
     r.ebooks_subscription_titles_subtotal = sumWithNull(r.ebooks_subscription_titles_chinese, r.ebooks_subscription_titles_japanese, r.ebooks_subscription_titles_korean, r.ebooks_subscription_titles_noncjk);
@@ -477,10 +483,11 @@ async function fetchElectronicBooksData(year: number) {
     // Volumes subtotals
     r.ebooks_purchased_prev_volumes_subtotal = sumWithNull(r.ebooks_purchased_prev_volumes_chinese, r.ebooks_purchased_prev_volumes_japanese, r.ebooks_purchased_prev_volumes_korean, r.ebooks_purchased_prev_volumes_noncjk);
     r.ebooks_purchased_add_volumes_subtotal = sumWithNull(r.ebooks_purchased_add_volumes_chinese, r.ebooks_purchased_add_volumes_japanese, r.ebooks_purchased_add_volumes_korean, r.ebooks_purchased_add_volumes_noncjk);
-    r.ebooks_purchased_volumes_chinese = sumWithNull(r.ebooks_purchased_prev_volumes_chinese, r.ebooks_purchased_add_volumes_chinese);
-    r.ebooks_purchased_volumes_japanese = sumWithNull(r.ebooks_purchased_prev_volumes_japanese, r.ebooks_purchased_add_volumes_japanese);
-    r.ebooks_purchased_volumes_korean = sumWithNull(r.ebooks_purchased_prev_volumes_korean, r.ebooks_purchased_add_volumes_korean);
-    r.ebooks_purchased_volumes_noncjk = sumWithNull(r.ebooks_purchased_prev_volumes_noncjk, r.ebooks_purchased_add_volumes_noncjk);
+    r.ebooks_purchased_withdrawn_volumes_subtotal = sumWithNull(r.ebooks_purchased_withdrawn_volumes_chinese, r.ebooks_purchased_withdrawn_volumes_japanese, r.ebooks_purchased_withdrawn_volumes_korean, r.ebooks_purchased_withdrawn_volumes_noncjk);
+    r.ebooks_purchased_volumes_chinese = calculateEBookHolding(r.ebooks_purchased_prev_volumes_chinese, r.ebooks_purchased_add_volumes_chinese, r.ebooks_purchased_withdrawn_volumes_chinese);
+    r.ebooks_purchased_volumes_japanese = calculateEBookHolding(r.ebooks_purchased_prev_volumes_japanese, r.ebooks_purchased_add_volumes_japanese, r.ebooks_purchased_withdrawn_volumes_japanese);
+    r.ebooks_purchased_volumes_korean = calculateEBookHolding(r.ebooks_purchased_prev_volumes_korean, r.ebooks_purchased_add_volumes_korean, r.ebooks_purchased_withdrawn_volumes_korean);
+    r.ebooks_purchased_volumes_noncjk = calculateEBookHolding(r.ebooks_purchased_prev_volumes_noncjk, r.ebooks_purchased_add_volumes_noncjk, r.ebooks_purchased_withdrawn_volumes_noncjk);
     r.ebooks_purchased_volumes_subtotal = sumWithNull(r.ebooks_purchased_volumes_chinese, r.ebooks_purchased_volumes_japanese, r.ebooks_purchased_volumes_korean, r.ebooks_purchased_volumes_noncjk);
     r.ebooks_nonpurchased_volumes_subtotal = sumWithNull(r.ebooks_nonpurchased_volumes_chinese, r.ebooks_nonpurchased_volumes_japanese, r.ebooks_nonpurchased_volumes_korean, r.ebooks_nonpurchased_volumes_noncjk);
     r.ebooks_subscription_volumes_subtotal = sumWithNull(r.ebooks_subscription_volumes_chinese, r.ebooks_subscription_volumes_japanese, r.ebooks_subscription_volumes_korean, r.ebooks_subscription_volumes_noncjk);

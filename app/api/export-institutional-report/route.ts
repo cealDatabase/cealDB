@@ -24,6 +24,11 @@ function sumWithNull(...values: any[]): number | null {
   return values.reduce((sum, val) => sum + parseNum(val), 0);
 }
 
+function calculateEBookHolding(previous: any, added: any, withdrawn: any): number | null {
+  if ([previous, added, withdrawn].every(value => value === null || value === undefined || value === '')) return null;
+  return parseNum(previous) + parseNum(added) - parseNum(withdrawn);
+}
+
 // Helper function to round to 2 decimal places (fixes floating-point precision)
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
@@ -167,19 +172,21 @@ function calculateFormFields(formType: string, record: any): any {
     case 'electronicBooks':
       calculated.ebooks_purchased_prev_titles_subtotal = sumWithNull(record.ebooks_purchased_prev_titles_chinese, record.ebooks_purchased_prev_titles_japanese, record.ebooks_purchased_prev_titles_korean, record.ebooks_purchased_prev_titles_noncjk);
       calculated.ebooks_purchased_add_titles_subtotal = sumWithNull(record.ebooks_purchased_add_titles_chinese, record.ebooks_purchased_add_titles_japanese, record.ebooks_purchased_add_titles_korean, record.ebooks_purchased_add_titles_noncjk);
-      calculated.ebooks_purchased_titles_chinese = sumWithNull(record.ebooks_purchased_prev_titles_chinese, record.ebooks_purchased_add_titles_chinese);
-      calculated.ebooks_purchased_titles_japanese = sumWithNull(record.ebooks_purchased_prev_titles_japanese, record.ebooks_purchased_add_titles_japanese);
-      calculated.ebooks_purchased_titles_korean = sumWithNull(record.ebooks_purchased_prev_titles_korean, record.ebooks_purchased_add_titles_korean);
-      calculated.ebooks_purchased_titles_noncjk = sumWithNull(record.ebooks_purchased_prev_titles_noncjk, record.ebooks_purchased_add_titles_noncjk);
+      calculated.ebooks_purchased_withdrawn_titles_subtotal = sumWithNull(record.ebooks_purchased_withdrawn_titles_chinese, record.ebooks_purchased_withdrawn_titles_japanese, record.ebooks_purchased_withdrawn_titles_korean, record.ebooks_purchased_withdrawn_titles_noncjk);
+      calculated.ebooks_purchased_titles_chinese = calculateEBookHolding(record.ebooks_purchased_prev_titles_chinese, record.ebooks_purchased_add_titles_chinese, record.ebooks_purchased_withdrawn_titles_chinese);
+      calculated.ebooks_purchased_titles_japanese = calculateEBookHolding(record.ebooks_purchased_prev_titles_japanese, record.ebooks_purchased_add_titles_japanese, record.ebooks_purchased_withdrawn_titles_japanese);
+      calculated.ebooks_purchased_titles_korean = calculateEBookHolding(record.ebooks_purchased_prev_titles_korean, record.ebooks_purchased_add_titles_korean, record.ebooks_purchased_withdrawn_titles_korean);
+      calculated.ebooks_purchased_titles_noncjk = calculateEBookHolding(record.ebooks_purchased_prev_titles_noncjk, record.ebooks_purchased_add_titles_noncjk, record.ebooks_purchased_withdrawn_titles_noncjk);
       calculated.ebooks_purchased_titles_subtotal = sumWithNull(calculated.ebooks_purchased_titles_chinese, calculated.ebooks_purchased_titles_japanese, calculated.ebooks_purchased_titles_korean, calculated.ebooks_purchased_titles_noncjk);
       calculated.ebooks_nonpurchased_titles_subtotal = sumWithNull(record.ebooks_nonpurchased_titles_chinese, record.ebooks_nonpurchased_titles_japanese, record.ebooks_nonpurchased_titles_korean, record.ebooks_nonpurchased_titles_noncjk);
       calculated.ebooks_subscription_titles_subtotal = sumWithNull(record.ebooks_subscription_titles_chinese, record.ebooks_subscription_titles_japanese, record.ebooks_subscription_titles_korean, record.ebooks_subscription_titles_noncjk);
       calculated.ebooks_purchased_prev_volumes_subtotal = sumWithNull(record.ebooks_purchased_prev_volumes_chinese, record.ebooks_purchased_prev_volumes_japanese, record.ebooks_purchased_prev_volumes_korean, record.ebooks_purchased_prev_volumes_noncjk);
       calculated.ebooks_purchased_add_volumes_subtotal = sumWithNull(record.ebooks_purchased_add_volumes_chinese, record.ebooks_purchased_add_volumes_japanese, record.ebooks_purchased_add_volumes_korean, record.ebooks_purchased_add_volumes_noncjk);
-      calculated.ebooks_purchased_volumes_chinese = sumWithNull(record.ebooks_purchased_prev_volumes_chinese, record.ebooks_purchased_add_volumes_chinese);
-      calculated.ebooks_purchased_volumes_japanese = sumWithNull(record.ebooks_purchased_prev_volumes_japanese, record.ebooks_purchased_add_volumes_japanese);
-      calculated.ebooks_purchased_volumes_korean = sumWithNull(record.ebooks_purchased_prev_volumes_korean, record.ebooks_purchased_add_volumes_korean);
-      calculated.ebooks_purchased_volumes_noncjk = sumWithNull(record.ebooks_purchased_prev_volumes_noncjk, record.ebooks_purchased_add_volumes_noncjk);
+      calculated.ebooks_purchased_withdrawn_volumes_subtotal = sumWithNull(record.ebooks_purchased_withdrawn_volumes_chinese, record.ebooks_purchased_withdrawn_volumes_japanese, record.ebooks_purchased_withdrawn_volumes_korean, record.ebooks_purchased_withdrawn_volumes_noncjk);
+      calculated.ebooks_purchased_volumes_chinese = calculateEBookHolding(record.ebooks_purchased_prev_volumes_chinese, record.ebooks_purchased_add_volumes_chinese, record.ebooks_purchased_withdrawn_volumes_chinese);
+      calculated.ebooks_purchased_volumes_japanese = calculateEBookHolding(record.ebooks_purchased_prev_volumes_japanese, record.ebooks_purchased_add_volumes_japanese, record.ebooks_purchased_withdrawn_volumes_japanese);
+      calculated.ebooks_purchased_volumes_korean = calculateEBookHolding(record.ebooks_purchased_prev_volumes_korean, record.ebooks_purchased_add_volumes_korean, record.ebooks_purchased_withdrawn_volumes_korean);
+      calculated.ebooks_purchased_volumes_noncjk = calculateEBookHolding(record.ebooks_purchased_prev_volumes_noncjk, record.ebooks_purchased_add_volumes_noncjk, record.ebooks_purchased_withdrawn_volumes_noncjk);
       calculated.ebooks_purchased_volumes_subtotal = sumWithNull(calculated.ebooks_purchased_volumes_chinese, calculated.ebooks_purchased_volumes_japanese, calculated.ebooks_purchased_volumes_korean, calculated.ebooks_purchased_volumes_noncjk);
       calculated.ebooks_nonpurchased_volumes_subtotal = sumWithNull(record.ebooks_nonpurchased_volumes_chinese, record.ebooks_nonpurchased_volumes_japanese, record.ebooks_nonpurchased_volumes_korean, record.ebooks_nonpurchased_volumes_noncjk);
       calculated.ebooks_subscription_volumes_subtotal = sumWithNull(record.ebooks_subscription_volumes_chinese, record.ebooks_subscription_volumes_japanese, record.ebooks_subscription_volumes_korean, record.ebooks_subscription_volumes_noncjk);

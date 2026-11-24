@@ -7,11 +7,10 @@ export interface CurrencyInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   value?: number
   onChange?: (value: number) => void
-  allowNegative?: boolean
 }
 
 const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
-  ({ className, disabled, value = 0, onChange, onBlur, allowNegative = false, ...props }, ref) => {
+  ({ className, disabled, value = 0, onChange, onBlur, ...props }, ref) => {
     const [displayValue, setDisplayValue] = React.useState<string>("")
     const [isFocused, setIsFocused] = React.useState(false)
 
@@ -23,13 +22,11 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
 
     // Parse display value to number, rounded to 2 decimal places
     const parseValue = (str: string): number => {
-      const isNegative = allowNegative && str.trim().startsWith('-')
       const cleaned = str.replace(/[^0-9.]/g, '')
       const parsed = parseFloat(cleaned)
       if (isNaN(parsed)) return 0
       // Round to 2 decimal places to avoid floating point precision issues
-      const rounded = Math.round(parsed * 100) / 100
-      return isNegative ? -rounded : rounded
+      return Math.round(parsed * 100) / 100
     }
 
     // Update display value when external value changes (on mount or data load)
@@ -42,8 +39,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let inputValue = e.target.value
 
-      // Preserve one leading minus sign only when the calling form permits it.
-      const isNegative = allowNegative && inputValue.trim().startsWith('-')
+      // Remove any non-numeric characters except decimal point
       inputValue = inputValue.replace(/[^0-9.]/g, '')
 
       // Prevent multiple decimal points
@@ -57,8 +53,6 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
       if (parts[1] && parts[1].length > 2) {
         inputValue = `${parts[0]}.${parts[1].slice(0, 2)}`
       }
-
-      if (isNegative) inputValue = `-${inputValue}`
 
       setDisplayValue(inputValue)
       

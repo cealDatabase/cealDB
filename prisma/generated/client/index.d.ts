@@ -9254,6 +9254,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number | null
     ebooks_purchased_add_titles_noncjk: number | null
     ebooks_purchased_add_titles_subtotal: number | null
+    ebooks_purchased_withdrawn_titles_chinese: number | null
+    ebooks_purchased_withdrawn_titles_japanese: number | null
+    ebooks_purchased_withdrawn_titles_korean: number | null
+    ebooks_purchased_withdrawn_titles_noncjk: number | null
+    ebooks_purchased_withdrawn_titles_subtotal: number | null
     ebooks_purchased_prev_volumes_chinese: number | null
     ebooks_purchased_prev_volumes_japanese: number | null
     ebooks_purchased_prev_volumes_korean: number | null
@@ -9264,6 +9269,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number | null
     ebooks_purchased_add_volumes_noncjk: number | null
     ebooks_purchased_add_volumes_subtotal: number | null
+    ebooks_purchased_withdrawn_volumes_chinese: number | null
+    ebooks_purchased_withdrawn_volumes_japanese: number | null
+    ebooks_purchased_withdrawn_volumes_korean: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal: number | null
   }
 
   export type Electronic_BooksSumAggregateOutputType = {
@@ -9312,6 +9322,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number | null
     ebooks_purchased_add_titles_noncjk: number | null
     ebooks_purchased_add_titles_subtotal: number | null
+    ebooks_purchased_withdrawn_titles_chinese: number | null
+    ebooks_purchased_withdrawn_titles_japanese: number | null
+    ebooks_purchased_withdrawn_titles_korean: number | null
+    ebooks_purchased_withdrawn_titles_noncjk: number | null
+    ebooks_purchased_withdrawn_titles_subtotal: number | null
     ebooks_purchased_prev_volumes_chinese: number | null
     ebooks_purchased_prev_volumes_japanese: number | null
     ebooks_purchased_prev_volumes_korean: number | null
@@ -9322,6 +9337,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number | null
     ebooks_purchased_add_volumes_noncjk: number | null
     ebooks_purchased_add_volumes_subtotal: number | null
+    ebooks_purchased_withdrawn_volumes_chinese: number | null
+    ebooks_purchased_withdrawn_volumes_japanese: number | null
+    ebooks_purchased_withdrawn_volumes_korean: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal: number | null
   }
 
   export type Electronic_BooksMinAggregateOutputType = {
@@ -9371,6 +9391,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number | null
     ebooks_purchased_add_titles_noncjk: number | null
     ebooks_purchased_add_titles_subtotal: number | null
+    ebooks_purchased_withdrawn_titles_chinese: number | null
+    ebooks_purchased_withdrawn_titles_japanese: number | null
+    ebooks_purchased_withdrawn_titles_korean: number | null
+    ebooks_purchased_withdrawn_titles_noncjk: number | null
+    ebooks_purchased_withdrawn_titles_subtotal: number | null
     ebooks_purchased_prev_volumes_chinese: number | null
     ebooks_purchased_prev_volumes_japanese: number | null
     ebooks_purchased_prev_volumes_korean: number | null
@@ -9381,6 +9406,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number | null
     ebooks_purchased_add_volumes_noncjk: number | null
     ebooks_purchased_add_volumes_subtotal: number | null
+    ebooks_purchased_withdrawn_volumes_chinese: number | null
+    ebooks_purchased_withdrawn_volumes_japanese: number | null
+    ebooks_purchased_withdrawn_volumes_korean: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal: number | null
   }
 
   export type Electronic_BooksMaxAggregateOutputType = {
@@ -9430,6 +9460,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number | null
     ebooks_purchased_add_titles_noncjk: number | null
     ebooks_purchased_add_titles_subtotal: number | null
+    ebooks_purchased_withdrawn_titles_chinese: number | null
+    ebooks_purchased_withdrawn_titles_japanese: number | null
+    ebooks_purchased_withdrawn_titles_korean: number | null
+    ebooks_purchased_withdrawn_titles_noncjk: number | null
+    ebooks_purchased_withdrawn_titles_subtotal: number | null
     ebooks_purchased_prev_volumes_chinese: number | null
     ebooks_purchased_prev_volumes_japanese: number | null
     ebooks_purchased_prev_volumes_korean: number | null
@@ -9440,6 +9475,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number | null
     ebooks_purchased_add_volumes_noncjk: number | null
     ebooks_purchased_add_volumes_subtotal: number | null
+    ebooks_purchased_withdrawn_volumes_chinese: number | null
+    ebooks_purchased_withdrawn_volumes_japanese: number | null
+    ebooks_purchased_withdrawn_volumes_korean: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal: number | null
   }
 
   export type Electronic_BooksCountAggregateOutputType = {
@@ -9489,6 +9529,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number
     ebooks_purchased_add_titles_noncjk: number
     ebooks_purchased_add_titles_subtotal: number
+    ebooks_purchased_withdrawn_titles_chinese: number
+    ebooks_purchased_withdrawn_titles_japanese: number
+    ebooks_purchased_withdrawn_titles_korean: number
+    ebooks_purchased_withdrawn_titles_noncjk: number
+    ebooks_purchased_withdrawn_titles_subtotal: number
     ebooks_purchased_prev_volumes_chinese: number
     ebooks_purchased_prev_volumes_japanese: number
     ebooks_purchased_prev_volumes_korean: number
@@ -9499,6 +9544,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number
     ebooks_purchased_add_volumes_noncjk: number
     ebooks_purchased_add_volumes_subtotal: number
+    ebooks_purchased_withdrawn_volumes_chinese: number
+    ebooks_purchased_withdrawn_volumes_japanese: number
+    ebooks_purchased_withdrawn_volumes_korean: number
+    ebooks_purchased_withdrawn_volumes_noncjk: number
+    ebooks_purchased_withdrawn_volumes_subtotal: number
     _all: number
   }
 
@@ -9549,6 +9599,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: true
     ebooks_purchased_add_titles_noncjk?: true
     ebooks_purchased_add_titles_subtotal?: true
+    ebooks_purchased_withdrawn_titles_chinese?: true
+    ebooks_purchased_withdrawn_titles_japanese?: true
+    ebooks_purchased_withdrawn_titles_korean?: true
+    ebooks_purchased_withdrawn_titles_noncjk?: true
+    ebooks_purchased_withdrawn_titles_subtotal?: true
     ebooks_purchased_prev_volumes_chinese?: true
     ebooks_purchased_prev_volumes_japanese?: true
     ebooks_purchased_prev_volumes_korean?: true
@@ -9559,6 +9614,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: true
     ebooks_purchased_add_volumes_noncjk?: true
     ebooks_purchased_add_volumes_subtotal?: true
+    ebooks_purchased_withdrawn_volumes_chinese?: true
+    ebooks_purchased_withdrawn_volumes_japanese?: true
+    ebooks_purchased_withdrawn_volumes_korean?: true
+    ebooks_purchased_withdrawn_volumes_noncjk?: true
+    ebooks_purchased_withdrawn_volumes_subtotal?: true
   }
 
   export type Electronic_BooksSumAggregateInputType = {
@@ -9607,6 +9667,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: true
     ebooks_purchased_add_titles_noncjk?: true
     ebooks_purchased_add_titles_subtotal?: true
+    ebooks_purchased_withdrawn_titles_chinese?: true
+    ebooks_purchased_withdrawn_titles_japanese?: true
+    ebooks_purchased_withdrawn_titles_korean?: true
+    ebooks_purchased_withdrawn_titles_noncjk?: true
+    ebooks_purchased_withdrawn_titles_subtotal?: true
     ebooks_purchased_prev_volumes_chinese?: true
     ebooks_purchased_prev_volumes_japanese?: true
     ebooks_purchased_prev_volumes_korean?: true
@@ -9617,6 +9682,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: true
     ebooks_purchased_add_volumes_noncjk?: true
     ebooks_purchased_add_volumes_subtotal?: true
+    ebooks_purchased_withdrawn_volumes_chinese?: true
+    ebooks_purchased_withdrawn_volumes_japanese?: true
+    ebooks_purchased_withdrawn_volumes_korean?: true
+    ebooks_purchased_withdrawn_volumes_noncjk?: true
+    ebooks_purchased_withdrawn_volumes_subtotal?: true
   }
 
   export type Electronic_BooksMinAggregateInputType = {
@@ -9666,6 +9736,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: true
     ebooks_purchased_add_titles_noncjk?: true
     ebooks_purchased_add_titles_subtotal?: true
+    ebooks_purchased_withdrawn_titles_chinese?: true
+    ebooks_purchased_withdrawn_titles_japanese?: true
+    ebooks_purchased_withdrawn_titles_korean?: true
+    ebooks_purchased_withdrawn_titles_noncjk?: true
+    ebooks_purchased_withdrawn_titles_subtotal?: true
     ebooks_purchased_prev_volumes_chinese?: true
     ebooks_purchased_prev_volumes_japanese?: true
     ebooks_purchased_prev_volumes_korean?: true
@@ -9676,6 +9751,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: true
     ebooks_purchased_add_volumes_noncjk?: true
     ebooks_purchased_add_volumes_subtotal?: true
+    ebooks_purchased_withdrawn_volumes_chinese?: true
+    ebooks_purchased_withdrawn_volumes_japanese?: true
+    ebooks_purchased_withdrawn_volumes_korean?: true
+    ebooks_purchased_withdrawn_volumes_noncjk?: true
+    ebooks_purchased_withdrawn_volumes_subtotal?: true
   }
 
   export type Electronic_BooksMaxAggregateInputType = {
@@ -9725,6 +9805,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: true
     ebooks_purchased_add_titles_noncjk?: true
     ebooks_purchased_add_titles_subtotal?: true
+    ebooks_purchased_withdrawn_titles_chinese?: true
+    ebooks_purchased_withdrawn_titles_japanese?: true
+    ebooks_purchased_withdrawn_titles_korean?: true
+    ebooks_purchased_withdrawn_titles_noncjk?: true
+    ebooks_purchased_withdrawn_titles_subtotal?: true
     ebooks_purchased_prev_volumes_chinese?: true
     ebooks_purchased_prev_volumes_japanese?: true
     ebooks_purchased_prev_volumes_korean?: true
@@ -9735,6 +9820,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: true
     ebooks_purchased_add_volumes_noncjk?: true
     ebooks_purchased_add_volumes_subtotal?: true
+    ebooks_purchased_withdrawn_volumes_chinese?: true
+    ebooks_purchased_withdrawn_volumes_japanese?: true
+    ebooks_purchased_withdrawn_volumes_korean?: true
+    ebooks_purchased_withdrawn_volumes_noncjk?: true
+    ebooks_purchased_withdrawn_volumes_subtotal?: true
   }
 
   export type Electronic_BooksCountAggregateInputType = {
@@ -9784,6 +9874,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: true
     ebooks_purchased_add_titles_noncjk?: true
     ebooks_purchased_add_titles_subtotal?: true
+    ebooks_purchased_withdrawn_titles_chinese?: true
+    ebooks_purchased_withdrawn_titles_japanese?: true
+    ebooks_purchased_withdrawn_titles_korean?: true
+    ebooks_purchased_withdrawn_titles_noncjk?: true
+    ebooks_purchased_withdrawn_titles_subtotal?: true
     ebooks_purchased_prev_volumes_chinese?: true
     ebooks_purchased_prev_volumes_japanese?: true
     ebooks_purchased_prev_volumes_korean?: true
@@ -9794,6 +9889,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: true
     ebooks_purchased_add_volumes_noncjk?: true
     ebooks_purchased_add_volumes_subtotal?: true
+    ebooks_purchased_withdrawn_volumes_chinese?: true
+    ebooks_purchased_withdrawn_volumes_japanese?: true
+    ebooks_purchased_withdrawn_volumes_korean?: true
+    ebooks_purchased_withdrawn_volumes_noncjk?: true
+    ebooks_purchased_withdrawn_volumes_subtotal?: true
     _all?: true
   }
 
@@ -9930,6 +10030,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: number | null
     ebooks_purchased_add_titles_noncjk: number | null
     ebooks_purchased_add_titles_subtotal: number | null
+    ebooks_purchased_withdrawn_titles_chinese: number | null
+    ebooks_purchased_withdrawn_titles_japanese: number | null
+    ebooks_purchased_withdrawn_titles_korean: number | null
+    ebooks_purchased_withdrawn_titles_noncjk: number | null
+    ebooks_purchased_withdrawn_titles_subtotal: number | null
     ebooks_purchased_prev_volumes_chinese: number | null
     ebooks_purchased_prev_volumes_japanese: number | null
     ebooks_purchased_prev_volumes_korean: number | null
@@ -9940,6 +10045,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean: number | null
     ebooks_purchased_add_volumes_noncjk: number | null
     ebooks_purchased_add_volumes_subtotal: number | null
+    ebooks_purchased_withdrawn_volumes_chinese: number | null
+    ebooks_purchased_withdrawn_volumes_japanese: number | null
+    ebooks_purchased_withdrawn_volumes_korean: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal: number | null
     _count: Electronic_BooksCountAggregateOutputType | null
     _avg: Electronic_BooksAvgAggregateOutputType | null
     _sum: Electronic_BooksSumAggregateOutputType | null
@@ -10008,6 +10118,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: boolean
     ebooks_purchased_add_titles_noncjk?: boolean
     ebooks_purchased_add_titles_subtotal?: boolean
+    ebooks_purchased_withdrawn_titles_chinese?: boolean
+    ebooks_purchased_withdrawn_titles_japanese?: boolean
+    ebooks_purchased_withdrawn_titles_korean?: boolean
+    ebooks_purchased_withdrawn_titles_noncjk?: boolean
+    ebooks_purchased_withdrawn_titles_subtotal?: boolean
     ebooks_purchased_prev_volumes_chinese?: boolean
     ebooks_purchased_prev_volumes_japanese?: boolean
     ebooks_purchased_prev_volumes_korean?: boolean
@@ -10018,6 +10133,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: boolean
     ebooks_purchased_add_volumes_noncjk?: boolean
     ebooks_purchased_add_volumes_subtotal?: boolean
+    ebooks_purchased_withdrawn_volumes_chinese?: boolean
+    ebooks_purchased_withdrawn_volumes_japanese?: boolean
+    ebooks_purchased_withdrawn_volumes_korean?: boolean
+    ebooks_purchased_withdrawn_volumes_noncjk?: boolean
+    ebooks_purchased_withdrawn_volumes_subtotal?: boolean
     Library_Year?: boolean | Electronic_Books$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["electronic_Books"]>
 
@@ -10068,6 +10188,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: boolean
     ebooks_purchased_add_titles_noncjk?: boolean
     ebooks_purchased_add_titles_subtotal?: boolean
+    ebooks_purchased_withdrawn_titles_chinese?: boolean
+    ebooks_purchased_withdrawn_titles_japanese?: boolean
+    ebooks_purchased_withdrawn_titles_korean?: boolean
+    ebooks_purchased_withdrawn_titles_noncjk?: boolean
+    ebooks_purchased_withdrawn_titles_subtotal?: boolean
     ebooks_purchased_prev_volumes_chinese?: boolean
     ebooks_purchased_prev_volumes_japanese?: boolean
     ebooks_purchased_prev_volumes_korean?: boolean
@@ -10078,6 +10203,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: boolean
     ebooks_purchased_add_volumes_noncjk?: boolean
     ebooks_purchased_add_volumes_subtotal?: boolean
+    ebooks_purchased_withdrawn_volumes_chinese?: boolean
+    ebooks_purchased_withdrawn_volumes_japanese?: boolean
+    ebooks_purchased_withdrawn_volumes_korean?: boolean
+    ebooks_purchased_withdrawn_volumes_noncjk?: boolean
+    ebooks_purchased_withdrawn_volumes_subtotal?: boolean
     Library_Year?: boolean | Electronic_Books$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["electronic_Books"]>
 
@@ -10128,6 +10258,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: boolean
     ebooks_purchased_add_titles_noncjk?: boolean
     ebooks_purchased_add_titles_subtotal?: boolean
+    ebooks_purchased_withdrawn_titles_chinese?: boolean
+    ebooks_purchased_withdrawn_titles_japanese?: boolean
+    ebooks_purchased_withdrawn_titles_korean?: boolean
+    ebooks_purchased_withdrawn_titles_noncjk?: boolean
+    ebooks_purchased_withdrawn_titles_subtotal?: boolean
     ebooks_purchased_prev_volumes_chinese?: boolean
     ebooks_purchased_prev_volumes_japanese?: boolean
     ebooks_purchased_prev_volumes_korean?: boolean
@@ -10138,6 +10273,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: boolean
     ebooks_purchased_add_volumes_noncjk?: boolean
     ebooks_purchased_add_volumes_subtotal?: boolean
+    ebooks_purchased_withdrawn_volumes_chinese?: boolean
+    ebooks_purchased_withdrawn_volumes_japanese?: boolean
+    ebooks_purchased_withdrawn_volumes_korean?: boolean
+    ebooks_purchased_withdrawn_volumes_noncjk?: boolean
+    ebooks_purchased_withdrawn_volumes_subtotal?: boolean
     Library_Year?: boolean | Electronic_Books$Library_YearArgs<ExtArgs>
   }, ExtArgs["result"]["electronic_Books"]>
 
@@ -10188,6 +10328,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: boolean
     ebooks_purchased_add_titles_noncjk?: boolean
     ebooks_purchased_add_titles_subtotal?: boolean
+    ebooks_purchased_withdrawn_titles_chinese?: boolean
+    ebooks_purchased_withdrawn_titles_japanese?: boolean
+    ebooks_purchased_withdrawn_titles_korean?: boolean
+    ebooks_purchased_withdrawn_titles_noncjk?: boolean
+    ebooks_purchased_withdrawn_titles_subtotal?: boolean
     ebooks_purchased_prev_volumes_chinese?: boolean
     ebooks_purchased_prev_volumes_japanese?: boolean
     ebooks_purchased_prev_volumes_korean?: boolean
@@ -10198,9 +10343,14 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: boolean
     ebooks_purchased_add_volumes_noncjk?: boolean
     ebooks_purchased_add_volumes_subtotal?: boolean
+    ebooks_purchased_withdrawn_volumes_chinese?: boolean
+    ebooks_purchased_withdrawn_volumes_japanese?: boolean
+    ebooks_purchased_withdrawn_volumes_korean?: boolean
+    ebooks_purchased_withdrawn_volumes_noncjk?: boolean
+    ebooks_purchased_withdrawn_volumes_subtotal?: boolean
   }
 
-  export type Electronic_BooksOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "libraryyear" | "ebooks_purchased_volumes_chinese" | "ebooks_purchased_volumes_japanese" | "ebooks_purchased_volumes_korean" | "ebooks_purchased_volumes_noncjk" | "ebooks_purchased_volumes_subtotal" | "ebooks_purchased_titles_chinese" | "ebooks_purchased_titles_japanese" | "ebooks_purchased_titles_korean" | "ebooks_purchased_titles_noncjk" | "ebooks_purchased_titles_subtotal" | "ebooks_nonpurchased_volumes_chinese" | "ebooks_nonpurchased_volumes_japanese" | "ebooks_nonpurchased_volumes_korean" | "ebooks_nonpurchased_volumes_noncjk" | "ebooks_nonpurchased_volumes_subtotal" | "ebooks_nonpurchased_titles_chinese" | "ebooks_nonpurchased_titles_japanese" | "ebooks_nonpurchased_titles_korean" | "ebooks_nonpurchased_titles_noncjk" | "ebooks_nonpurchased_titles_subtotal" | "ebooks_subscription_volumes_chinese" | "ebooks_subscription_volumes_japanese" | "ebooks_subscription_volumes_korean" | "ebooks_subscription_volumes_noncjk" | "ebooks_subscription_volumes_subtotal" | "ebooks_subscription_titles_chinese" | "ebooks_subscription_titles_japanese" | "ebooks_subscription_titles_korean" | "ebooks_subscription_titles_noncjk" | "ebooks_subscription_titles_subtotal" | "ebooks_total_volumes" | "ebooks_total_titles" | "ebooks_expenditure_grandtotal" | "ebooks_notes" | "ebooks_purchased_prev_titles_chinese" | "ebooks_purchased_prev_titles_japanese" | "ebooks_purchased_prev_titles_korean" | "ebooks_purchased_prev_titles_noncjk" | "ebooks_purchased_prev_titles_subtotal" | "ebooks_purchased_add_titles_chinese" | "ebooks_purchased_add_titles_japanese" | "ebooks_purchased_add_titles_korean" | "ebooks_purchased_add_titles_noncjk" | "ebooks_purchased_add_titles_subtotal" | "ebooks_purchased_prev_volumes_chinese" | "ebooks_purchased_prev_volumes_japanese" | "ebooks_purchased_prev_volumes_korean" | "ebooks_purchased_prev_volumes_noncjk" | "ebooks_purchased_prev_volumes_subtotal" | "ebooks_purchased_add_volumes_chinese" | "ebooks_purchased_add_volumes_japanese" | "ebooks_purchased_add_volumes_korean" | "ebooks_purchased_add_volumes_noncjk" | "ebooks_purchased_add_volumes_subtotal", ExtArgs["result"]["electronic_Books"]>
+  export type Electronic_BooksOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "libraryyear" | "ebooks_purchased_volumes_chinese" | "ebooks_purchased_volumes_japanese" | "ebooks_purchased_volumes_korean" | "ebooks_purchased_volumes_noncjk" | "ebooks_purchased_volumes_subtotal" | "ebooks_purchased_titles_chinese" | "ebooks_purchased_titles_japanese" | "ebooks_purchased_titles_korean" | "ebooks_purchased_titles_noncjk" | "ebooks_purchased_titles_subtotal" | "ebooks_nonpurchased_volumes_chinese" | "ebooks_nonpurchased_volumes_japanese" | "ebooks_nonpurchased_volumes_korean" | "ebooks_nonpurchased_volumes_noncjk" | "ebooks_nonpurchased_volumes_subtotal" | "ebooks_nonpurchased_titles_chinese" | "ebooks_nonpurchased_titles_japanese" | "ebooks_nonpurchased_titles_korean" | "ebooks_nonpurchased_titles_noncjk" | "ebooks_nonpurchased_titles_subtotal" | "ebooks_subscription_volumes_chinese" | "ebooks_subscription_volumes_japanese" | "ebooks_subscription_volumes_korean" | "ebooks_subscription_volumes_noncjk" | "ebooks_subscription_volumes_subtotal" | "ebooks_subscription_titles_chinese" | "ebooks_subscription_titles_japanese" | "ebooks_subscription_titles_korean" | "ebooks_subscription_titles_noncjk" | "ebooks_subscription_titles_subtotal" | "ebooks_total_volumes" | "ebooks_total_titles" | "ebooks_expenditure_grandtotal" | "ebooks_notes" | "ebooks_purchased_prev_titles_chinese" | "ebooks_purchased_prev_titles_japanese" | "ebooks_purchased_prev_titles_korean" | "ebooks_purchased_prev_titles_noncjk" | "ebooks_purchased_prev_titles_subtotal" | "ebooks_purchased_add_titles_chinese" | "ebooks_purchased_add_titles_japanese" | "ebooks_purchased_add_titles_korean" | "ebooks_purchased_add_titles_noncjk" | "ebooks_purchased_add_titles_subtotal" | "ebooks_purchased_withdrawn_titles_chinese" | "ebooks_purchased_withdrawn_titles_japanese" | "ebooks_purchased_withdrawn_titles_korean" | "ebooks_purchased_withdrawn_titles_noncjk" | "ebooks_purchased_withdrawn_titles_subtotal" | "ebooks_purchased_prev_volumes_chinese" | "ebooks_purchased_prev_volumes_japanese" | "ebooks_purchased_prev_volumes_korean" | "ebooks_purchased_prev_volumes_noncjk" | "ebooks_purchased_prev_volumes_subtotal" | "ebooks_purchased_add_volumes_chinese" | "ebooks_purchased_add_volumes_japanese" | "ebooks_purchased_add_volumes_korean" | "ebooks_purchased_add_volumes_noncjk" | "ebooks_purchased_add_volumes_subtotal" | "ebooks_purchased_withdrawn_volumes_chinese" | "ebooks_purchased_withdrawn_volumes_japanese" | "ebooks_purchased_withdrawn_volumes_korean" | "ebooks_purchased_withdrawn_volumes_noncjk" | "ebooks_purchased_withdrawn_volumes_subtotal", ExtArgs["result"]["electronic_Books"]>
   export type Electronic_BooksInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Library_Year?: boolean | Electronic_Books$Library_YearArgs<ExtArgs>
   }
@@ -10263,6 +10413,11 @@ export namespace Prisma {
       ebooks_purchased_add_titles_korean: number | null
       ebooks_purchased_add_titles_noncjk: number | null
       ebooks_purchased_add_titles_subtotal: number | null
+      ebooks_purchased_withdrawn_titles_chinese: number | null
+      ebooks_purchased_withdrawn_titles_japanese: number | null
+      ebooks_purchased_withdrawn_titles_korean: number | null
+      ebooks_purchased_withdrawn_titles_noncjk: number | null
+      ebooks_purchased_withdrawn_titles_subtotal: number | null
       ebooks_purchased_prev_volumes_chinese: number | null
       ebooks_purchased_prev_volumes_japanese: number | null
       ebooks_purchased_prev_volumes_korean: number | null
@@ -10273,6 +10428,11 @@ export namespace Prisma {
       ebooks_purchased_add_volumes_korean: number | null
       ebooks_purchased_add_volumes_noncjk: number | null
       ebooks_purchased_add_volumes_subtotal: number | null
+      ebooks_purchased_withdrawn_volumes_chinese: number | null
+      ebooks_purchased_withdrawn_volumes_japanese: number | null
+      ebooks_purchased_withdrawn_volumes_korean: number | null
+      ebooks_purchased_withdrawn_volumes_noncjk: number | null
+      ebooks_purchased_withdrawn_volumes_subtotal: number | null
     }, ExtArgs["result"]["electronic_Books"]>
     composites: {}
   }
@@ -10743,6 +10903,11 @@ export namespace Prisma {
     readonly ebooks_purchased_add_titles_korean: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_add_titles_noncjk: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_add_titles_subtotal: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_titles_chinese: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_titles_japanese: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_titles_korean: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_titles_noncjk: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_titles_subtotal: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_prev_volumes_chinese: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_prev_volumes_japanese: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_prev_volumes_korean: FieldRef<"Electronic_Books", 'Int'>
@@ -10753,6 +10918,11 @@ export namespace Prisma {
     readonly ebooks_purchased_add_volumes_korean: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_add_volumes_noncjk: FieldRef<"Electronic_Books", 'Int'>
     readonly ebooks_purchased_add_volumes_subtotal: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_volumes_chinese: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_volumes_japanese: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_volumes_korean: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_volumes_noncjk: FieldRef<"Electronic_Books", 'Int'>
+    readonly ebooks_purchased_withdrawn_volumes_subtotal: FieldRef<"Electronic_Books", 'Int'>
   }
     
 
@@ -61010,6 +61180,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean: 'ebooks_purchased_add_titles_korean',
     ebooks_purchased_add_titles_noncjk: 'ebooks_purchased_add_titles_noncjk',
     ebooks_purchased_add_titles_subtotal: 'ebooks_purchased_add_titles_subtotal',
+    ebooks_purchased_withdrawn_titles_chinese: 'ebooks_purchased_withdrawn_titles_chinese',
+    ebooks_purchased_withdrawn_titles_japanese: 'ebooks_purchased_withdrawn_titles_japanese',
+    ebooks_purchased_withdrawn_titles_korean: 'ebooks_purchased_withdrawn_titles_korean',
+    ebooks_purchased_withdrawn_titles_noncjk: 'ebooks_purchased_withdrawn_titles_noncjk',
+    ebooks_purchased_withdrawn_titles_subtotal: 'ebooks_purchased_withdrawn_titles_subtotal',
     ebooks_purchased_prev_volumes_chinese: 'ebooks_purchased_prev_volumes_chinese',
     ebooks_purchased_prev_volumes_japanese: 'ebooks_purchased_prev_volumes_japanese',
     ebooks_purchased_prev_volumes_korean: 'ebooks_purchased_prev_volumes_korean',
@@ -61019,7 +61194,12 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_japanese: 'ebooks_purchased_add_volumes_japanese',
     ebooks_purchased_add_volumes_korean: 'ebooks_purchased_add_volumes_korean',
     ebooks_purchased_add_volumes_noncjk: 'ebooks_purchased_add_volumes_noncjk',
-    ebooks_purchased_add_volumes_subtotal: 'ebooks_purchased_add_volumes_subtotal'
+    ebooks_purchased_add_volumes_subtotal: 'ebooks_purchased_add_volumes_subtotal',
+    ebooks_purchased_withdrawn_volumes_chinese: 'ebooks_purchased_withdrawn_volumes_chinese',
+    ebooks_purchased_withdrawn_volumes_japanese: 'ebooks_purchased_withdrawn_volumes_japanese',
+    ebooks_purchased_withdrawn_volumes_korean: 'ebooks_purchased_withdrawn_volumes_korean',
+    ebooks_purchased_withdrawn_volumes_noncjk: 'ebooks_purchased_withdrawn_volumes_noncjk',
+    ebooks_purchased_withdrawn_volumes_subtotal: 'ebooks_purchased_withdrawn_volumes_subtotal'
   };
 
   export type Electronic_BooksScalarFieldEnum = (typeof Electronic_BooksScalarFieldEnum)[keyof typeof Electronic_BooksScalarFieldEnum]
@@ -62724,6 +62904,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_korean?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
@@ -62734,6 +62919,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
   }
 
@@ -62784,6 +62974,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrderInput | SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrderInput | SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrderInput | SortOrder
@@ -62794,6 +62989,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrderInput | SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrderInput | SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrderInput | SortOrder
     Library_Year?: Library_YearOrderByWithRelationInput
   }
 
@@ -62847,6 +63047,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_korean?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
@@ -62857,6 +63062,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: IntNullableFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: IntNullableFilter<"Electronic_Books"> | number | null
     Library_Year?: XOR<Library_YearNullableScalarRelationFilter, Library_YearWhereInput> | null
   }, "id" | "libraryyear">
 
@@ -62907,6 +63117,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrderInput | SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrderInput | SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrderInput | SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrderInput | SortOrder
@@ -62917,6 +63132,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrderInput | SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrderInput | SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrderInput | SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrderInput | SortOrder
     _count?: Electronic_BooksCountOrderByAggregateInput
     _avg?: Electronic_BooksAvgOrderByAggregateInput
     _max?: Electronic_BooksMaxOrderByAggregateInput
@@ -62974,6 +63194,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_noncjk?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_titles_subtotal?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_korean?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_chinese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_japanese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_prev_volumes_korean?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
@@ -62984,6 +63209,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_noncjk?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
     ebooks_purchased_add_volumes_subtotal?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: IntNullableWithAggregatesFilter<"Electronic_Books"> | number | null
   }
 
   export type EmailTemplateWhereInput = {
@@ -68108,6 +68338,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: number | null
     ebooks_purchased_add_titles_noncjk?: number | null
     ebooks_purchased_add_titles_subtotal?: number | null
+    ebooks_purchased_withdrawn_titles_chinese?: number | null
+    ebooks_purchased_withdrawn_titles_japanese?: number | null
+    ebooks_purchased_withdrawn_titles_korean?: number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: number | null
     ebooks_purchased_prev_volumes_chinese?: number | null
     ebooks_purchased_prev_volumes_japanese?: number | null
     ebooks_purchased_prev_volumes_korean?: number | null
@@ -68118,6 +68353,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: number | null
     ebooks_purchased_add_volumes_noncjk?: number | null
     ebooks_purchased_add_volumes_subtotal?: number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: number | null
+    ebooks_purchased_withdrawn_volumes_korean?: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: number | null
     Library_Year?: Library_YearCreateNestedOneWithoutElectronic_BooksInput
   }
 
@@ -68168,6 +68408,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: number | null
     ebooks_purchased_add_titles_noncjk?: number | null
     ebooks_purchased_add_titles_subtotal?: number | null
+    ebooks_purchased_withdrawn_titles_chinese?: number | null
+    ebooks_purchased_withdrawn_titles_japanese?: number | null
+    ebooks_purchased_withdrawn_titles_korean?: number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: number | null
     ebooks_purchased_prev_volumes_chinese?: number | null
     ebooks_purchased_prev_volumes_japanese?: number | null
     ebooks_purchased_prev_volumes_korean?: number | null
@@ -68178,6 +68423,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: number | null
     ebooks_purchased_add_volumes_noncjk?: number | null
     ebooks_purchased_add_volumes_subtotal?: number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: number | null
+    ebooks_purchased_withdrawn_volumes_korean?: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: number | null
   }
 
   export type Electronic_BooksUpdateInput = {
@@ -68225,6 +68475,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -68235,6 +68490,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     Library_Year?: Library_YearUpdateOneWithoutElectronic_BooksNestedInput
   }
 
@@ -68285,6 +68545,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -68295,6 +68560,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type Electronic_BooksCreateManyInput = {
@@ -68344,6 +68614,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: number | null
     ebooks_purchased_add_titles_noncjk?: number | null
     ebooks_purchased_add_titles_subtotal?: number | null
+    ebooks_purchased_withdrawn_titles_chinese?: number | null
+    ebooks_purchased_withdrawn_titles_japanese?: number | null
+    ebooks_purchased_withdrawn_titles_korean?: number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: number | null
     ebooks_purchased_prev_volumes_chinese?: number | null
     ebooks_purchased_prev_volumes_japanese?: number | null
     ebooks_purchased_prev_volumes_korean?: number | null
@@ -68354,6 +68629,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: number | null
     ebooks_purchased_add_volumes_noncjk?: number | null
     ebooks_purchased_add_volumes_subtotal?: number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: number | null
+    ebooks_purchased_withdrawn_volumes_korean?: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: number | null
   }
 
   export type Electronic_BooksUpdateManyMutationInput = {
@@ -68401,6 +68681,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -68411,6 +68696,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type Electronic_BooksUncheckedUpdateManyInput = {
@@ -68460,6 +68750,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -68470,6 +68765,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type EmailTemplateCreateInput = {
@@ -74199,6 +74499,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrder
@@ -74209,6 +74514,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrder
   }
 
   export type Electronic_BooksAvgOrderByAggregateInput = {
@@ -74257,6 +74567,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrder
@@ -74267,6 +74582,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrder
   }
 
   export type Electronic_BooksMaxOrderByAggregateInput = {
@@ -74316,6 +74636,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrder
@@ -74326,6 +74651,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrder
   }
 
   export type Electronic_BooksMinOrderByAggregateInput = {
@@ -74375,6 +74705,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrder
@@ -74385,6 +74720,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrder
   }
 
   export type Electronic_BooksSumOrderByAggregateInput = {
@@ -74433,6 +74773,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: SortOrder
     ebooks_purchased_add_titles_noncjk?: SortOrder
     ebooks_purchased_add_titles_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_titles_chinese?: SortOrder
+    ebooks_purchased_withdrawn_titles_japanese?: SortOrder
+    ebooks_purchased_withdrawn_titles_korean?: SortOrder
+    ebooks_purchased_withdrawn_titles_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_titles_subtotal?: SortOrder
     ebooks_purchased_prev_volumes_chinese?: SortOrder
     ebooks_purchased_prev_volumes_japanese?: SortOrder
     ebooks_purchased_prev_volumes_korean?: SortOrder
@@ -74443,6 +74788,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: SortOrder
     ebooks_purchased_add_volumes_noncjk?: SortOrder
     ebooks_purchased_add_volumes_subtotal?: SortOrder
+    ebooks_purchased_withdrawn_volumes_chinese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_japanese?: SortOrder
+    ebooks_purchased_withdrawn_volumes_korean?: SortOrder
+    ebooks_purchased_withdrawn_volumes_noncjk?: SortOrder
+    ebooks_purchased_withdrawn_volumes_subtotal?: SortOrder
   }
 
   export type EmailTemplateCountOrderByAggregateInput = {
@@ -84679,6 +85029,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: number | null
     ebooks_purchased_add_titles_noncjk?: number | null
     ebooks_purchased_add_titles_subtotal?: number | null
+    ebooks_purchased_withdrawn_titles_chinese?: number | null
+    ebooks_purchased_withdrawn_titles_japanese?: number | null
+    ebooks_purchased_withdrawn_titles_korean?: number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: number | null
     ebooks_purchased_prev_volumes_chinese?: number | null
     ebooks_purchased_prev_volumes_japanese?: number | null
     ebooks_purchased_prev_volumes_korean?: number | null
@@ -84689,6 +85044,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: number | null
     ebooks_purchased_add_volumes_noncjk?: number | null
     ebooks_purchased_add_volumes_subtotal?: number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: number | null
+    ebooks_purchased_withdrawn_volumes_korean?: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: number | null
   }
 
   export type Electronic_BooksUncheckedCreateWithoutLibrary_YearInput = {
@@ -84737,6 +85097,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: number | null
     ebooks_purchased_add_titles_noncjk?: number | null
     ebooks_purchased_add_titles_subtotal?: number | null
+    ebooks_purchased_withdrawn_titles_chinese?: number | null
+    ebooks_purchased_withdrawn_titles_japanese?: number | null
+    ebooks_purchased_withdrawn_titles_korean?: number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: number | null
     ebooks_purchased_prev_volumes_chinese?: number | null
     ebooks_purchased_prev_volumes_japanese?: number | null
     ebooks_purchased_prev_volumes_korean?: number | null
@@ -84747,6 +85112,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: number | null
     ebooks_purchased_add_volumes_noncjk?: number | null
     ebooks_purchased_add_volumes_subtotal?: number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: number | null
+    ebooks_purchased_withdrawn_volumes_korean?: number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: number | null
   }
 
   export type Electronic_BooksCreateOrConnectWithoutLibrary_YearInput = {
@@ -86091,6 +86461,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -86101,6 +86476,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type Electronic_BooksUncheckedUpdateWithoutLibrary_YearInput = {
@@ -86149,6 +86529,11 @@ export namespace Prisma {
     ebooks_purchased_add_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_titles_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_prev_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
@@ -86159,6 +86544,11 @@ export namespace Prisma {
     ebooks_purchased_add_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
     ebooks_purchased_add_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_chinese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_japanese?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_korean?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_noncjk?: NullableIntFieldUpdateOperationsInput | number | null
+    ebooks_purchased_withdrawn_volumes_subtotal?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type Entry_StatusUpsertWithoutLibrary_YearInput = {

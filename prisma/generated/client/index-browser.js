@@ -302,6 +302,11 @@ exports.Prisma.Electronic_BooksScalarFieldEnum = {
   ebooks_purchased_add_titles_korean: 'ebooks_purchased_add_titles_korean',
   ebooks_purchased_add_titles_noncjk: 'ebooks_purchased_add_titles_noncjk',
   ebooks_purchased_add_titles_subtotal: 'ebooks_purchased_add_titles_subtotal',
+  ebooks_purchased_withdrawn_titles_chinese: 'ebooks_purchased_withdrawn_titles_chinese',
+  ebooks_purchased_withdrawn_titles_japanese: 'ebooks_purchased_withdrawn_titles_japanese',
+  ebooks_purchased_withdrawn_titles_korean: 'ebooks_purchased_withdrawn_titles_korean',
+  ebooks_purchased_withdrawn_titles_noncjk: 'ebooks_purchased_withdrawn_titles_noncjk',
+  ebooks_purchased_withdrawn_titles_subtotal: 'ebooks_purchased_withdrawn_titles_subtotal',
   ebooks_purchased_prev_volumes_chinese: 'ebooks_purchased_prev_volumes_chinese',
   ebooks_purchased_prev_volumes_japanese: 'ebooks_purchased_prev_volumes_japanese',
   ebooks_purchased_prev_volumes_korean: 'ebooks_purchased_prev_volumes_korean',
@@ -311,7 +316,12 @@ exports.Prisma.Electronic_BooksScalarFieldEnum = {
   ebooks_purchased_add_volumes_japanese: 'ebooks_purchased_add_volumes_japanese',
   ebooks_purchased_add_volumes_korean: 'ebooks_purchased_add_volumes_korean',
   ebooks_purchased_add_volumes_noncjk: 'ebooks_purchased_add_volumes_noncjk',
-  ebooks_purchased_add_volumes_subtotal: 'ebooks_purchased_add_volumes_subtotal'
+  ebooks_purchased_add_volumes_subtotal: 'ebooks_purchased_add_volumes_subtotal',
+  ebooks_purchased_withdrawn_volumes_chinese: 'ebooks_purchased_withdrawn_volumes_chinese',
+  ebooks_purchased_withdrawn_volumes_japanese: 'ebooks_purchased_withdrawn_volumes_japanese',
+  ebooks_purchased_withdrawn_volumes_korean: 'ebooks_purchased_withdrawn_volumes_korean',
+  ebooks_purchased_withdrawn_volumes_noncjk: 'ebooks_purchased_withdrawn_volumes_noncjk',
+  ebooks_purchased_withdrawn_volumes_subtotal: 'ebooks_purchased_withdrawn_volumes_subtotal'
 };
 
 exports.Prisma.EmailTemplateScalarFieldEnum = {

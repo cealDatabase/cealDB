@@ -252,6 +252,8 @@ const COLUMN_GROUPS: Record<string, ColGroup[]> = {
     { label: null, span: 1 },
     { label: "Purchased Volumes", span: 5 },
     { label: "Purchased Titles", span: 5 },
+    { label: "Withdrawn Volumes", span: 5 },
+    { label: "Withdrawn Titles", span: 5 },
     { label: "Non-Purchased Volumes", span: 5 },
     { label: "Non-Purchased Titles", span: 5 },
     { label: null, span: 1 }, // Subscription Vols Subtotal
@@ -1273,6 +1275,56 @@ const TABLE_CONFIG: Record<
       {
         key: "ebooks_purchased_titles_subtotal",
         label: "Purch. Titles Subtotal",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_volumes_chinese",
+        label: "Withdrawn Vols CHN",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_volumes_japanese",
+        label: "Withdrawn Vols JPN",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_volumes_korean",
+        label: "Withdrawn Vols KOR",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_volumes_noncjk",
+        label: "Withdrawn Vols Non-CJK",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_volumes_subtotal",
+        label: "Withdrawn Vols Subtotal",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_titles_chinese",
+        label: "Withdrawn Titles CHN",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_titles_japanese",
+        label: "Withdrawn Titles JPN",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_titles_korean",
+        label: "Withdrawn Titles KOR",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_titles_noncjk",
+        label: "Withdrawn Titles Non-CJK",
+        type: "number",
+      },
+      {
+        key: "ebooks_purchased_withdrawn_titles_subtotal",
+        label: "Withdrawn Titles Subtotal",
         type: "number",
       },
       {
