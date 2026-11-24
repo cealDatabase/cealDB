@@ -13,6 +13,7 @@ interface ReusableFormFieldProps<T extends FieldValues> {
   placeholder?: string
   disabled?: boolean
   min?: string
+  allowNegative?: boolean
   className?: string
   hideLabel?: boolean
 }
@@ -25,6 +26,7 @@ export function ReusableFormField<T extends FieldValues>({
   placeholder = "0",
   disabled = false,
   min,
+  allowNegative = false,
   className,
   hideLabel = false
 }: ReusableFormFieldProps<T>) {
@@ -62,12 +64,15 @@ export function ReusableFormField<T extends FieldValues>({
             <FormControl>
               <Input
                 type="number"
-                min={min || "0"}
+                min={allowNegative ? undefined : (min ?? "0")}
                 placeholder={placeholder}
                 disabled={disabled}
                 {...field}
                 value={field.value ?? 0}
                 onChange={(e) => {
+                  // Keep a typed leading minus sign in the input long enough
+                  // for the next digit to form a valid negative number.
+                  if (allowNegative && e.target.value === "-") return
                   // Strip leading zeros: "058" -> 58, "0" -> 0
                   const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10) || 0
                   field.onChange(value)
@@ -122,6 +127,7 @@ export function ReusableNumberFormField<T extends FieldValues>({
   placeholder = "0",
   disabled = false,
   min,
+  allowNegative = false,
   className,
   useFloat = false
 }: ReusableFormFieldProps<T> & { useFloat?: boolean }) {
@@ -135,13 +141,16 @@ export function ReusableNumberFormField<T extends FieldValues>({
           <FormControl>
             <Input
               type="number"
-              min={min || "0"}
+              min={allowNegative ? undefined : (min ?? "0")}
               step={useFloat ? "any" : "1"}
               placeholder={placeholder}
               disabled={disabled}
               {...field}
               value={field.value ?? 0}
               onChange={(e) => {
+                  // Keep a typed leading minus sign in the input long enough
+                  // for the next digit to form a valid negative number.
+                  if (allowNegative && e.target.value === "-") return
                 // Strip leading zeros for both integers and floats
                 const value = useFloat 
                   ? (parseFloat(e.target.value) || 0)
@@ -173,7 +182,8 @@ export function ReusableCurrencyFormField<T extends FieldValues>({
   disabled = false,
   className,
   hideLabel = false,
-  inputClassName
+  inputClassName,
+  allowNegative = false,
 }: Omit<ReusableFormFieldProps<T>, 'type' | 'min'> & { inputClassName?: string }) {
   return (
     <FormField
@@ -192,6 +202,7 @@ export function ReusableCurrencyFormField<T extends FieldValues>({
               }}
               onBlur={field.onBlur}
               className={inputClassName}
+              allowNegative={allowNegative}
             />
           </FormControl>
           <FormMessage />
