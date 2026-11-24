@@ -45,6 +45,11 @@ model Electronic_Books {
   ebooks_purchased_add_titles_korean     Int?
   ebooks_purchased_add_titles_noncjk     Int?
   ebooks_purchased_add_titles_subtotal   Int?
+  ebooks_purchased_withdrawn_titles_chinese Int?
+  ebooks_purchased_withdrawn_titles_japanese Int?
+  ebooks_purchased_withdrawn_titles_korean  Int?
+  ebooks_purchased_withdrawn_titles_noncjk  Int?
+  ebooks_purchased_withdrawn_titles_subtotal Int?
   ebooks_purchased_prev_volumes_chinese  Int?
   ebooks_purchased_prev_volumes_japanese Int?
   ebooks_purchased_prev_volumes_korean   Int?
@@ -55,5 +60,10 @@ model Electronic_Books {
   ebooks_purchased_add_volumes_korean    Int?
   ebooks_purchased_add_volumes_noncjk    Int?
   ebooks_purchased_add_volumes_subtotal  Int?
+  ebooks_purchased_withdrawn_volumes_chinese Int?
+  ebooks_purchased_withdrawn_volumes_japanese Int?
+  ebooks_purchased_withdrawn_volumes_korean  Int?
+  ebooks_purchased_withdrawn_volumes_noncjk  Int?
+  ebooks_purchased_withdrawn_volumes_subtotal Int?
   Library_Year                           Library_Year? @relation(fields: [libraryyear], references: [id])
 }

@@ -68,21 +68,22 @@ function calcVolumeHoldings(vh: any): {
  * Total volumes = purchased_volumes_subtotal + nonpurchased_volumes_subtotal
  *
  * IMPORTANT: The DB fields ebooks_purchased_volumes_{lang} may be null for
- * older records where the form split volumes into prev+add sub-fields. In that
- * case we fall back to prev_volumes + add_volumes per language — exactly the
+ * older records where the form split volumes into previous/add/withdrawn sub-fields. In that
+ * case we fall back to previous + added - withdrawn per language — exactly the
  * same fallback used in the purchased-volumes API and year-end-pdf route.
  */
 function calcEBookVolumes(eb: any): number | null {
   if (!eb) return null;
 
-  // Resolve per-language purchased volumes: stored field ?? (prev + add)
+  // Resolve per-language purchased volumes: stored field ?? (previous + added - withdrawn)
   function purchasedLang(lang: string): number | null {
     const stored = eb[`ebooks_purchased_volumes_${lang}`];
     if (stored !== null && stored !== undefined) return n(stored);
     const prev = eb[`ebooks_purchased_prev_volumes_${lang}`];
     const add  = eb[`ebooks_purchased_add_volumes_${lang}`];
-    if ((prev === null || prev === undefined) && (add === null || add === undefined)) return null;
-    return n(prev) + n(add);
+    const withdrawn = eb[`ebooks_purchased_withdrawn_volumes_${lang}`];
+    if ((prev === null || prev === undefined) && (add === null || add === undefined) && (withdrawn === null || withdrawn === undefined)) return null;
+    return n(prev) + n(add) - n(withdrawn);
   }
 
   const purchasedSub = sumWithNull(
@@ -354,6 +355,8 @@ export async function GET(request: NextRequest) {
               ebooks_purchased_prev_volumes_korean:     true, ebooks_purchased_prev_volumes_noncjk:      true,
               ebooks_purchased_add_volumes_chinese:     true, ebooks_purchased_add_volumes_japanese:     true,
               ebooks_purchased_add_volumes_korean:      true, ebooks_purchased_add_volumes_noncjk:       true,
+              ebooks_purchased_withdrawn_volumes_chinese: true, ebooks_purchased_withdrawn_volumes_japanese: true,
+              ebooks_purchased_withdrawn_volumes_korean:  true, ebooks_purchased_withdrawn_volumes_noncjk:   true,
               ebooks_nonpurchased_volumes_chinese:      true, ebooks_nonpurchased_volumes_japanese:      true,
               ebooks_nonpurchased_volumes_korean:       true, ebooks_nonpurchased_volumes_noncjk:        true,
             },
@@ -668,6 +671,8 @@ export async function GET(request: NextRequest) {
               ebooks_purchased_prev_volumes_korean:     true, ebooks_purchased_prev_volumes_noncjk:      true,
               ebooks_purchased_add_volumes_chinese:     true, ebooks_purchased_add_volumes_japanese:     true,
               ebooks_purchased_add_volumes_korean:      true, ebooks_purchased_add_volumes_noncjk:       true,
+              ebooks_purchased_withdrawn_volumes_chinese: true, ebooks_purchased_withdrawn_volumes_japanese: true,
+              ebooks_purchased_withdrawn_volumes_korean:  true, ebooks_purchased_withdrawn_volumes_noncjk:   true,
               ebooks_nonpurchased_volumes_chinese:      true, ebooks_nonpurchased_volumes_japanese:      true,
               ebooks_nonpurchased_volumes_korean:       true, ebooks_nonpurchased_volumes_noncjk:        true,
             },

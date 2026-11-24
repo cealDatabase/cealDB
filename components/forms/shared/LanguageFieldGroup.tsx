@@ -22,7 +22,6 @@ interface LanguageFieldGroupProps<T extends FieldValues> {
   className?: string
   singleField?: boolean
   disabled?: boolean
-  allowNegative?: boolean
 }
 
 export function LanguageFieldGroup<T extends FieldValues>({
@@ -32,8 +31,7 @@ export function LanguageFieldGroup<T extends FieldValues>({
   useCurrency = false,
   className = "grid grid-cols-1 md:grid-cols-2 gap-4",
   singleField = false,
-  disabled = false,
-  allowNegative = false,
+  disabled = false
 }: LanguageFieldGroupProps<T>) {
   const renderField = (field: LanguageField) => {
     const isDisabled = disabled || field.disabled;
@@ -45,7 +43,6 @@ export function LanguageFieldGroup<T extends FieldValues>({
           label={field.label}
           placeholder="0.00"
           disabled={isDisabled}
-          allowNegative={allowNegative}
         />
       )
     }
@@ -59,7 +56,6 @@ export function LanguageFieldGroup<T extends FieldValues>({
           type="number"
           disabled={isDisabled}
           useFloat={true}
-          allowNegative={allowNegative}
         />
       )
     }
@@ -71,7 +67,6 @@ export function LanguageFieldGroup<T extends FieldValues>({
         label={field.label}
         type="number"
         disabled={isDisabled}
-        allowNegative={allowNegative}
       />
     )
   }

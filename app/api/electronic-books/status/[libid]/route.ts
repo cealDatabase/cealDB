@@ -90,24 +90,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ libid: s
 
         if (previousEBooksData) {
           
-          // Calculate previous year's TOTAL (if ebooks_purchased_titles_* is null, calculate from prev + add)
+          // Calculate previous year's TOTAL (fall back to previous + added - withdrawn).
           const prevTitlesChinese = previousEBooksData.ebooks_purchased_titles_chinese ?? 
-            ((previousEBooksData.ebooks_purchased_prev_titles_chinese ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_chinese ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_titles_chinese ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_chinese ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_titles_chinese ?? 0));
           const prevTitlesJapanese = previousEBooksData.ebooks_purchased_titles_japanese ?? 
-            ((previousEBooksData.ebooks_purchased_prev_titles_japanese ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_japanese ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_titles_japanese ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_japanese ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_titles_japanese ?? 0));
           const prevTitlesKorean = previousEBooksData.ebooks_purchased_titles_korean ?? 
-            ((previousEBooksData.ebooks_purchased_prev_titles_korean ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_korean ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_titles_korean ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_korean ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_titles_korean ?? 0));
           const prevTitlesNoncjk = previousEBooksData.ebooks_purchased_titles_noncjk ?? 
-            ((previousEBooksData.ebooks_purchased_prev_titles_noncjk ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_noncjk ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_titles_noncjk ?? 0) + (previousEBooksData.ebooks_purchased_add_titles_noncjk ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_titles_noncjk ?? 0));
           
           const prevVolumesChinese = previousEBooksData.ebooks_purchased_volumes_chinese ?? 
-            ((previousEBooksData.ebooks_purchased_prev_volumes_chinese ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_chinese ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_volumes_chinese ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_chinese ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_volumes_chinese ?? 0));
           const prevVolumesJapanese = previousEBooksData.ebooks_purchased_volumes_japanese ?? 
-            ((previousEBooksData.ebooks_purchased_prev_volumes_japanese ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_japanese ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_volumes_japanese ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_japanese ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_volumes_japanese ?? 0));
           const prevVolumesKorean = previousEBooksData.ebooks_purchased_volumes_korean ?? 
-            ((previousEBooksData.ebooks_purchased_prev_volumes_korean ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_korean ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_volumes_korean ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_korean ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_volumes_korean ?? 0));
           const prevVolumesNoncjk = previousEBooksData.ebooks_purchased_volumes_noncjk ?? 
-            ((previousEBooksData.ebooks_purchased_prev_volumes_noncjk ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_noncjk ?? 0));
+            ((previousEBooksData.ebooks_purchased_prev_volumes_noncjk ?? 0) + (previousEBooksData.ebooks_purchased_add_volumes_noncjk ?? 0) - (previousEBooksData.ebooks_purchased_withdrawn_volumes_noncjk ?? 0));
           
           // Map previous year's TOTAL purchased (titles and volumes) to prev_* fields
           previousYearData = {

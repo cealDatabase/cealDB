@@ -21,57 +21,61 @@ import {
   FormSubmitSection
 } from './shared';
 
-// Counts in this form may be corrections as well as additions, so a negative
-// number is valid. Totals are calculated from these signed values.
-const signedNumber = z.number().default(0)
-
 const formSchema = z.object({
-  // Purchased Titles (Previous + Add = Total)
-  ebooks_purchased_prev_titles_chinese: signedNumber,
-  ebooks_purchased_prev_titles_japanese: signedNumber,
-  ebooks_purchased_prev_titles_korean: signedNumber,
-  ebooks_purchased_prev_titles_noncjk: signedNumber,
-  ebooks_purchased_add_titles_chinese: signedNumber,
-  ebooks_purchased_add_titles_japanese: signedNumber,
-  ebooks_purchased_add_titles_korean: signedNumber,
-  ebooks_purchased_add_titles_noncjk: signedNumber,
+  // Purchased Titles (Previous + Add - Withdrawn = Total)
+  ebooks_purchased_prev_titles_chinese: z.number().min(0).default(0),
+  ebooks_purchased_prev_titles_japanese: z.number().min(0).default(0),
+  ebooks_purchased_prev_titles_korean: z.number().min(0).default(0),
+  ebooks_purchased_prev_titles_noncjk: z.number().min(0).default(0),
+  ebooks_purchased_add_titles_chinese: z.number().min(0).default(0),
+  ebooks_purchased_add_titles_japanese: z.number().min(0).default(0),
+  ebooks_purchased_add_titles_korean: z.number().min(0).default(0),
+  ebooks_purchased_add_titles_noncjk: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_titles_chinese: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_titles_japanese: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_titles_korean: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_titles_noncjk: z.number().min(0).default(0),
 
   // Non-Purchased Titles
-  ebooks_nonpurchased_titles_chinese: signedNumber,
-  ebooks_nonpurchased_titles_japanese: signedNumber,
-  ebooks_nonpurchased_titles_korean: signedNumber,
-  ebooks_nonpurchased_titles_noncjk: signedNumber,
+  ebooks_nonpurchased_titles_chinese: z.number().min(0).default(0),
+  ebooks_nonpurchased_titles_japanese: z.number().min(0).default(0),
+  ebooks_nonpurchased_titles_korean: z.number().min(0).default(0),
+  ebooks_nonpurchased_titles_noncjk: z.number().min(0).default(0),
 
   // Subscription Titles
-  ebooks_subscription_titles_chinese: signedNumber,
-  ebooks_subscription_titles_japanese: signedNumber,
-  ebooks_subscription_titles_korean: signedNumber,
-  ebooks_subscription_titles_noncjk: signedNumber,
+  ebooks_subscription_titles_chinese: z.number().min(0).default(0),
+  ebooks_subscription_titles_japanese: z.number().min(0).default(0),
+  ebooks_subscription_titles_korean: z.number().min(0).default(0),
+  ebooks_subscription_titles_noncjk: z.number().min(0).default(0),
 
-  // Purchased Volumes (Previous + Add = Total)
-  ebooks_purchased_prev_volumes_chinese: signedNumber,
-  ebooks_purchased_prev_volumes_japanese: signedNumber,
-  ebooks_purchased_prev_volumes_korean: signedNumber,
-  ebooks_purchased_prev_volumes_noncjk: signedNumber,
-  ebooks_purchased_add_volumes_chinese: signedNumber,
-  ebooks_purchased_add_volumes_japanese: signedNumber,
-  ebooks_purchased_add_volumes_korean: signedNumber,
-  ebooks_purchased_add_volumes_noncjk: signedNumber,
+  // Purchased Volumes (Previous + Add - Withdrawn = Total)
+  ebooks_purchased_prev_volumes_chinese: z.number().min(0).default(0),
+  ebooks_purchased_prev_volumes_japanese: z.number().min(0).default(0),
+  ebooks_purchased_prev_volumes_korean: z.number().min(0).default(0),
+  ebooks_purchased_prev_volumes_noncjk: z.number().min(0).default(0),
+  ebooks_purchased_add_volumes_chinese: z.number().min(0).default(0),
+  ebooks_purchased_add_volumes_japanese: z.number().min(0).default(0),
+  ebooks_purchased_add_volumes_korean: z.number().min(0).default(0),
+  ebooks_purchased_add_volumes_noncjk: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_volumes_chinese: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_volumes_japanese: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_volumes_korean: z.number().min(0).default(0),
+  ebooks_purchased_withdrawn_volumes_noncjk: z.number().min(0).default(0),
 
   // Non-Purchased Volumes
-  ebooks_nonpurchased_volumes_chinese: signedNumber,
-  ebooks_nonpurchased_volumes_japanese: signedNumber,
-  ebooks_nonpurchased_volumes_korean: signedNumber,
-  ebooks_nonpurchased_volumes_noncjk: signedNumber,
+  ebooks_nonpurchased_volumes_chinese: z.number().min(0).default(0),
+  ebooks_nonpurchased_volumes_japanese: z.number().min(0).default(0),
+  ebooks_nonpurchased_volumes_korean: z.number().min(0).default(0),
+  ebooks_nonpurchased_volumes_noncjk: z.number().min(0).default(0),
 
   // Subscription Volumes
-  ebooks_subscription_volumes_chinese: signedNumber,
-  ebooks_subscription_volumes_japanese: signedNumber,
-  ebooks_subscription_volumes_korean: signedNumber,
-  ebooks_subscription_volumes_noncjk: signedNumber,
+  ebooks_subscription_volumes_chinese: z.number().min(0).default(0),
+  ebooks_subscription_volumes_japanese: z.number().min(0).default(0),
+  ebooks_subscription_volumes_korean: z.number().min(0).default(0),
+  ebooks_subscription_volumes_noncjk: z.number().min(0).default(0),
 
   // Expenditure (Field #33 - note: main expenditure is in Electronic form #41)
-  ebooks_expenditure_grandtotal: signedNumber,
+  ebooks_expenditure_grandtotal: z.number().min(0).default(0),
 
   // Notes
   ebooks_notes: z.string().optional(),
@@ -98,6 +102,10 @@ export default function ElectronicBooksForm() {
       ebooks_purchased_add_titles_japanese: 0,
       ebooks_purchased_add_titles_korean: 0,
       ebooks_purchased_add_titles_noncjk: 0,
+      ebooks_purchased_withdrawn_titles_chinese: 0,
+      ebooks_purchased_withdrawn_titles_japanese: 0,
+      ebooks_purchased_withdrawn_titles_korean: 0,
+      ebooks_purchased_withdrawn_titles_noncjk: 0,
       ebooks_nonpurchased_titles_chinese: 0,
       ebooks_nonpurchased_titles_japanese: 0,
       ebooks_nonpurchased_titles_korean: 0,
@@ -114,6 +122,10 @@ export default function ElectronicBooksForm() {
       ebooks_purchased_add_volumes_japanese: 0,
       ebooks_purchased_add_volumes_korean: 0,
       ebooks_purchased_add_volumes_noncjk: 0,
+      ebooks_purchased_withdrawn_volumes_chinese: 0,
+      ebooks_purchased_withdrawn_volumes_japanese: 0,
+      ebooks_purchased_withdrawn_volumes_korean: 0,
+      ebooks_purchased_withdrawn_volumes_noncjk: 0,
       ebooks_nonpurchased_volumes_chinese: 0,
       ebooks_nonpurchased_volumes_japanese: 0,
       ebooks_nonpurchased_volumes_korean: 0,
@@ -238,10 +250,15 @@ export default function ElectronicBooksForm() {
     (watchedValues.ebooks_purchased_add_titles_korean || 0) +
     (watchedValues.ebooks_purchased_add_titles_noncjk || 0)
 
-  const purchasedTotalTitlesChinese = (watchedValues.ebooks_purchased_prev_titles_chinese || 0) + (watchedValues.ebooks_purchased_add_titles_chinese || 0)
-  const purchasedTotalTitlesJapanese = (watchedValues.ebooks_purchased_prev_titles_japanese || 0) + (watchedValues.ebooks_purchased_add_titles_japanese || 0)
-  const purchasedTotalTitlesKorean = (watchedValues.ebooks_purchased_prev_titles_korean || 0) + (watchedValues.ebooks_purchased_add_titles_korean || 0)
-  const purchasedTotalTitlesNoncjk = (watchedValues.ebooks_purchased_prev_titles_noncjk || 0) + (watchedValues.ebooks_purchased_add_titles_noncjk || 0)
+  const purchasedWithdrawnTitlesSubtotal = (watchedValues.ebooks_purchased_withdrawn_titles_chinese || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_titles_japanese || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_titles_korean || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_titles_noncjk || 0)
+
+  const purchasedTotalTitlesChinese = (watchedValues.ebooks_purchased_prev_titles_chinese || 0) + (watchedValues.ebooks_purchased_add_titles_chinese || 0) - (watchedValues.ebooks_purchased_withdrawn_titles_chinese || 0)
+  const purchasedTotalTitlesJapanese = (watchedValues.ebooks_purchased_prev_titles_japanese || 0) + (watchedValues.ebooks_purchased_add_titles_japanese || 0) - (watchedValues.ebooks_purchased_withdrawn_titles_japanese || 0)
+  const purchasedTotalTitlesKorean = (watchedValues.ebooks_purchased_prev_titles_korean || 0) + (watchedValues.ebooks_purchased_add_titles_korean || 0) - (watchedValues.ebooks_purchased_withdrawn_titles_korean || 0)
+  const purchasedTotalTitlesNoncjk = (watchedValues.ebooks_purchased_prev_titles_noncjk || 0) + (watchedValues.ebooks_purchased_add_titles_noncjk || 0) - (watchedValues.ebooks_purchased_withdrawn_titles_noncjk || 0)
   const purchasedTotalTitlesSubtotal = purchasedTotalTitlesChinese + purchasedTotalTitlesJapanese + purchasedTotalTitlesKorean + purchasedTotalTitlesNoncjk
 
   const nonPurchasedTitlesSubtotal = (watchedValues.ebooks_nonpurchased_titles_chinese || 0) +
@@ -264,10 +281,15 @@ export default function ElectronicBooksForm() {
     (watchedValues.ebooks_purchased_add_volumes_korean || 0) +
     (watchedValues.ebooks_purchased_add_volumes_noncjk || 0)
 
-  const purchasedTotalVolumesChinese = (watchedValues.ebooks_purchased_prev_volumes_chinese || 0) + (watchedValues.ebooks_purchased_add_volumes_chinese || 0)
-  const purchasedTotalVolumesJapanese = (watchedValues.ebooks_purchased_prev_volumes_japanese || 0) + (watchedValues.ebooks_purchased_add_volumes_japanese || 0)
-  const purchasedTotalVolumesKorean = (watchedValues.ebooks_purchased_prev_volumes_korean || 0) + (watchedValues.ebooks_purchased_add_volumes_korean || 0)
-  const purchasedTotalVolumesNoncjk = (watchedValues.ebooks_purchased_prev_volumes_noncjk || 0) + (watchedValues.ebooks_purchased_add_volumes_noncjk || 0)
+  const purchasedWithdrawnVolumesSubtotal = (watchedValues.ebooks_purchased_withdrawn_volumes_chinese || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_volumes_japanese || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_volumes_korean || 0) +
+    (watchedValues.ebooks_purchased_withdrawn_volumes_noncjk || 0)
+
+  const purchasedTotalVolumesChinese = (watchedValues.ebooks_purchased_prev_volumes_chinese || 0) + (watchedValues.ebooks_purchased_add_volumes_chinese || 0) - (watchedValues.ebooks_purchased_withdrawn_volumes_chinese || 0)
+  const purchasedTotalVolumesJapanese = (watchedValues.ebooks_purchased_prev_volumes_japanese || 0) + (watchedValues.ebooks_purchased_add_volumes_japanese || 0) - (watchedValues.ebooks_purchased_withdrawn_volumes_japanese || 0)
+  const purchasedTotalVolumesKorean = (watchedValues.ebooks_purchased_prev_volumes_korean || 0) + (watchedValues.ebooks_purchased_add_volumes_korean || 0) - (watchedValues.ebooks_purchased_withdrawn_volumes_korean || 0)
+  const purchasedTotalVolumesNoncjk = (watchedValues.ebooks_purchased_prev_volumes_noncjk || 0) + (watchedValues.ebooks_purchased_add_volumes_noncjk || 0) - (watchedValues.ebooks_purchased_withdrawn_volumes_noncjk || 0)
   const purchasedTotalVolumesSubtotal = purchasedTotalVolumesChinese + purchasedTotalVolumesJapanese + purchasedTotalVolumesKorean + purchasedTotalVolumesNoncjk
 
   const nonPurchasedVolumesSubtotal = (watchedValues.ebooks_nonpurchased_volumes_chinese || 0) +
@@ -357,6 +379,7 @@ export default function ElectronicBooksForm() {
         // Add calculated subtotals and totals
         ebooks_purchased_prev_titles_subtotal: purchasedPrevTitlesSubtotal,
         ebooks_purchased_add_titles_subtotal: purchasedAddTitlesSubtotal,
+        ebooks_purchased_withdrawn_titles_subtotal: purchasedWithdrawnTitlesSubtotal,
         ebooks_purchased_titles_chinese: purchasedTotalTitlesChinese,
         ebooks_purchased_titles_japanese: purchasedTotalTitlesJapanese,
         ebooks_purchased_titles_korean: purchasedTotalTitlesKorean,
@@ -366,6 +389,7 @@ export default function ElectronicBooksForm() {
         ebooks_subscription_titles_subtotal: subscriptionTitlesSubtotal,
         ebooks_purchased_prev_volumes_subtotal: purchasedPrevVolumesSubtotal,
         ebooks_purchased_add_volumes_subtotal: purchasedAddVolumesSubtotal,
+        ebooks_purchased_withdrawn_volumes_subtotal: purchasedWithdrawnVolumesSubtotal,
         ebooks_purchased_volumes_chinese: purchasedTotalVolumesChinese,
         ebooks_purchased_volumes_japanese: purchasedTotalVolumesJapanese,
         ebooks_purchased_volumes_korean: purchasedTotalVolumesKorean,
@@ -416,6 +440,7 @@ export default function ElectronicBooksForm() {
         ...values,
         ebooks_purchased_prev_titles_subtotal: purchasedPrevTitlesSubtotal,
         ebooks_purchased_add_titles_subtotal: purchasedAddTitlesSubtotal,
+        ebooks_purchased_withdrawn_titles_subtotal: purchasedWithdrawnTitlesSubtotal,
         ebooks_purchased_titles_chinese: purchasedTotalTitlesChinese,
         ebooks_purchased_titles_japanese: purchasedTotalTitlesJapanese,
         ebooks_purchased_titles_korean: purchasedTotalTitlesKorean,
@@ -425,6 +450,7 @@ export default function ElectronicBooksForm() {
         ebooks_subscription_titles_subtotal: subscriptionTitlesSubtotal,
         ebooks_purchased_prev_volumes_subtotal: purchasedPrevVolumesSubtotal,
         ebooks_purchased_add_volumes_subtotal: purchasedAddVolumesSubtotal,
+        ebooks_purchased_withdrawn_volumes_subtotal: purchasedWithdrawnVolumesSubtotal,
         ebooks_purchased_volumes_chinese: purchasedTotalVolumesChinese,
         ebooks_purchased_volumes_japanese: purchasedTotalVolumesJapanese,
         ebooks_purchased_volumes_korean: purchasedTotalVolumesKorean,
@@ -515,7 +541,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_titles_chinese'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -544,7 +569,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_titles_japanese'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -573,7 +597,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_titles_korean'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -602,7 +625,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_titles_noncjk'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -641,6 +663,27 @@ export default function ElectronicBooksForm() {
         </div>
       </FormSection>
 
+      <FormSection
+        title='Purchased Electronic Book Titles Withdrawn This Year'
+        description='Enter the number of purchased electronic book titles withdrawn by language.'
+      >
+        <LanguageFieldGroup
+          control={form.control}
+          fields={{
+            chinese: { name: 'ebooks_purchased_withdrawn_titles_chinese', label: 'Withdrawn Chinese' },
+            japanese: { name: 'ebooks_purchased_withdrawn_titles_japanese', label: 'Withdrawn Japanese' },
+            korean: { name: 'ebooks_purchased_withdrawn_titles_korean', label: 'Withdrawn Korean' },
+            eastasian: { name: 'ebooks_purchased_withdrawn_titles_noncjk', label: 'Withdrawn Non-CJK' },
+          }}
+          disabled={isReadOnly}
+        />
+        <SubtotalDisplay
+          label='Purchased Titles Withdrawn Subtotal'
+          value={purchasedWithdrawnTitlesSubtotal}
+          formula='Chinese + Japanese + Korean + Non-CJK'
+        />
+      </FormSection>
+
       {/* Non-Purchased Titles */}
       <FormSection
         title='Non-Purchased Titles'
@@ -667,7 +710,6 @@ export default function ElectronicBooksForm() {
             },
           }}
           disabled={isReadOnly}
-          allowNegative
         />
         <SubtotalDisplay
           label='10. Non-Purchased Titles Subtotal (06 + 07 + 08 + 09)'
@@ -719,7 +761,6 @@ export default function ElectronicBooksForm() {
             },
           }}
           disabled={isReadOnly}
-          allowNegative
         />
         <SubtotalDisplay
           label='15. Subscription Titles Subtotal (11 + 12 + 13 + 14)'
@@ -769,7 +810,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_volumes_chinese'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -798,7 +838,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_volumes_japanese'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -827,7 +866,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_volumes_korean'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -856,7 +894,6 @@ export default function ElectronicBooksForm() {
                     name='ebooks_purchased_add_volumes_noncjk'
                     type='number'
                     disabled={isReadOnly}
-                    allowNegative
                     hideLabel
                   />
                 </td>
@@ -895,6 +932,27 @@ export default function ElectronicBooksForm() {
         </div>
       </FormSection>
 
+      <FormSection
+        title='Purchased Electronic Book Volumes Withdrawn This Year'
+        description='Enter the number of purchased electronic book volumes withdrawn by language.'
+      >
+        <LanguageFieldGroup
+          control={form.control}
+          fields={{
+            chinese: { name: 'ebooks_purchased_withdrawn_volumes_chinese', label: 'Withdrawn Chinese' },
+            japanese: { name: 'ebooks_purchased_withdrawn_volumes_japanese', label: 'Withdrawn Japanese' },
+            korean: { name: 'ebooks_purchased_withdrawn_volumes_korean', label: 'Withdrawn Korean' },
+            eastasian: { name: 'ebooks_purchased_withdrawn_volumes_noncjk', label: 'Withdrawn Non-CJK' },
+          }}
+          disabled={isReadOnly}
+        />
+        <SubtotalDisplay
+          label='Purchased Volumes Withdrawn Subtotal'
+          value={purchasedWithdrawnVolumesSubtotal}
+          formula='Chinese + Japanese + Korean + Non-CJK'
+        />
+      </FormSection>
+
       {/* Non-Purchased Volumes */}
       <FormSection
         title='Non-Purchased Volumes'
@@ -921,7 +979,6 @@ export default function ElectronicBooksForm() {
             },
           }}
           disabled={isReadOnly}
-          allowNegative
         />
         <SubtotalDisplay
           label='25. Non-Purchased Volumes Subtotal (21 + 22 + 23 + 24)'
@@ -973,7 +1030,6 @@ export default function ElectronicBooksForm() {
             },
           }}
           disabled={isReadOnly}
-          allowNegative
         />
         <SubtotalDisplay
           label='30. Subscription Volumes Subtotal (26 + 27 + 28 + 29)'
@@ -1012,7 +1068,6 @@ export default function ElectronicBooksForm() {
           label='33. Expenditure Total'
           placeholder='0.00'
           disabled={isReadOnly}
-          allowNegative
         />
 
         <ReusableFormField

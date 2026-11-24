@@ -645,7 +645,7 @@ export function getTable10_1Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: '', colspan: 1, rowspan: 3 },
-          { label: 'Purchased', colspan: 15 },
+          { label: 'Purchased', colspan: 20 },
           { label: 'Non-Purchased', colspan: 5 },
           { label: 'Subscription', colspan: 5 },
           { label: 'Titles Total', colspan: 1 },
@@ -656,6 +656,7 @@ export function getTable10_1Config(year: number): Omit<PdfTableConfig, 'data'> {
           { label: '', colspan: 1 },
           { label: `Held June 30, ${year - 1}`, colspan: 5 },
           { label: 'Added During Year', colspan: 5 },
+          { label: 'Withdrawn During Year', colspan: 5 },
           { label: `Held June 30, ${year}`, colspan: 5 },
           { label: '', colspan: 5 },
           { label: '', colspan: 5 },
@@ -665,7 +666,7 @@ export function getTable10_1Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: 'Institutions', colspan: 1 },
-          ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(),
+          ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(),
           ...cjkSubHeaders(), ...cjkSubHeaders(),
           { label: '', colspan: 1 },
         ],
@@ -675,6 +676,7 @@ export function getTable10_1Config(year: number): Omit<PdfTableConfig, 'data'> {
       'Library_Year.Library.library_name',
       'ebooks_purchased_prev_titles_chinese', 'ebooks_purchased_prev_titles_japanese', 'ebooks_purchased_prev_titles_korean', 'ebooks_purchased_prev_titles_noncjk', 'ebooks_purchased_prev_titles_subtotal',
       'ebooks_purchased_add_titles_chinese', 'ebooks_purchased_add_titles_japanese', 'ebooks_purchased_add_titles_korean', 'ebooks_purchased_add_titles_noncjk', 'ebooks_purchased_add_titles_subtotal',
+      'ebooks_purchased_withdrawn_titles_chinese', 'ebooks_purchased_withdrawn_titles_japanese', 'ebooks_purchased_withdrawn_titles_korean', 'ebooks_purchased_withdrawn_titles_noncjk', 'ebooks_purchased_withdrawn_titles_subtotal',
       'ebooks_purchased_titles_chinese', 'ebooks_purchased_titles_japanese', 'ebooks_purchased_titles_korean', 'ebooks_purchased_titles_noncjk', 'ebooks_purchased_titles_subtotal',
       'ebooks_nonpurchased_titles_chinese', 'ebooks_nonpurchased_titles_japanese', 'ebooks_nonpurchased_titles_korean', 'ebooks_nonpurchased_titles_noncjk', 'ebooks_nonpurchased_titles_subtotal',
       'ebooks_subscription_titles_chinese', 'ebooks_subscription_titles_japanese', 'ebooks_subscription_titles_korean', 'ebooks_subscription_titles_noncjk', 'ebooks_subscription_titles_subtotal',
@@ -697,7 +699,7 @@ export function getTable10_2Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: '', colspan: 1, rowspan: 3 },
-          { label: 'Purchased', colspan: 15 },
+          { label: 'Purchased', colspan: 20 },
           { label: 'Non-Purchased', colspan: 5 },
           { label: 'Subscription', colspan: 5 },
           { label: 'Volumes Total', colspan: 1 },
@@ -708,6 +710,7 @@ export function getTable10_2Config(year: number): Omit<PdfTableConfig, 'data'> {
           { label: '', colspan: 1 },
           { label: `Held June 30, ${year - 1}`, colspan: 5 },
           { label: 'Added During Year', colspan: 5 },
+          { label: 'Withdrawn During Year', colspan: 5 },
           { label: `Held June 30, ${year}`, colspan: 5 },
           { label: '', colspan: 5 },
           { label: '', colspan: 5 },
@@ -717,7 +720,7 @@ export function getTable10_2Config(year: number): Omit<PdfTableConfig, 'data'> {
       {
         cells: [
           { label: 'Institutions', colspan: 1 },
-          ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(),
+          ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(), ...cjkSubHeaders(),
           ...cjkSubHeaders(), ...cjkSubHeaders(),
           { label: '', colspan: 1 },
         ],
@@ -727,6 +730,7 @@ export function getTable10_2Config(year: number): Omit<PdfTableConfig, 'data'> {
       'Library_Year.Library.library_name',
       'ebooks_purchased_prev_volumes_chinese', 'ebooks_purchased_prev_volumes_japanese', 'ebooks_purchased_prev_volumes_korean', 'ebooks_purchased_prev_volumes_noncjk', 'ebooks_purchased_prev_volumes_subtotal',
       'ebooks_purchased_add_volumes_chinese', 'ebooks_purchased_add_volumes_japanese', 'ebooks_purchased_add_volumes_korean', 'ebooks_purchased_add_volumes_noncjk', 'ebooks_purchased_add_volumes_subtotal',
+      'ebooks_purchased_withdrawn_volumes_chinese', 'ebooks_purchased_withdrawn_volumes_japanese', 'ebooks_purchased_withdrawn_volumes_korean', 'ebooks_purchased_withdrawn_volumes_noncjk', 'ebooks_purchased_withdrawn_volumes_subtotal',
       'ebooks_purchased_volumes_chinese', 'ebooks_purchased_volumes_japanese', 'ebooks_purchased_volumes_korean', 'ebooks_purchased_volumes_noncjk', 'ebooks_purchased_volumes_subtotal',
       'ebooks_nonpurchased_volumes_chinese', 'ebooks_nonpurchased_volumes_japanese', 'ebooks_nonpurchased_volumes_korean', 'ebooks_nonpurchased_volumes_noncjk', 'ebooks_nonpurchased_volumes_subtotal',
       'ebooks_subscription_volumes_chinese', 'ebooks_subscription_volumes_japanese', 'ebooks_subscription_volumes_korean', 'ebooks_subscription_volumes_noncjk', 'ebooks_subscription_volumes_subtotal',
